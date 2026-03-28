@@ -51,7 +51,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
       </div>
     );
   }
@@ -60,105 +60,105 @@ export default function DashboardPage() {
     <div className="space-y-6 p-4">
       {/* Greeting */}
       <div>
-        <h1 className="text-2xl font-bold text-white">
+        <h1 className="text-xl font-semibold text-[var(--text-1)]">
           {getGreeting()}, {profile.name.split(' ')[0]}
         </h1>
-        <p className="text-sm text-gray-400">{organization.name}</p>
+        <p className="text-sm text-[var(--text-3)]">{organization.name}</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
-          <p className="text-xs text-gray-400">{t('dashboard.cash_balance')}</p>
-          <p className={`mt-1 text-xl font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
+          <p className="text-xs text-[var(--text-3)]">{t('dashboard.cash_balance')}</p>
+          <p className={`mt-1 font-mono text-lg font-medium ${balance >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
             {formatCurrency(balance, currency)}
           </p>
         </div>
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
-          <p className="text-xs text-gray-400">{t('dashboard.unpaid_invoices')}</p>
-          <p className="mt-1 text-xl font-bold text-amber-400">
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
+          <p className="text-xs text-[var(--text-3)]">{t('dashboard.unpaid_invoices')}</p>
+          <p className="mt-1 font-mono text-lg font-medium text-[var(--accent)]">
             {invoices.length > 0 ? `${invoices.length} (${formatCurrency(unpaidTotal, currency)})` : '0'}
           </p>
         </div>
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
-          <p className="text-xs text-gray-400">{t('dashboard.monthly_income')}</p>
-          <p className="mt-1 text-xl font-bold text-green-400">{formatCurrency(totalIn, currency)}</p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
+          <p className="text-xs text-[var(--text-3)]">{t('dashboard.monthly_income')}</p>
+          <p className="mt-1 font-mono text-lg font-medium text-[var(--green)]">{formatCurrency(totalIn, currency)}</p>
         </div>
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4">
-          <p className="text-xs text-gray-400">{t('dashboard.monthly_expenses')}</p>
-          <p className="mt-1 text-xl font-bold text-red-400">{formatCurrency(totalOut, currency)}</p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
+          <p className="text-xs text-[var(--text-3)]">{t('dashboard.monthly_expenses')}</p>
+          <p className="mt-1 font-mono text-lg font-medium text-[var(--red)]">{formatCurrency(totalOut, currency)}</p>
         </div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-gray-400 uppercase tracking-wider">{t('dashboard.quick_actions')}</h2>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">{t('dashboard.quick_actions')}</h2>
         <div className="grid grid-cols-3 gap-3">
           <Link
             href="/invoices?new=1"
-            className="flex flex-col items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center transition-colors hover:border-amber-500/30"
+            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/10">
-              <svg className="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--accent-light)]">
+              <svg className="h-5 w-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </div>
-            <span className="text-xs text-gray-300">{t('dashboard.new_invoice')}</span>
+            <span className="text-xs text-[var(--text-2)]">{t('dashboard.new_invoice')}</span>
           </Link>
           <Link
             href="/cash-flow?new=1"
-            className="flex flex-col items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center transition-colors hover:border-amber-500/30"
+            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-              <svg className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--green-bg)]">
+              <svg className="h-5 w-5 text-[var(--green)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </div>
-            <span className="text-xs text-gray-300">{t('dashboard.new_expense')}</span>
+            <span className="text-xs text-[var(--text-2)]">{t('dashboard.new_expense')}</span>
           </Link>
           <Link
             href="/documents?scan=1"
-            className="flex flex-col items-center gap-2 rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center transition-colors hover:border-amber-500/30"
+            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10">
-              <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--accent-light)]">
+              <svg className="h-5 w-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
               </svg>
             </div>
-            <span className="text-xs text-gray-300">{t('dashboard.scan_document')}</span>
+            <span className="text-xs text-[var(--text-2)]">{t('dashboard.scan_document')}</span>
           </Link>
         </div>
       </div>
 
-      {/* Recent Transactions */}
+      {/* Recent Activity */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">{t('dashboard.recent_transactions')}</h2>
-          <Link href="/cash-flow" className="text-xs text-amber-400 hover:text-amber-300">View all</Link>
+          <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">{t('dashboard.recent_transactions')}</h2>
+          <Link href="/cash-flow" className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">View all</Link>
         </div>
         <div className="space-y-2">
           {recentFlows.length === 0 ? (
-            <p className="rounded-xl border border-gray-800 bg-gray-900/50 p-6 text-center text-sm text-gray-500">
-              No transactions yet. Add your first cash flow entry.
-            </p>
+            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-8 text-center">
+              <p className="text-sm text-[var(--text-3)]">No transactions yet. Add your first cash flow entry.</p>
+            </div>
           ) : (
             recentFlows.map((f) => (
-              <div key={f.id} className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+              <div key={f.id} className="flex items-center justify-between rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                    f.flow_type === 'IN' ? 'bg-green-500/10' : 'bg-red-500/10'
+                    f.flow_type === 'IN' ? 'bg-[var(--green-bg)]' : 'bg-[var(--red-bg)]'
                   }`}>
-                    <svg className={`h-4 w-4 ${f.flow_type === 'IN' ? 'text-green-400' : 'text-red-400'}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <svg className={`h-4 w-4 ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d={f.flow_type === 'IN' ? 'M12 19.5v-15m0 0-6.75 6.75M12 4.5l6.75 6.75' : 'M12 4.5v15m0 0 6.75-6.75M12 19.5l-6.75-6.75'} />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{f.category}</p>
-                    <p className="text-xs text-gray-500">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
+                    <p className="text-base font-medium text-[var(--text-1)]">{f.category}</p>
+                    <p className="text-xs text-[var(--text-4)]">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
                   </div>
                 </div>
-                <span className={`text-sm font-semibold ${f.flow_type === 'IN' ? 'text-green-400' : 'text-red-400'}`}>
+                <span className={`font-mono text-base font-medium ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                   {f.flow_type === 'IN' ? '+' : '-'}{formatCurrency(f.amount, currency)}
                 </span>
               </div>

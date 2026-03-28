@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <AuthProvider user={user} profile={profile} organization={organization}>
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
-        <div className="min-h-screen bg-gray-950 pb-16">
+        <div className="min-h-screen bg-[var(--bg)] pb-20">
           <main className="mx-auto max-w-2xl">
             {children}
           </main>

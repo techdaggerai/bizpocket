@@ -1,16 +1,16 @@
 {
   "app": {
-    "name": "BizPocket Japan",
+    "name": "BizPocket",
     "tagline": "Your business in your pocket"
   },
   "nav": {
-    "dashboard": "Dashboard",
+    "dashboard": "Hub",
     "invoices": "Invoices",
-    "cash_flow": "Cash Flow",
-    "documents": "Documents",
-    "more": "More",
+    "cash_flow": "Money",
+    "documents": "Vault",
+    "more": "Pocket",
     "expenses": "Expenses",
-    "settings": "Settings",
+    "settings": "My Pocket",
     "accountant": "Accountant",
     "logout": "Logout"
   },
@@ -20,14 +20,14 @@
     "monthly_income": "Monthly Income",
     "monthly_expenses": "Monthly Expenses",
     "unpaid_invoices": "Unpaid Invoices",
-    "recent_transactions": "Recent Transactions",
+    "recent_transactions": "Recent Activity",
     "quick_actions": "Quick Actions",
-    "new_invoice": "New Invoice",
-    "new_expense": "New Expense",
-    "scan_document": "Scan Document"
+    "new_invoice": "Fire Invoice",
+    "new_expense": "Log It",
+    "scan_document": "Snap & Vault"
   },
   "cash_flow": {
-    "title": "Cash Flow",
+    "title": "Money View",
     "subtitle": "Track money in and out",
     "add_entry": "Add Entry",
     "cancel": "Cancel",
@@ -54,7 +54,7 @@
   "invoices": {
     "title": "Invoices",
     "subtitle": "Create and manage invoices",
-    "new_invoice": "New Invoice",
+    "new_invoice": "Fire Invoice",
     "invoice_number": "Invoice #",
     "customer": "Customer",
     "items": "Items",
@@ -72,7 +72,7 @@
   "expenses": {
     "title": "Expenses",
     "subtitle": "Track your business expenses",
-    "add_expense": "Quick Add",
+    "add_expense": "Log It",
     "category": "Category",
     "amount": "Amount",
     "notes": "Notes",
@@ -80,9 +80,9 @@
     "no_expenses": "No expenses this month"
   },
   "documents": {
-    "title": "Documents",
+    "title": "Snap & Vault",
     "subtitle": "Your document vault",
-    "scan": "Scan",
+    "scan": "Snap",
     "upload": "Upload",
     "no_documents": "No documents yet",
     "types": {
@@ -94,7 +94,7 @@
     }
   },
   "settings": {
-    "title": "Settings",
+    "title": "My Pocket",
     "business_profile": "Business Profile",
     "language": "Language",
     "currency": "Currency",
@@ -116,7 +116,7 @@
     "step5_subtitle": "Optional — you can do this later",
     "next": "Next",
     "back": "Back",
-    "finish": "Get Started",
+    "finish": "Open Your Pocket",
     "skip": "Skip for now"
   },
   "common": {
@@ -146,16 +146,16 @@
   "landing": {
     "hero_title": "Your Business in Your Pocket",
     "hero_subtitle": "The mobile-first business toolkit for foreigners running businesses in Japan. Invoices, cash flow, expenses, and accountant sharing — all from your phone.",
-    "start_free": "Start Free Trial",
+    "start_free": "Open Your Pocket",
     "features": "Features",
     "pricing": "Pricing",
-    "feature_invoices": "Professional Invoices",
+    "feature_invoices": "Fire Invoice",
     "feature_invoices_desc": "Create and send invoices in Japanese, English, or Urdu in 60 seconds.",
-    "feature_cashflow": "Cash Flow Tracking",
+    "feature_cashflow": "Money View",
     "feature_cashflow_desc": "Every yen in and out, categorized and running balance always visible.",
-    "feature_documents": "Document Vault",
+    "feature_documents": "Snap & Vault",
     "feature_documents_desc": "Snap receipts and documents. Organized by month, always accessible.",
-    "feature_accountant": "Accountant Sharing",
+    "feature_accountant": "Accountant Portal",
     "feature_accountant_desc": "Give your accountant read-only access. No more chasing for documents.",
     "plan_free": "Free",
     "plan_free_price": "¥0",
