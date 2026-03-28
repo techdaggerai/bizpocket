@@ -30,26 +30,32 @@ export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({
     business_name: '',
-    business_type: '',
+    business_types: [] as string[],
     language: 'en',
     currency: 'JPY',
     accountant_email: '',
   });
 
-  async function handleFinish() {
+  async function handleFinish(skip = false) {
     setLoading(true);
+    setError('');
 
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      setError('Session expired — please log in again.');
+      setLoading(false);
+      return;
+    }
 
     // Create organization
     const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name: form.business_name,
-        business_type: form.business_type,
+        business_type: form.business_types.join(',') || 'other',
         language: form.language,
         currency: form.currency,
         created_by: user.id,
@@ -59,6 +65,7 @@ export default function OnboardingPage() {
       .single();
 
     if (orgError || !org) {
+      setError(orgError?.message || 'Failed to create organization.');
       setLoading(false);
       return;
     }
@@ -73,8 +80,8 @@ export default function OnboardingPage() {
       language: form.language,
     });
 
-    // If accountant email provided, create invite placeholder
-    if (form.accountant_email) {
+    // If accountant email provided (and not skipping), create invite placeholder
+    if (!skip && form.accountant_email) {
       await supabase.from('profiles').insert({
         user_id: user.id, // placeholder — will be updated on accountant signup
         organization_id: org.id,
@@ -125,19 +132,29 @@ export default function OnboardingPage() {
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-300">Business type</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {BUSINESS_TYPES.map((bt) => (
-                    <button
-                      key={bt.value}
-                      onClick={() => setForm({ ...form, business_type: bt.value })}
-                      className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
-                        form.business_type === bt.value
-                          ? 'border-amber-500 bg-amber-500/10 text-amber-400'
-                          : 'border-gray-700 text-gray-300 hover:border-gray-600'
-                      }`}
-                    >
-                      {bt.label}
-                    </button>
-                  ))}
+                  {BUSINESS_TYPES.map((bt) => {
+                    const selected = form.business_types.includes(bt.value);
+                    return (
+                      <button
+                        key={bt.value}
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            business_types: selected
+                              ? form.business_types.filter((t) => t !== bt.value)
+                              : [...form.business_types, bt.value],
+                          })
+                        }
+                        className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+                          selected
+                            ? 'border-[#FFD700] bg-[#FFD700]/10 text-[#FFD700]'
+                            : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                        }`}
+                      >
+                        {bt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -224,14 +241,14 @@ export default function OnboardingPage() {
           {step < totalSteps ? (
             <button
               onClick={() => setStep(step + 1)}
-              disabled={step === 1 && (!form.business_name || !form.business_type)}
+              disabled={step === 1 && (!form.business_name || form.business_types.length === 0)}
               className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
             >
               Next
             </button>
           ) : (
             <button
-              onClick={handleFinish}
+              onClick={() => handleFinish(false)}
               disabled={loading}
               className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
             >
@@ -242,12 +259,18 @@ export default function OnboardingPage() {
 
         {step === 4 && (
           <button
-            onClick={handleFinish}
+            onClick={() => handleFinish(true)}
             disabled={loading}
             className="mt-3 w-full py-2 text-center text-sm text-gray-500 hover:text-gray-300"
           >
             Skip for now
           </button>
+        )}
+
+        {error && (
+          <div className="mt-4 rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
         )}
       </div>
     </div>
