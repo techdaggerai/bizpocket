@@ -1,0 +1,255 @@
+'use client';
+
+import { useState } from 'react';
+import { createClient } from '@/lib/supabase-client';
+import { useRouter } from 'next/navigation';
+
+const BUSINESS_TYPES = [
+  { value: 'car_dealer', label: 'Car Dealer' },
+  { value: 'parts', label: 'Parts & Export' },
+  { value: 'restaurant', label: 'Restaurant / Food' },
+  { value: 'retail', label: 'Retail / Shop' },
+  { value: 'construction', label: 'Construction' },
+  { value: 'consulting', label: 'Consulting / Services' },
+  { value: 'other', label: 'Other' },
+];
+
+const LANGUAGES = [
+  { value: 'en', label: 'English' },
+  { value: 'ja', label: '日本語 (Japanese)' },
+  { value: 'ur', label: 'اردو (Urdu)' },
+];
+
+const CURRENCIES = [
+  { value: 'JPY', label: '¥ JPY — Japanese Yen' },
+  { value: 'USD', label: '$ USD — US Dollar' },
+];
+
+export default function OnboardingPage() {
+  const supabase = createClient();
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    business_name: '',
+    business_type: '',
+    language: 'en',
+    currency: 'JPY',
+    accountant_email: '',
+  });
+
+  async function handleFinish() {
+    setLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Create organization
+    const { data: org, error: orgError } = await supabase
+      .from('organizations')
+      .insert({
+        name: form.business_name,
+        business_type: form.business_type,
+        language: form.language,
+        currency: form.currency,
+        created_by: user.id,
+        plan: 'free',
+      })
+      .select()
+      .single();
+
+    if (orgError || !org) {
+      setLoading(false);
+      return;
+    }
+
+    // Create owner profile
+    await supabase.from('profiles').insert({
+      user_id: user.id,
+      organization_id: org.id,
+      role: 'owner',
+      name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+      email: user.email!,
+      language: form.language,
+    });
+
+    // If accountant email provided, create invite placeholder
+    if (form.accountant_email) {
+      await supabase.from('profiles').insert({
+        user_id: user.id, // placeholder — will be updated on accountant signup
+        organization_id: org.id,
+        role: 'accountant',
+        name: 'Accountant (Invited)',
+        email: form.accountant_email,
+        language: form.language,
+      });
+    }
+
+    router.push('/dashboard');
+  }
+
+  const totalSteps = 4;
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
+      <div className="w-full max-w-md">
+        {/* Progress */}
+        <div className="mb-8">
+          <div className="mb-2 flex items-center justify-between text-xs text-gray-400">
+            <span>Step {step} of {totalSteps}</span>
+            <span>{Math.round((step / totalSteps) * 100)}%</span>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-gray-800">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-300"
+              style={{ width: `${(step / totalSteps) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Step 1: Business Name + Type */}
+        {step === 1 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white">What&apos;s your business called?</h2>
+              <p className="mt-1 text-sm text-gray-400">We&apos;ll use this on invoices and documents</p>
+            </div>
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={form.business_name}
+                onChange={(e) => setForm({ ...form, business_name: e.target.value })}
+                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+                placeholder="e.g., Tokyo Auto Export"
+              />
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-300">Business type</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {BUSINESS_TYPES.map((bt) => (
+                    <button
+                      key={bt.value}
+                      onClick={() => setForm({ ...form, business_type: bt.value })}
+                      className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+                        form.business_type === bt.value
+                          ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                          : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                      }`}
+                    >
+                      {bt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Language */}
+        {step === 2 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Choose your language</h2>
+              <p className="mt-1 text-sm text-gray-400">You can change this anytime in settings</p>
+            </div>
+            <div className="space-y-2">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l.value}
+                  onClick={() => setForm({ ...form, language: l.value })}
+                  className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
+                    form.language === l.value
+                      ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                      : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Currency */}
+        {step === 3 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Default currency</h2>
+              <p className="mt-1 text-sm text-gray-400">Used for invoices and cash flow tracking</p>
+            </div>
+            <div className="space-y-2">
+              {CURRENCIES.map((c) => (
+                <button
+                  key={c.value}
+                  onClick={() => setForm({ ...form, currency: c.value })}
+                  className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
+                    form.currency === c.value
+                      ? 'border-amber-500 bg-amber-500/10 text-amber-400'
+                      : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Invite Accountant */}
+        {step === 4 && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Invite your accountant</h2>
+              <p className="mt-1 text-sm text-gray-400">They&apos;ll get read-only access to everything. You can skip this.</p>
+            </div>
+            <input
+              type="email"
+              value={form.accountant_email}
+              onChange={(e) => setForm({ ...form, accountant_email: e.target.value })}
+              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+              placeholder="accountant@example.com"
+            />
+          </div>
+        )}
+
+        {/* Navigation buttons */}
+        <div className="mt-8 flex gap-3">
+          {step > 1 && (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="flex-1 rounded-lg border border-gray-700 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-gray-500"
+            >
+              Back
+            </button>
+          )}
+          {step < totalSteps ? (
+            <button
+              onClick={() => setStep(step + 1)}
+              disabled={step === 1 && (!form.business_name || !form.business_type)}
+              className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleFinish}
+              disabled={loading}
+              className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
+            >
+              {loading ? 'Setting up...' : 'Get Started'}
+            </button>
+          )}
+        </div>
+
+        {step === 4 && (
+          <button
+            onClick={handleFinish}
+            disabled={loading}
+            className="mt-3 w-full py-2 text-center text-sm text-gray-500 hover:text-gray-300"
+          >
+            Skip for now
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
