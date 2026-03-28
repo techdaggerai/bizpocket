@@ -43,7 +43,7 @@ export default function ExpensesPage() {
     if (error) toast(error.message, 'error');
     else setExpenses(data || []);
     setLoading(false);
-  }, [month, organization.id]);
+  }, [month, organization.id, supabase, toast]);
 
   useEffect(() => { fetchExpenses(); }, [fetchExpenses]);
 

@@ -52,7 +52,7 @@ export default function CashFlowPage() {
     if (error) toast(error.message, 'error');
     else setFlows(data || []);
     setLoading(false);
-  }, [month, organization.id]);
+  }, [month, organization.id, supabase, toast]);
 
   useEffect(() => { fetchFlows(); }, [fetchFlows]);
 

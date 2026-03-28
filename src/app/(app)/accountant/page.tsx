@@ -43,7 +43,7 @@ export default function AccountantPage() {
       setLoading(false);
     }
     load();
-  }, [month, organization.id]);
+  }, [month, organization.id, supabase]);
 
   const totalIn = flows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
   const totalOut = flows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);

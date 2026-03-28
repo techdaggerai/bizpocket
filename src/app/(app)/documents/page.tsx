@@ -33,7 +33,7 @@ export default function DocumentsPage() {
     if (error) toast(error.message, 'error');
     else setDocuments(data || []);
     setLoading(false);
-  }, [organization.id]);
+  }, [organization.id, supabase, toast]);
 
   useEffect(() => { fetchDocuments(); }, [fetchDocuments]);
 

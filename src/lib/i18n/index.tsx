@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, type ReactNode } from 'react';
 import en from '@/locales/en.json';
 import ja from '@/locales/ja.json';
 import ur from '@/locales/ur.json';
@@ -47,21 +47,19 @@ export function I18nProvider({
   const [lang, setLangInternal] = useState<Language>(initialLang);
   const isRTL = lang === 'ur';
 
-  function setLang(newLang: Language) {
+  const setLang = useCallback((newLang: Language) => {
     setLangInternal(newLang);
     if (typeof document !== 'undefined') {
       document.documentElement.dir = newLang === 'ur' ? 'rtl' : 'ltr';
       document.documentElement.lang = newLang;
     }
-  }
+  }, []);
 
-  const currentTranslations = translations[lang];
+  const t = useCallback((key: string): string => {
+    return resolve(translations[lang] as unknown as Record<string, unknown>, key);
+  }, [lang]);
 
-  function t(key: string): string {
-    return resolve(currentTranslations as unknown as Record<string, unknown>, key);
-  }
-
-  const value = useMemo(() => ({ lang, setLang, t, isRTL }), [lang]);
+  const value = useMemo(() => ({ lang, setLang, t, isRTL }), [lang, setLang, t, isRTL]);
 
   return (
     <I18nContext.Provider value={value}>

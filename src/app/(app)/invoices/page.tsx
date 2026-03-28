@@ -45,7 +45,7 @@ export default function InvoicesPage() {
     setInvoices(invRes.data || []);
     setCustomers(custRes.data || []);
     setLoading(false);
-  }, [organization.id]);
+  }, [organization.id, supabase]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
