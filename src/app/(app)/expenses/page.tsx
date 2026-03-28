@@ -81,28 +81,18 @@ export default function ExpensesPage() {
     }
   }
 
-  const CATEGORY_COLORS: Record<string, string> = {
-    Rent: 'bg-purple-500/10 text-purple-400',
-    Salary: 'bg-blue-500/10 text-blue-400',
-    Utility: 'bg-yellow-500/10 text-yellow-400',
-    Fuel: 'bg-orange-500/10 text-orange-400',
-    Food: 'bg-green-500/10 text-green-400',
-    'Repair Cost': 'bg-red-500/10 text-red-400',
-    Parts: 'bg-cyan-500/10 text-cyan-400',
-    Tax: 'bg-pink-500/10 text-pink-400',
-    Insurance: 'bg-indigo-500/10 text-indigo-400',
-  };
+  const inputClass = "w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">{t('expenses.title')}</h1>
-          <p className="text-xs text-gray-400">{t('expenses.subtitle')}</p>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('expenses.title')}</h1>
+          <p className="text-xs text-[var(--text-3)]">{t('expenses.subtitle')}</p>
         </div>
         <button
           onClick={() => setShowQuickAdd(!showQuickAdd)}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-950 hover:bg-amber-400 transition-colors"
+          className="rounded-btn bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px"
         >
           {showQuickAdd ? t('common.cancel') : t('expenses.add_expense')}
         </button>
@@ -114,8 +104,8 @@ export default function ExpensesPage() {
           <button
             key={m}
             onClick={() => setMonth(m)}
-            className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              month === m ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'border border-gray-800 text-gray-400'
+            className={`flex-shrink-0 rounded-btn px-3 py-1.5 text-xs font-medium transition-colors ${
+              month === m ? 'bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20' : 'border border-[var(--border)] text-[var(--text-3)]'
             }`}
           >
             {m}
@@ -124,28 +114,28 @@ export default function ExpensesPage() {
       </div>
 
       {/* Total */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center">
-        <p className="text-xs text-gray-500 uppercase">{t('expenses.total')}</p>
-        <p className="text-2xl font-bold text-red-400">{formatCurrency(total, currency)}</p>
+      <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
+        <p className="text-xs text-[var(--text-4)] uppercase tracking-wider">{t('expenses.total')}</p>
+        <p className="font-mono text-2xl font-medium text-[var(--red)]">{formatCurrency(total, currency)}</p>
       </div>
 
       {/* Quick Add */}
       {showQuickAdd && (
-        <form onSubmit={handleQuickAdd} className="space-y-3 rounded-xl border border-gray-700 bg-gray-900 p-4">
+        <form onSubmit={handleQuickAdd} className="space-y-3 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
           <input
             type="number"
             inputMode="numeric"
             value={quickAmount}
             onChange={(e) => setQuickAmount(e.target.value)}
             placeholder={t('expenses.amount')}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-3 text-lg text-white placeholder-gray-500 text-center"
+            className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-3 font-mono text-lg text-[var(--text-1)] placeholder-[var(--text-4)] text-center focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             required
             autoFocus
           />
           <select
             value={quickCategory}
             onChange={(e) => setQuickCategory(e.target.value)}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200"
+            className={inputClass}
           >
             {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -153,14 +143,14 @@ export default function ExpensesPage() {
             value={quickNotes}
             onChange={(e) => setQuickNotes(e.target.value)}
             placeholder={t('expenses.notes')}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-500"
+            className={inputClass}
           />
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-lg bg-amber-500 py-2.5 text-sm font-semibold text-gray-950 disabled:opacity-50"
+            className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50"
           >
-            {saving ? 'Saving...' : 'Add Expense'}
+            {saving ? 'Saving...' : t('expenses.add_expense')}
           </button>
         </form>
       )}
@@ -168,12 +158,12 @@ export default function ExpensesPage() {
       {/* Category Breakdown */}
       {Object.keys(byCategory).length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold text-gray-400 uppercase">By Category</h3>
+          <h3 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">By Category</h3>
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(byCategory).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
-              <div key={cat} className={`rounded-xl border border-gray-800 p-3 ${CATEGORY_COLORS[cat] || 'bg-gray-500/10 text-gray-400'}`}>
-                <p className="text-xs opacity-70">{cat}</p>
-                <p className="text-sm font-bold">{formatCurrency(amt, currency)}</p>
+              <div key={cat} className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3">
+                <p className="text-xs text-[var(--text-3)]">{cat}</p>
+                <p className="font-mono text-sm font-medium text-[var(--text-1)]">{formatCurrency(amt, currency)}</p>
               </div>
             ))}
           </div>
@@ -183,21 +173,21 @@ export default function ExpensesPage() {
       {/* Expense List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
         </div>
       ) : expenses.length === 0 ? (
-        <p className="rounded-xl border border-gray-800 bg-gray-900/50 p-8 text-center text-sm text-gray-500">
-          {t('expenses.no_expenses')}
-        </p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-8 text-center">
+          <p className="text-sm text-[var(--text-3)]">{t('expenses.no_expenses')}</p>
+        </div>
       ) : (
         <div className="space-y-2">
           {expenses.map((exp) => (
-            <div key={exp.id} className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900/50 px-4 py-3">
+            <div key={exp.id} className="flex items-center justify-between rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-white">{exp.category}</p>
-                <p className="text-xs text-gray-500">{formatDate(exp.date)}{exp.description ? ` · ${exp.description}` : ''}</p>
+                <p className="text-base font-medium text-[var(--text-1)]">{exp.category}</p>
+                <p className="text-xs text-[var(--text-4)]">{formatDate(exp.date)}{exp.description ? ` · ${exp.description}` : ''}</p>
               </div>
-              <span className="text-sm font-bold text-red-400">-{formatCurrency(exp.amount, currency)}</span>
+              <span className="font-mono text-base font-medium text-[var(--red)]">-{formatCurrency(exp.amount, currency)}</span>
             </div>
           ))}
         </div>

@@ -56,7 +56,6 @@ export default function CashFlowPage() {
 
   useEffect(() => { fetchFlows(); }, [fetchFlows]);
 
-  // Open form from URL param
   useEffect(() => {
     if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('new')) {
       setShowForm(true);
@@ -130,17 +129,19 @@ export default function CashFlowPage() {
     else { toast('Entry deleted', 'success'); fetchFlows(); }
   }
 
+  const inputClass = "w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
+
   return (
     <div className="space-y-4 p-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">{t('cash_flow.title')}</h1>
-          <p className="text-xs text-gray-400">{t('cash_flow.subtitle')}</p>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('cash_flow.title')}</h1>
+          <p className="text-xs text-[var(--text-3)]">{t('cash_flow.subtitle')}</p>
         </div>
         <button
           onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); }}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-950 hover:bg-amber-400 transition-colors"
+          className="rounded-btn bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px"
         >
           {showForm ? t('cash_flow.cancel') : t('cash_flow.add_entry')}
         </button>
@@ -152,8 +153,8 @@ export default function CashFlowPage() {
           <button
             key={m}
             onClick={() => setMonth(m)}
-            className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              month === m ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'border border-gray-800 text-gray-400 hover:text-white'
+            className={`flex-shrink-0 rounded-btn px-3 py-1.5 text-xs font-medium transition-colors ${
+              month === m ? 'bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20' : 'border border-[var(--border)] text-[var(--text-3)] hover:text-[var(--text-1)]'
             }`}
           >
             {m}
@@ -163,39 +164,39 @@ export default function CashFlowPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-[10px] text-gray-500 uppercase">{t('cash_flow.total_in')}</p>
-          <p className="text-sm font-bold text-green-400">{formatCurrency(totalIn, currency)}</p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 text-center">
+          <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">{t('cash_flow.total_in')}</p>
+          <p className="font-mono text-sm font-medium text-[var(--green)]">{formatCurrency(totalIn, currency)}</p>
         </div>
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-[10px] text-gray-500 uppercase">{t('cash_flow.total_out')}</p>
-          <p className="text-sm font-bold text-red-400">{formatCurrency(totalOut, currency)}</p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 text-center">
+          <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">{t('cash_flow.total_out')}</p>
+          <p className="font-mono text-sm font-medium text-[var(--red)]">{formatCurrency(totalOut, currency)}</p>
         </div>
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-[10px] text-gray-500 uppercase">{t('cash_flow.net')}</p>
-          <p className={`text-sm font-bold ${net >= 0 ? 'text-green-400' : 'text-red-400'}`}>{formatCurrency(net, currency)}</p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 text-center">
+          <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">{t('cash_flow.net')}</p>
+          <p className={`font-mono text-sm font-medium ${net >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>{formatCurrency(net, currency)}</p>
         </div>
       </div>
 
       {/* Add/Edit Form */}
       {showForm && (
-        <form onSubmit={handleSave} className="space-y-3 rounded-xl border border-gray-700 bg-gray-900 p-4">
-          <h3 className="text-sm font-semibold text-white">{editId ? 'Edit Entry' : 'New Entry'}</h3>
+        <form onSubmit={handleSave} className="space-y-3 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
+          <h3 className="text-base font-medium text-[var(--text-1)]">{editId ? 'Edit Entry' : 'New Entry'}</h3>
 
           <input
             type="date"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200"
+            className={inputClass}
             required
           />
 
-          <div className="flex overflow-hidden rounded-lg border border-gray-700">
+          <div className="flex overflow-hidden rounded-btn border border-[var(--border-strong)]">
             <button
               type="button"
               onClick={() => setForm({ ...form, flow_type: 'IN' })}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                form.flow_type === 'IN' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400'
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                form.flow_type === 'IN' ? 'bg-[var(--green)] text-white' : 'bg-[var(--bg-2)] text-[var(--text-3)]'
               }`}
             >
               {t('cash_flow.type_in')}
@@ -203,8 +204,8 @@ export default function CashFlowPage() {
             <button
               type="button"
               onClick={() => setForm({ ...form, flow_type: 'OUT' })}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                form.flow_type === 'OUT' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400'
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                form.flow_type === 'OUT' ? 'bg-[var(--red)] text-white' : 'bg-[var(--bg-2)] text-[var(--text-3)]'
               }`}
             >
               {t('cash_flow.type_out')}
@@ -214,7 +215,7 @@ export default function CashFlowPage() {
           <select
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200"
+            className={inputClass}
           >
             {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -223,7 +224,7 @@ export default function CashFlowPage() {
             placeholder={t('cash_flow.from_to')}
             value={form.from_to}
             onChange={(e) => setForm({ ...form, from_to: e.target.value })}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-500"
+            className={inputClass}
             required
           />
 
@@ -231,7 +232,7 @@ export default function CashFlowPage() {
             placeholder={t('cash_flow.description')}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-500"
+            className={inputClass}
           />
 
           <input
@@ -240,7 +241,7 @@ export default function CashFlowPage() {
             placeholder={t('cash_flow.amount')}
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-500"
+            className={inputClass}
             required
           />
 
@@ -248,7 +249,7 @@ export default function CashFlowPage() {
             <select
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200"
+              className={inputClass}
             >
               <option value="COMPLETED">COMPLETED</option>
               <option value="PENDING">PENDING</option>
@@ -257,7 +258,7 @@ export default function CashFlowPage() {
             <select
               value={form.classify_as}
               onChange={(e) => setForm({ ...form, classify_as: e.target.value as ClassifyAs })}
-              className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-200"
+              className={inputClass}
             >
               <option value="cash_flow_only">{t('cash_flow.cash_flow_only')}</option>
               <option value="expense">{t('cash_flow.expense')}</option>
@@ -268,7 +269,7 @@ export default function CashFlowPage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-lg bg-amber-500 py-2.5 text-sm font-semibold text-gray-950 hover:bg-amber-400 disabled:opacity-50 transition-colors"
+            className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50"
           >
             {saving ? t('cash_flow.saving') : t('cash_flow.save')}
           </button>
@@ -278,52 +279,52 @@ export default function CashFlowPage() {
       {/* Flow List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
         </div>
       ) : flowsWithBalance.length === 0 ? (
-        <p className="rounded-xl border border-gray-800 bg-gray-900/50 p-8 text-center text-sm text-gray-500">
-          {t('cash_flow.no_entries')}
-        </p>
+        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-8 text-center">
+          <p className="text-sm text-[var(--text-3)]">{t('cash_flow.no_entries')}</p>
+        </div>
       ) : (
         <div className="space-y-2">
           {flowsWithBalance.map((f) => (
-            <div key={f.id} className="rounded-xl border border-gray-800 bg-gray-900/50 p-3">
+            <div key={f.id} className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${
-                    f.flow_type === 'IN' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium ${
+                    f.flow_type === 'IN' ? 'bg-[var(--green-bg)] text-[var(--green)]' : 'bg-[var(--red-bg)] text-[var(--red)]'
                   }`}>
                     {f.flow_type === 'IN' ? '↑' : '↓'}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{f.category}</p>
-                    <p className="text-xs text-gray-500">{formatDate(f.date)} · {f.from_to}</p>
+                    <p className="text-base font-medium text-[var(--text-1)]">{f.category}</p>
+                    <p className="text-xs text-[var(--text-4)]">{formatDate(f.date)} · {f.from_to}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className={`text-sm font-bold ${f.flow_type === 'IN' ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`font-mono text-base font-medium ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
                     {f.flow_type === 'IN' ? '+' : '-'}{formatCurrency(f.amount, currency)}
                   </p>
-                  <p className={`text-[10px] ${f.balance >= 0 ? 'text-gray-400' : 'text-red-400'}`}>
+                  <p className={`font-mono text-[10px] ${f.balance >= 0 ? 'text-[var(--text-4)]' : 'text-[var(--red)]'}`}>
                     bal: {formatCurrency(f.balance, currency)}
                   </p>
                 </div>
               </div>
-              {f.description && <p className="mt-1 text-xs text-gray-500 pl-11">{f.description}</p>}
+              {f.description && <p className="mt-1 text-xs text-[var(--text-4)] pl-11">{f.description}</p>}
               <div className="mt-2 flex items-center gap-2 pl-11">
-                <span className={`rounded px-1.5 py-0.5 text-[10px] ${
-                  f.status === 'COMPLETED' ? 'bg-green-500/10 text-green-400' :
-                  f.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' :
-                  'bg-gray-500/10 text-gray-400'
+                <span className={`rounded-btn px-1.5 py-0.5 text-[10px] font-medium ${
+                  f.status === 'COMPLETED' ? 'bg-[var(--green-bg)] text-[var(--green)]' :
+                  f.status === 'PENDING' ? 'bg-[var(--accent-light)] text-[var(--accent)]' :
+                  'bg-[var(--bg-3)] text-[var(--text-4)]'
                 }`}>{f.status}</span>
                 {f.classify_as !== 'cash_flow_only' && (
-                  <span className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] text-blue-400">
+                  <span className="rounded-btn bg-[var(--accent-light)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--accent)]">
                     {f.classify_as}
                   </span>
                 )}
-                <div className="ml-auto flex gap-2">
-                  <button onClick={() => startEdit(f)} className="text-[10px] text-gray-500 hover:text-amber-400">Edit</button>
-                  <button onClick={() => handleDelete(f.id)} className="text-[10px] text-gray-500 hover:text-red-400">Delete</button>
+                <div className="ml-auto flex gap-3">
+                  <button onClick={() => startEdit(f)} className="text-[10px] text-[var(--text-4)] hover:text-[var(--accent)]">Edit</button>
+                  <button onClick={() => handleDelete(f.id)} className="text-[10px] text-[var(--text-4)] hover:text-[var(--red)]">Delete</button>
                 </div>
               </div>
             </div>
