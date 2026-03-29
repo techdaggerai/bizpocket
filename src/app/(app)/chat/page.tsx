@@ -42,8 +42,15 @@ interface Message {
   attachment_url: string | null;
   invoice_id: string | null;
   read_at: string | null;
+  original_text: string | null;
+  original_language: string | null;
+  translations: Record<string, string> | null;
   created_at: string;
 }
+
+const LANG_FLAGS: Record<string, string> = {
+  en: '🇬🇧', ja: '🇯🇵', ur: '🇵🇰', ar: '🇸🇦', tl: '🇵🇭', pt: '🇧🇷', bn: '🇧🇩',
+};
 
 type FilterType = 'all' | 'customer' | 'supplier' | 'invoice';
 
@@ -78,7 +85,7 @@ function avatarColor(name: string): string {
 /* ---------- Component ---------- */
 
 export default function PocketChatPage() {
-  const { organization } = useAuth();
+  const { organization, profile } = useAuth();
   const { toast } = useToast();
   const supabase = createClient();
 
@@ -93,6 +100,7 @@ export default function PocketChatPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -243,6 +251,32 @@ export default function PocketChatPage() {
     };
   }, [organization?.id, activeConvoId]);
 
+  /* ---------- Translate message ---------- */
+
+  const translateMessage = useCallback(async (messageId: string, targetLang: string) => {
+    try {
+      const res = await fetch('/api/chat/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, targetLanguage: targetLang }),
+      });
+      const data = await res.json();
+      if (data.translation) {
+        setMessages(prev => prev.map(m =>
+          m.id === messageId
+            ? {
+                ...m,
+                original_language: data.originalLanguage || m.original_language,
+                translations: { ...(m.translations || {}), [targetLang]: data.translation },
+              }
+            : m
+        ));
+      }
+    } catch {
+      toast('Translation failed', 'error');
+    }
+  }, []);
+
   /* ---------- Send message ---------- */
 
   const sendMessage = useCallback(async () => {
@@ -255,9 +289,11 @@ export default function PocketChatPage() {
       conversation_id: activeConvoId,
       organization_id: organization.id,
       sender_type: 'owner',
-      sender_name: 'You',
+      sender_name: profile?.name || 'You',
       message: text,
       message_type: 'text',
+      original_text: text,
+      original_language: profile?.language || 'en',
     });
 
     if (error) {
@@ -454,7 +490,16 @@ export default function PocketChatPage() {
               );
             }
 
-            // Regular text message
+            // Regular text message with translation
+            const userLang = profile?.language || 'en';
+            const origLang = msg.original_language;
+            const hasTranslation = msg.translations && msg.translations[userLang];
+            const showTranslated = hasTranslation && origLang !== userLang;
+            const displayText = showTranslated && !showOriginal[msg.id]
+              ? msg.translations![userLang]
+              : msg.message;
+            const langFlag = origLang ? LANG_FLAGS[origLang] || '' : '';
+
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
@@ -468,11 +513,30 @@ export default function PocketChatPage() {
                         : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                    <p className="text-sm whitespace-pre-wrap break-words">{displayText}</p>
                   </div>
-                  <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
-                    {formatTimestamp(msg.created_at)}
-                  </p>
+                  <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
+                    {langFlag && <span className="text-[10px]">{langFlag}</span>}
+                    {showTranslated && (
+                      <button
+                        onClick={() => setShowOriginal(p => ({ ...p, [msg.id]: !p[msg.id] }))}
+                        className={`text-[10px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                      >
+                        {showOriginal[msg.id] ? 'Translated' : 'Original'}
+                      </button>
+                    )}
+                    {!hasTranslation && origLang && origLang !== userLang && (
+                      <button
+                        onClick={() => translateMessage(msg.id, userLang)}
+                        className={`text-[10px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                      >
+                        Translate
+                      </button>
+                    )}
+                    <span className="text-[10px] text-[#A3A3A3]">
+                      {formatTimestamp(msg.created_at)}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
