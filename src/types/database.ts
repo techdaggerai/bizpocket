@@ -64,6 +64,18 @@ export interface InvoiceItem {
   amount: number;
 }
 
+export interface InvoiceLineItem {
+  id?: string;
+  line_number: number;
+  description: string;
+  chassis_no?: string;
+  quantity: number;
+  unit_price: number;
+  tax_rate: number;
+  tax_amount: number;
+  total_price: number;
+}
+
 export interface Invoice {
   id: string;
   organization_id: string;
@@ -75,6 +87,18 @@ export interface Invoice {
   subtotal: number;
   tax: number;
   total: number;
+  tax_rate?: number;
+  tax_amount?: number;
+  grand_total?: number;
+  notes?: string;
+  bank_name?: string;
+  bank_branch?: string;
+  bank_account_name?: string;
+  bank_account_number?: string;
+  bank_account_type?: string;
+  invoice_prefix?: string;
+  sent_at?: string;
+  paid_at?: string;
   currency: string;
   status: InvoiceStatus;
   language: string;
@@ -87,10 +111,23 @@ export interface Customer {
   id: string;
   organization_id: string;
   name: string;
+  company?: string;
   address: string;
   phone: string;
   email: string;
+  fax?: string;
   notes: string | null;
+  created_at: string;
+}
+
+export interface ItemTemplate {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  default_price: number;
+  default_tax_rate: number;
+  created_by: string | null;
   created_at: string;
 }
 

@@ -142,12 +142,12 @@ export default function InvoicesPage() {
           <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('invoices.title')}</h1>
           <p className="text-xs text-[var(--text-3)]">{t('invoices.subtitle')}</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
+        <a
+          href="/invoices/new"
           className="rounded-btn bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px"
         >
-          {showForm ? t('common.cancel') : t('invoices.new_invoice')}
-        </button>
+          {t('invoices.new_invoice')}
+        </a>
       </div>
 
       {/* Create Invoice Form */}
