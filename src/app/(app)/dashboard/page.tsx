@@ -52,6 +52,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
+  const [now, setNow] = useState(new Date());
+
+  const DEFAULT_CLOCKS = [
+    { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
+    { flag: '\u{1F1F5}\u{1F1F0}', city: 'Karachi', tz: 'Asia/Karachi' },
+    { flag: '\u{1F1E6}\u{1F1EA}', city: 'Dubai', tz: 'Asia/Dubai' },
+    { flag: '\u{1F1EC}\u{1F1E7}', city: 'London', tz: 'Europe/London' },
+    { flag: '\u{1F1FA}\u{1F1F8}', city: 'New York', tz: 'America/New_York' },
+    { flag: '\u{1F1E8}\u{1F1F3}', city: 'Shanghai', tz: 'Asia/Shanghai' },
+  ];
 
   const month = getCurrentMonth();
   const currency = organization.currency || 'JPY';
@@ -81,6 +91,11 @@ export default function DashboardPage() {
     }
     setBriefingLoading(false);
   }, [organization.id, firstName]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -201,6 +216,29 @@ export default function DashboardPage() {
         <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
           <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.monthly_expenses')}</p>
           <p className="mt-1.5 font-mono text-xl font-semibold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
+        </div>
+      </div>
+
+      {/* World Clock */}
+      <div>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">World Clock</h2>
+        <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1">
+          {DEFAULT_CLOCKS.map((c) => {
+            const formatted = new Intl.DateTimeFormat('en-US', {
+              timeZone: c.tz,
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            }).format(now);
+            const [time, period] = formatted.split(' ');
+            return (
+              <div key={c.tz} className="flex-shrink-0 rounded-card border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-center min-w-[100px]">
+                <span className="text-lg">{c.flag}</span>
+                <p className="font-mono text-lg font-semibold text-[var(--text-1)]">{time} <span className="text-xs font-normal text-[var(--text-4)]">{period}</span></p>
+                <p className="text-[10px] text-[var(--text-4)]">{c.city}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
