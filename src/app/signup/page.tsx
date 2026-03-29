@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { PocketMark, LogoWordmark } from '@/components/Logo';
 
 export default function SignupPage() {
   const supabase = createClient();
@@ -40,11 +41,9 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-5">
-            <svg width="40" height="40" viewBox="0 0 32 32" fill="none" className="mx-auto">
-              <path d="M16 2L28.66 9V23L16 30L3.34 23V9L16 2Z" fill="var(--accent)" />
-              <text x="16" y="20" textAnchor="middle" fill="white" fontSize="12" fontWeight="600" fontFamily="var(--font-dm-sans), system-ui">B</text>
-            </svg>
+          <div className="mx-auto mb-5 flex flex-col items-center gap-3">
+            <PocketMark variant="lg" />
+            <LogoWordmark />
           </div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">Create your account</h1>
           <p className="mt-1.5 text-sm text-[var(--text-3)]">Start managing your business</p>

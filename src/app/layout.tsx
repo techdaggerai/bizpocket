@@ -16,8 +16,11 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'BizPocket — Your Business in Your Pocket',
+  title: 'BizPocket — Your business in your pocket',
   description: 'Mobile-first business toolkit for foreigners running businesses in Japan. Invoices, cash flow, expenses, accountant sharing.',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export const viewport: Viewport = {

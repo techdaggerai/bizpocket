@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { PocketMark, LogoWordmark } from '@/components/Logo';
 
 const FEATURES = [
   {
@@ -98,15 +99,6 @@ const HERO_TEXT: Record<Lang, { title1: string; title2: string; subtitle: string
 
 const LANG_LABELS: Record<Lang, string> = { en: 'EN', ja: '日本語', ur: 'اردو' };
 
-function HexLogo({ size = 32, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" className={className}>
-      <path d="M16 2L28.66 9V23L16 30L3.34 23V9L16 2Z" fill="var(--accent)" />
-      <text x="16" y="20" textAnchor="middle" fill="white" fontSize="12" fontWeight="600" fontFamily="var(--font-dm-sans), system-ui">B</text>
-    </svg>
-  );
-}
-
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>('en');
   const hero = HERO_TEXT[lang];
@@ -117,8 +109,8 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <HexLogo size={28} />
-            <span className="text-md font-semibold text-[var(--text-1)]">BizPocket</span>
+            <PocketMark variant="xl" />
+            <LogoWordmark />
           </div>
           <div className="flex items-center gap-3">
             <div className="flex rounded-input border border-[var(--border-strong)] bg-[var(--bg-2)] text-xs overflow-hidden">
@@ -244,8 +236,8 @@ export default function LandingPage() {
       <footer className="border-t border-[var(--border)] bg-[var(--bg-2)]">
         <div className="mx-auto max-w-5xl px-4 py-8 text-center">
           <div className="mb-2 flex items-center justify-center gap-2">
-            <HexLogo size={20} />
-            <span className="text-sm font-medium text-[var(--text-3)]">BizPocket</span>
+            <PocketMark variant="sm" />
+            <LogoWordmark />
           </div>
           <p className="text-xs text-[var(--text-4)]">A TechDagger Product &middot; MS Dynamics LLC</p>
         </div>
