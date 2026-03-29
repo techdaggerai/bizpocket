@@ -9,9 +9,11 @@ import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 
 export default function DashboardPage() {
-  const { profile, organization } = useAuth();
+  const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const supabase = createClient();
+  const fullName = user.user_metadata?.full_name || profile.name || '';
+  const firstName = fullName.split(' ')[0] || '';
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,32 +63,32 @@ export default function DashboardPage() {
       {/* Greeting */}
       <div>
         <h1 className="text-xl font-semibold text-[var(--text-1)]">
-          {getGreeting()}, {profile.name.split(' ')[0]}
+          {getGreeting()}{firstName ? `, ${firstName}` : ''}
         </h1>
         <p className="text-sm text-[var(--text-3)]">{organization.name}</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
-          <p className="text-xs text-[var(--text-3)]">{t('dashboard.cash_balance')}</p>
-          <p className={`mt-1 font-mono text-lg font-medium ${balance >= 0 ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+        <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.cash_balance')}</p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">
             {formatCurrency(balance, currency)}
           </p>
         </div>
-        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
-          <p className="text-xs text-[var(--text-3)]">{t('dashboard.unpaid_invoices')}</p>
-          <p className="mt-1 font-mono text-lg font-medium text-[var(--accent)]">
+        <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.unpaid_invoices')}</p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">
             {invoices.length > 0 ? `${invoices.length} (${formatCurrency(unpaidTotal, currency)})` : '0'}
           </p>
         </div>
-        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
-          <p className="text-xs text-[var(--text-3)]">{t('dashboard.monthly_income')}</p>
-          <p className="mt-1 font-mono text-lg font-medium text-[var(--green)]">{formatCurrency(totalIn, currency)}</p>
+        <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.monthly_income')}</p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
         </div>
-        <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4">
-          <p className="text-xs text-[var(--text-3)]">{t('dashboard.monthly_expenses')}</p>
-          <p className="mt-1 font-mono text-lg font-medium text-[var(--red)]">{formatCurrency(totalOut, currency)}</p>
+        <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.monthly_expenses')}</p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
         </div>
       </div>
 
@@ -96,37 +98,31 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 gap-3">
           <Link
             href="/invoices?new=1"
-            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
+            className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(79,70,229,0.08)] p-5 text-center transition-all hover:bg-[rgba(79,70,229,0.12)]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--accent-light)]">
-              <svg className="h-5 w-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </div>
-            <span className="text-xs text-[var(--text-2)]">{t('dashboard.new_invoice')}</span>
+            <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+            </svg>
+            <span className="text-xs font-medium text-[#4F46E5]">{t('dashboard.new_invoice')}</span>
           </Link>
           <Link
             href="/cash-flow?new=1"
-            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
+            className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(22,163,74,0.08)] p-5 text-center transition-all hover:bg-[rgba(22,163,74,0.12)]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--green-bg)]">
-              <svg className="h-5 w-5 text-[var(--green)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </div>
-            <span className="text-xs text-[var(--text-2)]">{t('dashboard.new_expense')}</span>
+            <svg className="h-6 w-6 text-[#16A34A]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span className="text-xs font-medium text-[#16A34A]">{t('dashboard.new_expense')}</span>
           </Link>
           <Link
             href="/documents?scan=1"
-            className="flex flex-col items-center gap-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center transition-all hover:shadow-sm"
+            className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(79,70,229,0.08)] p-5 text-center transition-all hover:bg-[rgba(79,70,229,0.12)]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-btn bg-[var(--accent-light)]">
-              <svg className="h-5 w-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
-              </svg>
-            </div>
-            <span className="text-xs text-[var(--text-2)]">{t('dashboard.scan_document')}</span>
+            <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+            </svg>
+            <span className="text-xs font-medium text-[#4F46E5]">{t('dashboard.scan_document')}</span>
           </Link>
         </div>
       </div>

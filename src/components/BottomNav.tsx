@@ -58,8 +58,8 @@ export default function BottomNav() {
   const { t } = useI18n();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-md safe-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-[#E5E5E5] bg-white safe-bottom">
+      <div className="mx-auto flex h-full max-w-lg items-center justify-around">
         {NAV_ITEMS.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + '/');
@@ -67,14 +67,14 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-w-[60px] flex-col items-center gap-0.5 px-3 py-2.5 text-xs transition-colors ${
+              className={`flex min-w-[60px] flex-col items-center gap-0.5 px-3 py-2 text-xs transition-colors ${
                 isActive
-                  ? 'text-[var(--accent)]'
-                  : 'text-[var(--text-4)] hover:text-[var(--text-2)]'
+                  ? 'text-[#4F46E5]'
+                  : 'text-[#A3A3A3] hover:text-[var(--text-2)]'
               }`}
             >
               {item.icon}
-              <span className="mt-0.5 text-[11px]">{t(item.labelKey)}</span>
+              <span className="mt-0.5 text-[11px] font-medium">{t(item.labelKey)}</span>
             </Link>
           );
         })}
