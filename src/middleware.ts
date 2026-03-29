@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback'];
+const PUBLIC_PREFIXES = ['/i/']; // Public invoice + PocketChat pages
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
@@ -36,6 +37,11 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
+
+  // Public prefix routes (e.g., /i/{token}) — always allow
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return supabaseResponse;
+  }
 
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {

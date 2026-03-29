@@ -113,6 +113,7 @@ export interface Invoice {
   language: string;
   created_by: string;
   pdf_url: string | null;
+  chat_token: string | null;
   created_at: string;
 }
 
@@ -137,6 +138,17 @@ export interface ItemTemplate {
   default_price: number;
   default_tax_rate: number;
   created_by: string | null;
+  created_at: string;
+}
+
+export interface InvoiceChat {
+  id: string;
+  organization_id: string;
+  invoice_id: string;
+  sender_type: 'owner' | 'customer';
+  sender_name: string | null;
+  message: string;
+  read_at: string | null;
   created_at: string;
 }
 
