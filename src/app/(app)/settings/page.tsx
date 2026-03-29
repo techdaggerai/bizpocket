@@ -182,13 +182,27 @@ export default function SettingsPage() {
         )}
       </div>
 
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="w-full rounded-card border border-[#DC2626]/20 bg-[#DC2626]/5 py-3 text-sm font-medium text-[#DC2626] transition-colors hover:bg-[#DC2626]/10"
-      >
-        {t('nav.logout')}
-      </button>
+      {/* Account + Logout */}
+      <div className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F46E5] text-white text-sm font-semibold">
+            {(user.user_metadata?.full_name || profile.name || 'U').charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium text-[var(--text-1)] truncate">{user.user_metadata?.full_name || profile.name}</p>
+            <p className="text-xs text-[var(--text-4)] truncate">{user.email}</p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center justify-center gap-2 rounded-btn border border-[#DC2626]/20 bg-[#DC2626]/5 py-3 text-sm font-medium text-[#DC2626] transition-colors hover:bg-[#DC2626]/10"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+          {t('nav.logout')}
+        </button>
+      </div>
 
       {/* Footer */}
       <p className="text-center text-xs text-[var(--text-4)]">A TechDagger Product · MS Dynamics LLC</p>
