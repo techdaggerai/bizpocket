@@ -173,19 +173,34 @@ export default function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 py-20">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
           <div className="flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Fire Invoice\u2122</p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Fire Invoice™</p>
             <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">Invoice fired.<br/>Before you leave the parking lot.</h2>
             <p className="text-sm leading-relaxed text-[var(--text-3)]">Professional invoices in 60 seconds. 5 templates. PDF export. Share via PocketChat, LINE, or WhatsApp. 10 languages. Bank details auto-filled.</p>
           </div>
-          <div className="flex-1 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
-            <div className="rounded-lg bg-[var(--bg-2)] p-4">
-              <div className="h-3 w-24 rounded bg-[var(--accent)]/20 mb-3" />
-              <div className="h-2 w-full rounded bg-[var(--border)] mb-2" />
-              <div className="h-2 w-3/4 rounded bg-[var(--border)] mb-4" />
-              <div className="flex justify-between border-t border-[var(--border)] pt-3">
-                <div className="h-2 w-16 rounded bg-[var(--border)]" />
-                <div className="h-3 w-20 rounded bg-[var(--accent)]/30" />
+          <div className="flex-1 rounded-[14px] border border-[#E5E5E5] bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs font-semibold text-[#0A0A0A]">BIZPOCKET CO.</p>
+                <p className="text-[10px] text-[#A3A3A3]">Invoice #INV/BIZ/260330-0001</p>
               </div>
+              <span className="rounded-full bg-[#16A34A]/10 px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">PAID</span>
+            </div>
+            <div className="mb-3 text-[10px] text-[#737373]">
+              <span className="font-medium text-[#0A0A0A]">Bill To:</span> Al-Rashid Motors LLC
+            </div>
+            <div className="border-t border-[#E5E5E5] pt-2 mb-2">
+              <div className="flex justify-between text-[10px] text-[#737373] mb-1">
+                <span>Toyota Alphard 2025</span>
+                <span className="font-mono text-[#0A0A0A]">¥850,000</span>
+              </div>
+              <div className="flex justify-between text-[10px] text-[#737373]">
+                <span>Tax (10%)</span>
+                <span className="font-mono text-[#0A0A0A]">¥85,000</span>
+              </div>
+            </div>
+            <div className="flex justify-between border-t border-[#0A0A0A] pt-2">
+              <span className="text-xs font-semibold text-[#0A0A0A]">Total</span>
+              <span className="font-mono text-sm font-bold text-[#4F46E5]">¥935,000</span>
             </div>
           </div>
         </div>
@@ -196,7 +211,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl px-4 py-20">
           <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#818CF8]">PocketChat\u2122</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#818CF8]">PocketChat™</p>
               <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl leading-tight">
                 They speak Japanese.<br/>You speak English.<br/>Nobody notices the difference.
               </h2>
@@ -233,7 +248,13 @@ export default function LandingPage() {
               <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
               <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
             </div>
-            <p className="text-sm text-[var(--text-2)] leading-relaxed">Good morning, Doc. Here&apos;s your overnight:<br/>&#x2022; Cash balance: ¥4,280,000<br/>&#x2022; 2 invoices unpaid (¥340,000 overdue)<br/>&#x2022; Recommended: Follow up with Al-Rashid Motors</p>
+            <p className="text-sm text-[var(--text-2)] leading-relaxed mb-3">Good morning, Doc. While you slept:</p>
+            <div className="space-y-1.5 text-sm">
+              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">2 invoices auto-sent</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">¥340,000 payment received</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#DC2626]">⚠️</span><span className="text-[var(--text-2)]">Cash gap predicted on Apr 15</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#4F46E5]">→</span><span className="text-[var(--text-2)]">Recommend: sell white Prius first</span></div>
+            </div>
           </div>
         </div>
       </section>
@@ -242,20 +263,53 @@ export default function LandingPage() {
       <section className="border-y border-[var(--border)] bg-[var(--bg-2)]">
         <div className="mx-auto max-w-5xl px-4 py-20">
           <div className="grid gap-6 sm:grid-cols-3">
-            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
+            {/* Money View */}
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
               <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Money View</p>
-              <h3 className="mb-2 text-base font-semibold text-[var(--text-1)]">Know your numbers.<br/>Before your accountant asks.</h3>
-              <p className="text-sm text-[var(--text-3)]">Every yen in, every yen out. AI predicts cash flow gaps. Monthly summaries. Zero spreadsheets.</p>
+              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Know your numbers.</h3>
+              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-3">
+                <p className="text-[10px] text-[#A3A3A3] uppercase">Cash Balance</p>
+                <p className="font-mono text-lg font-bold text-[#4F46E5]">¥4,280,500</p>
+              </div>
+              <div className="flex items-end gap-1 h-10">
+                {[65, 40, 80, 55, 90, 70].map((h, i) => (
+                  <div key={i} className="flex-1 flex flex-col gap-0.5">
+                    <div className="rounded-sm bg-[#16A34A]/20" style={{ height: `${h * 0.4}px` }} />
+                    <div className="rounded-sm bg-[#DC2626]/20" style={{ height: `${(100 - h) * 0.25}px` }} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Snap & Vault\u2122</p>
-              <h3 className="mb-2 text-base font-semibold text-[var(--text-1)]">Point. Shoot. Filed.</h3>
-              <p className="text-sm text-[var(--text-3)]">Camera to PDF to filed. Receipt photos auto-categorized. Accountant-ready every month.</p>
+            {/* Snap & Vault */}
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Snap & Vault™</p>
+              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Point. Shoot. Filed.</h3>
+              <div className="grid grid-cols-3 gap-1.5">
+                {['Mar 28', 'Mar 25', 'Mar 20'].map((date) => (
+                  <div key={date} className="rounded-lg bg-[var(--bg-2)] p-2 text-center">
+                    <div className="h-10 mb-1.5 rounded bg-[var(--border)] flex items-center justify-center">
+                      <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                    </div>
+                    <p className="text-[9px] text-[var(--text-4)]">{date}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-6">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Accountant Portal\u2122</p>
-              <h3 className="mb-2 text-base font-semibold text-[var(--text-1)]">Your accountant<br/>always has the full picture.</h3>
-              <p className="text-sm text-[var(--text-3)]">One link. Live read-only access. Monthly packages auto-generated. No more chasing documents.</p>
+            {/* Accountant Portal */}
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Accountant Portal™</p>
+              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Always the full picture.</h3>
+              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-medium text-[var(--text-1)]">Client Overview</span>
+                  <span className="rounded-full bg-[#DC2626]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#DC2626]">READ ONLY</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div><p className="text-[9px] text-[#A3A3A3]">Income</p><p className="font-mono text-xs font-bold text-[#16A34A]">¥2.1M</p></div>
+                  <div><p className="text-[9px] text-[#A3A3A3]">Expenses</p><p className="font-mono text-xs font-bold text-[#DC2626]">¥890K</p></div>
+                  <div><p className="text-[9px] text-[#A3A3A3]">Net</p><p className="font-mono text-xs font-bold text-[#4F46E5]">¥1.2M</p></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
