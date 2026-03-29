@@ -403,29 +403,211 @@ export default function NewInvoicePage() {
             <h2 className="text-base font-medium text-[var(--text-1)]">Choose Invoice Template</h2>
             <p className="text-sm text-[var(--text-3)]">Select a style for your invoice PDF</p>
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: 'classic', name: 'Classic', desc: 'Clean, traditional layout', color: '#4F46E5' },
-                { id: 'modern', name: 'Modern', desc: 'Minimal with bold typography', color: '#0EA5E9' },
-                { id: 'japanese', name: 'Japanese Style', desc: 'Optimized for 請求書 format', color: '#DC2626' },
-                { id: 'compact', name: 'Compact', desc: 'Dense, more items per page', color: '#16A34A' },
-                { id: 'export', name: 'Export', desc: 'International trade format', color: '#7C3AED' },
-              ].map((tpl) => (
-                <button
-                  key={tpl.id}
-                  onClick={() => { setSelectedTemplate(tpl.id); setStep(1); }}
-                  className={`flex flex-col rounded-card border p-4 text-left transition-all hover:shadow-sm ${
-                    selectedTemplate === tpl.id
-                      ? 'border-[var(--accent)] bg-[var(--accent-light)]'
-                      : 'border-[#E5E5E5] bg-white'
-                  }`}
-                >
-                  <div className="mb-3 flex h-16 items-center justify-center rounded-lg" style={{ backgroundColor: `${tpl.color}10` }}>
-                    <div className="h-10 w-8 rounded border-2 border-dashed" style={{ borderColor: tpl.color, opacity: 0.5 }} />
+              {/* Classic */}
+              <button
+                onClick={() => { setSelectedTemplate('classic'); setStep(1); }}
+                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                  selectedTemplate === 'classic' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                }`}
+              >
+                <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                    <div style={{ background: '#000', color: '#fff', padding: '20px 24px', fontSize: '18px', fontWeight: 700 }}>BIZPOCKET CO.</div>
+                    <div style={{ padding: '16px 24px' }}>
+                      <div style={{ fontSize: '11px', color: '#666', marginBottom: '12px' }}>INVOICE #INV/BIZ/260330-0001</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#666', marginBottom: '14px' }}>
+                        <div><b style={{ color: '#000' }}>Bill To:</b><br/>Customer Corp<br/>Tokyo, Japan</div>
+                        <div style={{ textAlign: 'right' }}><b style={{ color: '#000' }}>Date:</b> 2026-03-30<br/><b style={{ color: '#000' }}>Due:</b> 2026-04-29</div>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
+                        <thead><tr style={{ background: '#000', color: '#fff' }}>
+                          <th style={{ padding: '6px 8px', textAlign: 'left' }}>Description</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Qty</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Price</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Total</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '6px 8px' }}>Used Vehicle — Toyota Hiace</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td></tr>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '6px 8px' }}>Shipping & Export</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td></tr>
+                        </tbody>
+                      </table>
+                      <div style={{ textAlign: 'right', fontSize: '10px', marginTop: '8px', borderTop: '2px solid #000', paddingTop: '6px' }}><b>Total: ¥970,000</b></div>
+                    </div>
                   </div>
-                  <p className="text-sm font-medium text-[var(--text-1)]">{tpl.name}</p>
-                  <p className="text-xs text-[var(--text-4)]">{tpl.desc}</p>
-                </button>
-              ))}
+                </div>
+                <div className="p-3 border-t border-[#E5E5E5]">
+                  <p className="text-sm font-medium text-[var(--text-1)]">Classic</p>
+                  <p className="text-xs text-[var(--text-4)]">Clean, traditional layout</p>
+                </div>
+              </button>
+
+              {/* Modern */}
+              <button
+                onClick={() => { setSelectedTemplate('modern'); setStep(1); }}
+                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                  selectedTemplate === 'modern' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                }`}
+              >
+                <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                    <div style={{ background: '#4F46E5', color: '#fff', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: '20px', fontWeight: 700 }}>INVOICE</div>
+                      <div style={{ textAlign: 'right', fontSize: '11px' }}>BizPocket Co.<br/>#INV/BIZ/260330</div>
+                    </div>
+                    <div style={{ padding: '16px 24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#666', marginBottom: '14px' }}>
+                        <div><b style={{ color: '#000' }}>Bill To:</b><br/>Customer Corp</div>
+                        <div style={{ textAlign: 'right' }}>Date: 2026-03-30<br/>Due: 2026-04-29</div>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
+                        <thead><tr style={{ background: '#4F46E5', color: '#fff' }}>
+                          <th style={{ padding: '6px 8px', textAlign: 'left' }}>Item</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Qty</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Rate</th>
+                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Amount</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr style={{ background: '#F8F8FF' }}><td style={{ padding: '6px 8px' }}>Toyota Hiace 2024</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td></tr>
+                          <tr><td style={{ padding: '6px 8px' }}>Export Handling</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td></tr>
+                        </tbody>
+                      </table>
+                      <div style={{ textAlign: 'right', fontSize: '11px', marginTop: '8px', color: '#4F46E5', fontWeight: 700 }}>Total: ¥970,000</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border-t border-[#E5E5E5]">
+                  <p className="text-sm font-medium text-[var(--text-1)]">Modern</p>
+                  <p className="text-xs text-[var(--text-4)]">Bold indigo typography</p>
+                </div>
+              </button>
+
+              {/* Japanese Style */}
+              <button
+                onClick={() => { setSelectedTemplate('japanese'); setStep(1); }}
+                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                  selectedTemplate === 'japanese' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                }`}
+              >
+                <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                    <div style={{ borderTop: '4px solid #000', padding: '20px 24px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.2em' }}>請求書</div>
+                      <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>INVOICE</div>
+                    </div>
+                    <div style={{ padding: '0 24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '12px' }}>
+                        <div><b>御中:</b> Customer Corp 様</div>
+                        <div style={{ textAlign: 'right' }}>請求日: 2026/03/30<br/>支払期限: 2026/04/29</div>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #000' }}>
+                        <thead><tr style={{ background: '#f5f5f5' }}>
+                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'left' }}>品名</th>
+                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>数量</th>
+                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>単価</th>
+                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>金額</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr><td style={{ padding: '5px', border: '1px solid #ddd' }}>中古車 トヨタ ハイエース</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>1</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>¥850,000</td></tr>
+                        </tbody>
+                      </table>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700 }}>合計: ¥850,000</div>
+                        <div style={{ width: '50px', height: '50px', border: '2px solid #DC2626', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626', fontSize: '10px', fontWeight: 700 }}>印</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border-t border-[#E5E5E5]">
+                  <p className="text-sm font-medium text-[var(--text-1)]">Japanese Style</p>
+                  <p className="text-xs text-[var(--text-4)]">請求書 format with seal</p>
+                </div>
+              </button>
+
+              {/* Compact */}
+              <button
+                onClick={() => { setSelectedTemplate('compact'); setStep(1); }}
+                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                  selectedTemplate === 'compact' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                }`}
+              >
+                <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                    <div style={{ borderTop: '3px solid #16A34A', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 700 }}>INVOICE</div>
+                      <div style={{ fontSize: '9px', color: '#666' }}>#INV/BIZ/260330 · 2026-03-30</div>
+                    </div>
+                    <div style={{ padding: '0 24px', fontSize: '9px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#666' }}>
+                        <div><b style={{ color: '#000' }}>From:</b> BizPocket Co.</div>
+                        <div><b style={{ color: '#000' }}>To:</b> Customer Corp</div>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
+                        <thead><tr style={{ borderBottom: '1px solid #16A34A' }}>
+                          <th style={{ padding: '4px 6px', textAlign: 'left', color: '#16A34A' }}>Item</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Qty</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Price</th>
+                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Total</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Toyota Hiace</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥850,000</td></tr>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Shipping</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥120,000</td></tr>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Insurance</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥45,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥45,000</td></tr>
+                        </tbody>
+                      </table>
+                      <div style={{ textAlign: 'right', marginTop: '6px', fontWeight: 700, color: '#16A34A', fontSize: '10px' }}>Total: ¥1,015,000</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border-t border-[#E5E5E5]">
+                  <p className="text-sm font-medium text-[var(--text-1)]">Compact</p>
+                  <p className="text-xs text-[var(--text-4)]">Dense, more items per page</p>
+                </div>
+              </button>
+
+              {/* Export */}
+              <button
+                onClick={() => { setSelectedTemplate('export'); setStep(1); }}
+                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                  selectedTemplate === 'export' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                }`}
+              >
+                <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                    <div style={{ background: '#111', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ color: '#7C3AED', fontSize: '16px', fontWeight: 700 }}>EXPORT INVOICE</div>
+                      <div style={{ color: '#999', fontSize: '10px', textAlign: 'right' }}>BizPocket Co.<br/>Tokyo, Japan</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: '#f8f8f8', fontSize: '8px', padding: '6px 24px', borderBottom: '1px solid #ddd' }}>
+                      <div><b>Port:</b> Yokohama</div>
+                      <div><b>Terms:</b> FOB</div>
+                      <div><b>Vessel:</b> TBD</div>
+                      <div><b>Country:</b> UAE</div>
+                    </div>
+                    <div style={{ padding: '10px 24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '10px' }}>
+                        <div style={{ width: '48%' }}><b>Shipper:</b><br/>BizPocket Co.<br/>Tokyo, Japan</div>
+                        <div style={{ width: '48%' }}><b>Consignee:</b><br/>Al-Rashid Motors<br/>Dubai, UAE</div>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
+                        <thead><tr style={{ background: '#7C3AED', color: '#fff' }}>
+                          <th style={{ padding: '5px 6px', textAlign: 'left' }}>Vehicle</th>
+                          <th style={{ padding: '5px 6px', textAlign: 'left' }}>Chassis</th>
+                          <th style={{ padding: '5px 6px', textAlign: 'right' }}>Price</th>
+                        </tr></thead>
+                        <tbody>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '4px 6px' }}>Toyota Hiace 2024</td><td style={{ padding: '4px 6px' }}>GDH-303</td><td style={{ padding: '4px 6px', textAlign: 'right' }}>$7,200</td></tr>
+                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '4px 6px' }}>Suzuki Carry 2023</td><td style={{ padding: '4px 6px' }}>DA16T-K</td><td style={{ padding: '4px 6px', textAlign: 'right' }}>$3,800</td></tr>
+                        </tbody>
+                      </table>
+                      <div style={{ textAlign: 'right', marginTop: '6px', fontWeight: 700, color: '#7C3AED', fontSize: '10px' }}>Total: $11,000</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border-t border-[#E5E5E5]">
+                  <p className="text-sm font-medium text-[var(--text-1)]">Export</p>
+                  <p className="text-xs text-[var(--text-4)]">International trade format</p>
+                </div>
+              </button>
             </div>
           </div>
         )}
