@@ -98,17 +98,17 @@ export default function OnboardingPage() {
   const totalSteps = 4;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-white px-4">
       <div className="w-full max-w-md">
         {/* Progress */}
         <div className="mb-8">
-          <div className="mb-2 flex items-center justify-between text-xs text-gray-400">
+          <div className="mb-2 flex items-center justify-between text-xs text-[var(--text-3)]">
             <span>Step {step} of {totalSteps}</span>
             <span>{Math.round((step / totalSteps) * 100)}%</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-gray-800">
+          <div className="h-1.5 overflow-hidden rounded-full bg-[#E5E5E5]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] transition-all duration-300"
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
@@ -118,19 +118,19 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-white">What&apos;s your business called?</h2>
-              <p className="mt-1 text-sm text-gray-400">We&apos;ll use this on invoices and documents</p>
+              <h2 className="text-2xl font-bold text-[var(--text-1)]">What&apos;s your business called?</h2>
+              <p className="mt-1 text-sm text-[var(--text-3)]">We&apos;ll use this on invoices and documents</p>
             </div>
             <div className="space-y-4">
               <input
                 type="text"
                 value={form.business_name}
                 onChange={(e) => setForm({ ...form, business_name: e.target.value })}
-                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+                className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
                 placeholder="e.g., Tokyo Auto Export"
               />
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-300">Business type</label>
+                <label className="mb-2 block text-sm font-medium text-[var(--text-2)]">Business type</label>
                 <div className="grid grid-cols-2 gap-2">
                   {BUSINESS_TYPES.map((bt) => {
                     const selected = form.business_types.includes(bt.value);
@@ -147,8 +147,8 @@ export default function OnboardingPage() {
                         }
                         className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
                           selected
-                            ? 'border-[#FFD700] bg-[#FFD700]/10 text-[#FFD700]'
-                            : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                            ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                            : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
                         }`}
                       >
                         {bt.label}
@@ -165,8 +165,8 @@ export default function OnboardingPage() {
         {step === 2 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-white">Choose your language</h2>
-              <p className="mt-1 text-sm text-gray-400">You can change this anytime in settings</p>
+              <h2 className="text-2xl font-bold text-[var(--text-1)]">Choose your language</h2>
+              <p className="mt-1 text-sm text-[var(--text-3)]">You can change this anytime in settings</p>
             </div>
             <div className="space-y-2">
               {LANGUAGES.map((l) => (
@@ -175,8 +175,8 @@ export default function OnboardingPage() {
                   onClick={() => setForm({ ...form, language: l.value })}
                   className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
                     form.language === l.value
-                      ? 'border-amber-500 bg-amber-500/10 text-amber-400'
-                      : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                      ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                      : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
                   }`}
                 >
                   {l.label}
@@ -190,8 +190,8 @@ export default function OnboardingPage() {
         {step === 3 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-white">Default currency</h2>
-              <p className="mt-1 text-sm text-gray-400">Used for invoices and cash flow tracking</p>
+              <h2 className="text-2xl font-bold text-[var(--text-1)]">Default currency</h2>
+              <p className="mt-1 text-sm text-[var(--text-3)]">Used for invoices and cash flow tracking</p>
             </div>
             <div className="space-y-2">
               {CURRENCIES.map((c) => (
@@ -200,8 +200,8 @@ export default function OnboardingPage() {
                   onClick={() => setForm({ ...form, currency: c.value })}
                   className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
                     form.currency === c.value
-                      ? 'border-amber-500 bg-amber-500/10 text-amber-400'
-                      : 'border-gray-700 text-gray-300 hover:border-gray-600'
+                      ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                      : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
                   }`}
                 >
                   {c.label}
@@ -215,14 +215,14 @@ export default function OnboardingPage() {
         {step === 4 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-white">Invite your accountant</h2>
-              <p className="mt-1 text-sm text-gray-400">They&apos;ll get read-only access to everything. You can skip this.</p>
+              <h2 className="text-2xl font-bold text-[var(--text-1)]">Invite your accountant</h2>
+              <p className="mt-1 text-sm text-[var(--text-3)]">They&apos;ll get read-only access to everything. You can skip this.</p>
             </div>
             <input
               type="email"
               value={form.accountant_email}
               onChange={(e) => setForm({ ...form, accountant_email: e.target.value })}
-              className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-3 text-white placeholder-gray-500 focus:border-amber-500 focus:outline-none"
+              className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
               placeholder="accountant@example.com"
             />
           </div>
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
           {step > 1 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="flex-1 rounded-lg border border-gray-700 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:border-gray-500"
+              className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[var(--text-2)] transition-colors hover:border-[#C5C5C5]"
             >
               Back
             </button>
@@ -242,7 +242,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => setStep(step + 1)}
               disabled={step === 1 && (!form.business_name || form.business_types.length === 0)}
-              className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
+              className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#4338CA] disabled:opacity-50"
             >
               Next
             </button>
@@ -250,7 +250,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => handleFinish(false)}
               disabled={loading}
-              className="flex-1 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 py-2.5 text-sm font-semibold text-gray-950 transition-all disabled:opacity-50"
+              className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#4338CA] disabled:opacity-50"
             >
               {loading ? 'Setting up...' : 'Get Started'}
             </button>
@@ -261,7 +261,7 @@ export default function OnboardingPage() {
           <button
             onClick={() => handleFinish(true)}
             disabled={loading}
-            className="mt-3 w-full py-2 text-center text-sm text-gray-500 hover:text-gray-300"
+            className="mt-3 w-full py-2 text-center text-sm text-[var(--text-4)] hover:text-[var(--text-2)]"
           >
             Skip for now
           </button>
