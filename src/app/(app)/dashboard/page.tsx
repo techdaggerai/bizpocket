@@ -12,8 +12,11 @@ export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const supabase = createClient();
-  const fullName = user.user_metadata?.full_name || profile.name || '';
-  const firstName = fullName.split(' ')[0] || '';
+  const fullName = user.user_metadata?.full_name || '';
+  const profileName = profile.name || '';
+  // Use auth metadata first; skip profile.name if it matches org name (data bug)
+  const displayName = fullName || (profileName !== organization.name ? profileName : '') || user.email?.split('@')[0] || '';
+  const firstName = displayName.split(' ')[0];
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);

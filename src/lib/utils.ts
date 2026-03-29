@@ -1,5 +1,7 @@
 export function formatCurrency(amount: number, currency = 'JPY'): string {
-  return new Intl.NumberFormat('ja-JP', {
+  // Use en-US locale to get plain ¥ (U+00A5) instead of ￥ (U+FFE5)
+  // which some browsers render as an emoji-like icon
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
     minimumFractionDigits: currency === 'JPY' ? 0 : 2,
