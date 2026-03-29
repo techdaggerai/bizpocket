@@ -118,10 +118,37 @@ export default function InvoicesPage() {
     }
   }
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   async function updateStatus(id: string, status: InvoiceStatus) {
-    const { error } = await supabase.from('invoices').update({ status }).eq('id', id);
+    const updateData: Record<string, unknown> = { status };
+    if (status === 'sent') updateData.sent_at = new Date().toISOString();
+    if (status === 'paid') updateData.paid_at = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('invoices')
+      .update(updateData)
+      .eq('id', id)
+      .eq('organization_id', organization.id);
     if (error) toast(error.message, 'error');
     else { toast(`Marked as ${status}`, 'success'); fetchData(); }
+  }
+
+  async function handleDeleteInvoice(id: string) {
+    // Delete line items first, then the invoice
+    await supabase.from('invoice_items').delete().eq('invoice_id', id).eq('organization_id', organization.id);
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', id)
+      .eq('organization_id', organization.id);
+    if (error) {
+      toast(`Delete failed: ${error.message}`, 'error');
+    } else {
+      toast('Invoice deleted', 'success');
+      setInvoices((prev) => prev.filter((inv) => inv.id !== id));
+    }
+    setDeleteConfirmId(null);
   }
 
   const filtered = filter === 'all' ? invoices : invoices.filter((inv) => inv.status === filter);
@@ -314,15 +341,43 @@ export default function InvoicesPage() {
                   </span>
                 </div>
               </div>
-              <div className="mt-2.5 flex gap-3">
+              <div className="mt-2.5 flex items-center gap-3">
                 {inv.status === 'draft' && (
-                  <button onClick={() => updateStatus(inv.id, 'sent')} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
-                    Mark Sent
-                  </button>
+                  <>
+                    <button onClick={() => updateStatus(inv.id, 'sent')} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
+                      Mark Sent
+                    </button>
+                    <a href={`/invoices/new?edit=${inv.id}`} className="text-xs text-[var(--text-4)] hover:text-[var(--accent)]">
+                      Edit
+                    </a>
+                  </>
                 )}
                 {inv.status === 'sent' && (
                   <button onClick={() => updateStatus(inv.id, 'paid')} className="text-xs text-[var(--green)] hover:opacity-80">
                     Mark Paid
+                  </button>
+                )}
+                {deleteConfirmId === inv.id ? (
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleDeleteInvoice(inv.id)}
+                      className="rounded-btn bg-[#DC2626] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#B91C1C]"
+                    >
+                      Delete?
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(null)}
+                      className="text-xs text-[var(--text-3)]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setDeleteConfirmId(inv.id)}
+                    className="ml-auto text-xs text-[#DC2626] hover:opacity-80"
+                  >
+                    Delete
                   </button>
                 )}
               </div>

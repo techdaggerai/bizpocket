@@ -50,6 +50,19 @@ export default function OnboardingPage() {
       return;
     }
 
+    // Check if user already has a profile+org (prevent duplicate creation)
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id, organization_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (existingProfile?.organization_id) {
+      // Already onboarded — just redirect
+      router.push('/dashboard');
+      return;
+    }
+
     // Create organization
     const { data: org, error: orgError } = await supabase
       .from('organizations')
