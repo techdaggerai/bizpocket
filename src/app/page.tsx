@@ -13,7 +13,7 @@ const PAIN_POINTS = [
 const FEATURES = [
   {
     title: 'Fire Invoice',
-    desc: 'Create and send professional invoices in Japanese, English, or Urdu in 60 seconds. 5 templates, PDF export, LINE/WhatsApp sharing.',
+    desc: 'Create and send invoices in 60 seconds. 5 templates, PDF export, LINE/WhatsApp sharing. 10 languages.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
@@ -22,7 +22,7 @@ const FEATURES = [
   },
   {
     title: 'Money View',
-    desc: 'Every yen in and out, categorized. Running balance always visible. Monthly breakdown with category insights.',
+    desc: 'Predictive cash flow tracking. Every yen in and out, categorized with AI insights.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
@@ -30,17 +30,17 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Log It',
-    desc: 'Track expenses with receipt photos. Category breakdowns, planned vs actual budgets, monthly summaries.',
+    title: 'PocketChat',
+    desc: 'Business messenger with auto-translation. Voice notes, media sharing, invoice threads. 10 languages.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14.25l3-3m0 0l3 3m-3-3v8.25M3 6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 19.5H5.25A2.25 2.25 0 013 17.25V6.75z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
       </svg>
     ),
   },
   {
     title: 'Snap & Vault',
-    desc: 'Snap receipts and documents. Organized by month, searchable, always accessible. Never lose a receipt again.',
+    desc: 'Snap receipts and documents. AI-powered scanning, organized by month.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
@@ -50,10 +50,19 @@ const FEATURES = [
   },
   {
     title: 'Accountant Portal',
-    desc: 'Give your accountant read-only access with one link. No more chasing for documents or monthly handoffs.',
+    desc: 'Give your accountant live read-only access with one link. Monthly packages auto-generated.',
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+      </svg>
+    ),
+  },
+  {
+    title: 'AI Command Hub',
+    desc: 'Morning briefing powered by Claude AI. Business insights, action recommendations, overnight summary.',
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
       </svg>
     ),
   },
@@ -61,30 +70,39 @@ const FEATURES = [
 
 const PLANS = [
   {
-    name: 'Free',
+    name: 'Starter',
     price: '¥0',
     period: '',
     desc: 'Get started',
-    features: ['5 invoices/month', 'Basic cash flow', '1 language', 'Single user'],
+    features: ['5 invoices/month', 'Basic cash flow', 'PocketChat (2 contacts)', '1 language'],
     cta: 'Open Your Pocket',
     highlight: false,
   },
   {
     name: 'Pro',
-    price: '¥1,980',
+    price: '¥2,980',
     period: '/mo',
     desc: 'For serious businesses',
-    features: ['Unlimited invoices', 'Snap & Vault', 'Accountant Portal', 'All 3 languages', 'AI Morning Briefing', 'Priority support'],
+    features: ['Unlimited invoices', 'All 5 features', '5 languages', 'PocketChat unlimited', 'AI Morning Briefing', 'Accountant Portal'],
     cta: 'Go Pro',
     highlight: true,
   },
   {
-    name: 'Team',
-    price: '¥3,980',
+    name: 'Business',
+    price: '¥5,980',
     period: '/mo',
-    desc: 'Multiple users',
-    features: ['Everything in Pro', 'Up to 5 team members', 'Shared cash flow', 'Role-based access', 'Data export'],
-    cta: 'Go Pro',
+    desc: 'Scale your team',
+    features: ['Everything in Pro', 'Voice translation', 'Document scan AI', 'Priority support', '10 languages', 'Multiple staff'],
+    cta: 'Go Business',
+    highlight: false,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: '',
+    desc: 'Large organizations',
+    features: ['Multiple organizations', 'API access', 'White label option', 'Dedicated support', 'Custom integrations'],
+    cta: 'Contact Us',
     highlight: false,
   },
 ];
@@ -93,21 +111,21 @@ type Lang = 'en' | 'ja' | 'ur';
 
 const HERO_TEXT: Record<Lang, { title1: string; title2: string; subtitle: string; cta: string }> = {
   en: {
-    title1: 'Your Business',
-    title2: 'in Your Pocket',
-    subtitle: 'The mobile-first business toolkit for foreigners running businesses in Japan. Invoices, cash flow, expenses, and accountant sharing — all from your phone.',
+    title1: 'Your AI Business',
+    title2: 'Autopilot',
+    subtitle: 'Invoices. Cash flow. Business chat with auto-translation. 10 languages. All from your phone. Built for entrepreneurs in Japan.',
     cta: 'Open Your Pocket',
   },
   ja: {
-    title1: 'ビジネスを',
-    title2: 'ポケットに',
-    subtitle: '日本でビジネスを運営する外国人のためのモバイルファースト・ビジネスツールキット。請求書、キャッシュフロー、経費、会計士共有 — すべてスマホから。',
+    title1: 'AIビジネス',
+    title2: 'オートパイロット',
+    subtitle: '請求書、キャッシュフロー、自動翻訳ビジネスチャット。10言語対応。すべてスマホから。日本の起業家のために。',
     cta: '無料で始める',
   },
   ur: {
-    title1: 'آپ کا کاروبار',
-    title2: 'آپ کی جیب میں',
-    subtitle: 'جاپان میں کاروبار چلانے والے غیر ملکیوں کے لیے موبائل فرسٹ ٹول کٹ۔ انوائس، کیش فلو، اخراجات، اور اکاؤنٹنٹ شیئرنگ — سب فون سے۔',
+    title1: 'AI بزنس',
+    title2: 'آٹو پائلٹ',
+    subtitle: 'انوائس، کیش فلو، آٹو ٹرانسلیشن بزنس چیٹ۔ 10 زبانیں۔ سب فون سے۔ جاپان میں کاروباریوں کے لیے۔',
     cta: 'مفت شروع کریں',
   },
 };
@@ -153,7 +171,7 @@ export default function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 py-20 text-center sm:py-28">
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-2)] px-3.5 py-1.5 text-xs text-[var(--text-3)]">
-            Built for foreigners in Japan
+            AI-powered business toolkit
           </div>
           <h1 className="mb-6 text-3xl font-light text-[var(--text-1)] sm:text-3xl">
             {hero.title1}{' '}
@@ -224,7 +242,7 @@ export default function LandingPage() {
             </div>
             <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)]">Accountant Portal</h2>
             <p className="mb-8 text-md leading-relaxed text-[var(--text-3)]">
-              Generate one link. Your accountant gets read-only access to everything — invoices, cash flow, expenses, receipts. Download monthly packages as ZIP. No login required. No more LINE messages at 11pm asking for receipts.
+              Generate one link. Your accountant gets read-only access to everything — invoices, cash flow, expenses, receipts. Download monthly packages as ZIP. No login required. Integrated with PocketChat for seamless accountant communication. No more LINE messages at 11pm asking for receipts.
             </p>
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
@@ -248,7 +266,7 @@ export default function LandingPage() {
       <section id="pricing" className="mx-auto max-w-5xl px-4 py-20">
         <p className="mb-2 text-center text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Pricing</p>
         <h2 className="mb-14 text-center text-xl font-semibold text-[var(--text-1)]">Simple, transparent pricing</h2>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {PLANS.map((plan) => (
             <div
               key={plan.name}

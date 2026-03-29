@@ -189,6 +189,13 @@ export default function OnboardingPage() {
               <option value="en">🌐 English</option>
               <option value="ja">🌐 日本語</option>
               <option value="ur">🌐 اردو</option>
+              <option value="ar">🌐 العربية</option>
+              <option value="bn">🌐 বাংলা</option>
+              <option value="pt">🌐 Português</option>
+              <option value="tl">🌐 Filipino</option>
+              <option value="vi">🌐 Tiếng Việt</option>
+              <option value="tr">🌐 Türkçe</option>
+              <option value="zh">🌐 中文</option>
             </select>
           </div>
         )}

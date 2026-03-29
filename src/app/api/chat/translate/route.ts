@@ -6,6 +6,7 @@ import Anthropic from '@anthropic-ai/sdk'
 const LANG_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic',
   tl: 'Tagalog', pt: 'Portuguese', bn: 'Bengali',
+  vi: 'Vietnamese', tr: 'Turkish', zh: 'Simplified Chinese',
 }
 
 export async function POST(request: Request) {

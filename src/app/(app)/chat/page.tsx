@@ -50,6 +50,7 @@ interface Message {
 
 const LANG_FLAGS: Record<string, string> = {
   en: '🇬🇧', ja: '🇯🇵', ur: '🇵🇰', ar: '🇸🇦', tl: '🇵🇭', pt: '🇧🇷', bn: '🇧🇩',
+  vi: '🇻🇳', tr: '🇹🇷', zh: '🇨🇳',
 };
 
 type FilterType = 'all' | 'customer' | 'supplier' | 'invoice';
@@ -847,6 +848,9 @@ export default function PocketChatPage() {
               <option value="bn">🇧🇩</option>
               <option value="pt">🇧🇷</option>
               <option value="tl">🇵🇭</option>
+              <option value="vi">🇻🇳</option>
+              <option value="tr">🇹🇷</option>
+              <option value="zh">🇨🇳</option>
             </select>
 
             {/* Message input */}
