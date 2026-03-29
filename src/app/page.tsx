@@ -86,6 +86,7 @@ function getTime(tz: string): string {
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>('en');
   const [now, setNow] = useState(new Date());
+  const [priceCurrency, setPriceCurrency] = useState<'JPY' | 'USD' | 'EUR'>('JPY');
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -94,6 +95,17 @@ export default function LandingPage() {
 
   // Suppress unused var warning — now drives clock re-renders
   void now;
+
+  const PRICE_MAP: Record<string, Record<string, string>> = {
+    '¥0': { JPY: '¥0', USD: '$0', EUR: '€0' },
+    '¥2,980': { JPY: '¥2,980', USD: '$20', EUR: '€18' },
+    '¥5,980': { JPY: '¥5,980', USD: '$40', EUR: '€36' },
+    'Custom': { JPY: 'Custom', USD: 'Custom', EUR: 'Custom' },
+  };
+
+  function getPrice(basePrice: string): string {
+    return PRICE_MAP[basePrice]?.[priceCurrency] || basePrice;
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text-1)]" dir={lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -224,7 +236,7 @@ export default function LandingPage() {
                 The world&apos;s first business messenger with real-time AI translation. Send messages, voice notes, photos and documents in your language. Your customer reads it in theirs. 13 languages. 16 currencies. Zero friction.
               </p>
               <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#4F46E5]/30 bg-[#4F46E5]/10 px-4 py-2">
-                <span className="text-sm">🇺🇸 🇯🇵 🇵🇰 🇸🇦 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳 🇫🇷 🇳🇱 🇪🇸</span>
+                <span className="text-sm">🇺🇸 🇯🇵 🇵🇰 🇦🇪 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳 🇫🇷 🇳🇱 🇪🇸</span>
               </div>
             </div>
             <div className="flex-1">
@@ -338,7 +350,24 @@ export default function LandingPage() {
       <section id="pricing" className="border-t border-[var(--border)]">
         <div className="mx-auto max-w-5xl px-4 py-20">
           <p className="mb-2 text-center text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Pricing</p>
-          <h2 className="mb-14 text-center text-xl font-semibold text-[var(--text-1)]">Simple, transparent pricing</h2>
+          <h2 className="mb-6 text-center text-xl font-semibold text-[var(--text-1)]">Simple, transparent pricing</h2>
+          <div className="mb-10 flex justify-center">
+            <div className="inline-flex rounded-[10px] border border-[var(--border-strong)] bg-[var(--bg-2)] p-1">
+              {(['JPY', 'USD', 'EUR'] as const).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setPriceCurrency(c)}
+                  className={`rounded-[8px] px-4 py-1.5 text-xs font-medium transition-colors ${
+                    priceCurrency === c
+                      ? 'bg-[var(--accent)] text-white'
+                      : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
+                  }`}
+                >
+                  {c === 'JPY' ? '¥ JPY' : c === 'USD' ? '$ USD' : '€ EUR'}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {PLANS.map((plan) => (
               <div
@@ -357,10 +386,11 @@ export default function LandingPage() {
                 <h4 className="text-md font-medium text-[var(--text-1)]">{plan.name}</h4>
                 <p className="mb-4 text-sm text-[var(--text-3)]">{plan.desc}</p>
                 <div className="mb-6">
-                  <span className="font-mono text-2xl font-medium text-[var(--text-1)]">{plan.price}</span>
+                  <span className="font-mono text-2xl font-medium text-[var(--text-1)]">{getPrice(plan.price)}</span>
                   <span className="text-sm text-[var(--text-3)]">{plan.period}</span>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(plan as any).priceAlt && <p className="text-xs text-[var(--text-4)] mt-0.5">{(plan as any).priceAlt}</p>}
+                  {priceCurrency !== 'JPY' && plan.price !== 'Custom' && plan.price !== '¥0' && (
+                    <p className="text-[10px] text-[var(--text-4)] mt-0.5">{plan.price}/mo in JPY</p>
+                  )}
                 </div>
                 <ul className="mb-6 space-y-2.5">
                   {plan.features.map((f) => (
