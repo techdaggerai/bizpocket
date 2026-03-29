@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
@@ -8,21 +8,79 @@ import { formatCurrency, getGreeting, getCurrentMonth, formatDateShort } from '@
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 
+const BRIEFING_CACHE_KEY = 'bizpocket_ai_briefing';
+const BRIEFING_TTL = 4 * 60 * 60 * 1000; // 4 hours
+
+interface CachedBriefing {
+  text: string;
+  ownerName: string;
+  timestamp: number;
+  orgId: string;
+}
+
+function getCachedBriefing(orgId: string): CachedBriefing | null {
+  try {
+    const raw = localStorage.getItem(BRIEFING_CACHE_KEY);
+    if (!raw) return null;
+    const cached: CachedBriefing = JSON.parse(raw);
+    if (cached.orgId !== orgId) return null;
+    if (Date.now() - cached.timestamp > BRIEFING_TTL) return null;
+    return cached;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedBriefing(text: string, ownerName: string, orgId: string) {
+  try {
+    const data: CachedBriefing = { text, ownerName, timestamp: Date.now(), orgId };
+    localStorage.setItem(BRIEFING_CACHE_KEY, JSON.stringify(data));
+  } catch {}
+}
+
 export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const supabase = createClient();
   const fullName = user.user_metadata?.full_name || '';
   const profileName = profile.name || '';
-  // Use auth metadata first; skip profile.name if it matches org name (data bug)
   const displayName = fullName || (profileName !== organization.name ? profileName : '') || user.email?.split('@')[0] || '';
   const firstName = displayName.split(' ')[0];
+
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [briefing, setBriefing] = useState<string | null>(null);
+  const [briefingLoading, setBriefingLoading] = useState(true);
 
   const month = getCurrentMonth();
   const currency = organization.currency || 'JPY';
+
+  const fetchBriefing = useCallback(async () => {
+    const cached = getCachedBriefing(organization.id);
+    if (cached) {
+      setBriefing(cached.text);
+      setBriefingLoading(false);
+      return;
+    }
+
+    setBriefingLoading(true);
+    try {
+      const res = await fetch('/api/ai/briefing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organizationId: organization.id }),
+      });
+      const data = await res.json();
+      if (data.briefing) {
+        setBriefing(data.briefing);
+        setCachedBriefing(data.briefing, data.ownerName || firstName, organization.id);
+      }
+    } catch {
+      // Silently fail — static greeting remains
+    }
+    setBriefingLoading(false);
+  }, [organization.id, firstName]);
 
   useEffect(() => {
     async function load() {
@@ -45,7 +103,8 @@ export default function DashboardPage() {
       setLoading(false);
     }
     load();
-  }, [supabase, organization.id, month]);
+    fetchBriefing();
+  }, [supabase, organization.id, month, fetchBriefing]);
 
   const totalIn = flows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
   const totalOut = flows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
@@ -63,12 +122,38 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 p-4">
-      {/* Greeting */}
+      {/* AI Morning Briefing */}
       <div>
         <h1 className="text-xl font-semibold text-[var(--text-1)]">
           {getGreeting()}{firstName ? `, ${firstName}` : ''}
         </h1>
-        <p className="text-sm text-[var(--text-3)]">{organization.name}</p>
+        <p className="mb-3 text-sm text-[var(--text-3)]">{organization.name}</p>
+
+        {briefingLoading ? (
+          <div className="rounded-card border border-[#E5E5E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
+              <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 w-full animate-pulse rounded bg-[rgba(79,70,229,0.1)]" />
+              <div className="h-3 w-4/5 animate-pulse rounded bg-[rgba(79,70,229,0.1)]" />
+              <div className="h-3 w-3/5 animate-pulse rounded bg-[rgba(79,70,229,0.1)]" />
+            </div>
+          </div>
+        ) : briefing ? (
+          <div className="rounded-card border border-[#E5E5E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+              </svg>
+              <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
+            </div>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--text-2)]">
+              {briefing}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       {/* KPI Cards */}
