@@ -38,7 +38,7 @@ interface Message {
   sender_type: 'owner' | 'customer';
   sender_name: string;
   message: string;
-  message_type: 'text' | 'invoice' | 'document' | 'payment_confirmed';
+  message_type: 'text' | 'invoice' | 'document' | 'image' | 'payment_confirmed';
   attachment_url: string | null;
   invoice_id: string | null;
   read_at: string | null;
@@ -98,6 +98,9 @@ export default function PocketChatPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [contactSearch, setContactSearch] = useState('');
   const [newMessage, setNewMessage] = useState('');
+  const [chatLang, setChatLang] = useState(profile?.language || 'en');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
@@ -251,6 +254,59 @@ export default function PocketChatPage() {
     };
   }, [organization?.id, activeConvoId]);
 
+  /* ---------- File upload ---------- */
+
+  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeConvoId || !organization?.id) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast('File too large (max 10MB)', 'error');
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split('.').pop() || 'bin';
+    const isImage = file.type.startsWith('image/');
+    const folder = isImage ? 'images' : 'documents';
+    const path = `messages/${organization.id}/${activeConvoId}/${folder}/${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(path, file);
+
+    if (uploadError) {
+      toast(`Upload failed: ${uploadError.message}`, 'error');
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+
+    const msgType = isImage ? 'image' : 'document';
+    const { error } = await supabase.from('messages').insert({
+      conversation_id: activeConvoId,
+      organization_id: organization.id,
+      sender_type: 'owner',
+      sender_name: profile?.name || 'You',
+      message: file.name,
+      message_type: msgType,
+      attachment_url: urlData.publicUrl,
+      original_language: chatLang,
+    });
+
+    if (error) toast('Failed to send', 'error');
+    else {
+      await supabase
+        .from('conversations')
+        .update({ last_message: `📎 ${file.name}`, last_message_at: new Date().toISOString() })
+        .eq('id', activeConvoId);
+    }
+
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, [activeConvoId, organization?.id, chatLang]);
+
   /* ---------- Translate message ---------- */
 
   const translateMessage = useCallback(async (messageId: string, targetLang: string) => {
@@ -293,7 +349,7 @@ export default function PocketChatPage() {
       message: text,
       message_type: 'text',
       original_text: text,
-      original_language: profile?.language || 'en',
+      original_language: chatLang,
     });
 
     if (error) {
@@ -437,6 +493,53 @@ export default function PocketChatPage() {
               );
             }
 
+            // Image message
+            if (msg.message_type === 'image' && msg.attachment_url) {
+              return (
+                <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+                  <div className="max-w-[70%]">
+                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className="block rounded-[12px] overflow-hidden border border-[#E5E5E5]">
+                      <img src={msg.attachment_url} alt={msg.message} className="max-h-[240px] w-full object-cover" loading="lazy" />
+                    </a>
+                    <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                      {formatTimestamp(msg.created_at)}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+
+            // Document message
+            if (msg.message_type === 'document' && msg.attachment_url) {
+              return (
+                <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+                  <div className="max-w-[80%]">
+                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    <a
+                      href={msg.attachment_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 rounded-[12px] border border-[#E5E5E5] bg-white px-3.5 py-2.5 hover:bg-[#F9F9F8] transition-colors"
+                    >
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#DC2626]/10">
+                        <svg className="h-5 w-5 text-[#DC2626]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[#0A0A0A] truncate">{msg.message}</p>
+                        <p className="text-[10px] text-[#A3A3A3]">Tap to download</p>
+                      </div>
+                    </a>
+                    <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                      {formatTimestamp(msg.created_at)}
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+
             // Invoice message
             if (msg.message_type === 'invoice') {
               const invoiceData = (() => {
@@ -544,32 +647,112 @@ export default function PocketChatPage() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,.pdf,.doc,.docx,.xlsx,.xls"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+
+        {/* Upload progress */}
+        {uploading && (
+          <div className="px-4 py-2 border-t border-[#E5E5E5] bg-[#F9F9F8]">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 flex-1 rounded-full bg-[#E5E5E5] overflow-hidden">
+                <div className="h-full bg-[#4F46E5] rounded-full animate-pulse" style={{ width: '60%' }} />
+              </div>
+              <span className="text-[10px] text-[#A3A3A3]">Uploading...</span>
+            </div>
+          </div>
+        )}
+
         {/* Input area */}
-        <div className="p-3 border-t border-[#E5E5E5] flex gap-2 bg-white">
-          <textarea
-            ref={inputRef}
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-              }
-            }}
-            placeholder="Type a message..."
-            rows={1}
-            className="flex-1 border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!newMessage.trim() || sending}
-            className="bg-[#4F46E5] text-white rounded-[10px] p-2.5 hover:bg-[#4338CA] transition-colors disabled:opacity-40"
-            aria-label="Send"
-          >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
-            </svg>
-          </button>
+        <div className="p-3 border-t border-[#E5E5E5] bg-white">
+          <div className="flex items-end gap-2">
+            {/* Language selector */}
+            <select
+              value={chatLang}
+              onChange={(e) => setChatLang(e.target.value)}
+              className="h-[42px] rounded-[10px] border border-[#E5E5E5] bg-white px-2 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
+              title="Message language"
+            >
+              <option value="en">🇬🇧</option>
+              <option value="ja">🇯🇵</option>
+              <option value="ur">🇵🇰</option>
+              <option value="ar">🇦🇪</option>
+              <option value="bn">🇧🇩</option>
+              <option value="pt">🇧🇷</option>
+              <option value="tl">🇵🇭</option>
+            </select>
+
+            {/* Message input */}
+            <textarea
+              ref={inputRef}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              placeholder="Type a message..."
+              rows={1}
+              className="flex-1 border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+            />
+
+            {/* Attachment button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
+              title="Attach file"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+              </svg>
+            </button>
+
+            {/* Camera button */}
+            <button
+              onClick={() => {
+                if (fileInputRef.current) {
+                  fileInputRef.current.accept = 'image/*';
+                  fileInputRef.current.capture = 'environment';
+                  fileInputRef.current.click();
+                  // Reset accept after click
+                  setTimeout(() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.accept = 'image/*,.pdf,.doc,.docx,.xlsx,.xls';
+                      fileInputRef.current.removeAttribute('capture');
+                    }
+                  }, 100);
+                }
+              }}
+              disabled={uploading}
+              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
+              title="Take photo"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
+              </svg>
+            </button>
+
+            {/* Send button */}
+            <button
+              onClick={sendMessage}
+              disabled={!newMessage.trim() || sending}
+              className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:opacity-40"
+              aria-label="Send"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     );

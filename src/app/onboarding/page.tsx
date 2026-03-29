@@ -181,21 +181,15 @@ export default function OnboardingPage() {
               <h2 className="text-2xl font-bold text-[var(--text-1)]">Choose your language</h2>
               <p className="mt-1 text-sm text-[var(--text-3)]">You can change this anytime in settings</p>
             </div>
-            <div className="space-y-2">
-              {LANGUAGES.map((l) => (
-                <button
-                  key={l.value}
-                  onClick={() => setForm({ ...form, language: l.value })}
-                  className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
-                    form.language === l.value
-                      ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
-                      : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
+            <select
+              value={form.language}
+              onChange={(e) => setForm({ ...form, language: e.target.value })}
+              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center]"
+            >
+              <option value="en">🌐 English</option>
+              <option value="ja">🌐 日本語</option>
+              <option value="ur">🌐 اردو</option>
+            </select>
           </div>
         )}
 
