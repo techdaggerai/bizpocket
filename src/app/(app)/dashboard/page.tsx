@@ -112,6 +112,11 @@ export default function DashboardPage() {
   const unpaidTotal = invoices.reduce((s, inv) => s + inv.total, 0);
   const recentFlows = flows.slice(0, 5);
 
+  // Profile completeness check
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const org = organization as any;
+  const profileIncomplete = !org.address || !org.phone || !org.bank_name || !org.bank_account_number;
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -128,6 +133,25 @@ export default function DashboardPage() {
           {getGreeting()}{firstName ? `, ${firstName}` : ''}
         </h1>
         <p className="mb-3 text-sm text-[var(--text-3)]">{organization.name}</p>
+
+        {/* Profile Completeness Banner */}
+        {profileIncomplete && (
+          <Link
+            href="/settings/business-setup"
+            className="mb-3 flex items-center gap-3 rounded-card border border-[#DC2626]/20 bg-[#DC2626]/5 p-3.5 transition-colors hover:bg-[#DC2626]/10"
+          >
+            <svg className="h-5 w-5 flex-shrink-0 text-[#DC2626]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[#DC2626]">Complete your business profile</p>
+              <p className="text-xs text-[#DC2626]/70">Required before you can fire invoices</p>
+            </div>
+            <svg className="h-4 w-4 text-[#DC2626]/50" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </Link>
+        )}
 
         {briefingLoading ? (
           <div className="rounded-card border border-[#E5E5E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">

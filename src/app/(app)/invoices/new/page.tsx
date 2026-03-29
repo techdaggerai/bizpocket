@@ -45,9 +45,10 @@ export default function NewInvoicePage() {
   const supabase = createClient();
   const currency = organization.currency || 'JPY';
 
-  // Wizard step
-  const [step, setStep] = useState(1);
+  // Wizard step (0 = template picker, 1-5 = form steps)
+  const [step, setStep] = useState(0);
   const totalSteps = 5;
+  const [selectedTemplate, setSelectedTemplate] = useState('classic');
 
   // Step 1 — Customer
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -77,12 +78,14 @@ export default function NewInvoicePage() {
   const [swipingIdx, setSwipingIdx] = useState<number | null>(null);
   const touchStartX = useRef(0);
 
-  // Step 4 — Bank Details
-  const [bankName, setBankName] = useState('');
-  const [bankBranch, setBankBranch] = useState('');
-  const [bankAccountName, setBankAccountName] = useState('');
-  const [bankAccountNumber, setBankAccountNumber] = useState('');
-  const [bankAccountType, setBankAccountType] = useState('Futsu');
+  // Step 4 — Bank Details (pre-fill from org)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const org = organization as any;
+  const [bankName, setBankName] = useState((org.bank_name as string) || '');
+  const [bankBranch, setBankBranch] = useState((org.bank_branch as string) || '');
+  const [bankAccountName, setBankAccountName] = useState((org.bank_account_name as string) || '');
+  const [bankAccountNumber, setBankAccountNumber] = useState((org.bank_account_number as string) || '');
+  const [bankAccountType, setBankAccountType] = useState((org.bank_account_type as string) || 'Futsu');
 
   // Step 5 — Preview & Save
   const [saving, setSaving] = useState(false);
@@ -244,6 +247,7 @@ export default function NewInvoicePage() {
         bank_account_number: bankAccountNumber || null,
         bank_account_type: bankAccountType || 'Futsu',
         invoice_prefix: 'INV',
+        template: selectedTemplate,
         currency,
         status,
         language: invoiceLang,
@@ -368,7 +372,7 @@ export default function NewInvoicePage() {
         <div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('invoices.new_invoice')}</h1>
           <p className="text-xs text-[var(--text-3)]">
-            {t('invoices.step')} {step} {t('invoices.of')} {totalSteps}
+            {step === 0 ? 'Choose template' : `${t('invoices.step')} ${step} ${t('invoices.of')} ${totalSteps}`}
           </p>
         </div>
         <button
@@ -380,7 +384,7 @@ export default function NewInvoicePage() {
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-6 flex gap-1.5">
+      {step > 0 && <div className="mb-6 flex gap-1.5">
         {Array.from({ length: totalSteps }, (_, i) => (
           <div
             key={i}
@@ -389,10 +393,43 @@ export default function NewInvoicePage() {
             }`}
           />
         ))}
-      </div>
+      </div>}
 
       {/* Step Content */}
       <div className="flex-1">
+        {/* ===== STEP 0: TEMPLATE PICKER ===== */}
+        {step === 0 && (
+          <div className="space-y-4">
+            <h2 className="text-base font-medium text-[var(--text-1)]">Choose Invoice Template</h2>
+            <p className="text-sm text-[var(--text-3)]">Select a style for your invoice PDF</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { id: 'classic', name: 'Classic', desc: 'Clean, traditional layout', color: '#4F46E5' },
+                { id: 'modern', name: 'Modern', desc: 'Minimal with bold typography', color: '#0EA5E9' },
+                { id: 'japanese', name: 'Japanese Style', desc: 'Optimized for 請求書 format', color: '#DC2626' },
+                { id: 'compact', name: 'Compact', desc: 'Dense, more items per page', color: '#16A34A' },
+                { id: 'export', name: 'Export', desc: 'International trade format', color: '#7C3AED' },
+              ].map((tpl) => (
+                <button
+                  key={tpl.id}
+                  onClick={() => { setSelectedTemplate(tpl.id); setStep(1); }}
+                  className={`flex flex-col rounded-card border p-4 text-left transition-all hover:shadow-sm ${
+                    selectedTemplate === tpl.id
+                      ? 'border-[var(--accent)] bg-[var(--accent-light)]'
+                      : 'border-[#E5E5E5] bg-white'
+                  }`}
+                >
+                  <div className="mb-3 flex h-16 items-center justify-center rounded-lg" style={{ backgroundColor: `${tpl.color}10` }}>
+                    <div className="h-10 w-8 rounded border-2 border-dashed" style={{ borderColor: tpl.color, opacity: 0.5 }} />
+                  </div>
+                  <p className="text-sm font-medium text-[var(--text-1)]">{tpl.name}</p>
+                  <p className="text-xs text-[var(--text-4)]">{tpl.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ===== STEP 1: CUSTOMER SELECTION ===== */}
         {step === 1 && (
           <div className="space-y-4">
@@ -940,13 +977,13 @@ export default function NewInvoicePage() {
         </div>
 
         {/* Navigation */}
-        <div className="flex gap-2">
-          {step > 1 && (
+        {step > 0 && <div className="flex gap-2">
+          {step >= 1 && (
             <button
               onClick={() => setStep(step - 1)}
               className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]"
             >
-              {t('invoices.back')}
+              {step === 1 ? 'Templates' : t('invoices.back')}
             </button>
           )}
           {step < totalSteps && (
@@ -963,7 +1000,7 @@ export default function NewInvoicePage() {
               {t('invoices.next')}
             </button>
           )}
-        </div>
+        </div>}
       </div>
     </div>
   );

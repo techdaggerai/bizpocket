@@ -14,6 +14,15 @@ export interface Organization {
   plan: PlanTier;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  address: string | null;
+  phone: string | null;
+  tax_number: string | null;
+  bank_name: string | null;
+  bank_branch: string | null;
+  bank_account_name: string | null;
+  bank_account_number: string | null;
+  bank_account_type: string | null;
+  logo_url: string | null;
   created_at: string;
 }
 
