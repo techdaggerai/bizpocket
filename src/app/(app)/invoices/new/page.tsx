@@ -49,6 +49,13 @@ export default function NewInvoicePage() {
   const [step, setStep] = useState(0);
   const totalSteps = 5;
   const [selectedTemplate, setSelectedTemplate] = useState('classic');
+  const [invoiceType, setInvoiceType] = useState('commercial');
+
+  // Transport-specific fields
+  const [transportFields, setTransportFields] = useState({
+    vessel: '', port_loading: '', port_discharge: '',
+    shipping_terms: 'FOB', container_no: '', bill_of_lading: '',
+  });
 
   // Step 1 — Customer
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -248,6 +255,15 @@ export default function NewInvoicePage() {
         bank_account_type: bankAccountType || 'Futsu',
         invoice_prefix: 'INV',
         template: selectedTemplate,
+        invoice_type: invoiceType,
+        ...(invoiceType === 'transport' ? {
+          vessel: transportFields.vessel || null,
+          port_loading: transportFields.port_loading || null,
+          port_discharge: transportFields.port_discharge || null,
+          shipping_terms: transportFields.shipping_terms || null,
+          container_no: transportFields.container_no || null,
+          bill_of_lading: transportFields.bill_of_lading || null,
+        } : {}),
         currency,
         status,
         language: invoiceLang,
@@ -609,6 +625,35 @@ export default function NewInvoicePage() {
                 </div>
               </button>
             </div>
+
+            {/* Invoice Type Selector */}
+            <div className="mt-6">
+              <h3 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Invoice Type</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: 'commercial', label: 'Commercial', desc: 'Goods, cars, parts', icon: '📦' },
+                  { id: 'transport', label: 'Transport', desc: 'Shipping, freight', icon: '🚢' },
+                  { id: 'service', label: 'Service', desc: 'Repair, consulting', icon: '🔧' },
+                  { id: 'proforma', label: 'Proforma', desc: 'Estimate, quote', icon: '📋' },
+                ].map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => setInvoiceType(type.id)}
+                    className={`flex items-center gap-3 rounded-[12px] border p-3 text-left transition-all ${
+                      invoiceType === type.id
+                        ? 'border-[var(--accent)] bg-[var(--accent-light)]'
+                        : 'border-[#E5E5E5] bg-white hover:border-[#C5C5C5]'
+                    }`}
+                  >
+                    <span className="text-lg">{type.icon}</span>
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text-1)]">{type.label}</p>
+                      <p className="text-[11px] text-[var(--text-4)]">{type.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
@@ -808,6 +853,44 @@ export default function NewInvoicePage() {
                 rows={3}
               />
             </div>
+
+            {/* Transport-specific fields */}
+            {invoiceType === 'transport' && (
+              <div className="space-y-3 rounded-card border border-[#E5E5E5] bg-[var(--bg-2)] p-4">
+                <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Shipping Details</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Vessel / Flight</label>
+                    <input value={transportFields.vessel} onChange={(e) => setTransportFields(p => ({ ...p, vessel: e.target.value }))} className={inputClass} placeholder="MV Pacific Star" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Shipping Terms</label>
+                    <select value={transportFields.shipping_terms} onChange={(e) => setTransportFields(p => ({ ...p, shipping_terms: e.target.value }))} className={inputClass}>
+                      <option value="FOB">FOB</option>
+                      <option value="CIF">CIF</option>
+                      <option value="CFR">CFR</option>
+                      <option value="EXW">EXW</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Port of Loading</label>
+                    <input value={transportFields.port_loading} onChange={(e) => setTransportFields(p => ({ ...p, port_loading: e.target.value }))} className={inputClass} placeholder="Yokohama" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Port of Discharge</label>
+                    <input value={transportFields.port_discharge} onChange={(e) => setTransportFields(p => ({ ...p, port_discharge: e.target.value }))} className={inputClass} placeholder="Dubai" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Container No.</label>
+                    <input value={transportFields.container_no} onChange={(e) => setTransportFields(p => ({ ...p, container_no: e.target.value }))} className={inputClass} placeholder="MSKU1234567" />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Bill of Lading</label>
+                    <input value={transportFields.bill_of_lading} onChange={(e) => setTransportFields(p => ({ ...p, bill_of_lading: e.target.value }))} className={inputClass} placeholder="BL-2026-0001" />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Selected Customer Card */}
             {selectedCustomer && (

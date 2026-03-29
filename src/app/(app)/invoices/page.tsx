@@ -336,9 +336,16 @@ export default function InvoicesPage() {
                 </div>
                 <div className="text-right">
                   <p className="font-mono text-base font-medium text-[var(--text-1)]">{formatCurrency(inv.total, inv.currency)}</p>
-                  <span className={`inline-block rounded-btn border px-1.5 py-0.5 text-[10px] font-medium ${statusColors[inv.status]}`}>
-                    {inv.status.toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-1 justify-end">
+                    {(inv as any).invoice_type && (inv as any).invoice_type !== 'commercial' && (
+                      <span className="inline-block rounded-btn border border-[var(--accent)]/20 bg-[var(--accent-light)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--accent)]">
+                        {((inv as any).invoice_type as string).toUpperCase()}
+                      </span>
+                    )}
+                    <span className={`inline-block rounded-btn border px-1.5 py-0.5 text-[10px] font-medium ${statusColors[inv.status]}`}>
+                      {inv.status.toUpperCase()}
+                    </span>
+                  </div>
                 </div>
               </div>
               <div className="mt-2.5 flex items-center gap-3">
