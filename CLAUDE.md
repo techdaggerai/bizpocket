@@ -1,7 +1,8 @@
 # CLAUDE.md — BizPocket
 Session command: launch zarrar
 Product: BizPocket | bizpocket.jp | "Your AI Business Autopilot"
-Legal: MS Dynamics LLC (Miami Beach FL) | Parent: TechDagger | Stripe: Mercury Bank
+Legal: MS Dynamics LLC, Miami Beach FL, USA | Parent: TechDagger | Stripe: Mercury Bank
+Default: en-US (American English) + JPY | RTL: Urdu + Arabic
 Founder: Dr. Bilal (Doc) — User #1
 
 CRITICAL: Never modify C:\TechDagger\pdj — copy and adapt only.
@@ -25,9 +26,11 @@ Core Features (v1 — BUILT):
 7. Auto-Translate — Claude API translation, 10 languages, language flags
 8. Public Invoice Chat — /i/[token], no login required
 
-Pricing: Starter ¥0 | Pro ¥2,980/mo | Business ¥5,980/mo | Enterprise Custom
+Pricing: Starter ¥0 | Pro ¥2,980/mo (~$20) | Business ¥5,980/mo (~$40) | Enterprise Custom
 
-Languages: EN, JA, UR, AR, BN, PT, TL, VI, TR, ZH (10 total)
+Languages (13): EN-US, JA, UR, AR, BN, PT-BR, FIL, VI, TR, ZH-CN, FR, NL, ES
+Currencies (16): JPY, USD, EUR, GBP, INR, PKR, SAR, AED, BDT, NGN, BRL, VND, TRY, CNY, PHP, IDR
+Currency utility: src/lib/utils.ts → formatCurrency(amount, currency, locale) + CURRENCIES array
 
 Rules:
 1. Mobile first — 390px always

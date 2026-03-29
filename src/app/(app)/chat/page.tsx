@@ -49,8 +49,8 @@ interface Message {
 }
 
 const LANG_FLAGS: Record<string, string> = {
-  en: '🇬🇧', ja: '🇯🇵', ur: '🇵🇰', ar: '🇸🇦', tl: '🇵🇭', pt: '🇧🇷', bn: '🇧🇩',
-  vi: '🇻🇳', tr: '🇹🇷', zh: '🇨🇳',
+  en: '🇺🇸', ja: '🇯🇵', ur: '🇵🇰', ar: '🇸🇦', tl: '🇵🇭', pt: '🇧🇷', bn: '🇧🇩',
+  vi: '🇻🇳', tr: '🇹🇷', zh: '🇨🇳', fr: '🇫🇷', nl: '🇳🇱', es: '🇪🇸',
 };
 
 type FilterType = 'all' | 'customer' | 'supplier' | 'invoice';
@@ -851,6 +851,9 @@ export default function PocketChatPage() {
               <option value="vi">🇻🇳</option>
               <option value="tr">🇹🇷</option>
               <option value="zh">🇨🇳</option>
+              <option value="fr">🇫🇷</option>
+              <option value="nl">🇳🇱</option>
+              <option value="es">🇪🇸</option>
             </select>
 
             {/* Message input */}

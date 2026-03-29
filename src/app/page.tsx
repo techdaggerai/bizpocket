@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { PocketMark, LogoWordmark } from '@/components/Logo';
 
 const LANG_OPTIONS = [
-  { value: 'en', flag: '🇬🇧', label: 'English' },
+  { value: 'en', flag: '🇺🇸', label: 'English (US)' },
   { value: 'ja', flag: '🇯🇵', label: '日本語' },
   { value: 'ur', flag: '🇵🇰', label: 'اردو' },
   { value: 'ar', flag: '🇦🇪', label: 'العربية' },
@@ -15,6 +15,9 @@ const LANG_OPTIONS = [
   { value: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
   { value: 'tr', flag: '🇹🇷', label: 'Türkçe' },
   { value: 'zh', flag: '🇨🇳', label: '中文' },
+  { value: 'fr', flag: '🇫🇷', label: 'Français' },
+  { value: 'nl', flag: '🇳🇱', label: 'Nederlands' },
+  { value: 'es', flag: '🇪🇸', label: 'Español' },
 ];
 
 const WORLD_CLOCKS = [
@@ -39,6 +42,7 @@ const PLANS = [
   {
     name: 'Pro',
     price: '¥2,980',
+    priceAlt: '~$20 · ~€18',
     period: '/mo',
     desc: 'For serious businesses',
     features: ['Unlimited invoices', 'PocketChat unlimited', '5 languages', 'AI Morning Briefing', 'Accountant Portal', 'All features'],
@@ -48,9 +52,10 @@ const PLANS = [
   {
     name: 'Business',
     price: '¥5,980',
+    priceAlt: '~$40 · ~€36',
     period: '/mo',
     desc: 'Scale your team',
-    features: ['Everything in Pro', 'Voice translation', '10 languages', 'Document scan AI', 'Priority support', 'Multiple staff'],
+    features: ['Everything in Pro', 'Voice translation', '13 languages', 'Document scan AI', 'Priority support', 'Multiple staff'],
     cta: 'Go Business',
     highlight: false,
   },
@@ -65,7 +70,7 @@ const PLANS = [
   },
 ];
 
-type Lang = 'en' | 'ja' | 'ur';
+type Lang = 'en' | 'ja' | 'ur' | 'ar' | 'bn' | 'pt' | 'tl' | 'vi' | 'tr' | 'zh' | 'fr' | 'nl' | 'es';
 
 const selectClass = "rounded-[8px] border border-[rgba(0,0,0,0.12)] bg-white px-2.5 py-1.5 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none pr-7 bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_8px_center]";
 
@@ -91,7 +96,7 @@ export default function LandingPage() {
   void now;
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text-1)]" dir={lang === 'ur' || lang === 'ar' as string ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text-1)]" dir={lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr'}>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
@@ -123,14 +128,14 @@ export default function LandingPage() {
       <section className="mx-auto max-w-5xl px-4 py-20 text-center sm:py-28">
         <div className="mx-auto max-w-2xl">
           <div className="mb-5 inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-2)] px-3.5 py-1.5 text-xs text-[var(--text-3)]">
-            AI-powered business toolkit &middot; 10 languages
+            13 languages &middot; 16 currencies &middot; Zero barriers
           </div>
           <h1 className="mb-3 text-3xl font-light text-[var(--text-1)] sm:text-[42px] sm:leading-[1.1]">
             Your AI Business{' '}
             <span className="font-semibold text-[var(--accent)]">Autopilot.</span>
           </h1>
           <p className="mb-6 text-md leading-relaxed text-[var(--text-3)]">
-            Invoices. Cash flow. PocketChat with real-time translation in 10 languages. All from your phone. AI runs your business while you sleep.
+            Invoices. Cash flow. PocketChat with real-time translation in 13 languages. 16 currencies. All from your phone. AI runs your business while you sleep.
           </p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/signup" className="w-full rounded-btn bg-[var(--accent)] px-8 py-3 text-center text-sm font-medium text-white shadow-sm transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px sm:w-auto">
@@ -216,10 +221,10 @@ export default function LandingPage() {
                 They speak Japanese.<br/>You speak English.<br/>Nobody notices the difference.
               </h2>
               <p className="text-sm leading-relaxed text-[#A1A1AA]">
-                The world&apos;s first business messenger with real-time AI translation. Send messages, voice notes, photos and documents in your language. Your customer reads it in theirs. 10 languages. Zero friction.
+                The world&apos;s first business messenger with real-time AI translation. Send messages, voice notes, photos and documents in your language. Your customer reads it in theirs. 13 languages. 16 currencies. Zero friction.
               </p>
               <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#4F46E5]/30 bg-[#4F46E5]/10 px-4 py-2">
-                <span className="text-sm">🇬🇧 🇯🇵 🇵🇰 🇸🇦 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳</span>
+                <span className="text-sm">🇺🇸 🇯🇵 🇵🇰 🇸🇦 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳 🇫🇷 🇳🇱 🇪🇸</span>
               </div>
             </div>
             <div className="flex-1">
@@ -354,6 +359,8 @@ export default function LandingPage() {
                 <div className="mb-6">
                   <span className="font-mono text-2xl font-medium text-[var(--text-1)]">{plan.price}</span>
                   <span className="text-sm text-[var(--text-3)]">{plan.period}</span>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(plan as any).priceAlt && <p className="text-xs text-[var(--text-4)] mt-0.5">{(plan as any).priceAlt}</p>}
                 </div>
                 <ul className="mb-6 space-y-2.5">
                   {plan.features.map((f) => (

@@ -93,6 +93,39 @@ export default function SettingsPage() {
           <option value="vi">🌐 Tiếng Việt</option>
           <option value="tr">🌐 Türkçe</option>
           <option value="zh">🌐 中文</option>
+          <option value="fr">🌐 Français</option>
+          <option value="nl">🌐 Nederlands</option>
+          <option value="es">🌐 Español</option>
+        </select>
+      </section>
+
+      {/* Currency */}
+      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Primary Currency</h2>
+        <select
+          value={organization.currency || 'JPY'}
+          onChange={async (e) => {
+            await supabase.from('organizations').update({ currency: e.target.value }).eq('id', organization.id);
+            toast('Currency updated', 'success');
+          }}
+          className="rounded-input border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] w-full"
+        >
+          <option value="JPY">¥ JPY — Japanese Yen</option>
+          <option value="USD">$ USD — US Dollar</option>
+          <option value="EUR">€ EUR — Euro</option>
+          <option value="GBP">£ GBP — British Pound</option>
+          <option value="INR">₹ INR — Indian Rupee</option>
+          <option value="PKR">₨ PKR — Pakistani Rupee</option>
+          <option value="SAR">﷼ SAR — Saudi Riyal</option>
+          <option value="AED">د.إ AED — UAE Dirham</option>
+          <option value="BDT">৳ BDT — Bangladeshi Taka</option>
+          <option value="NGN">₦ NGN — Nigerian Naira</option>
+          <option value="BRL">R$ BRL — Brazilian Real</option>
+          <option value="VND">₫ VND — Vietnamese Dong</option>
+          <option value="TRY">₺ TRY — Turkish Lira</option>
+          <option value="CNY">¥ CNY — Chinese Yuan</option>
+          <option value="PHP">₱ PHP — Philippine Peso</option>
+          <option value="IDR">Rp IDR — Indonesian Rupiah</option>
         </select>
       </section>
 

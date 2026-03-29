@@ -1,13 +1,35 @@
-export function formatCurrency(amount: number, currency = 'JPY'): string {
-  // Use en-US locale to get plain ¥ (U+00A5) instead of ￥ (U+FFE5)
-  // which some browsers render as an emoji-like icon
-  return new Intl.NumberFormat('en-US', {
+// Zero-decimal currencies (no cents)
+const ZERO_DECIMAL = new Set(['JPY', 'KRW', 'VND', 'IDR', 'CLP', 'BIF', 'GNF', 'PYG', 'RWF', 'UGX', 'XOF']);
+
+export function formatCurrency(amount: number, currency = 'JPY', locale = 'en-US'): string {
+  const noDecimals = ZERO_DECIMAL.has(currency);
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
-    minimumFractionDigits: currency === 'JPY' ? 0 : 2,
-    maximumFractionDigits: currency === 'JPY' ? 0 : 2,
+    minimumFractionDigits: noDecimals ? 0 : 2,
+    maximumFractionDigits: noDecimals ? 0 : 2,
   }).format(amount);
 }
+
+// All supported currencies
+export const CURRENCIES = [
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'PKR', symbol: '₨', name: 'Pakistani Rupee' },
+  { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' },
+  { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
+  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+  { code: 'VND', symbol: '₫', name: 'Vietnamese Dong' },
+  { code: 'TRY', symbol: '₺', name: 'Turkish Lira' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'PHP', symbol: '₱', name: 'Philippine Peso' },
+  { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah' },
+] as const;
 
 export function formatDate(date: string): string {
   return new Date(date).toLocaleDateString('en-CA'); // YYYY-MM-DD

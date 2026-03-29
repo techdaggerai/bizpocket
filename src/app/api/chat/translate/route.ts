@@ -7,6 +7,7 @@ const LANG_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic',
   tl: 'Tagalog', pt: 'Portuguese', bn: 'Bengali',
   vi: 'Vietnamese', tr: 'Turkish', zh: 'Simplified Chinese',
+  fr: 'French', nl: 'Dutch', es: 'Spanish',
 }
 
 export async function POST(request: Request) {
