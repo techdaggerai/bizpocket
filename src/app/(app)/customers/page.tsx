@@ -143,14 +143,19 @@ export default function CustomersPage() {
   }
 
   async function handleDelete(id: string) {
-    const { error } = await supabase.from('customers').delete().eq('id', id);
+    const { error } = await supabase
+      .from('customers')
+      .delete()
+      .eq('id', id)
+      .eq('organization_id', organization.id);
     if (error) {
-      toast(error.message, 'error');
+      toast(`Delete failed: ${error.message}`, 'error');
     } else {
       toast('Customer deleted', 'success');
-      setDeleteConfirmId(null);
-      fetchCustomers();
+      // Optimistic removal from local state
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
     }
+    setDeleteConfirmId(null);
   }
 
   function updateField(field: keyof CustomerForm, value: string) {
@@ -343,16 +348,16 @@ export default function CustomersPage() {
                     Edit
                   </button>
                   {deleteConfirmId === c.id ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleDelete(c.id)}
-                        className="text-xs font-medium text-[#DC2626] hover:opacity-80"
+                        className="rounded-btn bg-[#DC2626] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#B91C1C]"
                       >
-                        Confirm
+                        Delete {c.name.split(' ')[0]}?
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(null)}
-                        className="text-xs text-[var(--text-3)] hover:opacity-80"
+                        className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)]"
                       >
                         Cancel
                       </button>
