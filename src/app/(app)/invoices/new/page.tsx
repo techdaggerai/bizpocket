@@ -9,6 +9,12 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Customer, InvoiceLineItem, ItemTemplate, InvoiceStatus } from '@/types/database';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let html2pdf: any = null;
+if (typeof window !== 'undefined') {
+  import('html2pdf.js').then((mod) => { html2pdf = mod.default; });
+}
+
 const TAX_RATES = [
   { label: '10%', value: 0.10 },
   { label: '8%', value: 0.08 },
@@ -279,6 +285,77 @@ export default function NewInvoicePage() {
     setSaving(false);
     toast(status === 'draft' ? 'Invoice saved as draft' : 'Invoice sent', 'success');
     router.push('/invoices');
+  }
+
+  // PDF generation
+  async function generatePDF(): Promise<Blob | null> {
+    const el = document.getElementById('invoice-preview');
+    if (!el || !html2pdf) return null;
+
+    const prefix = organization.name?.slice(0, 3).toUpperCase() || 'BIZ';
+    const fileName = `BizPocket_INV-${prefix}-${invoiceDate.replace(/-/g, '')}.pdf`;
+
+    const opt = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+    };
+
+    const blob: Blob = await html2pdf().set(opt).from(el).outputPdf('blob');
+    return blob;
+  }
+
+  async function handleDownloadPDF() {
+    const el = document.getElementById('invoice-preview');
+    if (!el || !html2pdf) {
+      toast('PDF engine loading...', 'error');
+      return;
+    }
+
+    const prefix = organization.name?.slice(0, 3).toUpperCase() || 'BIZ';
+    const fileName = `BizPocket_INV-${prefix}-${invoiceDate.replace(/-/g, '')}.pdf`;
+
+    await html2pdf().set({
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+    }).from(el).save();
+
+    toast('PDF downloaded', 'success');
+  }
+
+  // Share via Web Share API
+  async function handleShare() {
+    const blob = await generatePDF();
+    if (!blob) {
+      toast('Could not generate PDF', 'error');
+      return;
+    }
+
+    const prefix = organization.name?.slice(0, 3).toUpperCase() || 'BIZ';
+    const fileName = `BizPocket_INV-${prefix}-${invoiceDate.replace(/-/g, '')}.pdf`;
+    const file = new File([blob], fileName, { type: 'application/pdf' });
+
+    if (navigator.share && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          title: `Invoice — ${selectedCustomer?.name || 'Customer'}`,
+          text: `Invoice from ${organization.name} — ${formatCurrency(grandTotal, currency)}`,
+          files: [file],
+        });
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          toast('Share cancelled', 'info');
+        }
+      }
+    } else {
+      // Fallback: download the PDF
+      handleDownloadPDF();
+    }
   }
 
   const inputClass = "w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
@@ -815,7 +892,23 @@ export default function NewInvoicePage() {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* PDF & Share Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleDownloadPDF}
+                className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]"
+              >
+                {t('invoices.download_pdf')}
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex-1 rounded-btn border border-[var(--accent)] bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:bg-[var(--accent)]  hover:text-white"
+              >
+                {t('invoices.share')}
+              </button>
+            </div>
+
+            {/* Save Buttons */}
             <div className="flex gap-2">
               <button
                 onClick={() => handleSave('draft')}
