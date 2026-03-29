@@ -38,7 +38,7 @@ interface Message {
   sender_type: 'owner' | 'customer';
   sender_name: string;
   message: string;
-  message_type: 'text' | 'invoice' | 'document' | 'image' | 'payment_confirmed';
+  message_type: 'text' | 'invoice' | 'document' | 'image' | 'voice' | 'payment_confirmed';
   attachment_url: string | null;
   invoice_id: string | null;
   read_at: string | null;
@@ -65,6 +65,12 @@ function timeAgo(dateStr: string): string {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
   if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 function formatTimestamp(dateStr: string): string {
@@ -104,6 +110,11 @@ export default function PocketChatPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
+  const [recording, setRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -253,6 +264,112 @@ export default function PocketChatPage() {
       supabase.removeChannel(channel);
     };
   }, [organization?.id, activeConvoId]);
+
+  /* ---------- Voice recording ---------- */
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        if (blob.size < 1000) return; // too short, ignore
+
+        await sendVoiceNote(blob, mimeType);
+      };
+
+      recorder.start(250);
+      mediaRecorderRef.current = recorder;
+      setRecording(true);
+      setRecordingDuration(0);
+
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingDuration(prev => {
+          if (prev >= 120) { // 2 min max
+            stopRecording();
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } catch {
+      toast('Microphone access denied', 'error');
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+    setRecordingDuration(0);
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+  }, []);
+
+  const cancelRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = () => {
+        mediaRecorderRef.current?.stream.getTracks().forEach(t => t.stop());
+      };
+      mediaRecorderRef.current.stop();
+    }
+    audioChunksRef.current = [];
+    setRecording(false);
+    setRecordingDuration(0);
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+  }, []);
+
+  const sendVoiceNote = useCallback(async (blob: Blob, mimeType: string) => {
+    if (!activeConvoId || !organization?.id) return;
+    setUploading(true);
+
+    const ext = mimeType.includes('webm') ? 'webm' : 'mp4';
+    const path = `messages/${organization.id}/${activeConvoId}/voice/${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(path, blob);
+
+    if (uploadError) {
+      toast(`Upload failed: ${uploadError.message}`, 'error');
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+    const duration = recordingDuration || 1;
+
+    const { error } = await supabase.from('messages').insert({
+      conversation_id: activeConvoId,
+      organization_id: organization.id,
+      sender_type: 'owner',
+      sender_name: profile?.name || 'You',
+      message: `Voice note (${formatDuration(duration)})`,
+      message_type: 'voice',
+      attachment_url: urlData.publicUrl,
+      original_language: chatLang,
+    });
+
+    if (error) toast('Failed to send voice note', 'error');
+    else {
+      await supabase
+        .from('conversations')
+        .update({ last_message: `🎤 Voice note (${formatDuration(duration)})`, last_message_at: new Date().toISOString() })
+        .eq('id', activeConvoId);
+    }
+    setUploading(false);
+  }, [activeConvoId, organization?.id, chatLang, recordingDuration]);
 
   /* ---------- File upload ---------- */
 
@@ -540,6 +657,51 @@ export default function PocketChatPage() {
               );
             }
 
+            // Voice message
+            if (msg.message_type === 'voice' && msg.attachment_url) {
+              const langFlag = msg.original_language ? LANG_FLAGS[msg.original_language] || '' : '';
+              return (
+                <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+                  <div className="max-w-[80%]">
+                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    <div
+                      className={`rounded-[12px] px-3.5 py-2.5 ${
+                        isOwner ? 'bg-[#4F46E5]' : 'bg-[#F3F3F1]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <button
+                          onClick={() => {
+                            const audio = new Audio(msg.attachment_url!);
+                            audio.play();
+                          }}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                            isOwner ? 'bg-white/20 text-white' : 'bg-[#4F46E5]/10 text-[#4F46E5]'
+                          }`}
+                        >
+                          <svg className="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </button>
+                        <div className="flex-1">
+                          <div className={`h-1 rounded-full ${isOwner ? 'bg-white/30' : 'bg-[#0A0A0A]/10'}`}>
+                            <div className={`h-full w-1/3 rounded-full ${isOwner ? 'bg-white' : 'bg-[#4F46E5]'}`} />
+                          </div>
+                        </div>
+                        <span className={`text-[10px] font-mono ${isOwner ? 'text-white/70' : 'text-[#A3A3A3]'}`}>
+                          {msg.message.match(/\d+:\d+/)?.[0] || '0:00'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
+                      {langFlag && <span className="text-[10px]">{langFlag}</span>}
+                      <span className="text-[10px] text-[#A3A3A3]">{formatTimestamp(msg.created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
             // Invoice message
             if (msg.message_type === 'invoice') {
               const invoiceData = (() => {
@@ -715,43 +877,72 @@ export default function PocketChatPage() {
               </svg>
             </button>
 
-            {/* Camera button */}
-            <button
-              onClick={() => {
-                if (fileInputRef.current) {
-                  fileInputRef.current.accept = 'image/*';
-                  fileInputRef.current.capture = 'environment';
-                  fileInputRef.current.click();
-                  // Reset accept after click
-                  setTimeout(() => {
-                    if (fileInputRef.current) {
-                      fileInputRef.current.accept = 'image/*,.pdf,.doc,.docx,.xlsx,.xls';
-                      fileInputRef.current.removeAttribute('capture');
-                    }
-                  }, 100);
-                }
-              }}
-              disabled={uploading}
-              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
-              title="Take photo"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
-              </svg>
-            </button>
+            {/* Voice / Send toggle */}
+            {recording ? (
+              <>
+                {/* Recording indicator */}
+                <div className="flex items-center gap-2 flex-1 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-[10px] px-3 py-2">
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#DC2626] animate-pulse" />
+                  <div className="flex-1 flex items-center gap-0.5">
+                    {Array.from({ length: 20 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="w-1 rounded-full bg-[#DC2626]/40"
+                        style={{ height: `${8 + Math.random() * 16}px`, animationDelay: `${i * 50}ms` }}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-mono text-xs text-[#DC2626]">{formatDuration(recordingDuration)}</span>
+                </div>
+                {/* Cancel */}
+                <button
+                  onClick={cancelRecording}
+                  className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                  title="Cancel"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                {/* Stop & Send */}
+                <button
+                  onClick={stopRecording}
+                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#DC2626] text-white rounded-[10px] hover:bg-[#B91C1C] transition-colors"
+                  title="Send voice note"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Mic button */}
+                <button
+                  onMouseDown={startRecording}
+                  onTouchStart={startRecording}
+                  disabled={uploading}
+                  className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
+                  title="Hold to record"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                  </svg>
+                </button>
 
-            {/* Send button */}
-            <button
-              onClick={sendMessage}
-              disabled={!newMessage.trim() || sending}
-              className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:opacity-40"
-              aria-label="Send"
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
-              </svg>
-            </button>
+                {/* Send button */}
+                <button
+                  onClick={sendMessage}
+                  disabled={!newMessage.trim() || sending}
+                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:opacity-40"
+                  aria-label="Send"
+                >
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
