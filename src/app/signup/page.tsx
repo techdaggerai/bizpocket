@@ -20,11 +20,14 @@ export default function SignupPage() {
     setLoading(true);
     setError('');
 
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+
     const { error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: name },
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     });
 
