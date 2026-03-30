@@ -31,6 +31,7 @@ const WORLD_CLOCKS = [
 
 const PLANS = [
   {
+    key: 'free',
     name: 'Starter',
     price: '¥0',
     period: '',
@@ -40,6 +41,7 @@ const PLANS = [
     highlight: false,
   },
   {
+    key: 'pro',
     name: 'Pro',
     price: '¥2,980',
     priceAlt: '~$20 · ~€18',
@@ -50,6 +52,7 @@ const PLANS = [
     highlight: true,
   },
   {
+    key: 'business',
     name: 'Business',
     price: '¥5,980',
     priceAlt: '~$40 · ~€36',
@@ -60,6 +63,7 @@ const PLANS = [
     highlight: false,
   },
   {
+    key: 'enterprise',
     name: 'Enterprise',
     price: 'Custom',
     period: '',
@@ -403,7 +407,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/signup"
+                  href={plan.key === 'enterprise' ? 'mailto:hello@bizpocket.jp' : `/signup?plan=${plan.key}`}
                   className={`block w-full rounded-btn py-2.5 text-center text-sm font-medium transition-all ${
                     plan.highlight
                       ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] hover:-translate-y-px'
