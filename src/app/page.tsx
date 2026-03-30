@@ -263,6 +263,84 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* AI Document Detector — Deep Dive */}
+      <section className="border-t border-[var(--border)] bg-gradient-to-b from-[var(--bg-2)] to-[var(--bg)]">
+        <div className="mx-auto max-w-5xl px-4 py-20">
+          <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
+            <div className="flex-1">
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Document Detector™</p>
+              <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">
+                Snap it.<br/>Understand it.<br/>
+                <span className="text-[var(--accent)]">In your language.</span>
+              </h2>
+              <p className="mb-6 text-sm leading-relaxed text-[var(--text-3)]">
+                Got a document in Japanese? A tax notice? A contract? A government form? Just take a picture. BizPocket AI detects what it is, translates it into your language, explains what it means, and suggests exactly what to do next.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">1</div>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Snap</span> — Take a photo of any document</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">2</div>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Detect</span> — AI identifies the document type instantly</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">3</div>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Translate</span> — Full translation in your native language</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">4</div>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Act</span> — AI suggests the response or next step</p>
+                </div>
+              </div>
+            </div>
+            {/* Visual mockup — document detection flow */}
+            <div className="flex-1">
+              <div className="rounded-[16px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 shadow-sm">
+                {/* Scanned document header */}
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--accent)]/10">
+                      <svg className="h-3.5 w-3.5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
+                    </div>
+                    <span className="text-xs font-medium text-[var(--text-2)]">Document Scanned</span>
+                  </div>
+                  <span className="rounded-full bg-[#16A34A]/10 px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">DETECTED</span>
+                </div>
+                {/* Fake Japanese document */}
+                <div className="mb-3 rounded-lg bg-[#FAFAF9] border border-[#E7E5E4] p-3">
+                  <p className="text-[11px] font-medium text-[#44403C] mb-1.5">🇯🇵 Original — 自動車税納税通知書</p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-[#78716C]">納税義務者：プレミアムドライブ合同会社</p>
+                    <p className="text-[10px] text-[#78716C]">課税標準額：自動車税　¥34,500</p>
+                    <p className="text-[10px] text-[#78716C]">納期限：令和8年4月30日</p>
+                  </div>
+                </div>
+                {/* AI Detection result */}
+                <div className="mb-3 rounded-lg bg-[rgba(79,70,229,0.04)] border border-[rgba(79,70,229,0.1)] p-3">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <svg className="h-3.5 w-3.5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+                    <span className="text-[10px] font-semibold text-[#4F46E5]">AI Translation — English</span>
+                  </div>
+                  <p className="text-xs font-medium text-[var(--text-1)] mb-1">Vehicle Tax Payment Notice</p>
+                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Taxpayer: Premium Drives LLC. Vehicle tax amount: ¥34,500. Due date: April 30, 2026.</p>
+                </div>
+                {/* Suggested action */}
+                <div className="rounded-lg bg-[#16A34A]/5 border border-[#16A34A]/15 p-3">
+                  <p className="text-[10px] font-semibold text-[#16A34A] mb-1">💡 Suggested Action</p>
+                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Pay ¥34,500 at any convenience store or bank by April 30. Want me to add a reminder to your planner?</p>
+                  <div className="mt-2.5 flex gap-2">
+                    <span className="rounded-full bg-[#4F46E5] px-3 py-1 text-[10px] font-semibold text-white">Add to Planner</span>
+                    <span className="rounded-full border border-[var(--border-strong)] px-3 py-1 text-[10px] font-medium text-[var(--text-3)]">Save to Vault</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Message Your BizPocket — The Vision */}
       <section className="border-y border-[var(--border)] bg-[#0A0A0A] text-white">
         <div className="mx-auto max-w-3xl px-4 py-20">
