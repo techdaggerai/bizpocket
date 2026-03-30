@@ -259,18 +259,21 @@ export function IconVoiceTranslation() {
   );
 }
 
-// Feature data with icon references
+// Feature data with icon references — ordered for color variety across rows
 export const FEATURES = [
+  // Row 1: orange, cyan/purple, gold, green
   { key: 'fire-invoice', name: 'Fire Invoice', desc: 'Professional invoices in 60 seconds. Fire from anywhere. Share via chat, LINE, or WhatsApp.', Icon: IconFireInvoice },
-  { key: 'invoice-templates', name: 'Invoice Templates', desc: '5 stunning templates — Classic, Modern, Japanese, Compact, and Export. Your brand, your style.', Icon: IconInvoiceTemplates },
   { key: 'pocketchat', name: 'PocketChat', desc: 'Real-time AI translation across 13 languages. Text, voice notes, photos, and documents.', Icon: IconPocketChat },
   { key: 'ai-briefing', name: 'AI Briefing', desc: 'Wake up to an AI-generated intelligence report on your business. Every single morning.', Icon: IconAIBriefing },
   { key: 'health-score', name: 'Business Health', desc: 'One number that tells you everything. Cash flow, receivables, risk — monitored 24/7 by AI.', Icon: IconHealthScore },
+  // Row 2: indigo, green, red/rose, blue
+  { key: 'invoice-templates', name: 'Invoice Templates', desc: '5 stunning templates — Classic, Modern, Japanese, Compact, and Export. Your brand, your style.', Icon: IconInvoiceTemplates },
   { key: 'cash-flow', name: 'Cash Flow', desc: 'Every yen tracked. Income and expenses auto-categorized. Real balance in real time.', Icon: IconCashFlow },
-  { key: 'snap-vault', name: 'Snap & Vault', desc: 'Point your camera. Snap. Instant PDF. Receipts, contracts, and documents — organized.', Icon: IconSnapVault },
-  { key: 'world-clock', name: 'World Clock', desc: "Live time zones for every contact. Know if it's business hours in Dubai, Lagos, or LA.", Icon: IconWorldClock },
-  { key: 'accountant-portal', name: 'Accountant Portal', desc: 'Read-only access for your accountant. Full visibility. Zero back-and-forth.', Icon: IconAccountantPortal },
-  { key: 'planner', name: 'Smart Planner', desc: 'Payment deadlines, meetings, shipments, tax dates — AI reminds you before it\'s too late.', Icon: IconPlanner },
-  { key: 'currencies', name: '16 Currencies', desc: 'JPY, USD, EUR, GBP, and 12 more. Auto-formatted, auto-converted. One tap to switch.', Icon: IconCurrencies },
   { key: 'voice-translation', name: 'Voice Translation', desc: 'Record a voice note in your language. Your contact hears it in theirs.', Icon: IconVoiceTranslation },
+  { key: 'world-clock', name: 'World Clock', desc: "Live time zones for every contact. Know if it's business hours in Dubai, Lagos, or LA.", Icon: IconWorldClock },
+  // Row 3: pink, teal, purple, multi-color
+  { key: 'planner', name: 'Smart Planner', desc: 'Payment deadlines, meetings, shipments, tax dates — AI reminds you before it\'s too late.', Icon: IconPlanner },
+  { key: 'snap-vault', name: 'Snap & Vault', desc: 'Point your camera. Snap. Instant PDF. Receipts, contracts, and documents — organized.', Icon: IconSnapVault },
+  { key: 'accountant-portal', name: 'Accountant Portal', desc: 'Read-only access for your accountant. Full visibility. Zero back-and-forth.', Icon: IconAccountantPortal },
+  { key: 'currencies', name: '16 Currencies', desc: 'JPY, USD, EUR, GBP, and 12 more. Auto-formatted, auto-converted. One tap to switch.', Icon: IconCurrencies },
 ];
