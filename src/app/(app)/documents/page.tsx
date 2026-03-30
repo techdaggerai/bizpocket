@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/utils';
+import NoteEditor from '@/components/NoteEditor';
 import type { Document } from '@/types/database';
 
 const DOC_CATEGORIES = ['Receipt', 'Invoice', 'Contract', 'Auction Slip', 'Other'];
@@ -146,28 +147,41 @@ export default function DocumentsPage() {
             <h3 className="mb-2 text-xs font-semibold uppercase text-[var(--text-3)]">{monthKey}</h3>
             <div className="grid grid-cols-2 gap-2">
               {docs.map((doc) => (
-                <a
-                  key={doc.id}
-                  href={doc.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group rounded-card border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#4F46E5]"
-                >
-                  <div className="mb-2 flex h-20 items-center justify-center rounded-lg bg-[var(--bg-2)]">
-                    {doc.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                      <img src={doc.file_url} alt={doc.title} className="h-full w-full rounded-lg object-cover" />
-                    ) : (
-                      <svg className="h-8 w-8 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                      </svg>
-                    )}
+                <div key={doc.id} className="rounded-card border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#4F46E5]">
+                  <a
+                    href={doc.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="mb-2 flex h-20 items-center justify-center rounded-lg bg-[var(--bg-2)]">
+                      {doc.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                        <img src={doc.file_url} alt={doc.title} className="h-full w-full rounded-lg object-cover" />
+                      ) : (
+                        <svg className="h-8 w-8 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                        </svg>
+                      )}
+                    </div>
+                    <p className="truncate text-xs font-medium text-[var(--text-1)]">{doc.title}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-[var(--text-4)]">{doc.category}</span>
+                      <span className="text-[10px] text-[var(--text-4)]">{formatDate(doc.date)}</span>
+                    </div>
+                  </a>
+                  <div className="mt-2 pt-2 border-t border-[#F0F0F0]">
+                    <NoteEditor
+                      note={(doc as any).notes || null}
+                      onSave={async (note) => {
+                        await supabase.from('documents').update({ notes: note }).eq('id', doc.id);
+                        fetchDocuments();
+                      }}
+                      onDelete={async () => {
+                        await supabase.from('documents').update({ notes: null }).eq('id', doc.id);
+                        fetchDocuments();
+                      }}
+                    />
                   </div>
-                  <p className="truncate text-xs font-medium text-[var(--text-1)]">{doc.title}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-[var(--text-4)]">{doc.category}</span>
-                    <span className="text-[10px] text-[var(--text-4)]">{formatDate(doc.date)}</span>
-                  </div>
-                </a>
+                </div>
               ))}
             </div>
           </div>

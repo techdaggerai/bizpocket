@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, getCurrentMonth, getMonthRange, formatDate } from '@/lib/utils';
+import NoteEditor from '@/components/NoteEditor';
 import type { CashFlow } from '@/types/database';
 
 const EXPENSE_CATEGORIES = [
@@ -219,12 +220,27 @@ export default function ExpensesPage() {
       ) : (
         <div className="space-y-2">
           {expenses.map((exp) => (
-            <div key={exp.id} className="flex items-center justify-between rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3">
-              <div>
-                <p className="text-base font-medium text-[var(--text-1)]">{exp.category}</p>
-                <p className="text-xs text-[var(--text-4)]">{formatDate(exp.date)}{exp.description ? ` · ${exp.description}` : ''}</p>
+            <div key={exp.id} className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-base font-medium text-[var(--text-1)]">{exp.category}</p>
+                  <p className="text-xs text-[var(--text-4)]">{formatDate(exp.date)}{exp.description ? ` · ${exp.description}` : ''}</p>
+                </div>
+                <span className="font-mono text-base font-medium text-[var(--red)]">-{formatCurrency(exp.amount, currency)}</span>
               </div>
-              <span className="font-mono text-base font-medium text-[var(--red)]">-{formatCurrency(exp.amount, currency)}</span>
+              <div className="mt-1.5">
+                <NoteEditor
+                  note={(exp as any).notes || null}
+                  onSave={async (note) => {
+                    await supabase.from('cash_flows').update({ notes: note }).eq('id', exp.id);
+                    fetchExpenses();
+                  }}
+                  onDelete={async () => {
+                    await supabase.from('cash_flows').update({ notes: null }).eq('id', exp.id);
+                    fetchExpenses();
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, getCurrentMonth, getMonthRange, formatDate } from '@/lib/utils';
+import NoteEditor from '@/components/NoteEditor';
 import type { CashFlow, FlowType, ClassifyAs } from '@/types/database';
 
 const CATEGORIES = [
@@ -373,7 +374,19 @@ export default function CashFlowPage() {
                 </div>
               </div>
               {f.description && <p className="mt-1 text-xs text-[var(--text-4)] pl-11">{f.description}</p>}
-              {f.notes && <p className="mt-0.5 text-xs text-[var(--text-3)] pl-11 italic">{f.notes}</p>}
+              <div className="mt-1 pl-11">
+                <NoteEditor
+                  note={f.notes || null}
+                  onSave={async (note) => {
+                    await supabase.from('cash_flows').update({ notes: note }).eq('id', f.id);
+                    fetchFlows();
+                  }}
+                  onDelete={async () => {
+                    await supabase.from('cash_flows').update({ notes: null }).eq('id', f.id);
+                    fetchFlows();
+                  }}
+                />
+              </div>
               <div className="mt-2 flex items-center gap-2 pl-11">
                 <span className={`rounded-btn px-1.5 py-0.5 text-[10px] font-medium ${
                   f.status === 'COMPLETED' ? 'bg-[var(--green-bg)] text-[var(--green)]' :

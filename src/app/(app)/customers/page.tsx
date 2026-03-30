@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
+import NoteEditor from '@/components/NoteEditor';
 import type { Customer } from '@/types/database';
 
 type CustomerForm = {
@@ -347,6 +348,12 @@ export default function CustomersPage() {
                   >
                     Edit
                   </button>
+                  <a
+                    href={`/customers/${c.id}`}
+                    className="text-xs text-[var(--text-4)] hover:text-[#4F46E5]"
+                  >
+                    View
+                  </a>
                   {deleteConfirmId === c.id ? (
                     <div className="flex items-center gap-1.5">
                       <button
@@ -371,6 +378,19 @@ export default function CustomersPage() {
                     </button>
                   )}
                 </div>
+              </div>
+              <div className="mt-2 pt-2 border-t border-[#F0F0F0]">
+                <NoteEditor
+                  note={c.notes}
+                  onSave={async (note) => {
+                    await supabase.from('customers').update({ notes: note }).eq('id', c.id);
+                    fetchCustomers();
+                  }}
+                  onDelete={async () => {
+                    await supabase.from('customers').update({ notes: null }).eq('id', c.id);
+                    fetchCustomers();
+                  }}
+                />
               </div>
             </div>
           ))}
