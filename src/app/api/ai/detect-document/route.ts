@@ -1,92 +1,95 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
 
-const LANG_NAMES: Record<string, string> = {
+const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic',
   bn: 'Bengali', pt: 'Portuguese', tl: 'Filipino', vi: 'Vietnamese',
   tr: 'Turkish', zh: 'Chinese', fr: 'French', nl: 'Dutch', es: 'Spanish',
-};
+}
+
+const SYSTEM_PROMPT = `You are BizPocket AI — a document detection assistant for foreign entrepreneurs running businesses in Japan.
+
+When given an image of a document, you must:
+1. DETECT what type of document it is (tax notice, invoice, contract, receipt, government form, letter, certificate, etc.)
+2. EXTRACT the key information (amounts, dates, names, reference numbers)
+3. TRANSLATE the full content to the user's language
+4. EXPLAIN what this document means in simple terms
+5. SUGGEST a specific action the user should take
+
+You MUST respond in valid JSON only. No markdown. No backticks. No preamble.
+
+Response format:
+{
+  "document_type": "string — e.g. Vehicle Tax Notice, Business Registration Certificate, Invoice",
+  "document_type_local": "string — the document type in the original language e.g. 自動車税納税通知書",
+  "confidence": "high | medium | low",
+  "original_language": "string — detected language of the document",
+  "key_info": {
+    "amounts": ["string array of any monetary amounts found"],
+    "dates": ["string array of any dates found"],
+    "parties": ["string array of any names/companies mentioned"],
+    "reference_numbers": ["string array of any reference/ID numbers"]
+  },
+  "translation": "string — full translation of the document content",
+  "explanation": "string — plain language explanation of what this document is and what it means for the business owner",
+  "suggested_action": "string — specific actionable recommendation",
+  "urgency": "high | medium | low",
+  "category": "tax | legal | financial | government | business | personal | other"
+}`
 
 export async function POST(request: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
-    return NextResponse.json({ error: 'AI not configured' }, { status: 200 });
+    return NextResponse.json({ error: 'AI not configured' }, { status: 500 })
   }
 
-  const cookieStore = await cookies();
+  const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return cookieStore.getAll(); },
+        getAll() { return cookieStore.getAll() },
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
-            );
+            )
           } catch {}
         },
       },
     }
-  );
+  )
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  let body: { imageBase64: string; mediaType: string; language: string; organizationId: string };
+  let body: { imageBase64: string; mediaType: string; language?: string; organizationId: string }
   try {
-    body = await request.json();
+    body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  const { imageBase64, mediaType, language, organizationId } = body;
+  const { imageBase64, mediaType, language, organizationId } = body
   if (!imageBase64 || !organizationId) {
-    return NextResponse.json({ error: 'Missing image or organizationId' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing image or organizationId' }, { status: 400 })
   }
 
-  const targetLang = LANG_NAMES[language] || 'English';
-
-  const systemPrompt = `You are BizPocket AI Document Detector. You analyze photos of documents and provide structured information.
-
-You MUST respond with valid JSON only — no markdown, no explanation outside the JSON.
-
-Response schema:
-{
-  "document_type": "string — document type in ${targetLang}",
-  "document_type_local": "string — document type in its original language",
-  "confidence": "high | medium | low",
-  "original_language": "string — detected language of the document",
-  "key_info": {
-    "amounts": ["string array — all monetary amounts found, with currency symbols"],
-    "dates": ["string array — all dates found, in YYYY-MM-DD format when possible"],
-    "parties": ["string array — names of people/companies mentioned"],
-    "reference_numbers": ["string array — any reference/invoice/tax numbers"]
-  },
-  "translation": "string — full translation of the key content into ${targetLang}",
-  "explanation": "string — plain-language explanation of what this document means and why it matters, in ${targetLang}",
-  "suggested_action": "string — what the user should do about this document, in ${targetLang}",
-  "urgency": "high | medium | low",
-  "category": "tax | financial | legal | government | medical | shipping | invoice | receipt | contract | other"
-}`;
+  const userLang = language || 'en'
+  const langName = LANGUAGE_NAMES[userLang] || 'English'
 
   try {
-    const anthropic = new Anthropic({ apiKey });
-
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const;
-    const resolvedType = validTypes.includes(mediaType as typeof validTypes[number])
-      ? (mediaType as typeof validTypes[number])
-      : 'image/jpeg';
+    const anthropic = new Anthropic({ apiKey })
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1500,
-      system: systemPrompt,
+      system: SYSTEM_PROMPT,
       messages: [
         {
           role: 'user',
@@ -95,37 +98,45 @@ Response schema:
               type: 'image',
               source: {
                 type: 'base64',
-                media_type: resolvedType,
+                media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
                 data: imageBase64,
               },
             },
             {
               type: 'text',
-              text: `Analyze this document. Translate and explain in ${targetLang}. Respond with JSON only.`,
+              text: `Analyze this document. The user's language is ${langName}. Translate and explain everything in ${langName}. Respond with JSON only.`,
             },
           ],
         },
       ],
-    });
+    })
 
-    const text = message.content[0].type === 'text' ? message.content[0].text : '';
+    const rawText = message.content[0].type === 'text' ? message.content[0].text : ''
 
-    // Parse JSON from response (handle potential markdown wrapping)
-    let parsed;
+    // Parse JSON response
+    let result
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+      const cleaned = rawText.replace(/```json\s*|```\s*/g, '').trim()
+      result = JSON.parse(cleaned)
     } catch {
-      parsed = null;
+      // If JSON parsing fails, return raw text as explanation
+      result = {
+        document_type: 'Document',
+        document_type_local: '',
+        confidence: 'medium',
+        original_language: 'Unknown',
+        key_info: { amounts: [], dates: [], parties: [], reference_numbers: [] },
+        translation: rawText,
+        explanation: rawText,
+        suggested_action: 'Review this document carefully.',
+        urgency: 'medium',
+        category: 'other',
+      }
     }
 
-    if (!parsed) {
-      return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 200 });
-    }
-
-    return NextResponse.json({ result: parsed });
+    return NextResponse.json({ result })
   } catch (err) {
-    console.error('[BizPocket AI] Document detection failed:', err);
-    return NextResponse.json({ error: 'AI detection failed' }, { status: 200 });
+    console.error('[BizPocket AI] Document detection failed:', err)
+    return NextResponse.json({ error: 'AI detection failed' }, { status: 500 })
   }
 }
