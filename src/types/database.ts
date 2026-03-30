@@ -160,6 +160,27 @@ export interface InvoiceChat {
   created_at: string;
 }
 
+export type PlannerEventType = 'incoming_payment' | 'upcoming_expense' | 'meeting' | 'shipment' | 'invoice_due' | 'tax_deadline' | 'recurring' | 'other';
+
+export interface PlannerEvent {
+  id: string;
+  organization_id: string;
+  title: string;
+  event_type: PlannerEventType;
+  amount: number | null;
+  currency: string;
+  contact_id: string | null;
+  invoice_id: string | null;
+  event_date: string;
+  event_time: string | null;
+  reminder_date: string | null;
+  notes: string | null;
+  status: string;
+  is_recurring: boolean;
+  recurring_frequency: string | null;
+  created_at: string;
+}
+
 export interface Notification {
   id: string;
   organization_id: string;

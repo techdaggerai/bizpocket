@@ -57,6 +57,7 @@ export default function DashboardPage() {
 
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
@@ -107,7 +108,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function load() {
-      const [flowRes, invRes] = await Promise.all([
+      const today = new Date().toISOString().slice(0, 10);
+      const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+      const [flowRes, invRes, evtRes] = await Promise.all([
         supabase
           .from('cash_flows')
           .select('*')
@@ -120,9 +123,19 @@ export default function DashboardPage() {
           .select('*')
           .eq('organization_id', organization.id)
           .neq('status', 'paid'),
+        supabase
+          .from('planner_events')
+          .select('*')
+          .eq('organization_id', organization.id)
+          .gte('event_date', today)
+          .lte('event_date', nextWeek)
+          .eq('status', 'pending')
+          .order('event_date', { ascending: true })
+          .limit(3),
       ]);
       setFlows(flowRes.data || []);
       setInvoices(invRes.data || []);
+      setUpcomingEvents(evtRes.data || []);
       setLoading(false);
     }
     load();
@@ -259,7 +272,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div>
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">{t('dashboard.quick_actions')}</h2>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           <Link
             href="/invoices?new=1"
             className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(79,70,229,0.08)] p-5 text-center transition-all hover:bg-[rgba(79,70,229,0.12)]"
@@ -288,8 +301,52 @@ export default function DashboardPage() {
             </svg>
             <span className="text-xs font-medium text-[#4F46E5]">{t('dashboard.scan_document')}</span>
           </Link>
+          <Link
+            href="/planner"
+            className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(124,58,237,0.08)] p-5 text-center transition-all hover:bg-[rgba(124,58,237,0.12)]"
+          >
+            <svg className="h-6 w-6 text-[#7C3AED]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+            </svg>
+            <span className="text-xs font-medium text-[#7C3AED]">Add Event</span>
+          </Link>
         </div>
       </div>
+
+      {/* Upcoming Events */}
+      {upcomingEvents.length > 0 && (
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">Upcoming</h2>
+            <Link href="/planner" className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">View planner</Link>
+          </div>
+          <div className="space-y-1.5">
+            {upcomingEvents.map((evt: any) => {
+              const dotColors: Record<string, string> = {
+                incoming_payment: 'bg-[#16A34A]', upcoming_expense: 'bg-[#DC2626]',
+                meeting: 'bg-[#0EA5E9]', shipment: 'bg-[#7C3AED]',
+                invoice_due: 'bg-[#4F46E5]', tax_deadline: 'bg-[#F59E0B]',
+              };
+              const evtDate = new Date(evt.event_date);
+              const isEvtToday = evt.event_date === new Date().toISOString().slice(0, 10);
+              const isTmr = evt.event_date === new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+              const label = isEvtToday ? 'Today' : isTmr ? 'Tomorrow' : evtDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+              return (
+                <div key={evt.id} className="flex items-center gap-3 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-2.5">
+                  <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotColors[evt.event_type] || 'bg-[#6B7280]'}`} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-[var(--text-1)] truncate">{evt.title}</p>
+                    <p className="text-xs text-[var(--text-4)]">{label}{evt.event_time ? ` ${evt.event_time.slice(0, 5)}` : ''}</p>
+                  </div>
+                  {evt.amount && (
+                    <span className="font-mono text-sm text-[var(--text-2)]">{formatCurrency(evt.amount, evt.currency || currency)}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recurring This Month */}
       {recurringFlows.length > 0 && (
