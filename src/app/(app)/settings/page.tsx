@@ -173,6 +173,31 @@ export default function SettingsPage() {
         </section>
       )}
 
+      {/* Upgrade Plan */}
+      {profile.role === 'owner' && (
+        <Link
+          href="/settings/upgrade"
+          className="flex items-center justify-between rounded-card border-2 border-[#4F46E5]/20 bg-gradient-to-r from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4 transition-shadow hover:shadow-md"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F46E5]">
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+              </svg>
+            </div>
+            <div>
+              <span className="text-sm font-semibold text-[var(--text-1)]">Upgrade Plan</span>
+              <p className="text-xs text-[var(--text-3)]">
+                Current: <span className="capitalize font-medium text-[#4F46E5]">{organization.plan}</span>
+              </p>
+            </div>
+          </div>
+          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </Link>
+      )}
+
       {/* Navigation Links */}
       <div className="space-y-2">
         <Link

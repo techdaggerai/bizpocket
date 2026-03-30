@@ -2,7 +2,7 @@ export type UserRole = 'owner' | 'staff' | 'accountant';
 export type FlowType = 'IN' | 'OUT';
 export type ClassifyAs = 'expense' | 'investment' | 'cash_flow_only';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid';
-export type PlanTier = 'free' | 'pro' | 'team';
+export type PlanTier = 'free' | 'pro' | 'business';
 
 export interface Organization {
   id: string;
