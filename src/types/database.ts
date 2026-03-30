@@ -61,32 +61,6 @@ export interface CashFlow {
   created_at: string;
 }
 
-export interface PlannedExpense {
-  id: string;
-  organization_id: string;
-  month: string;
-  category: string;
-  description: string | null;
-  planned_amount: number;
-  is_completed: boolean;
-  is_recurring: boolean;
-  notes: string | null;
-  created_at: string;
-}
-
-export interface PlannedIncome {
-  id: string;
-  organization_id: string;
-  month: string;
-  category: string;
-  description: string;
-  planned_amount: number;
-  expected_date: string | null;
-  is_completed: boolean;
-  notes: string | null;
-  created_at: string;
-}
-
 export interface Expense {
   id: string;
   organization_id: string;
@@ -229,5 +203,33 @@ export interface Document {
   amount_detected: number | null;
   date: string;
   uploaded_by: string;
+  created_at: string;
+}
+
+export interface PlannedExpense {
+  id: string;
+  organization_id: string;
+  month: string;
+  category: string;
+  description: string;
+  planned_amount: number;
+  is_recurring: boolean;
+  is_completed: boolean;
+  notes: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface PlannedIncome {
+  id: string;
+  organization_id: string;
+  month: string;
+  category: string;
+  description: string;
+  planned_amount: number;
+  expected_date: string | null;
+  is_completed: boolean;
+  notes: string | null;
+  created_by: string;
   created_at: string;
 }
