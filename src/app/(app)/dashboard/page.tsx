@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { formatCurrency, getGreeting, getCurrentMonth, formatDateShort } from '@/lib/utils';
+import GlobalSearch from '@/components/GlobalSearch';
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 
@@ -152,6 +153,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 p-4">
+      {/* Global Search */}
+      <GlobalSearch />
+
       {/* AI Morning Briefing */}
       <div>
         <h1 className="text-xl font-semibold text-[var(--text-1)]">
