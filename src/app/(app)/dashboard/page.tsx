@@ -42,10 +42,10 @@ export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const supabase = createClient();
-  const fullName = user.user_metadata?.full_name || '';
-  const profileName = profile.name || '';
-  const displayName = fullName || (profileName !== organization.name ? profileName : '') || user.email?.split('@')[0] || '';
-  const firstName = displayName.split(' ')[0];
+  const profileFullName = profile.name || '';
+  const authFullName = user.user_metadata?.full_name || '';
+  const displayName = authFullName || profileFullName || '';
+  const firstName = displayName.split(' ')[0] || user.email?.split('@')[0] || '';
 
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -189,7 +189,7 @@ export default function DashboardPage() {
               <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
             </div>
             <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--text-2)]">
-              {briefing}
+              {briefing.replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1').replace(/^#{1,3}\s+/gm, '')}
             </p>
           </div>
         ) : null}
