@@ -6,35 +6,35 @@ import { PocketMark, LogoWordmark } from '@/components/Logo';
 import { FEATURES } from '@/components/FeatureIcons';
 
 const LANG_OPTIONS = [
-  { value: 'en', flag: '🇺🇸', label: 'English (US)' },
-  { value: 'ja', flag: '🇯🇵', label: '日本語' },
-  { value: 'ur', flag: '🇵🇰', label: 'اردو' },
-  { value: 'ar', flag: '🇦🇪', label: 'العربية' },
-  { value: 'bn', flag: '🇧🇩', label: 'বাংলা' },
-  { value: 'pt', flag: '🇧🇷', label: 'Português' },
-  { value: 'tl', flag: '🇵🇭', label: 'Filipino' },
-  { value: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
-  { value: 'tr', flag: '🇹🇷', label: 'Türkçe' },
-  { value: 'zh', flag: '🇨🇳', label: '中文' },
-  { value: 'fr', flag: '🇫🇷', label: 'Français' },
-  { value: 'nl', flag: '🇳🇱', label: 'Nederlands' },
-  { value: 'es', flag: '🇪🇸', label: 'Español' },
+  { value: 'en', flag: '\u{1F1FA}\u{1F1F8}', label: 'English (US)' },
+  { value: 'ja', flag: '\u{1F1EF}\u{1F1F5}', label: '\u65E5\u672C\u8A9E' },
+  { value: 'ur', flag: '\u{1F1F5}\u{1F1F0}', label: '\u0627\u0631\u062F\u0648' },
+  { value: 'ar', flag: '\u{1F1E6}\u{1F1EA}', label: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629' },
+  { value: 'bn', flag: '\u{1F1E7}\u{1F1E9}', label: '\u09AC\u09BE\u0982\u09B2\u09BE' },
+  { value: 'pt', flag: '\u{1F1E7}\u{1F1F7}', label: 'Portugu\u00EAs' },
+  { value: 'tl', flag: '\u{1F1F5}\u{1F1ED}', label: 'Filipino' },
+  { value: 'vi', flag: '\u{1F1FB}\u{1F1F3}', label: 'Ti\u1EBFng Vi\u1EC7t' },
+  { value: 'tr', flag: '\u{1F1F9}\u{1F1F7}', label: 'T\u00FCrk\u00E7e' },
+  { value: 'zh', flag: '\u{1F1E8}\u{1F1F3}', label: '\u4E2D\u6587' },
+  { value: 'fr', flag: '\u{1F1EB}\u{1F1F7}', label: 'Fran\u00E7ais' },
+  { value: 'nl', flag: '\u{1F1F3}\u{1F1F1}', label: 'Nederlands' },
+  { value: 'es', flag: '\u{1F1EA}\u{1F1F8}', label: 'Espa\u00F1ol' },
 ];
 
 const WORLD_CLOCKS = [
-  { flag: '🇯🇵', city: 'Tokyo', tz: 'Asia/Tokyo' },
-  { flag: '🇵🇰', city: 'Karachi', tz: 'Asia/Karachi' },
-  { flag: '🇦🇪', city: 'Dubai', tz: 'Asia/Dubai' },
-  { flag: '🇬🇧', city: 'London', tz: 'Europe/London' },
-  { flag: '🇺🇸', city: 'New York', tz: 'America/New_York' },
-  { flag: '🇨🇳', city: 'Shanghai', tz: 'Asia/Shanghai' },
+  { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
+  { flag: '\u{1F1F5}\u{1F1F0}', city: 'Karachi', tz: 'Asia/Karachi' },
+  { flag: '\u{1F1E6}\u{1F1EA}', city: 'Dubai', tz: 'Asia/Dubai' },
+  { flag: '\u{1F1EC}\u{1F1E7}', city: 'London', tz: 'Europe/London' },
+  { flag: '\u{1F1FA}\u{1F1F8}', city: 'New York', tz: 'America/New_York' },
+  { flag: '\u{1F1E8}\u{1F1F3}', city: 'Shanghai', tz: 'Asia/Shanghai' },
 ];
 
 const PLANS = [
   {
     key: 'free',
     name: 'Starter',
-    price: '¥0',
+    price: '\u00A50',
     period: '',
     desc: 'Get started',
     features: ['5 invoices/month', 'PocketChat (2 contacts)', '1 language', 'Basic cash flow'],
@@ -44,8 +44,8 @@ const PLANS = [
   {
     key: 'pro',
     name: 'Pro',
-    price: '¥2,980',
-    priceAlt: '~$20 · ~€18',
+    price: '\u00A52,980',
+    priceAlt: '~$20 \u00B7 ~\u20AC18',
     period: '/mo',
     desc: 'For serious businesses',
     features: ['Unlimited invoices', 'PocketChat unlimited', '5 languages', 'AI Morning Briefing', 'Accountant Portal', 'All features'],
@@ -55,8 +55,8 @@ const PLANS = [
   {
     key: 'business',
     name: 'Business',
-    price: '¥5,980',
-    priceAlt: '~$40 · ~€36',
+    price: '\u00A55,980',
+    priceAlt: '~$40 \u00B7 ~\u20AC36',
     period: '/mo',
     desc: 'Scale your team',
     features: ['Everything in Pro', 'Voice translation', '13 languages', 'Document scan AI', 'Priority support', 'Multiple staff'],
@@ -102,9 +102,9 @@ export default function LandingPage() {
   void now;
 
   const PRICE_MAP: Record<string, Record<string, string>> = {
-    '¥0': { JPY: '¥0', USD: '$0', EUR: '€0' },
-    '¥2,980': { JPY: '¥2,980', USD: '$20', EUR: '€18' },
-    '¥5,980': { JPY: '¥5,980', USD: '$40', EUR: '€36' },
+    '\u00A50': { JPY: '\u00A50', USD: '$0', EUR: '\u20AC0' },
+    '\u00A52,980': { JPY: '\u00A52,980', USD: '$20', EUR: '\u20AC18' },
+    '\u00A55,980': { JPY: '\u00A55,980', USD: '$40', EUR: '\u20AC36' },
     'Custom': { JPY: 'Custom', USD: 'Custom', EUR: 'Custom' },
   };
 
@@ -165,7 +165,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pain Points — Bold Statements */}
+      {/* Pain Points */}
       <section className="border-y border-[var(--border)] bg-[var(--bg-2)]">
         <div className="mx-auto max-w-3xl px-4 py-16 space-y-10">
           <div className="text-center">
@@ -190,7 +190,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Grid — All 12 */}
+      {/* Features Grid */}
       <section id="features" className="mx-auto max-w-5xl px-4 py-20">
         <div className="text-center mb-12">
           <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Everything in your pocket</p>
@@ -210,12 +210,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Feature 2 — PocketChat (BIG dark section) */}
+      {/* PocketChat */}
       <section id="pocketchat" className="bg-[#0A0A0A] text-white">
         <div className="mx-auto max-w-5xl px-4 py-20">
           <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#818CF8]">PocketChat™</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#818CF8]">PocketChat&trade;</p>
               <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl leading-tight">
                 They speak Japanese.<br/>You speak English.<br/>Nobody notices the difference.
               </h2>
@@ -223,15 +223,14 @@ export default function LandingPage() {
                 The world&apos;s first business messenger with real-time AI translation. Send messages, voice notes, photos and documents in your language. Your customer reads it in theirs. 13 languages. 16 currencies. Zero friction.
               </p>
               <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#4F46E5]/30 bg-[#4F46E5]/10 px-4 py-2">
-                <span className="text-sm">🇺🇸 🇯🇵 🇵🇰 🇦🇪 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳 🇫🇷 🇳🇱 🇪🇸</span>
+                <span className="text-sm">{'\u{1F1FA}\u{1F1F8} \u{1F1EF}\u{1F1F5} \u{1F1F5}\u{1F1F0} \u{1F1E6}\u{1F1EA} \u{1F1E7}\u{1F1E9} \u{1F1E7}\u{1F1F7} \u{1F1F5}\u{1F1ED} \u{1F1FB}\u{1F1F3} \u{1F1F9}\u{1F1F7} \u{1F1E8}\u{1F1F3} \u{1F1EB}\u{1F1F7} \u{1F1F3}\u{1F1F1} \u{1F1EA}\u{1F1F8}'}</span>
               </div>
             </div>
             <div className="flex-1">
               <div className="rounded-[16px] border border-[#333] bg-[#141414] p-4 space-y-3">
-                {/* Mock chat bubbles */}
-                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-xs text-[#A1A1AA]">Customer</p><p className="text-sm text-white">お車の価格を教えてください</p><p className="text-[10px] text-[#525252] mt-1">🇯🇵 Translated from Japanese</p></div></div>
-                <div className="flex justify-end"><div className="rounded-[12px] bg-[#4F46E5] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">The Toyota Hiace is $7,200 FOB Yokohama. Shall I send the invoice?</p><p className="text-[10px] text-white/50 mt-1">🇬🇧 Auto-translated to Japanese for customer</p></div></div>
-                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">はい、請求書をお願いします</p><p className="text-[10px] text-[#525252] mt-1">🇯🇵 &quot;Yes, please send the invoice&quot;</p></div></div>
+                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-xs text-[#A1A1AA]">Customer</p><p className="text-sm text-white">{'\u304A\u8ECA\u306E\u4FA1\u683C\u3092\u6559\u3048\u3066\u304F\u3060\u3055\u3044'}</p><p className="text-[10px] text-[#525252] mt-1">{'\u{1F1EF}\u{1F1F5}'} Translated from Japanese</p></div></div>
+                <div className="flex justify-end"><div className="rounded-[12px] bg-[#4F46E5] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">The Toyota Hiace is $7,200 FOB Yokohama. Shall I send the invoice?</p><p className="text-[10px] text-white/50 mt-1">{'\u{1F1EC}\u{1F1E7}'} Auto-translated to Japanese for customer</p></div></div>
+                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">{'\u306F\u3044\u3001\u8ACB\u6C42\u66F8\u3092\u304A\u9858\u3044\u3057\u307E\u3059'}</p><p className="text-[10px] text-[#525252] mt-1">{'\u{1F1EF}\u{1F1F5}'} &quot;Yes, please send the invoice&quot;</p></div></div>
                 <div className="flex justify-center"><div className="rounded-full bg-[#059669]/20 px-3 py-1.5 text-[10px] text-[#34D399] font-medium">Invoice sent via PocketChat</div></div>
               </div>
             </div>
@@ -239,7 +238,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Feature 3 — AI Command Hub */}
+      {/* AI Command Hub */}
       <section className="mx-auto max-w-5xl px-4 py-20">
         <div className="flex flex-col gap-8 sm:flex-row-reverse sm:items-center">
           <div className="flex-1">
@@ -254,21 +253,21 @@ export default function LandingPage() {
             </div>
             <p className="text-sm text-[var(--text-2)] leading-relaxed mb-3">Good morning, Doc. While you slept:</p>
             <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">2 invoices auto-sent</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">¥340,000 payment received</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#DC2626]">⚠️</span><span className="text-[var(--text-2)]">Cash gap predicted on Apr 15</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#4F46E5]">→</span><span className="text-[var(--text-2)]">Recommend: sell white Prius first</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#16A34A]">{'\u2705'}</span><span className="text-[var(--text-2)]">2 invoices auto-sent</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#16A34A]">{'\u2705'}</span><span className="text-[var(--text-2)]">{'\u00A5'}340,000 payment received</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#DC2626]">{'\u26A0\uFE0F'}</span><span className="text-[var(--text-2)]">Cash gap predicted on Apr 15</span></div>
+              <div className="flex items-center gap-2"><span className="text-[#4F46E5]">{'\u2192'}</span><span className="text-[var(--text-2)]">Recommend: sell white Prius first</span></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* AI Document Detector — Deep Dive */}
+      {/* AI Document Detector */}
       <section className="border-t border-[var(--border)] bg-gradient-to-b from-[var(--bg-2)] to-[var(--bg)]">
         <div className="mx-auto max-w-5xl px-4 py-20">
           <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
             <div className="flex-1">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Document Detector™</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Document Detector&trade;</p>
               <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">
                 Snap it.<br/>Understand it.<br/>
                 <span className="text-[var(--accent)]">In your language.</span>
@@ -279,26 +278,24 @@ export default function LandingPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">1</div>
-                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Snap</span> — Take a photo of any document</p>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Snap</span> &mdash; Take a photo of any document</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">2</div>
-                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Detect</span> — AI identifies the document type instantly</p>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Detect</span> &mdash; AI identifies the document type instantly</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">3</div>
-                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Translate</span> — Full translation in your native language</p>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Translate</span> &mdash; Full translation in your native language</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">4</div>
-                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Act</span> — AI suggests the response or next step</p>
+                  <p className="text-sm text-[var(--text-2)]"><span className="font-semibold text-[var(--text-1)]">Act</span> &mdash; AI suggests the response or next step</p>
                 </div>
               </div>
             </div>
-            {/* Visual mockup — document detection flow */}
             <div className="flex-1">
               <div className="rounded-[16px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 shadow-sm">
-                {/* Scanned document header */}
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--accent)]/10">
@@ -308,28 +305,25 @@ export default function LandingPage() {
                   </div>
                   <span className="rounded-full bg-[#16A34A]/10 px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">DETECTED</span>
                 </div>
-                {/* Fake Japanese document */}
                 <div className="mb-3 rounded-lg bg-[#FAFAF9] border border-[#E7E5E4] p-3">
-                  <p className="text-[11px] font-medium text-[#44403C] mb-1.5">🇯🇵 Original — 自動車税納税通知書</p>
+                  <p className="text-[11px] font-medium text-[#44403C] mb-1.5">{'\u{1F1EF}\u{1F1F5}'} Original &mdash; {'\u81EA\u52D5\u8ECA\u7A0E\u7D0D\u7A0E\u901A\u77E5\u66F8'}</p>
                   <div className="space-y-1">
-                    <p className="text-[10px] text-[#78716C]">納税義務者：プレミアムドライブ合同会社</p>
-                    <p className="text-[10px] text-[#78716C]">課税標準額：自動車税　¥34,500</p>
-                    <p className="text-[10px] text-[#78716C]">納期限：令和8年4月30日</p>
+                    <p className="text-[10px] text-[#78716C]">{'\u7D0D\u7A0E\u7FA9\u52D9\u8005\uFF1A\u30D7\u30EC\u30DF\u30A2\u30E0\u30C9\u30E9\u30A4\u30D6\u5408\u540C\u4F1A\u793E'}</p>
+                    <p className="text-[10px] text-[#78716C]">{'\u8AB2\u7A0E\u6A19\u6E96\u984D\uFF1A\u81EA\u52D5\u8ECA\u7A0E\u3000\u00A534,500'}</p>
+                    <p className="text-[10px] text-[#78716C]">{'\u7D0D\u671F\u9650\uFF1A\u4EE4\u548C8\u5E744\u670830\u65E5'}</p>
                   </div>
                 </div>
-                {/* AI Detection result */}
                 <div className="mb-3 rounded-lg bg-[rgba(79,70,229,0.04)] border border-[rgba(79,70,229,0.1)] p-3">
                   <div className="flex items-center gap-1.5 mb-2">
                     <svg className="h-3.5 w-3.5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
-                    <span className="text-[10px] font-semibold text-[#4F46E5]">AI Translation — English</span>
+                    <span className="text-[10px] font-semibold text-[#4F46E5]">AI Translation &mdash; English</span>
                   </div>
                   <p className="text-xs font-medium text-[var(--text-1)] mb-1">Vehicle Tax Payment Notice</p>
-                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Taxpayer: Premium Drives LLC. Vehicle tax amount: ¥34,500. Due date: April 30, 2026.</p>
+                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Taxpayer: Premium Drives LLC. Vehicle tax amount: {'\u00A5'}34,500. Due date: April 30, 2026.</p>
                 </div>
-                {/* Suggested action */}
                 <div className="rounded-lg bg-[#16A34A]/5 border border-[#16A34A]/15 p-3">
-                  <p className="text-[10px] font-semibold text-[#16A34A] mb-1">💡 Suggested Action</p>
-                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Pay ¥34,500 at any convenience store or bank by April 30. Want me to add a reminder to your planner?</p>
+                  <p className="text-[10px] font-semibold text-[#16A34A] mb-1">{'\u{1F4A1}'} Suggested Action</p>
+                  <p className="text-[11px] text-[var(--text-2)] leading-relaxed">Pay {'\u00A5'}34,500 at any convenience store or bank by April 30. Want me to add a reminder to your planner?</p>
                   <div className="mt-2.5 flex gap-2">
                     <span className="rounded-full bg-[#4F46E5] px-3 py-1 text-[10px] font-semibold text-white">Add to Planner</span>
                     <span className="rounded-full border border-[var(--border-strong)] px-3 py-1 text-[10px] font-medium text-[var(--text-3)]">Save to Vault</span>
@@ -341,7 +335,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Message Your BizPocket — The Vision */}
+      {/* Message Your BizPocket */}
       <section className="border-y border-[var(--border)] bg-[#0A0A0A] text-white">
         <div className="mx-auto max-w-3xl px-4 py-20">
           <div className="text-center mb-10">
@@ -366,15 +360,15 @@ export default function LandingPage() {
               <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-sm font-bold text-white">B</div>
               <div>
                 <p className="text-[13px] font-semibold text-white">BizPocket AI</p>
-                <p className="text-[10px] text-[#16A34A]">● Online — always</p>
+                <p className="text-[10px] text-[#16A34A]">{'\u25CF'} Online &mdash; always</p>
               </div>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Invoice Tanaka-san ¥850,000 for the Alphard</p><p className="mt-1 text-[9px] text-white/40">9:01 AM</p></div></div>
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Invoice Tanaka-san {'\u00A5'}850,000 for the Alphard</p><p className="mt-1 text-[9px] text-white/40">9:01 AM</p></div></div>
               <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">Invoice #INV-0042 created and sent to Tanaka-san via PocketChat. Payment link included. PDF saved to Vault.</p><p className="mt-1 text-[9px] text-[#525252]">9:01 AM</p></div></div>
               <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">How much did we spend this month?</p><p className="mt-1 text-[9px] text-white/40">9:02 AM</p></div></div>
-              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">March expenses: ¥1,240,000. You&apos;re 12% under budget. Business Health: 74 — Good.</p><p className="mt-1 text-[9px] text-[#525252]">9:02 AM</p></div></div>
-              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Message Ali in Karachi — shipment arriving Thursday, send docs</p><p className="mt-1 text-[9px] text-white/40">9:03 AM</p></div></div>
+              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">March expenses: {'\u00A5'}1,240,000. You&apos;re 12% under budget. Business Health: 74 &mdash; Good.</p><p className="mt-1 text-[9px] text-[#525252]">9:02 AM</p></div></div>
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Message Ali in Karachi &mdash; shipment arriving Thursday, send docs</p><p className="mt-1 text-[9px] text-white/40">9:03 AM</p></div></div>
               <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">Sent to Ali (translated to Urdu). Export docs auto-attached from Vault.</p><p className="mt-1 text-[9px] text-[#525252]">9:03 AM</p></div></div>
             </div>
           </div>
@@ -383,7 +377,7 @@ export default function LandingPage() {
               { label: 'Replaces', value: '5 employees' },
               { label: 'Languages', value: '13' },
               { label: 'Response', value: '< 3 sec' },
-              { label: 'Cost', value: '¥2,980/mo' },
+              { label: 'Cost', value: '\u00A52,980/mo' },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <p className="font-mono text-lg font-bold text-white">{s.value}</p>
@@ -394,7 +388,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* One App. Five Roles. Zero Hires. */}
+      {/* One App Five Roles */}
       <section className="mx-auto max-w-2xl px-4 py-20">
         <h2 className="mb-8 text-center text-xl font-semibold text-[var(--text-1)]">
           One app. Five roles. <span className="text-[var(--accent)]">Zero hires.</span>
@@ -409,7 +403,7 @@ export default function LandingPage() {
           ].map((r) => (
             <div key={r.role} className="flex items-center gap-4 rounded-[12px] border border-[var(--card-border)] bg-[var(--card-bg)] px-5 py-3.5">
               <span className="min-w-[90px] text-sm font-bold text-[#DC2626] line-through">{r.role}</span>
-              <span className="text-sm text-[var(--text-3)]">→</span>
+              <span className="text-sm text-[var(--text-3)]">{'\u2192'}</span>
               <span className="text-sm text-[var(--text-2)]">{r.replaced}</span>
             </div>
           ))}
@@ -447,7 +441,7 @@ export default function LandingPage() {
                       : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
                   }`}
                 >
-                  {c === 'JPY' ? '¥ JPY' : c === 'USD' ? '$ USD' : '€ EUR'}
+                  {c === 'JPY' ? '\u00A5 JPY' : c === 'USD' ? '$ USD' : '\u20AC EUR'}
                 </button>
               ))}
             </div>
@@ -472,7 +466,7 @@ export default function LandingPage() {
                 <div className="mb-6">
                   <span className="font-mono text-2xl font-medium text-[var(--text-1)]">{getPrice(plan.price)}</span>
                   <span className="text-sm text-[var(--text-3)]">{plan.period}</span>
-                  {priceCurrency !== 'JPY' && plan.price !== 'Custom' && plan.price !== '¥0' && (
+                  {priceCurrency !== 'JPY' && plan.price !== 'Custom' && plan.price !== '\u00A50' && (
                     <p className="text-[10px] text-[var(--text-4)] mt-0.5">{plan.price}/mo in JPY</p>
                   )}
                 </div>
