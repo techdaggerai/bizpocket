@@ -38,14 +38,21 @@ function setCachedBriefing(text: string, ownerName: string, orgId: string) {
   } catch {}
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/`(.*?)`/g, '$1')
+    .trim();
+}
+
 export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const supabase = createClient();
-  const profileFullName = profile.name || '';
-  const authFullName = user.user_metadata?.full_name || '';
-  const displayName = authFullName || profileFullName || '';
-  const firstName = displayName.split(' ')[0] || user.email?.split('@')[0] || '';
+  const rawName = profile.full_name || user.user_metadata?.full_name || profile.name || '';
+  const firstName = rawName.split(' ')[0] || user.email?.split('@')[0] || '';
 
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -189,7 +196,7 @@ export default function DashboardPage() {
               <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
             </div>
             <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--text-2)]">
-              {briefing.replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1').replace(/^#{1,3}\s+/gm, '')}
+              {stripMarkdown(briefing)}
             </p>
           </div>
         ) : null}

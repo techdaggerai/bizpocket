@@ -32,6 +32,7 @@ export interface Profile {
   organization_id: string;
   role: UserRole;
   name: string;
+  full_name?: string;
   email: string;
   language: string;
   created_at: string;

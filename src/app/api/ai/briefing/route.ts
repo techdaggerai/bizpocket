@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
   const [orgRes, profileRes, flowsRes, invoicesRes, expensesRes] = await Promise.all([
     supabase.from('organizations').select('name, business_type, currency, plan').eq('id', orgId).single(),
-    supabase.from('profiles').select('name, role').eq('user_id', user.id).eq('organization_id', orgId).single(),
+    supabase.from('profiles').select('name, full_name, role').eq('user_id', user.id).eq('organization_id', orgId).single(),
     supabase.from('cash_flows').select('amount, flow_type, category, date, from_to').eq('organization_id', orgId).gte('date', sevenDaysAgo).order('date', { ascending: false }).limit(50),
     supabase.from('invoices').select('total, currency, status, customer_name, due_date').eq('organization_id', orgId).neq('status', 'paid').limit(20),
     supabase.from('expenses').select('amount, category, date').eq('organization_id', orgId).gte('date', sevenDaysAgo).order('date', { ascending: false }).limit(20),
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
   const today = new Date().toISOString().slice(0, 10)
   const overdueInvoices = invoices.filter((inv) => inv.due_date && inv.due_date < today)
 
-  const ownerName = user.user_metadata?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Boss'
+  const ownerName = profile?.full_name?.split(' ')[0] || user.user_metadata?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Boss'
 
   const dataContext = `
 Business: ${org?.name || 'Unknown'} (${org?.business_type || 'general'})
