@@ -93,7 +93,7 @@ export default function BusinessSetupPage() {
     'text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3] mb-3';
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 py-4">
       {/* Back link */}
       <Link
         href="/settings"

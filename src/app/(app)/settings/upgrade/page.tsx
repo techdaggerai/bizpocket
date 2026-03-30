@@ -96,7 +96,7 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 py-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link href="/settings" className="text-[var(--text-3)]">

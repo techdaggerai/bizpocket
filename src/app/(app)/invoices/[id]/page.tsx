@@ -211,7 +211,7 @@ export default function InvoiceDetailPage() {
 
   if (!invoice) {
     return (
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 py-4">
         <Link href="/invoices" className="text-sm text-[#4F46E5] hover:opacity-80">
           &larr; Back to Invoices
         </Link>
@@ -223,7 +223,7 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 py-4">
       {/* Back Link */}
       <Link href="/invoices" className="inline-flex items-center text-sm text-[#4F46E5] hover:opacity-80">
         &larr; Back to Invoices

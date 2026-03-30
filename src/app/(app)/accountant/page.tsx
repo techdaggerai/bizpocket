@@ -51,7 +51,7 @@ export default function AccountantPage() {
   const expenseTotal = expenses.reduce((s, f) => s + f.amount, 0);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 py-4">
       <div>
         <h1 className="text-xl font-bold text-[var(--text-1)]">
           {isAccountant ? `${t('nav.accountant')} Portal` : t('nav.accountant')}

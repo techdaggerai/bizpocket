@@ -9,7 +9,31 @@
       "Bash(curl:*)",
       "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(''stripe:'', p.dependencies.stripe || ''MISSING''\\); console.log\\(''@stripe/stripe-js:'', p.dependencies[''@stripe/stripe-js''] || ''MISSING''\\)\")",
       "Bash(git check-ignore:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx next:*)",
+      "Bash(find /c/TechDagger/bizpocket -path ./.next -prune -o -type f -name *.svg -print)",
+      "Bash(find /c/TechDagger/bizpocket -name *.svg -o -name *.png -o -name *.jpg)",
+      "Bash(ls /c/TechDagger/bizpocket/src/app/favicon*)",
+      "WebFetch(domain:bizpocket-i7xa.vercel.app)",
+      "Bash(xargs grep:*)",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:bizpocket.jp)",
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:bizpocket-l9poa01b9-techdagger.vercel.app)",
+      "WebFetch(domain:bizpocket.vercel.app)",
+      "Bash(node -e \"console.log\\(require\\(''@supabase/ssr/package.json''\\).version\\)\")",
+      "Bash(npm view:*)",
+      "Bash(find C:TechDaggerBIZPOCKET/src -name layout.tsx -o -name BottomNav* -o -name *kpi* -o -name *action*)",
+      "Bash(ls:*)",
+      "Bash(find C:/TechDagger/BIZPOCKET -type f \\\\\\(-name *invoice* -o -name *template* \\\\\\))",
+      "Bash(find C:/TechDagger/BIZPOCKET/src -type f -iname *invoice*)",
+      "Bash(find:*)",
+      "Bash(xargs wc:*)",
+      "Bash(ls C:/TechDagger/BIZPOCKET/src/app/\\\\\\(app\\\\\\)/settings/upgrade)",
+      "Bash(node:*)",
+      "Bash(grep -r \"recurring\\\\|schedule\" /c/TechDagger/BIZPOCKET/src --include=*.tsx --include=*.ts)"
     ]
   }
 }

@@ -86,7 +86,7 @@ export default function DocumentsPage() {
   }, {});
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 py-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('documents.title')}</h1>

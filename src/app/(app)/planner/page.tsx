@@ -219,7 +219,7 @@ export default function PlannerPage() {
   const inputClass = "w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 py-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

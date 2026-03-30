@@ -131,7 +131,7 @@ export default function CustomerDetailPage() {
   };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 py-4">
       {/* Back */}
       <Link href="/customers" className="inline-flex items-center gap-1 text-xs text-[var(--text-4)] hover:text-[var(--accent)]">
         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

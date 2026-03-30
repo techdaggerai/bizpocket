@@ -49,7 +49,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 py-4">
       <h1 className="text-xl font-bold text-[var(--text-1)]">{t('settings.title')}</h1>
 
       {/* Business Profile */}
