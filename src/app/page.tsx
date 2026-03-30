@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PocketMark, LogoWordmark } from '@/components/Logo';
+import { FEATURES } from '@/components/FeatureIcons';
 
 const LANG_OPTIONS = [
   { value: 'en', flag: '🇺🇸', label: 'English (US)' },
@@ -169,15 +170,14 @@ export default function LandingPage() {
         <div className="mx-auto max-w-3xl px-4 py-16 space-y-10">
           <div className="text-center">
             <p className="text-md leading-relaxed text-[var(--text-1)]">
-              Your customer speaks <span className="font-semibold text-[var(--accent)]">Japanese</span>.{' '}
-              Your supplier speaks <span className="font-semibold text-[var(--accent)]">Urdu</span>.{' '}
-              Your accountant speaks <span className="font-semibold text-[var(--accent)]">English</span>.
+              Your customer speaks one language. Your supplier speaks another.{' '}
+              Your accountant speaks a third.
             </p>
-            <p className="mt-2 text-sm text-[var(--text-3)]">You speak all three — or you lose deals.</p>
+            <p className="mt-2 text-sm text-[var(--text-3)]">They all speak different languages. <span className="font-semibold text-[var(--accent)]">You shouldn&apos;t have to.</span></p>
           </div>
           <div className="text-center">
             <p className="text-md leading-relaxed text-[var(--text-1)]">
-              You&apos;re always moving. Auctions. Yards. Ports. Airports.
+              You&apos;re always moving. Meetings. Deliveries. Clients. Deadlines.
             </p>
             <p className="mt-2 text-sm text-[var(--text-3)]">Your business doesn&apos;t stop. Your tools shouldn&apos;t either.</p>
           </div>
@@ -190,40 +190,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Feature 1 — Fire Invoice */}
-      <section className="mx-auto max-w-5xl px-4 py-20">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Fire Invoice™</p>
-            <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">Invoice fired.<br/>Before you leave the parking lot.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-3)]">Professional invoices in 60 seconds. 5 templates. PDF export. Share via PocketChat, LINE, or WhatsApp. 10 languages. Bank details auto-filled.</p>
-          </div>
-          <div className="flex-1 rounded-[14px] border border-[#E5E5E5] bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-xs font-semibold text-[#0A0A0A]">BIZPOCKET CO.</p>
-                <p className="text-[10px] text-[#A3A3A3]">Invoice #INV/BIZ/260330-0001</p>
+      {/* Features Grid — All 12 */}
+      <section id="features" className="mx-auto max-w-5xl px-4 py-20">
+        <div className="text-center mb-12">
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Everything in your pocket</p>
+          <h2 className="mb-3 text-xl font-semibold text-[var(--text-1)] sm:text-2xl">One app to run your entire business.</h2>
+          <p className="text-sm text-[var(--text-3)]">No extra tools. No spreadsheets. No extra hires. Just open your pocket.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {FEATURES.map((f) => (
+            <div key={f.key} className="group rounded-[16px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 transition-all hover:border-[var(--accent)]/20 hover:shadow-md hover:-translate-y-0.5">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-2)] transition-colors group-hover:bg-[rgba(79,70,229,0.06)]">
+                <f.Icon />
               </div>
-              <span className="rounded-full bg-[#16A34A]/10 px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">PAID</span>
+              <h3 className="mb-1.5 text-sm font-semibold text-[var(--text-1)]">{f.name}</h3>
+              <p className="text-xs leading-relaxed text-[var(--text-3)]">{f.desc}</p>
             </div>
-            <div className="mb-3 text-[10px] text-[#737373]">
-              <span className="font-medium text-[#0A0A0A]">Bill To:</span> Al-Rashid Motors LLC
-            </div>
-            <div className="border-t border-[#E5E5E5] pt-2 mb-2">
-              <div className="flex justify-between text-[10px] text-[#737373] mb-1">
-                <span>Toyota Alphard 2025</span>
-                <span className="font-mono text-[#0A0A0A]">¥850,000</span>
-              </div>
-              <div className="flex justify-between text-[10px] text-[#737373]">
-                <span>Tax (10%)</span>
-                <span className="font-mono text-[#0A0A0A]">¥85,000</span>
-              </div>
-            </div>
-            <div className="flex justify-between border-t border-[#0A0A0A] pt-2">
-              <span className="text-xs font-semibold text-[#0A0A0A]">Total</span>
-              <span className="font-mono text-sm font-bold text-[#4F46E5]">¥935,000</span>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -280,59 +263,78 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features 4-6 Grid */}
-      <section className="border-y border-[var(--border)] bg-[var(--bg-2)]">
-        <div className="mx-auto max-w-5xl px-4 py-20">
-          <div className="grid gap-6 sm:grid-cols-3">
-            {/* Money View */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Money View</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Know your numbers.</h3>
-              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-3">
-                <p className="text-[10px] text-[#A3A3A3] uppercase">Cash Balance</p>
-                <p className="font-mono text-lg font-bold text-[#4F46E5]">¥4,280,500</p>
-              </div>
-              <div className="flex items-end gap-1 h-10">
-                {[65, 40, 80, 55, 90, 70].map((h, i) => (
-                  <div key={i} className="flex-1 flex flex-col gap-0.5">
-                    <div className="rounded-sm bg-[#16A34A]/20" style={{ height: `${h * 0.4}px` }} />
-                    <div className="rounded-sm bg-[#DC2626]/20" style={{ height: `${(100 - h) * 0.25}px` }} />
-                  </div>
-                ))}
-              </div>
+      {/* Message Your BizPocket — The Vision */}
+      <section className="border-y border-[var(--border)] bg-[#0A0A0A] text-white">
+        <div className="mx-auto max-w-3xl px-4 py-20">
+          <div className="text-center mb-10">
+            <div className="mb-5 inline-flex items-center rounded-full border border-[#4F46E5]/30 bg-[#4F46E5]/10 px-3.5 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#818CF8]">The Vision</span>
             </div>
-            {/* Snap & Vault */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Snap & Vault™</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Point. Shoot. Filed.</h3>
-              <div className="grid grid-cols-3 gap-1.5">
-                {['Mar 28', 'Mar 25', 'Mar 20'].map((date) => (
-                  <div key={date} className="rounded-lg bg-[var(--bg-2)] p-2 text-center">
-                    <div className="h-10 mb-1.5 rounded bg-[var(--border)] flex items-center justify-center">
-                      <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                    </div>
-                    <p className="text-[9px] text-[var(--text-4)]">{date}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {/* Accountant Portal */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Accountant Portal™</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Always the full picture.</h3>
-              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-medium text-[var(--text-1)]">Client Overview</span>
-                  <span className="rounded-full bg-[#DC2626]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#DC2626]">READ ONLY</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div><p className="text-[9px] text-[#A3A3A3]">Income</p><p className="font-mono text-xs font-bold text-[#16A34A]">¥2.1M</p></div>
-                  <div><p className="text-[9px] text-[#A3A3A3]">Expenses</p><p className="font-mono text-xs font-bold text-[#DC2626]">¥890K</p></div>
-                  <div><p className="text-[9px] text-[#A3A3A3]">Net</p><p className="font-mono text-xs font-bold text-[#4F46E5]">¥1.2M</p></div>
-                </div>
-              </div>
+            <h2 className="mb-3 text-xl font-semibold text-white sm:text-2xl leading-tight">
+              Message your BizPocket.<br/>
+              <span className="text-[#818CF8]">Your business runs itself.</span>
+            </h2>
+            <p className="text-sm leading-relaxed text-[#71717A]">
+              No employees. No translators. No accountant. No manager.<br/>Just you, your phone, and one message.
+            </p>
+            <div className="mt-5 flex justify-center gap-2">
+              {['Telegram', 'WhatsApp', 'LINE'].map((app) => (
+                <span key={app} className="rounded-full border border-[#27272A] px-3 py-1 text-[11px] font-semibold text-[#52525B]">{app}</span>
+              ))}
             </div>
           </div>
+          <div className="rounded-[16px] border border-[#262626] bg-[#141414] p-5 max-w-lg mx-auto">
+            <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-[#1E1E1E]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-sm font-bold text-white">B</div>
+              <div>
+                <p className="text-[13px] font-semibold text-white">BizPocket AI</p>
+                <p className="text-[10px] text-[#16A34A]">● Online — always</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Invoice Tanaka-san ¥850,000 for the Alphard</p><p className="mt-1 text-[9px] text-white/40">9:01 AM</p></div></div>
+              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">Invoice #INV-0042 created and sent to Tanaka-san via PocketChat. Payment link included. PDF saved to Vault.</p><p className="mt-1 text-[9px] text-[#525252]">9:01 AM</p></div></div>
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">How much did we spend this month?</p><p className="mt-1 text-[9px] text-white/40">9:02 AM</p></div></div>
+              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">March expenses: ¥1,240,000. You&apos;re 12% under budget. Business Health: 74 — Good.</p><p className="mt-1 text-[9px] text-[#525252]">9:02 AM</p></div></div>
+              <div className="flex justify-end"><div className="max-w-[85%] rounded-[14px] rounded-br-[4px] bg-[#4F46E5] px-3.5 py-2.5"><p className="text-[13px] text-white">Message Ali in Karachi — shipment arriving Thursday, send docs</p><p className="mt-1 text-[9px] text-white/40">9:03 AM</p></div></div>
+              <div className="flex justify-start"><div className="max-w-[85%] rounded-[14px] rounded-bl-[4px] border border-[#262626] bg-[#1C1C1C] px-3.5 py-2.5"><p className="text-[13px] text-[#D4D4D8]">Sent to Ali (translated to Urdu). Export docs auto-attached from Vault.</p><p className="mt-1 text-[9px] text-[#525252]">9:03 AM</p></div></div>
+            </div>
+          </div>
+          <div className="mt-10 flex justify-center gap-10 flex-wrap">
+            {[
+              { label: 'Replaces', value: '5 employees' },
+              { label: 'Languages', value: '13' },
+              { label: 'Response', value: '< 3 sec' },
+              { label: 'Cost', value: '¥2,980/mo' },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="font-mono text-lg font-bold text-white">{s.value}</p>
+                <p className="mt-1 text-[10px] uppercase tracking-widest text-[#525252]">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* One App. Five Roles. Zero Hires. */}
+      <section className="mx-auto max-w-2xl px-4 py-20">
+        <h2 className="mb-8 text-center text-xl font-semibold text-[var(--text-1)]">
+          One app. Five roles. <span className="text-[var(--accent)]">Zero hires.</span>
+        </h2>
+        <div className="space-y-2">
+          {[
+            { role: 'Translator', replaced: 'PocketChat AI translates 13 languages in real-time' },
+            { role: 'Accountant', replaced: 'AI tracks every yen, auto-categorizes, generates reports' },
+            { role: 'Secretary', replaced: 'AI Briefing + Planner handles your schedule and reminders' },
+            { role: 'Manager', replaced: 'Business Health Score monitors operations 24/7' },
+            { role: 'IT Department', replaced: 'Snap & Vault, document management, all built in' },
+          ].map((r) => (
+            <div key={r.role} className="flex items-center gap-4 rounded-[12px] border border-[var(--card-border)] bg-[var(--card-bg)] px-5 py-3.5">
+              <span className="min-w-[90px] text-sm font-bold text-[#DC2626] line-through">{r.role}</span>
+              <span className="text-sm text-[var(--text-3)]">→</span>
+              <span className="text-sm text-[var(--text-2)]">{r.replaced}</span>
+            </div>
+          ))}
         </div>
       </section>
 
