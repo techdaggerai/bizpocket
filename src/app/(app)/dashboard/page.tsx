@@ -133,6 +133,9 @@ export default function DashboardPage() {
   const balance = totalIn - totalOut;
   const unpaidTotal = invoices.reduce((s, inv) => s + inv.total, 0);
   const recentFlows = flows.slice(0, 5);
+  const recurringFlows = flows.filter((f) => (f as any).is_recurring);
+  const recurringIn = recurringFlows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
+  const recurringOut = recurringFlows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
 
   // Profile completeness check
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -283,6 +286,36 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Recurring This Month */}
+      {recurringFlows.length > 0 && (
+        <div>
+          <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">Recurring This Month</h2>
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 text-center">
+              <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Recurring In</p>
+              <p className="font-mono text-sm font-medium text-[var(--green)]">{formatCurrency(recurringIn, currency)}</p>
+            </div>
+            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 text-center">
+              <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Recurring Out</p>
+              <p className="font-mono text-sm font-medium text-[var(--red)]">{formatCurrency(recurringOut, currency)}</p>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            {recurringFlows.slice(0, 5).map((f) => (
+              <div key={f.id} className="flex items-center justify-between rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#7C3AED] font-medium">{(f as any).recurring_frequency || 'recurring'}</span>
+                  <span className="text-sm text-[var(--text-1)]">{f.category}</span>
+                </div>
+                <span className={`font-mono text-sm font-medium ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
+                  {f.flow_type === 'IN' ? '+' : '-'}{formatCurrency(f.amount, currency)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Activity */}
       <div>

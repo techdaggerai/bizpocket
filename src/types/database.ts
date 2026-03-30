@@ -52,6 +52,11 @@ export interface CashFlow {
   description: string | null;
   status: string;
   classify_as: ClassifyAs;
+  is_recurring?: boolean;
+  recurring_frequency?: string | null;
+  recurring_end_date?: string | null;
+  parent_recurring_id?: string | null;
+  notes?: string | null;
   created_by: string;
   created_at: string;
 }

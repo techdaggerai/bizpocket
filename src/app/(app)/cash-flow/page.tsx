@@ -13,6 +13,8 @@ const CATEGORIES = [
   'Food', 'Salary', 'Utility', 'Shipping', 'Tax', 'Insurance', 'Other',
 ];
 
+const FREQUENCIES = ['daily', 'weekly', 'monthly', 'yearly'] as const;
+
 const emptyForm = {
   date: new Date().toISOString().slice(0, 10),
   flow_type: 'IN' as FlowType,
@@ -22,6 +24,10 @@ const emptyForm = {
   amount: '',
   status: 'COMPLETED',
   classify_as: 'cash_flow_only' as ClassifyAs,
+  is_recurring: false,
+  recurring_frequency: 'monthly' as string,
+  recurring_end_date: '',
+  notes: '',
 };
 
 export default function CashFlowPage() {
@@ -87,6 +93,10 @@ export default function CashFlowPage() {
       description: form.description || null,
       status: form.status,
       classify_as: form.classify_as,
+      is_recurring: form.is_recurring,
+      recurring_frequency: form.is_recurring ? form.recurring_frequency : null,
+      recurring_end_date: form.is_recurring && form.recurring_end_date ? form.recurring_end_date : null,
+      notes: form.notes || null,
     };
 
     let error;
@@ -118,6 +128,10 @@ export default function CashFlowPage() {
       amount: String(f.amount),
       status: f.status,
       classify_as: f.classify_as,
+      is_recurring: f.is_recurring || false,
+      recurring_frequency: f.recurring_frequency || 'monthly',
+      recurring_end_date: f.recurring_end_date || '',
+      notes: f.notes || '',
     });
     setEditId(f.id);
     setShowForm(true);
@@ -266,6 +280,54 @@ export default function CashFlowPage() {
             </select>
           </div>
 
+          {/* Notes */}
+          <input
+            placeholder="Notes (optional)"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            className={inputClass}
+          />
+
+          {/* Recurring Toggle */}
+          <div className="rounded-lg border border-[var(--border)] p-3 space-y-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div
+                onClick={() => setForm({ ...form, is_recurring: !form.is_recurring })}
+                className={`relative h-6 w-11 rounded-full transition-colors ${
+                  form.is_recurring ? 'bg-[var(--accent)]' : 'bg-[var(--bg-3)]'
+                }`}
+              >
+                <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  form.is_recurring ? 'translate-x-[22px]' : 'translate-x-0.5'
+                }`} />
+              </div>
+              <span className="text-sm text-[var(--text-2)]">Make this recurring</span>
+            </label>
+            {form.is_recurring && (
+              <div className="space-y-2">
+                <select
+                  value={form.recurring_frequency}
+                  onChange={(e) => setForm({ ...form, recurring_frequency: e.target.value })}
+                  className={inputClass}
+                >
+                  {FREQUENCIES.map((f) => (
+                    <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+                  ))}
+                </select>
+                <input
+                  type="date"
+                  value={form.recurring_end_date}
+                  onChange={(e) => setForm({ ...form, recurring_end_date: e.target.value })}
+                  placeholder="End date (optional)"
+                  className={inputClass}
+                />
+                <p className="text-xs text-[var(--text-4)]">
+                  This will auto-log every {form.recurring_frequency}
+                </p>
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={saving}
@@ -311,12 +373,18 @@ export default function CashFlowPage() {
                 </div>
               </div>
               {f.description && <p className="mt-1 text-xs text-[var(--text-4)] pl-11">{f.description}</p>}
+              {f.notes && <p className="mt-0.5 text-xs text-[var(--text-3)] pl-11 italic">{f.notes}</p>}
               <div className="mt-2 flex items-center gap-2 pl-11">
                 <span className={`rounded-btn px-1.5 py-0.5 text-[10px] font-medium ${
                   f.status === 'COMPLETED' ? 'bg-[var(--green-bg)] text-[var(--green)]' :
                   f.status === 'PENDING' ? 'bg-[var(--accent-light)] text-[var(--accent)]' :
                   'bg-[var(--bg-3)] text-[var(--text-4)]'
                 }`}>{f.status}</span>
+                {f.is_recurring && (
+                  <span className="rounded-btn bg-[rgba(124,58,237,0.08)] px-1.5 py-0.5 text-[10px] font-medium text-[#7C3AED]">
+                    {f.recurring_frequency || 'recurring'}
+                  </span>
+                )}
                 {f.classify_as !== 'cash_flow_only' && (
                   <span className="rounded-btn bg-[var(--accent-light)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--accent)]">
                     {f.classify_as}

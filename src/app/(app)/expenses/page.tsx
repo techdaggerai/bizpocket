@@ -28,6 +28,8 @@ export default function ExpensesPage() {
   const [quickAmount, setQuickAmount] = useState('');
   const [quickCategory, setQuickCategory] = useState(EXPENSE_CATEGORIES[0]);
   const [quickNotes, setQuickNotes] = useState('');
+  const [quickRecurring, setQuickRecurring] = useState(false);
+  const [quickFrequency, setQuickFrequency] = useState('monthly');
   const [saving, setSaving] = useState(false);
 
   const fetchExpenses = useCallback(async () => {
@@ -68,6 +70,8 @@ export default function ExpensesPage() {
       description: quickNotes || null,
       status: 'COMPLETED',
       classify_as: 'expense',
+      is_recurring: quickRecurring,
+      recurring_frequency: quickRecurring ? quickFrequency : null,
     });
     setSaving(false);
     if (error) {
@@ -76,6 +80,7 @@ export default function ExpensesPage() {
       toast('Expense added', 'success');
       setQuickAmount('');
       setQuickNotes('');
+      setQuickRecurring(false);
       setShowQuickAdd(false);
       fetchExpenses();
     }
@@ -145,6 +150,38 @@ export default function ExpensesPage() {
             placeholder={t('expenses.notes')}
             className={inputClass}
           />
+          {/* Recurring Toggle */}
+          <div className="rounded-lg border border-[var(--border)] p-3 space-y-2">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div
+                onClick={() => setQuickRecurring(!quickRecurring)}
+                className={`relative h-6 w-11 rounded-full transition-colors ${
+                  quickRecurring ? 'bg-[var(--accent)]' : 'bg-[var(--bg-3)]'
+                }`}
+              >
+                <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  quickRecurring ? 'translate-x-[22px]' : 'translate-x-0.5'
+                }`} />
+              </div>
+              <span className="text-sm text-[var(--text-2)]">Make this recurring</span>
+            </label>
+            {quickRecurring && (
+              <div className="space-y-1">
+                <select
+                  value={quickFrequency}
+                  onChange={(e) => setQuickFrequency(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+                <p className="text-xs text-[var(--text-4)]">This expense will auto-log every {quickFrequency}</p>
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={saving}
