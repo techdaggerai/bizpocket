@@ -33,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
         <div className="min-h-screen bg-[var(--bg)] pb-20">
           <TopNav />
-          <main className="mx-auto max-w-2xl">
+          <main className="mx-auto max-w-2xl px-4">
             {children}
           </main>
           <BottomNav />
