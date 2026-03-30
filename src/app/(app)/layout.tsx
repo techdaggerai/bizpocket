@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase-server';
 import { AuthProvider } from '@/lib/auth-context';
 import { I18nProvider } from '@/lib/i18n';
 import BottomNav from '@/components/BottomNav';
+import TopNav from '@/components/TopNav';
 import type { Language } from '@/lib/i18n';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <AuthProvider user={user} profile={profile} organization={organization}>
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
         <div className="min-h-screen bg-[var(--bg)] pb-20">
+          <TopNav />
           <main className="mx-auto max-w-2xl">
             {children}
           </main>

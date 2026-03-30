@@ -1,3 +1,5 @@
+export type NotificationType = 'invoice_overdue' | 'payment_due' | 'tax_deadline' | 'low_balance' | 'expense_reminder' | 'planner_reminder';
+
 export type UserRole = 'owner' | 'staff' | 'accountant';
 export type FlowType = 'IN' | 'OUT';
 export type ClassifyAs = 'expense' | 'investment' | 'cash_flow_only';
@@ -149,6 +151,17 @@ export interface InvoiceChat {
   sender_type: 'owner' | 'customer';
   sender_name: string | null;
   message: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  organization_id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  action_url: string | null;
   read_at: string | null;
   created_at: string;
 }
