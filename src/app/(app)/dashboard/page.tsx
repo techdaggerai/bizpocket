@@ -97,7 +97,7 @@ export default function DashboardPage() {
         setCachedBriefing(data.briefing, data.ownerName || firstName, organization.id);
       }
     } catch {
-      // Silently fail — static greeting remains
+      // Silently fail
     }
     setBriefingLoading(false);
   }, [organization.id, firstName]);
@@ -152,7 +152,6 @@ export default function DashboardPage() {
   const recurringIn = recurringFlows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
   const recurringOut = recurringFlows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
 
-  // Profile completeness check
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const org = organization as any;
   const profileIncomplete = !org.address || !org.phone || !org.bank_name || !org.bank_account_number;
@@ -177,7 +176,6 @@ export default function DashboardPage() {
         </h1>
         <p className="mb-3 text-sm text-[var(--text-3)]">{organization.name}</p>
 
-        {/* Profile Completeness Banner */}
         {profileIncomplete && (
           <Link
             href="/settings/business-setup"
@@ -296,14 +294,14 @@ export default function DashboardPage() {
             <span className="text-xs font-medium text-[#16A34A]">{t('dashboard.new_expense')}</span>
           </Link>
           <Link
-            href="/documents?scan=1"
+            href="/detect"
             className="flex flex-col items-center gap-3 rounded-[12px] bg-[rgba(79,70,229,0.08)] p-5 text-center transition-all hover:bg-[rgba(79,70,229,0.12)]"
           >
             <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" />
             </svg>
-            <span className="text-xs font-medium text-[#4F46E5]">{t('dashboard.scan_document')}</span>
+            <span className="text-xs font-medium text-[#4F46E5]">AI Detect</span>
           </Link>
           <Link
             href="/planner"
@@ -406,7 +404,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-base font-medium text-[var(--text-1)]">{f.category}</p>
-                    <p className="text-xs text-[var(--text-4)]">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
+                    <p className="text-xs text-[var(--text-4)]">{formatDateShort(f.date)}{f.from_to ? ` \u00B7 ${f.from_to}` : ''}</p>
                   </div>
                 </div>
                 <span className={`font-mono text-base font-medium ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
