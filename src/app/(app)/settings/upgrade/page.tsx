@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -56,6 +56,8 @@ export default function UpgradePage() {
 
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
+  const autoCheckout = searchParams.get('auto');
+  const targetPlan = searchParams.get('plan');
   const currentPlan = organization.plan || 'free';
 
   async function handleCheckout(priceId: string, planKey: string) {
@@ -77,6 +79,18 @@ export default function UpgradePage() {
       setLoading(null);
     }
   }
+
+  // Auto-trigger Stripe checkout when coming from signup flow
+  const [autoTriggered, setAutoTriggered] = useState(false);
+  useEffect(() => {
+    if (autoCheckout === '1' && targetPlan && !autoTriggered) {
+      const plan = PLANS.find((p) => p.key === targetPlan);
+      if (plan && plan.priceId) {
+        setAutoTriggered(true);
+        handleCheckout(plan.priceId, plan.key);
+      }
+    }
+  }, [autoCheckout, targetPlan, autoTriggered]);
 
   async function handlePortal() {
     setLoading('portal');

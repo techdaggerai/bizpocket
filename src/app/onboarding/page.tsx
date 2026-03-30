@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const BUSINESS_TYPES = [
   { value: 'car_dealer', label: 'Car Dealer' },
@@ -26,8 +26,18 @@ const CURRENCIES = [
 ];
 
 export default function OnboardingPage() {
+  return (
+    <Suspense>
+      <OnboardingInner />
+    </Suspense>
+  );
+}
+
+function OnboardingInner() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedPlan = searchParams.get('plan') || 'free';
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,7 +69,11 @@ export default function OnboardingPage() {
 
     if (existingProfile?.organization_id) {
       // Already onboarded — just redirect
-      router.push('/dashboard');
+      if (selectedPlan === 'pro' || selectedPlan === 'business') {
+        router.push(`/settings/upgrade?plan=${selectedPlan}&auto=1`);
+      } else {
+        router.push('/dashboard');
+      }
       return;
     }
 
@@ -105,7 +119,11 @@ export default function OnboardingPage() {
       });
     }
 
-    router.push('/dashboard');
+    if (selectedPlan === 'pro' || selectedPlan === 'business') {
+      router.push(`/settings/upgrade?plan=${selectedPlan}&auto=1`);
+    } else {
+      router.push('/dashboard');
+    }
   }
 
   const totalSteps = 4;

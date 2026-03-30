@@ -1,14 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark } from '@/components/Logo';
 
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupInner />
+    </Suspense>
+  );
+}
+
+function SignupInner() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const plan = searchParams.get('plan') || 'free';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -37,7 +47,7 @@ export default function SignupPage() {
       return;
     }
 
-    router.push('/onboarding');
+    router.push(`/onboarding?plan=${plan}`);
   }
 
   return (
