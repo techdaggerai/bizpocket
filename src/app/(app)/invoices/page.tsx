@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
@@ -119,6 +119,18 @@ export default function InvoicesPage() {
   }
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuOpenId && listRef.current && !((e.target as HTMLElement).closest('[data-menu]'))) {
+        setMenuOpenId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [menuOpenId]);
 
   async function updateStatus(id: string, status: InvoiceStatus) {
     const updateData: Record<string, unknown> = { status };
@@ -335,11 +347,6 @@ export default function InvoicesPage() {
                   <p className="text-xs text-[var(--text-4)]">{inv.invoice_number} · {formatDate(inv.created_at)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <a href={`/invoices/${inv.id}`} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-light)] text-[var(--accent)] hover:bg-[rgba(79,70,229,0.15)] transition-colors" title="Chat">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-                    </svg>
-                  </a>
                 <div className="text-right">
                   <p className="font-mono text-base font-medium text-[var(--text-1)]">{formatCurrency(inv.total, inv.currency)}</p>
                   <div className="flex items-center gap-1 justify-end">
@@ -355,45 +362,96 @@ export default function InvoicesPage() {
                 </div>
                 </div>
               </div>
-              <div className="mt-2.5 flex items-center gap-3">
+              <div className="mt-2.5 flex items-center gap-2">
+                {/* Status actions */}
                 {inv.status === 'draft' && (
-                  <>
-                    <button onClick={() => updateStatus(inv.id, 'sent')} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)]">
-                      Mark Sent
-                    </button>
-                    <a href={`/invoices/new?edit=${inv.id}`} className="text-xs text-[var(--text-4)] hover:text-[var(--accent)]">
-                      Edit
-                    </a>
-                  </>
+                  <button onClick={() => updateStatus(inv.id, 'sent')} className="rounded-btn bg-[var(--accent)] px-3 py-1.5 text-xs font-medium text-white hover:bg-[var(--accent-hover)]">
+                    Mark Sent
+                  </button>
                 )}
                 {inv.status === 'sent' && (
-                  <button onClick={() => updateStatus(inv.id, 'paid')} className="text-xs text-[var(--green)] hover:opacity-80">
+                  <button onClick={() => updateStatus(inv.id, 'paid')} className="rounded-btn bg-[var(--green)] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90">
                     Mark Paid
                   </button>
                 )}
-                {deleteConfirmId === inv.id ? (
-                  <div className="ml-auto flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleDeleteInvoice(inv.id)}
-                      className="rounded-btn bg-[#DC2626] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#B91C1C]"
-                    >
-                      Delete?
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirmId(null)}
-                      className="text-xs text-[var(--text-3)]"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setDeleteConfirmId(inv.id)}
-                    className="ml-auto text-xs text-[#DC2626] hover:opacity-80"
+
+                {/* Edit — draft/sent only */}
+                {inv.status !== 'paid' ? (
+                  <a
+                    href={`/invoices/new?edit=${inv.id}`}
+                    className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)]"
                   >
-                    Delete
-                  </button>
+                    Edit
+                  </a>
+                ) : (
+                  <span className="flex items-center gap-1 rounded-btn border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--text-4)]" title="Paid invoices are locked">
+                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                    Locked
+                  </span>
                 )}
+
+                {/* View */}
+                <a
+                  href={`/invoices/${inv.id}`}
+                  className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-xs font-medium text-[var(--accent)] hover:bg-[var(--accent-light)]"
+                >
+                  View
+                </a>
+
+                {/* 3-dot menu for delete */}
+                <div className="relative ml-auto" data-menu>
+                  <button
+                    onClick={() => setMenuOpenId(menuOpenId === inv.id ? null : inv.id)}
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--text-4)] hover:bg-[var(--bg-2)]"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                    </svg>
+                  </button>
+                  {menuOpenId === inv.id && (
+                    <div className="absolute right-0 top-8 z-20 w-36 rounded-lg border border-[var(--border)] bg-white py-1 shadow-lg">
+                      <a
+                        href={`/invoices/${inv.id}`}
+                        className="block px-3 py-2 text-xs text-[var(--text-2)] hover:bg-[var(--bg-2)]"
+                      >
+                        View Detail
+                      </a>
+                      {inv.status !== 'paid' && (
+                        <a
+                          href={`/invoices/new?edit=${inv.id}`}
+                          className="block px-3 py-2 text-xs text-[var(--text-2)] hover:bg-[var(--bg-2)]"
+                        >
+                          Edit Invoice
+                        </a>
+                      )}
+                      {deleteConfirmId === inv.id ? (
+                        <div className="flex items-center gap-1 px-3 py-2">
+                          <button
+                            onClick={() => { handleDeleteInvoice(inv.id); setMenuOpenId(null); }}
+                            className="rounded bg-[#DC2626] px-2 py-1 text-[10px] font-medium text-white"
+                          >
+                            Confirm
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="text-[10px] text-[var(--text-4)]"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeleteConfirmId(inv.id)}
+                          className="block w-full px-3 py-2 text-left text-xs text-[#DC2626] hover:bg-[var(--bg-2)]"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
