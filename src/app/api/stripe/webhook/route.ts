@@ -2,13 +2,16 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 function planFromPriceId(priceId: string): 'pro' | 'business' {
   if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) return 'business'
@@ -16,6 +19,9 @@ function planFromPriceId(priceId: string): 'pro' | 'business' {
 }
 
 export async function POST(request: Request) {
+  const stripe = getStripe()
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+  const supabase = getSupabase()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')!
 
