@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { formatCurrency, getGreeting, getCurrentMonth, formatDateShort } from '@/lib/utils';
 import GlobalSearch from '@/components/GlobalSearch';
+import HealthScore from '@/components/HealthScore';
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 
@@ -245,6 +246,9 @@ export default function DashboardPage() {
           <p className="mt-1.5 font-mono text-xl font-semibold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
         </div>
       </div>
+
+      {/* Business Health Score */}
+      <HealthScore />
 
       {/* World Clock */}
       <div>
