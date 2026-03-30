@@ -67,18 +67,17 @@ export function IconPocketChat() {
 
 export function IconAIBriefing() {
   return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="ai1" x1="8" y1="4" x2="32" y2="36" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FBBF24"/><stop offset="1" stopColor="#F59E0B"/>
-        </linearGradient>
-        <linearGradient id="ai2" x1="24" y1="2" x2="36" y2="16" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FDE68A"/><stop offset="1" stopColor="#F59E0B"/>
-        </linearGradient>
-      </defs>
-      <path d="M18 6l2.2 7a5 5 0 0 0 3.5 3.5l7 2.2-7 2.2a5 5 0 0 0-3.5 3.5L18 31.4l-2.2-7a5 5 0 0 0-3.5-3.5l-7-2.2 7-2.2a5 5 0 0 0 3.5-3.5L18 6Z" fill="url(#ai1)"/>
-      <path d="M31 4l1 3.5a3 3 0 0 0 2 2L37.5 10.5 34 11.5a3 3 0 0 0-2 2L31 17l-1-3.5a3 3 0 0 0-2-2L24.5 10.5 28 9.5a3 3 0 0 0 2-2L31 4Z" fill="url(#ai2)"/>
-      <circle cx="9" cy="32" r="2.5" fill="#FDE68A" opacity="0.6"/><circle cx="9" cy="32" r="1" fill="#F59E0B"/>
+    <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="16" fill="#FFF4E0"/>
+      <rect x="16" y="16" width="26" height="34" rx="4" fill="#fff" stroke="#F0A830" strokeWidth="1.2"/>
+      <rect x="21" y="24" width="16" height="2" rx="1" fill="#F0A830"/>
+      <rect x="21" y="30" width="12" height="2" rx="1" fill="#F0A830" opacity="0.6"/>
+      <rect x="21" y="36" width="14" height="2" rx="1" fill="#F0A830" opacity="0.35"/>
+      <rect x="21" y="42" width="9" height="2" rx="1" fill="#F0A830" opacity="0.2"/>
+      <path d="M48 22 L50.5 16 L53 22 L59 24.5 L53 27 L50.5 33 L48 27 L42 24.5 Z" fill="#F5A623"/>
+      <path d="M38 42 L39.5 38 L41 42 L45 43.5 L41 45 L39.5 49 L38 45 L34 43.5 Z" fill="#F7BC5C"/>
+      <circle cx="54" cy="38" r="1.8" fill="#F5A623" opacity="0.7"/>
+      <circle cx="44" cy="15" r="1.2" fill="#F7BC5C" opacity="0.5"/>
     </svg>
   );
 }
@@ -101,20 +100,16 @@ export function IconHealthScore() {
 
 export function IconCashFlow() {
   return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="cf_bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#334155"/><stop offset="1" stopColor="#0F172A"/>
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="40" height="40" rx="10" fill="url(#cf_bg)"/>
-      <path d="M10 26V12" stroke="#4ADE80" strokeWidth="3.5" strokeLinecap="round"/>
-      <path d="M5.5 16.5L10 11l4.5 5.5" stroke="#4ADE80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 14v14" stroke="#F87171" strokeWidth="3.5" strokeLinecap="round"/>
-      <path d="M25.5 23.5L30 29l4.5-5.5" stroke="#F87171" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-      <text x="20" y="14" fontSize="8" fontWeight="700" fill="#fff" fontFamily="DM Sans" textAnchor="middle" opacity="0.95">$</text>
-      <text x="20" y="24" fontSize="8" fontWeight="700" fill="#fff" fontFamily="DM Sans" textAnchor="middle" opacity="0.7">¥</text>
-      <text x="20" y="34" fontSize="8" fontWeight="700" fill="#fff" fontFamily="DM Sans" textAnchor="middle" opacity="0.5">€</text>
+    <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="16" fill="#E6F9F0"/>
+      <rect x="14" y="20" width="28" height="20" rx="4" fill="#34C77B"/>
+      <text x="28" y="33" textAnchor="middle" dominantBaseline="central" fontFamily="system-ui, -apple-system, sans-serif" fontWeight="600" fontSize="14" fill="#fff">$</text>
+      <rect x="18" y="26" width="28" height="20" rx="4" fill="#2AB86A" opacity="0.45"/>
+      <circle cx="50" cy="50" r="11" fill="#1FA85E"/>
+      <path d="M45.5 50 A4.5 4.5 0 1 1 54.5 50" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round"/>
+      <polygon points="54.5,47.5 56.8,50 54.5,52.5" fill="#fff"/>
+      <path d="M54.5 50 A4.5 4.5 0 1 1 45.5 50" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round"/>
+      <polygon points="45.5,52.5 43.2,50 45.5,47.5" fill="#fff"/>
     </svg>
   );
 }
@@ -152,22 +147,21 @@ export function IconSnapVault() {
 
 export function IconWorldClock() {
   return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="wc1" x1="4" y1="4" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#60A5FA"/><stop offset="1" stopColor="#2563EB"/>
-        </linearGradient>
-      </defs>
-      <circle cx="20" cy="20" r="16" fill="url(#wc1)"/>
-      <ellipse cx="20" cy="20" rx="6.5" ry="16" stroke="#93C5FD" strokeWidth="1.2" opacity="0.4"/>
-      <ellipse cx="20" cy="20" rx="11.5" ry="16" stroke="#93C5FD" strokeWidth="0.8" opacity="0.25"/>
-      <path d="M4 20h32" stroke="#93C5FD" strokeWidth="1" opacity="0.35"/>
-      <path d="M5.5 13h29" stroke="#93C5FD" strokeWidth="0.8" opacity="0.2"/>
-      <path d="M5.5 27h29" stroke="#93C5FD" strokeWidth="0.8" opacity="0.2"/>
-      <path d="M20 10v10.5l5 4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="20" cy="20.5" r="1.5" fill="#BFDBFE"/>
-      <circle cx="32" cy="9" r="4" fill="#EF4444"/>
-      <text x="32" y="11" fontSize="5" fontWeight="700" fill="#fff" fontFamily="DM Mono" textAnchor="middle">6</text>
+    <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="16" fill="#E6F1FB"/>
+      <circle cx="28" cy="28" r="16" fill="#fff" stroke="#4A9BE8" strokeWidth="1.3"/>
+      <line x1="12" y1="28" x2="44" y2="28" stroke="#4A9BE8" strokeWidth="0.9" opacity="0.5"/>
+      <line x1="15" y1="21" x2="41" y2="21" stroke="#4A9BE8" strokeWidth="0.7" opacity="0.3"/>
+      <line x1="15" y1="35" x2="41" y2="35" stroke="#4A9BE8" strokeWidth="0.7" opacity="0.3"/>
+      <ellipse cx="28" cy="28" rx="7" ry="16" fill="none" stroke="#4A9BE8" strokeWidth="0.8" opacity="0.4"/>
+      <circle cx="46" cy="46" r="13" fill="#fff" stroke="#185FA5" strokeWidth="1.5"/>
+      <line x1="46" y1="35.5" x2="46" y2="38" stroke="#185FA5" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="46" y1="54" x2="46" y2="56.5" stroke="#185FA5" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="35.5" y1="46" x2="38" y2="46" stroke="#185FA5" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="54" y1="46" x2="56.5" y2="46" stroke="#185FA5" strokeWidth="1.2" strokeLinecap="round"/>
+      <line x1="46" y1="46" x2="41" y2="39" stroke="#185FA5" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="46" y1="46" x2="52" y2="40" stroke="#185FA5" strokeWidth="1.4" strokeLinecap="round"/>
+      <circle cx="46" cy="46" r="1.5" fill="#185FA5"/>
     </svg>
   );
 }
