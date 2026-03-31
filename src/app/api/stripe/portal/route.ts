@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No active subscription' }, { status: 400 })
   }
 
-  const origin = request.headers.get('origin') || 'https://bizpocket.jp'
+  const origin = request.headers.get('origin') || 'https://www.bizpocket.io'
 
   const session = await stripe.billingPortal.sessions.create({
     customer: org.stripe_customer_id,

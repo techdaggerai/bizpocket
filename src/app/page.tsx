@@ -481,7 +481,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link
-                  href={plan.key === 'enterprise' ? 'mailto:hello@bizpocket.jp' : `/signup?plan=${plan.key}`}
+                  href={plan.key === 'enterprise' ? 'mailto:hello@bizpocket.io' : `/signup?plan=${plan.key}`}
                   className={`block w-full rounded-btn py-2.5 text-center text-sm font-medium transition-all ${
                     plan.highlight
                       ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] hover:-translate-y-px'
@@ -536,7 +536,7 @@ export default function LandingPage() {
             </select>
           </div>
           <div className="mt-6 text-center">
-            <p className="text-xs text-[var(--text-4)]">A TechDagger Product &middot; MS Dynamics LLC &middot; bizpocket.jp</p>
+            <p className="text-xs text-[var(--text-4)]">A TechDagger Product &middot; MS Dynamics LLC &middot; bizpocket.io</p>
           </div>
         </div>
       </footer>

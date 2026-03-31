@@ -227,7 +227,7 @@ export default function UpgradePage() {
           Multiple orgs, API access, white label, dedicated support
         </p>
         <a
-          href="mailto:hello@bizpocket.jp"
+          href="mailto:hello@bizpocket.io"
           className="mt-4 inline-block rounded-btn border border-[#4F46E5] px-6 py-2.5 text-sm font-semibold text-[#4F46E5] transition-colors hover:bg-[rgba(79,70,229,0.08)]"
         >
           Contact Sales

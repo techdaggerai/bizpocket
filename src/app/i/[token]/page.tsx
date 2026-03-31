@@ -554,7 +554,7 @@ export default function PublicInvoicePage() {
           <span className="text-[11px] text-[#A3A3A3]">
             Powered by{' '}
             <a
-              href="https://bizpocket.jp"
+              href="https://bizpocket.io"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#4F46E5] hover:underline"

@@ -1,6 +1,6 @@
 # CLAUDE.md — BizPocket
 Session command: launch zarrar
-Product: BizPocket | bizpocket.jp | "Your AI Business Autopilot"
+Product: BizPocket | bizpocket.io | "Your AI Business Autopilot"
 Legal: MS Dynamics LLC, Miami Beach FL, USA | Parent: TechDagger | Stripe: Mercury Bank
 Default: en-US (American English) + JPY | RTL: Urdu + Arabic
 Founder: Dr. Bilal (Doc) — User #1

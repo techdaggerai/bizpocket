@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       .eq('id', organizationId)
   }
 
-  const origin = request.headers.get('origin') || 'https://bizpocket.jp'
+  const origin = request.headers.get('origin') || 'https://www.bizpocket.io'
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
