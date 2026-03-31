@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { PocketMark } from '@/components/Logo';
 import NotificationBell from './NotificationBell';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -37,9 +38,9 @@ export default function TopNav() {
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4F46E5] text-xs font-bold text-white transition-opacity hover:opacity-90"
+            className="flex items-center justify-center rounded-lg transition-opacity hover:opacity-80"
           >
-            {initials}
+            <PocketMark variant="xl" />
           </button>
           {showMenu && (
             <>

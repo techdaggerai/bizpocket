@@ -97,7 +97,7 @@ export default function DashboardPage() {
         setCachedBriefing(data.briefing, data.ownerName || firstName, organization.id);
       }
     } catch {
-      // Silently fail
+      // Silently fail — static greeting remains
     }
     setBriefingLoading(false);
   }, [organization.id, firstName]);
@@ -152,6 +152,7 @@ export default function DashboardPage() {
   const recurringIn = recurringFlows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
   const recurringOut = recurringFlows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
 
+  // Profile completeness check
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const org = organization as any;
   const profileIncomplete = !org.address || !org.phone || !org.bank_name || !org.bank_account_number;
@@ -165,7 +166,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6 p-4">
       {/* Global Search */}
       <GlobalSearch />
 
@@ -176,6 +177,7 @@ export default function DashboardPage() {
         </h1>
         <p className="mb-3 text-sm text-[var(--text-3)]">{organization.name}</p>
 
+        {/* Profile Completeness Banner */}
         {profileIncomplete && (
           <Link
             href="/settings/business-setup"
@@ -404,7 +406,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     <p className="text-base font-medium text-[var(--text-1)]">{f.category}</p>
-                    <p className="text-xs text-[var(--text-4)]">{formatDateShort(f.date)}{f.from_to ? ` \u00B7 ${f.from_to}` : ''}</p>
+                    <p className="text-xs text-[var(--text-4)]">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
                   </div>
                 </div>
                 <span className={`font-mono text-base font-medium ${f.flow_type === 'IN' ? 'text-[var(--green)]' : 'text-[var(--red)]'}`}>
