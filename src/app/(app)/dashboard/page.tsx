@@ -313,9 +313,9 @@ export default function DashboardPage() {
             <Link href="/cycle-setup" className="flex-1 rounded-lg border border-[#E5E5E5] py-2 text-center text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">
               Edit Cycle
             </Link>
-            <span className="flex-1 rounded-lg bg-[#4F46E5]/50 py-2 text-center text-[10px] font-medium text-white cursor-default" title="Ops Radar — coming soon">
-              Ops Radar (Soon)
-            </span>
+            <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-center text-[10px] font-medium text-white hover:bg-[#4338CA] transition-colors">
+              Ops Radar &rarr;
+            </Link>
           </div>
         </div>
       ) : (

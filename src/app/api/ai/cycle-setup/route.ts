@@ -7,6 +7,15 @@ const SYSTEM_PROMPT = `You are BizPocket AI — a business operations architect.
 
 Your job is to understand the user's business and create a BUSINESS CYCLE — the stages their products/services/items flow through from start to finish.
 
+LANGUAGE:
+- CRITICAL: Detect the language the user writes in and respond in THAT language
+- If they write in Japanese, respond in Japanese
+- If they write in Urdu, respond in Urdu
+- If they write in Arabic, respond in Arabic
+- If they write in any language, respond in THAT language
+- Stage names in the generated cycle should be in ENGLISH (for system compatibility) but descriptions can be in the user's language
+- Default to English if unclear
+
 CONVERSATION FLOW:
 1. Ask what their business does (if not already clear)
 2. Ask them to walk through what happens from start to finish — from when they first get/create something to when they get paid
@@ -90,7 +99,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing messages or organizationId' }, { status: 400 })
   }
 
-  // Get org info for context
   const { data: org } = await supabase
     .from('organizations')
     .select('name, business_type, currency')
@@ -109,7 +117,6 @@ export async function POST(request: Request) {
       content: m.content,
     }))
 
-    // Inject context into first user message
     if (apiMessages.length > 0 && contextMsg) {
       apiMessages[0].content = `[Context: ${contextMsg}]\n\n${apiMessages[0].content}`
     }
@@ -125,13 +132,9 @@ export async function POST(request: Request) {
 
     let result
     try {
-      // Multiple cleaning strategies
       let cleaned = rawText.trim()
-
-      // Remove markdown code fences (```json ... ``` or ``` ... ```)
       cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
 
-      // If still not starting with {, try to extract JSON from the text
       if (!cleaned.startsWith('{')) {
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
         if (jsonMatch) {
@@ -141,7 +144,6 @@ export async function POST(request: Request) {
 
       result = JSON.parse(cleaned)
     } catch {
-      // Final fallback: try to find JSON anywhere in the raw text
       try {
         const jsonMatch = rawText.match(/\{[\s\S]*"type"\s*:\s*"(?:cycle|message)"[\s\S]*\}/)
         if (jsonMatch) {
