@@ -21,7 +21,7 @@ const BRAND_COLORS = [
 ];
 
 export default function WebsiteBuilderPage() {
-  const { organization, profile } = useAuth();
+  const { organization, profile, user } = useAuth();
   const { toast } = useToast();
   const supabase = createClient();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -75,7 +75,7 @@ export default function WebsiteBuilderPage() {
     setGenerating(false);
   }
 
-  function downloadHTML() {
+  async function downloadHTML() {
     if (!generatedHTML) return;
     const blob = new Blob([generatedHTML], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -91,6 +91,68 @@ export default function WebsiteBuilderPage() {
     if (!generatedHTML) return;
     await navigator.clipboard.writeText(generatedHTML);
     toast('HTML copied to clipboard!', 'success');
+  }
+
+  const [publishing, setPublishing] = useState(false);
+  const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
+
+  async function publishWebsite() {
+    if (!generatedHTML) return;
+    setPublishing(true);
+
+    const slug = form.businessName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 50);
+
+    const { data: existing } = await supabase
+      .from('published_websites')
+      .select('id')
+      .eq('organization_id', organization.id)
+      .limit(1)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      // Update existing
+      const res = await supabase
+        .from('published_websites')
+        .update({
+          slug,
+          business_name: form.businessName,
+          html: generatedHTML,
+          style: form.style,
+          brand_color: form.brandColor,
+          is_published: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id);
+      error = res.error;
+    } else {
+      // Create new
+      const res = await supabase
+        .from('published_websites')
+        .insert({
+          organization_id: organization.id,
+          slug,
+          business_name: form.businessName,
+          html: generatedHTML,
+          style: form.style,
+          brand_color: form.brandColor,
+          created_by: user.id,
+        });
+      error = res.error;
+    }
+
+    if (error) {
+      toast('Failed to publish: ' + error.message, 'error');
+    } else {
+      const url = `${window.location.origin}/site/${slug}`;
+      setPublishedUrl(url);
+      toast('Website is LIVE!', 'success');
+    }
+    setPublishing(false);
   }
 
   const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
@@ -113,25 +175,45 @@ export default function WebsiteBuilderPage() {
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => { setStep('form'); setGeneratedHTML(null); }}
+              onClick={() => { setStep('form'); setGeneratedHTML(null); setPublishedUrl(null); }}
               className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors"
             >
               Regenerate
             </button>
             <button
-              onClick={copyHTML}
-              className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors"
-            >
-              Copy HTML
-            </button>
-            <button
               onClick={downloadHTML}
-              className="rounded-lg bg-[#4F46E5] px-3 py-2 text-xs font-semibold text-white hover:bg-[#4338CA] transition-colors"
+              className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors"
             >
               Download
             </button>
+            <button
+              onClick={publishWebsite}
+              disabled={publishing}
+              className="rounded-lg bg-[#16A34A] px-3 py-2 text-xs font-semibold text-white hover:bg-[#15803D] transition-colors disabled:opacity-50"
+            >
+              {publishing ? 'Publishing...' : publishedUrl ? 'Update' : 'Publish Live'}
+            </button>
           </div>
         </div>
+
+        {/* Published URL Banner */}
+        {publishedUrl && (
+          <div className="mx-4 mt-2 rounded-lg bg-[#16A34A]/10 border border-[#16A34A]/20 p-3 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#16A34A]">Your website is LIVE!</p>
+              <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#16A34A] underline break-all">{publishedUrl}</a>
+            </div>
+            <button
+              onClick={async () => {
+                await navigator.clipboard.writeText(publishedUrl);
+                toast('URL copied!', 'success');
+              }}
+              className="shrink-0 rounded-md bg-[#16A34A] px-2.5 py-1.5 text-[10px] font-semibold text-white"
+            >
+              Copy URL
+            </button>
+          </div>
+        )}
 
         {/* Website Preview */}
         <div className="flex-1 bg-[#F0F0F0] p-4 overflow-hidden">

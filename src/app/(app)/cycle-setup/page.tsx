@@ -139,6 +139,13 @@ export default function CycleSetupPage() {
     if (!generatedCycle) return;
     setSaving(true);
 
+    // Deactivate any existing active cycles first
+    await supabase
+      .from('business_cycles')
+      .update({ is_active: false })
+      .eq('organization_id', organization.id)
+      .eq('is_active', true);
+
     // Create business cycle
     const { data: cycle, error: cycleError } = await supabase
       .from('business_cycles')
