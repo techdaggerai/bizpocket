@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
+import BotOnboarding from '@/components/BotOnboarding';
+import { usePocketBot } from '@/lib/use-pocket-bot';
 
 /* ---------- Types ---------- */
 
@@ -28,6 +30,7 @@ interface Conversation {
   last_message_at: string | null;
   unread_count: number;
   created_at: string;
+  is_bot_chat?: boolean;
   contact?: Contact | null;
 }
 
@@ -35,7 +38,7 @@ interface Message {
   id: string;
   conversation_id: string;
   organization_id: string;
-  sender_type: 'owner' | 'customer';
+  sender_type: 'owner' | 'customer' | 'bot';
   sender_name: string;
   message: string;
   message_type: 'text' | 'invoice' | 'document' | 'image' | 'voice' | 'payment_confirmed';
@@ -117,6 +120,12 @@ export default function PocketChatPage() {
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const {
+    botConfig, botName, botEmoji, botLoading,
+    botConfigLoaded, isSetupComplete,
+    fetchBotConfig, sendBotMessage
+  } = usePocketBot();
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -192,7 +201,8 @@ export default function PocketChatPage() {
 
   useEffect(() => {
     fetchConversations();
-  }, [fetchConversations]);
+    fetchBotConfig();
+  }, [fetchConversations, fetchBotConfig]);
 
   useEffect(() => {
     if (activeConvoId) {
@@ -236,7 +246,13 @@ export default function PocketChatPage() {
           if (newMsg.conversation_id === activeConvoId) {
             setMessages((prev) => {
               if (prev.some((m) => m.id === newMsg.id)) return prev;
-              return [...prev, newMsg];
+              // Remove optimistic temp messages that match the real one
+              const filtered = prev.filter((m) => {
+                if (!m.id.startsWith('temp-') && !m.id.startsWith('bot-')) return true;
+                // Match by sender_type + message content (within 5s)
+                return !(m.sender_type === newMsg.sender_type && m.message === newMsg.message);
+              });
+              return [...filtered, newMsg];
             });
           }
 
@@ -454,6 +470,56 @@ export default function PocketChatPage() {
   /* ---------- Send message ---------- */
 
   const sendMessage = useCallback(async () => {
+    // If this is a bot conversation, use bot handler
+    if (activeConvo?.is_bot_chat) {
+      if (!newMessage.trim() || sending) return;
+      const msg = newMessage.trim();
+      setNewMessage('');
+      setSending(true);
+
+      // Optimistically add user message to UI
+      const tempUserMsg = {
+        id: 'temp-' + Date.now(),
+        conversation_id: activeConvoId!,
+        organization_id: organization!.id,
+        sender_type: 'owner' as const,
+        sender_name: profile?.full_name || profile?.name || 'You',
+        message: msg,
+        message_type: 'text' as const,
+        attachment_url: null,
+        invoice_id: null,
+        read_at: null,
+        original_text: null,
+        original_language: chatLang,
+        translations: null,
+        created_at: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, tempUserMsg]);
+
+      await sendBotMessage(msg, activeConvoId!, (botReply) => {
+        const tempBotMsg = {
+          id: 'bot-' + Date.now(),
+          conversation_id: activeConvoId!,
+          organization_id: organization!.id,
+          sender_type: 'bot' as const,
+          sender_name: botName,
+          message: botReply,
+          message_type: 'text' as const,
+          attachment_url: null,
+          invoice_id: null,
+          read_at: null,
+          original_text: null,
+          original_language: null,
+          translations: null,
+          created_at: new Date().toISOString(),
+        };
+        setMessages(prev => [...prev, tempBotMsg]);
+      });
+
+      setSending(false);
+      return;
+    }
+
     if (!newMessage.trim() || !activeConvoId || !organization?.id || sending) return;
     setSending(true);
     const text = newMessage.trim();
@@ -481,7 +547,7 @@ export default function PocketChatPage() {
         .eq('id', activeConvoId);
     }
     setSending(false);
-  }, [newMessage, activeConvoId, organization?.id, sending]);
+  }, [newMessage, activeConvoId, organization?.id, sending, activeConvo, sendBotMessage, botName, chatLang, profile]);
 
   /* ---------- Create new conversation ---------- */
 
@@ -548,11 +614,31 @@ export default function PocketChatPage() {
     return true;
   });
 
+  const sortedConversations = [...filteredConversations].sort((a, b) => {
+    if (a.is_bot_chat && !b.is_bot_chat) return -1;
+    if (!a.is_bot_chat && b.is_bot_chat) return 1;
+    return 0;
+  });
+
   const filteredContacts = contacts.filter((c) => {
     if (!contactSearch) return true;
     const q = contactSearch.toLowerCase();
     return c.name.toLowerCase().includes(q) || (c.company ?? '').toLowerCase().includes(q);
   });
+
+  // Show bot onboarding if not set up
+  if (botConfigLoaded && !isSetupComplete) {
+    return (
+      <div className="h-[calc(100vh-80px)] bg-white">
+        <BotOnboarding
+          onComplete={(name, icon) => {
+            fetchBotConfig();
+            fetchConversations();
+          }}
+        />
+      </div>
+    );
+  }
 
   /* ---------- Render: Active Conversation ---------- */
 
@@ -573,19 +659,29 @@ export default function PocketChatPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <div
-            className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
-            style={{ backgroundColor: avatarColor(contactName) }}
-          >
-            {contactName.charAt(0).toUpperCase()}
-          </div>
+          {activeConvo.is_bot_chat ? (
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-lg flex-shrink-0">
+              {botEmoji}
+            </div>
+          ) : (
+            <div
+              className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
+              style={{ backgroundColor: avatarColor(contactName) }}
+            >
+              {contactName.charAt(0).toUpperCase()}
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
-            {contactType && (
+            {activeConvo.is_bot_chat ? (
+              <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">
+                AI Assistant
+              </span>
+            ) : contactType ? (
               <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
                 {contactType}
               </span>
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -596,6 +692,7 @@ export default function PocketChatPage() {
           )}
           {messages.map((msg) => {
             const isOwner = msg.sender_type === 'owner';
+            const isBot = msg.sender_type === 'bot';
 
             // Payment confirmed
             if (msg.message_type === 'payment_confirmed') {
@@ -767,16 +864,26 @@ export default function PocketChatPage() {
             const langFlag = origLang ? LANG_FLAGS[origLang] || '' : '';
 
             return (
-              <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+              <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
+                {isBot && (
+                  <div className="h-8 w-8 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-base flex-shrink-0">
+                    {botEmoji}
+                  </div>
+                )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
-                  {!isOwner && (
+                  {!isOwner && !isBot && (
                     <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
+                  )}
+                  {isBot && (
+                    <p className="text-[10px] text-[#7C3AED] mb-1 ml-1 font-medium">{botName}</p>
                   )}
                   <div
                     className={`rounded-[12px] px-3.5 py-2.5 ${
                       isOwner
                         ? 'bg-[#4F46E5] text-white'
-                        : 'bg-[#F3F3F1] text-[#0A0A0A]'
+                        : isBot
+                          ? 'bg-[#4F46E5]/5 text-[#0A0A0A] border border-[#4F46E5]/10'
+                          : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap break-words">{displayText}</p>
@@ -970,15 +1077,20 @@ export default function PocketChatPage() {
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <h1 className="text-lg font-bold text-[#0A0A0A]">PocketChat</h1>
-        <button
-          onClick={() => {
-            fetchContacts();
-            setShowNewChat(true);
-          }}
-          className="bg-[#4F46E5] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#4338CA] transition-colors"
-        >
-          + New Chat
-        </button>
+        <div className="flex items-center gap-2">
+          <button className="bg-[#16A34A] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#15803D] transition-colors">
+            Invite
+          </button>
+          <button
+            onClick={() => {
+              fetchContacts();
+              setShowNewChat(true);
+            }}
+            className="bg-[#4F46E5] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#4338CA] transition-colors"
+          >
+            + New Chat
+          </button>
+        </div>
       </div>
 
       {/* Filter tabs */}
@@ -1015,14 +1127,14 @@ export default function PocketChatPage() {
           <div className="flex items-center justify-center h-32">
             <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : filteredConversations.length === 0 ? (
+        ) : sortedConversations.length === 0 ? (
           <div className="text-center py-12 px-4">
             <p className="text-sm text-[#A3A3A3]">
               {search || filter !== 'all' ? 'No conversations match your filter.' : 'No conversations yet. Start a new chat!'}
             </p>
           </div>
         ) : (
-          filteredConversations.map((convo) => {
+          sortedConversations.map((convo) => {
             const name = convo.contact?.name ?? convo.title ?? 'Unknown';
             return (
               <button
@@ -1031,12 +1143,18 @@ export default function PocketChatPage() {
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#F3F3F1] text-left"
               >
                 {/* Avatar */}
-                <div
-                  className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
-                  style={{ backgroundColor: avatarColor(name) }}
-                >
-                  {name.charAt(0).toUpperCase()}
-                </div>
+                {convo.is_bot_chat ? (
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-lg flex-shrink-0">
+                    {botEmoji}
+                  </div>
+                ) : (
+                  <div
+                    className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
+                    style={{ backgroundColor: avatarColor(name) }}
+                  >
+                    {name.charAt(0).toUpperCase()}
+                  </div>
+                )}
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
