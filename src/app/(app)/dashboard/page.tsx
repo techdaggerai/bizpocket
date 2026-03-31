@@ -270,6 +270,7 @@ export default function DashboardPage() {
               </div>
             );
           })}
+          <div className="shrink-0 w-px" aria-hidden="true" />
         </div>
       </div>
 
