@@ -77,7 +77,8 @@ function OnboardingInner() {
       return;
     }
 
-    // Create organization
+    // Create organization with 14-day trial
+    const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
     const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
@@ -87,6 +88,7 @@ function OnboardingInner() {
         currency: form.currency,
         created_by: user.id,
         plan: 'free',
+        trial_ends_at: trialEnd,
       })
       .select()
       .single();
