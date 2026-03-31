@@ -34,9 +34,9 @@ const PLANS = [
     name: 'Starter',
     price: '¥0',
     period: '',
-    desc: 'Get started',
-    features: ['5 invoices/month', 'PocketChat (2 contacts)', '1 language', 'Basic cash flow'],
-    cta: 'Open Your Pocket',
+    desc: 'Start with a 14-day Pro trial',
+    features: ['14-day free trial (full Pro)', '3 invoices/month', 'AI Document Detector (unlimited)', 'PocketChat (10 AI translations/day)', 'AI Website Builder', 'Business Health Score', 'Basic cash flow'],
+    cta: 'Start Free Trial',
     highlight: false,
   },
   {
@@ -44,8 +44,8 @@ const PLANS = [
     price: '¥2,980',
     priceAlt: '~$20 · ~€18',
     period: '/mo',
-    desc: 'For serious businesses',
-    features: ['Unlimited invoices', 'PocketChat unlimited', '5 languages', 'AI Morning Briefing', 'Accountant Portal', 'All features'],
+    desc: 'Your AI business autopilot',
+    features: ['Unlimited invoices', 'AI Morning Briefing', 'Unlimited AI translations', 'Expense Planner + AI', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', '5 languages'],
     cta: 'Go Pro',
     highlight: true,
   },
@@ -54,8 +54,8 @@ const PLANS = [
     price: '¥5,980',
     priceAlt: '~$40 · ~€36',
     period: '/mo',
-    desc: 'Scale your team',
-    features: ['Everything in Pro', 'Voice translation', '13 languages', 'Document scan AI', 'Priority support', 'Multiple staff'],
+    desc: 'Your entire office — automated',
+    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Business Radar + AI insights', 'Voice translation', '13 languages', 'Japanese compliance toolkit', 'Custom branding', 'Social media integration'],
     cta: 'Go Business',
     highlight: false,
   },
@@ -63,8 +63,8 @@ const PLANS = [
     name: 'Enterprise',
     price: 'Custom',
     period: '',
-    desc: 'Large organizations',
-    features: ['Multiple organizations', 'API access', 'White label', 'Dedicated support'],
+    desc: 'For firms managing multiple clients',
+    features: ['Everything in Business', 'Multi-org dashboard', 'API access', 'White-label everything', 'Dedicated account manager'],
     cta: 'Contact Us',
     highlight: false,
   },
@@ -328,6 +328,83 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* AI Website Builder */}
+      <section className="mx-auto max-w-5xl px-4 py-20">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#16A34A]">AI Website Builder</p>
+            <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">Your website.<br/>Built in 60 seconds.</h2>
+            <p className="text-sm leading-relaxed text-[var(--text-3)]">Fill in your business details, pick a style, and AI generates a professional website instantly. One click to publish &mdash; your business is live on the internet with its own URL. No coding. No designers. No waiting.</p>
+          </div>
+          <div className="flex-1 rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] overflow-hidden">
+            <div className="flex items-center gap-1.5 bg-[#F5F5F5] px-3 py-2">
+              <div className="flex gap-1"><div className="w-2 h-2 rounded-full bg-[#FF5F57]" /><div className="w-2 h-2 rounded-full bg-[#FEBC2E]" /><div className="w-2 h-2 rounded-full bg-[#28C840]" /></div>
+              <div className="flex-1 text-center text-[9px] text-[#999]">your-business.bizpocket.io</div>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-[#16A34A]/5 to-[#16A34A]/10">
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <div className="h-3 w-24 bg-[#16A34A]/20 rounded mb-2" />
+                <div className="h-2 w-full bg-[#E5E5E5] rounded mb-1" />
+                <div className="h-2 w-3/4 bg-[#E5E5E5] rounded mb-3" />
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="h-12 bg-[#16A34A]/10 rounded" />
+                  <div className="h-12 bg-[#16A34A]/10 rounded" />
+                  <div className="h-12 bg-[#16A34A]/10 rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ops Radar + Business Cycle */}
+      <section className="border-y border-[var(--border)] bg-gradient-to-br from-[rgba(79,70,229,0.02)] to-[rgba(124,58,237,0.04)]">
+        <div className="mx-auto max-w-5xl px-4 py-20">
+          <div className="text-center mb-10">
+            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Business Cycle Engine</p>
+            <h2 className="mb-3 text-xl font-semibold text-[var(--text-1)] sm:text-2xl">Your business. Your pipeline. Your AI.</h2>
+            <p className="text-sm text-[var(--text-3)] max-w-xl mx-auto">Tell AI about your business in 2 minutes. It creates a custom operations pipeline &mdash; then tracks everything, detects bottlenecks, and gets smarter every day.</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-3">
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#4F46E5]/10">
+                <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">AI Creates Your Cycle</h3>
+              <p className="text-xs text-[var(--text-3)]">Chat with AI about your business. It builds your custom pipeline &mdash; whether you sell cars, cakes, or consulting.</p>
+            </div>
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED]/10">
+                <svg className="h-6 w-6 text-[#7C3AED]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6Z" /></svg>
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">Ops Radar</h3>
+              <p className="text-xs text-[var(--text-3)]">Your command center. See every item in your pipeline, detect bottlenecks, track costs, measure performance &mdash; all in real time.</p>
+            </div>
+            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EC4899]/10">
+                <svg className="h-6 w-6 text-[#EC4899]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>
+              </div>
+              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">AI Gets Smarter</h3>
+              <p className="text-xs text-[var(--text-3)]">Every day the AI learns your patterns. After a month, it predicts bottlenecks before they happen and recommends what to do next.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Connect Everywhere */}
+      <section className="mx-auto max-w-5xl px-4 py-20">
+        <div className="text-center mb-10">
+          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Connect Everywhere</p>
+          <h2 className="mb-3 text-xl font-semibold text-[var(--text-1)] sm:text-2xl">Link your platforms. Expand your reach.</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-4">
+          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">📸</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Instagram</p><p className="text-[9px] text-[var(--text-4)]">Showcase your work</p></div>
+          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">💬</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">WhatsApp</p><p className="text-[9px] text-[var(--text-4)]">Direct customer chat</p></div>
+          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">🌐</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Your Website</p><p className="text-[9px] text-[var(--text-4)]">AI-built, instant publish</p></div>
+          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">✈️</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Telegram</p><p className="text-[9px] text-[var(--text-4)]">Run business by text</p></div>
         </div>
       </section>
 
