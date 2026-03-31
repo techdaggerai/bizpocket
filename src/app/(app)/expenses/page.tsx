@@ -82,13 +82,13 @@ export default function ExpensePlannerPage() {
 
   async function addExpense(e: React.FormEvent) {
     e.preventDefault(); if (!expenseForm.description || !expenseForm.amount) return; setSaving(true);
-    const { error } = await supabase.from('planned_expenses').insert({ organization_id: organization.id, month: openMonth, category: expenseForm.category, description: expenseForm.description, planned_amount: parseInt(expenseForm.amount), is_recurring: expenseForm.is_recurring, notes: expenseForm.notes || null });
+    const { error } = await supabase.from('planned_expenses').insert({ organization_id: organization.id, month: openMonth, category: expenseForm.category, description: expenseForm.description, planned_amount: parseInt(expenseForm.amount), is_recurring: expenseForm.is_recurring, notes: expenseForm.notes || null, created_by: user.id });
     setSaving(false); if (error) { toast(error.message, 'error'); return; }
     toast('Added', 'success'); setExpenseForm({ category: EXPENSE_CATEGORIES[0], description: '', amount: '', notes: '', is_recurring: false }); setShowExpenseForm(false); fetchData(openMonth);
   }
   async function addIncome(e: React.FormEvent) {
     e.preventDefault(); if (!incomeForm.description || !incomeForm.amount) return; setSaving(true);
-    const { error } = await supabase.from('planned_income').insert({ organization_id: organization.id, month: openMonth, category: incomeForm.category, description: incomeForm.description, planned_amount: parseInt(incomeForm.amount), expected_date: incomeForm.expected_date || null, notes: incomeForm.notes || null });
+    const { error } = await supabase.from('planned_income').insert({ organization_id: organization.id, month: openMonth, category: incomeForm.category, description: incomeForm.description, planned_amount: parseInt(incomeForm.amount), expected_date: incomeForm.expected_date || null, notes: incomeForm.notes || null, created_by: user.id });
     setSaving(false); if (error) { toast(error.message, 'error'); return; }
     toast('Added', 'success'); setIncomeForm({ category: INCOME_CATEGORIES[0], description: '', amount: '', expected_date: '', notes: '' }); setShowIncomeForm(false); fetchData(openMonth);
   }
@@ -96,7 +96,7 @@ export default function ExpensePlannerPage() {
   const ic = "w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
 
   return (
-    <div className="space-y-3 py-4">
+    <div className="space-y-3 p-4">
       <div><h1 className="text-xl font-bold text-[var(--text-1)]">Expense & Planner</h1><p className="text-xs text-[var(--text-3)]">Plan it. Track it. Compare it.</p></div>
 
       {allMonths.map((m) => {
@@ -115,27 +115,27 @@ export default function ExpensePlannerPage() {
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   <div><p className="text-[10px] text-[var(--text-4)] uppercase">Planned</p><p className="font-mono text-sm font-semibold text-[var(--text-1)]">{formatCurrency(plannedTotal, currency)}</p></div>
                   <div><p className="text-[10px] text-[var(--text-4)] uppercase">Actual</p><p className="font-mono text-sm font-semibold text-[var(--text-1)]">{formatCurrency(actualTotal, currency)}</p></div>
-                  <div><p className="text-[10px] text-[var(--text-4)] uppercase">Variance</p><p className={`font-mono text-sm font-semibold ${variance >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>{variance >= 0 ? '\u2705 ' : '\u26A0\uFE0F '}{formatCurrency(Math.abs(variance), currency)}</p></div>
+                  <div><p className="text-[10px] text-[var(--text-4)] uppercase">Variance</p><p className={`font-mono text-sm font-semibold ${variance >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>{variance >= 0 ? '✅ ' : '⚠️ '}{formatCurrency(Math.abs(variance), currency)}</p></div>
                 </div>
               )}
             </button>
             {isOpen && (
               <div className="rounded-b-xl border border-t-0 border-[#E5E5E5] bg-white">
                 <div className="flex border-b border-[#E5E5E5]">
-                  <button onClick={() => setTab('actual')} className={`flex-1 py-3 text-center text-sm font-semibold transition-colors ${tab === 'actual' ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[var(--text-3)]'}`}>Actual</button>
-                  <button onClick={() => setTab('planner')} className={`flex-1 py-3 text-center text-sm font-semibold transition-colors ${tab === 'planner' ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[var(--text-3)]'}`}>Planner</button>
+                  <button onClick={() => setTab('actual')} className={`flex-1 py-3 text-center text-sm font-semibold transition-colors ${tab === 'actual' ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[var(--text-3)]'}`}>📊 Actual</button>
+                  <button onClick={() => setTab('planner')} className={`flex-1 py-3 text-center text-sm font-semibold transition-colors ${tab === 'planner' ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[var(--text-3)]'}`}>📋 Planner</button>
                 </div>
                 {loading ? (
                   <div className="flex justify-center py-12"><div className="h-6 w-6 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>
                 ) : tab === 'actual' ? (
                   <div className="p-4 space-y-4">
                     {Object.keys(byCategory).length === 0 ? (
-                      <div className="py-8 text-center"><p className="text-sm text-[var(--text-3)]">No expenses this month.</p><Link href="/cash-flow?new=1" className="mt-2 inline-block text-sm font-medium text-[#4F46E5]">Log a cash out &rarr;</Link></div>
+                      <div className="py-8 text-center"><p className="text-sm text-[var(--text-3)]">No expenses this month.</p><Link href="/cash-flow?new=1" className="mt-2 inline-block text-sm font-medium text-[#4F46E5]">Log a cash out →</Link></div>
                     ) : (
                       <>
                         {Object.entries(byCategory).sort((a, b) => b[1].reduce((s, e) => s + e.amount, 0) - a[1].reduce((s, e) => s + e.amount, 0)).map(([cat, items]) => {
                           const ct = items.reduce((s, e) => s + e.amount, 0);
-                          return (<div key={cat}><div className="flex items-center justify-between mb-2"><span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-3)]">{cat}</span><span className="font-mono text-sm font-semibold text-[var(--text-1)]">{formatCurrency(ct, currency)}</span></div><div className="space-y-1">{items.map((e) => (<div key={e.id} className="flex items-center justify-between rounded-lg bg-[var(--bg-2)] px-3 py-2"><div><p className="text-sm text-[var(--text-1)]">{e.description || e.category}</p><p className="text-[10px] text-[var(--text-4)]">{formatDate(e.date)}{e.from_to ? ` \u00B7 ${e.from_to}` : ''}</p></div><span className="font-mono text-sm font-medium text-[#DC2626]">{formatCurrency(e.amount, currency)}</span></div>))}</div></div>);
+                          return (<div key={cat}><div className="flex items-center justify-between mb-2"><span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-3)]">{cat}</span><span className="font-mono text-sm font-semibold text-[var(--text-1)]">{formatCurrency(ct, currency)}</span></div><div className="space-y-1">{items.map((e) => (<div key={e.id} className="flex items-center justify-between rounded-lg bg-[var(--bg-2)] px-3 py-2"><div><p className="text-sm text-[var(--text-1)]">{e.description || e.category}</p><p className="text-[10px] text-[var(--text-4)]">{formatDate(e.date)}{e.from_to ? ` · ${e.from_to}` : ''}</p></div><span className="font-mono text-sm font-medium text-[#DC2626]">{formatCurrency(e.amount, currency)}</span></div>))}</div></div>);
                         })}
                         <div className="flex items-center justify-between border-t border-[#E5E5E5] pt-3"><span className="text-sm font-bold text-[var(--text-1)]">Total Actual</span><span className="font-mono text-lg font-bold text-[#DC2626]">{formatCurrency(actualTotal, currency)}</span></div>
                       </>
@@ -145,8 +145,8 @@ export default function ExpensePlannerPage() {
                   <div className="p-4 space-y-5">
                     {/* Summary */}
                     <div className="rounded-xl bg-[var(--bg-2)] p-4 space-y-2">
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-3)]">Planned Expenses</span><span className="font-mono font-medium text-[var(--text-1)]">{formatCurrency(plannedTotal, currency)} <span className="text-[10px] text-[var(--text-4)]">&middot; {formatCurrency(coveredExpenses, currency)} covered</span></span></div>
-                      <div className="flex justify-between text-sm"><span className="text-[var(--text-3)]">Expected Income</span><span className="font-mono font-medium text-[#16A34A]">{formatCurrency(incomeTotal, currency)} <span className="text-[10px] text-[var(--text-4)]">&middot; {formatCurrency(receivedIncome, currency)} received</span></span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-3)]">Planned Expenses</span><span className="font-mono font-medium text-[var(--text-1)]">{formatCurrency(plannedTotal, currency)} <span className="text-[10px] text-[var(--text-4)]">· {formatCurrency(coveredExpenses, currency)} covered</span></span></div>
+                      <div className="flex justify-between text-sm"><span className="text-[var(--text-3)]">Expected Income</span><span className="font-mono font-medium text-[#16A34A]">{formatCurrency(incomeTotal, currency)} <span className="text-[10px] text-[var(--text-4)]">· {formatCurrency(receivedIncome, currency)} received</span></span></div>
                       <div className="flex justify-between border-t border-[#E5E5E5] pt-2 text-sm"><span className="font-semibold text-[var(--text-1)]">Net Position</span><span className={`font-mono font-bold ${netPosition >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>{netPosition >= 0 ? '+' : ''}{formatCurrency(netPosition, currency)}</span></div>
                     </div>
                     {/* Planned Expenses */}
@@ -179,7 +179,7 @@ export default function ExpensePlannerPage() {
                         <div className="space-y-1.5">{plannedIncome.map((pi) => (
                           <div key={pi.id} className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${pi.is_completed ? 'border-[#E5E5E5] bg-[var(--bg-2)] opacity-50' : 'border-[#E5E5E5] bg-white'}`}>
                             <button onClick={() => togglePI(pi.id, pi.is_completed)} className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 ${pi.is_completed ? 'border-[#16A34A] bg-[#16A34A]' : 'border-[#D4D4D4]'}`}>{pi.is_completed && <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>}</button>
-                            <div className="flex-1 min-w-0"><p className={`text-sm text-[var(--text-1)] ${pi.is_completed ? 'line-through' : ''}`}>{pi.description}</p><p className="text-[10px] text-[var(--text-4)]">{pi.category}{pi.expected_date ? ` \u00B7 Due ${pi.expected_date}` : ''}</p></div>
+                            <div className="flex-1 min-w-0"><p className={`text-sm text-[var(--text-1)] ${pi.is_completed ? 'line-through' : ''}`}>{pi.description}</p><p className="text-[10px] text-[var(--text-4)]">{pi.category}{pi.expected_date ? ` · Due ${pi.expected_date}` : ''}</p></div>
                             <span className={`font-mono text-sm font-medium shrink-0 ${pi.is_completed ? 'text-[var(--text-4)] line-through' : 'text-[#16A34A]'}`}>{formatCurrency(pi.planned_amount, currency)}</span>
                             <button onClick={() => deletePI(pi.id)} className="shrink-0 text-[var(--text-4)] hover:text-[#DC2626]"><svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg></button>
                           </div>
