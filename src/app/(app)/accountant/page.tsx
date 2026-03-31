@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
-import { useI18n } from '@/lib/i18n';
+import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate, getMonthRange } from '@/lib/utils';
 import type { CashFlow, Invoice } from '@/types/database';
 
 export default function AccountantPage() {
   const { organization, profile } = useAuth();
-  const { t } = useI18n();
+  const { toast } = useToast();
   const supabase = createClient();
   const months = getMonthRange(12);
   const currency = organization.currency || 'JPY';
@@ -19,24 +19,17 @@ export default function AccountantPage() {
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'overview' | 'cashflow' | 'invoices' | 'expenses'>('overview');
+  const [tab, setTab] = useState<'overview' | 'cashflow' | 'invoices' | 'expenses' | 'report'>('overview');
+  const [report, setReport] = useState<string | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       const [flowRes, invRes] = await Promise.all([
-        supabase
-          .from('cash_flows')
-          .select('*')
-          .eq('organization_id', organization.id)
-          .gte('date', month + '-01')
-          .lte('date', month + '-31')
-          .order('date', { ascending: true }),
-        supabase
-          .from('invoices')
-          .select('*')
-          .eq('organization_id', organization.id)
-          .order('created_at', { ascending: false }),
+        supabase.from('cash_flows').select('*').eq('organization_id', organization.id)
+          .gte('date', month + '-01').lte('date', month + '-31').order('date', { ascending: true }),
+        supabase.from('invoices').select('*').eq('organization_id', organization.id).order('created_at', { ascending: false }),
       ]);
       setFlows(flowRes.data || []);
       setInvoices(invRes.data || []);
@@ -45,146 +38,260 @@ export default function AccountantPage() {
     load();
   }, [month, organization.id, supabase]);
 
-  const totalIn = flows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
-  const totalOut = flows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
-  const expenses = flows.filter((f) => f.classify_as === 'expense');
+  const totalIn = flows.filter(f => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
+  const totalOut = flows.filter(f => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
+  const net = totalIn - totalOut;
+  const expenses = flows.filter(f => f.classify_as === 'expense');
   const expenseTotal = expenses.reduce((s, f) => s + f.amount, 0);
 
+  const taxableIncome = totalIn;
+  const estimatedTax10 = Math.round(taxableIncome * 0.1 / 1.1);
+  const estimatedTax8 = Math.round(taxableIncome * 0.08 / 1.08);
+
+  const expByCategory: Record<string, number> = {};
+  expenses.forEach(f => {
+    const cat = f.category || 'Other';
+    expByCategory[cat] = (expByCategory[cat] || 0) + f.amount;
+  });
+
+  const monthInvoices = invoices.filter(inv => inv.created_at?.startsWith(month));
+  const paidInvoices = monthInvoices.filter(inv => inv.status === 'paid');
+  const unpaidInvoices = monthInvoices.filter(inv => inv.status !== 'paid');
+
+  async function generateReport() {
+    setReportLoading(true);
+    try {
+      const res = await fetch('/api/ai/accountant-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationId: organization.id,
+          month,
+          language: profile.language === 'ja' ? 'ja' : 'en',
+        }),
+      });
+      const data = await res.json();
+      if (data.report) {
+        setReport(data.report);
+        setTab('report');
+      } else {
+        toast('Failed to generate report', 'error');
+      }
+    } catch {
+      toast('Failed to generate report', 'error');
+    }
+    setReportLoading(false);
+  }
+
+  function exportCSV() {
+    if (flows.length === 0) { toast('No data to export', 'error'); return; }
+    const headers = ['Date', 'Type', 'Category', 'From/To', 'Description', 'Amount', 'Flow'];
+    const rows = flows.map(f => [
+      f.date, f.flow_type, f.category, f.from_to || '', f.description || '',
+      String(f.amount), f.flow_type === 'IN' ? 'Income' : 'Expense',
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${organization.name}-${month}-cashflow.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('CSV downloaded!', 'success');
+  }
+
+  async function shareWithAccountant() {
+    const text = `${organization.name} \u2014 ${month} Financial Summary\n\nIncome: ${formatCurrency(totalIn, currency)}\nExpenses: ${formatCurrency(totalOut, currency)}\nNet: ${formatCurrency(net, currency)}\nTransactions: ${flows.length}\n\nGenerated by BizPocket`;
+    if (navigator.share) {
+      await navigator.share({ title: `${organization.name} Financials`, text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast('Summary copied to clipboard!', 'success');
+    }
+  }
+
+  const tabs = ['overview', 'cashflow', 'invoices', 'expenses', 'report'] as const;
+
   return (
-    <div className="space-y-4 py-4">
-      <div>
-        <h1 className="text-xl font-bold text-[var(--text-1)]">
-          {isAccountant ? `${t('nav.accountant')} Portal` : t('nav.accountant')}
-        </h1>
-        <p className="text-xs text-[var(--text-4)]">
-          {isAccountant ? 'Read-only access to all financials' : 'Monthly financial overview for your accountant'}
-        </p>
+    <div className="space-y-4 p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Accountant Portal</h1>
+          <p className="text-xs text-[var(--text-3)]">{isAccountant ? 'Read-only access' : 'Monthly financial overview'}</p>
+        </div>
+        <div className="flex gap-1.5">
+          <button onClick={exportCSV} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Export CSV</button>
+          <button onClick={shareWithAccountant} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Share</button>
+          <button onClick={generateReport} disabled={reportLoading} className="rounded-lg bg-[#4F46E5] px-2.5 py-1.5 text-[10px] font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50 transition-colors">{reportLoading ? 'Generating...' : 'AI Report'}</button>
+        </div>
       </div>
 
-      {/* Month Selector */}
-      <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-        {months.map((m) => (
-          <button
-            key={m}
-            onClick={() => setMonth(m)}
-            className={`flex-shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-              month === m ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5] border border-[#4F46E5]/20' : 'border border-[#E5E5E5] text-[var(--text-4)]'
-            }`}
-          >
+      <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4">
+        {months.map(m => (
+          <button key={m} onClick={() => { setMonth(m); setReport(null); }}
+            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${month === m ? 'bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20' : 'border border-[#E5E5E5] text-[var(--text-4)]'}`}>
             {m}
           </button>
         ))}
       </div>
 
-      {/* Tabs */}
       <div className="flex rounded-lg border border-[#E5E5E5] overflow-hidden">
-        {(['overview', 'cashflow', 'invoices', 'expenses'] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 py-2 text-xs font-medium transition-colors ${
-              tab === t ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]' : 'text-[var(--text-4)] hover:text-[var(--text-2)]'
-            }`}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+        {tabs.map(t => (
+          <button key={t} onClick={() => setTab(t)}
+            className={`flex-1 py-2 text-[10px] font-medium transition-colors ${tab === t ? 'bg-[#4F46E5]/10 text-[#4F46E5]' : 'text-[var(--text-4)] hover:text-[var(--text-2)]'}`}>
+            {t === 'report' ? 'AI Report' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
-        </div>
+        <div className="flex justify-center py-12"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>
       ) : (
         <>
-          {/* Overview Tab */}
           {tab === 'overview' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-card border border-[#E5E5E5] bg-white p-4">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Total Income</p>
-                  <p className="text-lg font-mono font-semibold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                  <p className="text-[10px] text-[#A3A3A3] uppercase">Total Income</p>
+                  <p className="text-lg font-mono font-bold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
                 </div>
-                <div className="rounded-card border border-[#E5E5E5] bg-white p-4">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Total Expenses</p>
-                  <p className="text-lg font-mono font-semibold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                  <p className="text-[10px] text-[#A3A3A3] uppercase">Total Expenses</p>
+                  <p className="text-lg font-mono font-bold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
                 </div>
-                <div className="rounded-card border border-[#E5E5E5] bg-white p-4">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Net</p>
-                  <p className={`text-lg font-mono font-semibold ${totalIn - totalOut >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-                    {formatCurrency(totalIn - totalOut, currency)}
-                  </p>
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                  <p className="text-[10px] text-[#A3A3A3] uppercase">Net Profit/Loss</p>
+                  <p className={`text-lg font-mono font-bold ${net >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>{formatCurrency(net, currency)}</p>
                 </div>
-                <div className="rounded-card border border-[#E5E5E5] bg-white p-4">
-                  <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Transactions</p>
-                  <p className="text-lg font-mono font-semibold text-[var(--text-1)]">{flows.length}</p>
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                  <p className="text-[10px] text-[#A3A3A3] uppercase">Transactions</p>
+                  <p className="text-lg font-mono font-bold text-[var(--text-1)]">{flows.length}</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 p-4">
+                <h3 className="text-xs font-semibold text-[#92400E] mb-2">Tax Estimate (\u6D88\u8CBB\u7A0E)</h3>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-[#92400E]/70">Standard rate (10%)</span>
+                  <span className="font-mono text-[#92400E]">{formatCurrency(estimatedTax10, currency)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-[#92400E]/70">Reduced rate (8%)</span>
+                  <span className="font-mono text-[#92400E]">{formatCurrency(estimatedTax8, currency)}</span>
+                </div>
+                <p className="text-[9px] text-[#92400E]/50 mt-2">*Estimated from total income. Consult your tax advisor for exact figures.</p>
+              </div>
+
+              {Object.keys(expByCategory).length > 0 && (
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Expense Breakdown</h3>
+                  {Object.entries(expByCategory).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
+                    <div key={cat} className="flex items-center justify-between py-1.5 border-b border-[#F5F5F5] last:border-0">
+                      <span className="text-xs text-[var(--text-2)]">{cat}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 rounded-full bg-[#E5E5E5] overflow-hidden">
+                          <div className="h-full bg-[#DC2626] rounded-full" style={{ width: `${(amt / expenseTotal) * 100}%` }} />
+                        </div>
+                        <span className="text-xs font-mono text-[var(--text-1)] w-20 text-right">{formatCurrency(amt, currency)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Invoice Summary</h3>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div><p className="text-[10px] text-[#A3A3A3]">Issued</p><p className="text-sm font-bold text-[var(--text-1)]">{monthInvoices.length}</p></div>
+                  <div><p className="text-[10px] text-[#A3A3A3]">Paid</p><p className="text-sm font-bold text-[#16A34A]">{paidInvoices.length}</p></div>
+                  <div><p className="text-[10px] text-[#A3A3A3]">Unpaid</p><p className="text-sm font-bold text-[#DC2626]">{unpaidInvoices.length}</p></div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Cash Flow Tab */}
           {tab === 'cashflow' && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {flows.length === 0 ? (
-                <p className="p-8 text-center text-sm text-[var(--text-4)]">No cash flow entries for {month}</p>
-              ) : (
-                flows.map((f) => (
-                  <div key={f.id} className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3">
-                    <div>
-                      <p className="text-sm text-[var(--text-1)]">{f.category}</p>
-                      <p className="text-xs text-[var(--text-4)]">{formatDate(f.date)} · {f.from_to}</p>
-                    </div>
-                    <span className={`text-sm font-mono font-semibold ${f.flow_type === 'IN' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
-                      {f.flow_type === 'IN' ? '+' : '-'}{formatCurrency(f.amount, currency)}
-                    </span>
+                <p className="p-8 text-center text-sm text-[var(--text-4)]">No entries for {month}</p>
+              ) : flows.map(f => (
+                <div key={f.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                  <div>
+                    <p className="text-sm text-[var(--text-1)]">{f.category}</p>
+                    <p className="text-[10px] text-[var(--text-4)]">{formatDate(f.date)}{f.from_to ? ` \u00B7 ${f.from_to}` : ''}</p>
                   </div>
-                ))
-              )}
+                  <span className={`text-sm font-mono font-medium ${f.flow_type === 'IN' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
+                    {f.flow_type === 'IN' ? '+' : '-'}{formatCurrency(f.amount, currency)}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Invoices Tab */}
           {tab === 'invoices' && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {invoices.length === 0 ? (
                 <p className="p-8 text-center text-sm text-[var(--text-4)]">No invoices</p>
-              ) : (
-                invoices.map((inv) => (
-                  <div key={inv.id} className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3">
-                    <div>
-                      <p className="text-sm text-[var(--text-1)]">{inv.customer_name}</p>
-                      <p className="text-xs text-[var(--text-4)]">{inv.invoice_number} · {formatDate(inv.created_at)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-mono font-semibold text-[var(--text-1)]">{formatCurrency(inv.total, inv.currency)}</p>
-                      <span className="text-[10px] text-[var(--text-3)] uppercase">{inv.status}</span>
-                    </div>
+              ) : invoices.map(inv => (
+                <div key={inv.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                  <div>
+                    <p className="text-sm text-[var(--text-1)]">{inv.customer_name}</p>
+                    <p className="text-[10px] text-[var(--text-4)]">{inv.invoice_number} \u00B7 {formatDate(inv.created_at)}</p>
                   </div>
-                ))
-              )}
+                  <div className="text-right">
+                    <p className="text-sm font-mono font-medium text-[var(--text-1)]">{formatCurrency(inv.total, inv.currency)}</p>
+                    <span className={`text-[9px] font-semibold uppercase ${inv.status === 'paid' ? 'text-[#16A34A]' : 'text-[#F59E0B]'}`}>{inv.status}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Expenses Tab */}
           {tab === 'expenses' && (
             <div className="space-y-3">
-              <div className="rounded-card border border-[#E5E5E5] bg-white p-4 text-center">
-                <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Total Expenses</p>
-                <p className="text-xl font-mono font-semibold text-[#DC2626]">{formatCurrency(expenseTotal, currency)}</p>
+              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 text-center">
+                <p className="text-[10px] text-[#A3A3A3] uppercase">Total Expenses</p>
+                <p className="text-xl font-mono font-bold text-[#DC2626]">{formatCurrency(expenseTotal, currency)}</p>
               </div>
               {expenses.length === 0 ? (
                 <p className="p-8 text-center text-sm text-[var(--text-4)]">No expenses for {month}</p>
-              ) : (
-                expenses.map((exp) => (
-                  <div key={exp.id} className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3">
-                    <div>
-                      <p className="text-sm text-[var(--text-1)]">{exp.category}</p>
-                      <p className="text-xs text-[var(--text-4)]">{formatDate(exp.date)}</p>
-                    </div>
-                    <span className="text-sm font-mono font-semibold text-[#DC2626]">-{formatCurrency(exp.amount, currency)}</span>
+              ) : expenses.map(exp => (
+                <div key={exp.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                  <div>
+                    <p className="text-sm text-[var(--text-1)]">{exp.category}</p>
+                    <p className="text-[10px] text-[var(--text-4)]">{formatDate(exp.date)}</p>
                   </div>
-                ))
+                  <span className="text-sm font-mono font-medium text-[#DC2626]">-{formatCurrency(exp.amount, currency)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tab === 'report' && (
+            <div className="space-y-3">
+              {report ? (
+                <div className="rounded-xl border border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+                      <span className="text-xs font-semibold text-[#4F46E5]">AI Monthly Report &mdash; {month}</span>
+                    </div>
+                    <button onClick={async () => { await navigator.clipboard.writeText(report); toast('Report copied!', 'success'); }}
+                      className="rounded-md bg-[#4F46E5] px-2 py-1 text-[10px] font-semibold text-white">Copy</button>
+                  </div>
+                  <p className="text-sm text-[var(--text-2)] leading-relaxed whitespace-pre-line">{report}</p>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-8 text-center">
+                  <svg className="h-8 w-8 text-[#4F46E5] mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+                  <p className="text-sm font-medium text-[var(--text-1)] mb-1">Generate AI Report</p>
+                  <p className="text-xs text-[var(--text-3)] mb-4">AI analyzes your {month} financials and generates a professional report for your accountant</p>
+                  <button onClick={generateReport} disabled={reportLoading}
+                    className="rounded-xl bg-[#4F46E5] px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                    {reportLoading ? 'Generating...' : 'Generate Report'}
+                  </button>
+                </div>
               )}
             </div>
           )}
