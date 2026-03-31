@@ -253,7 +253,7 @@ export default function DashboardPage() {
       {/* World Clock */}
       <div>
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">World Clock</h2>
-        <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1">
+        <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4">
           {DEFAULT_CLOCKS.map((c) => {
             const formatted = new Intl.DateTimeFormat('en-US', {
               timeZone: c.tz,
