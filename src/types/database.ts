@@ -233,3 +233,161 @@ export interface PlannedIncome {
   created_by: string;
   created_at: string;
 }
+
+// ═══ Spaceship Protocol ═══
+
+export interface BusinessCycle {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  business_type: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface CycleStage {
+  id: string;
+  organization_id: string;
+  cycle_id: string;
+  name: string;
+  stage_order: number;
+  color: string;
+  icon: string | null;
+  is_start: boolean;
+  is_end: boolean;
+  avg_days: number;
+  description: string | null;
+  created_at: string;
+}
+
+export interface CycleItem {
+  id: string;
+  organization_id: string;
+  cycle_id: string;
+  item_number: number;
+  name: string;
+  description: string | null;
+  category: string | null;
+  reference_id: string | null;
+  current_stage_id: string | null;
+  entered_current_stage_at: string | null;
+  is_bottleneck: boolean;
+  bottleneck_days: number;
+  purchase_date: string | null;
+  purchase_price: number;
+  total_cost: number;
+  sale_date: string | null;
+  sale_price: number;
+  profit: number;
+  currency: string;
+  supplier: string | null;
+  customer_id: string | null;
+  stakeholder_id: string | null;
+  status: 'active' | 'completed' | 'cancelled';
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  metadata: Record<string, unknown>;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CycleTransition {
+  id: string;
+  organization_id: string;
+  item_id: string;
+  from_stage_id: string | null;
+  to_stage_id: string;
+  transitioned_at: string;
+  days_in_previous_stage: number | null;
+  triggered_by: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface ItemCost {
+  id: string;
+  organization_id: string;
+  item_id: string;
+  date: string;
+  category: string;
+  description: string | null;
+  amount: number;
+  supplier: string | null;
+  receipt_url: string | null;
+  cash_flow_id: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface ItemPhoto {
+  id: string;
+  organization_id: string;
+  item_id: string;
+  file_url: string;
+  thumbnail_url: string | null;
+  is_main: boolean;
+  stage_id: string | null;
+  caption: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+}
+
+export interface Stakeholder {
+  id: string;
+  organization_id: string;
+  name: string;
+  type: 'investor' | 'partner' | 'supplier' | 'client';
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  profit_model: string | null;
+  profit_share_pct: number;
+  total_invested: number;
+  total_returned: number;
+  roi: number;
+  status: string;
+  portal_access: boolean;
+  portal_email: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export type InsightType = 'bottleneck' | 'trend' | 'recommendation' | 'anomaly' | 'prediction' | 'pattern';
+export type InsightSeverity = 'critical' | 'warning' | 'info' | 'positive';
+
+export interface AiInsight {
+  id: string;
+  organization_id: string;
+  type: InsightType;
+  category: string | null;
+  severity: InsightSeverity;
+  title: string;
+  message: string;
+  suggestion: string | null;
+  item_id: string | null;
+  stage_id: string | null;
+  stakeholder_id: string | null;
+  data_snapshot: Record<string, unknown>;
+  confidence: number;
+  model_used: string;
+  is_read: boolean;
+  is_dismissed: boolean;
+  is_acted_on: boolean;
+  user_feedback: string | null;
+  valid_until: string | null;
+  created_at: string;
+}
+
+export interface AiConversation {
+  id: string;
+  organization_id: string;
+  context: 'onboarding' | 'cycle_setup' | 'weekly_review' | 'daily_briefing' | 'user_question' | 'strategic_analysis';
+  role: 'user' | 'assistant';
+  content: string;
+  metadata: Record<string, unknown>;
+  created_by: string | null;
+  created_at: string;
+}
