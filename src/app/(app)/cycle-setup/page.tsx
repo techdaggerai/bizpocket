@@ -137,7 +137,6 @@ export default function CycleSetupPage() {
 
   async function saveCycle() {
     if (!generatedCycle) return;
-    console.log('generatedCycle:', generatedCycle);
     setSaving(true);
 
     // Create business cycle
@@ -152,8 +151,6 @@ export default function CycleSetupPage() {
       })
       .select()
       .single();
-
-    console.log('Cycle created:', cycle, cycleError);
 
     if (cycleError || !cycle) {
       toast(cycleError?.message || 'Failed to create cycle', 'error');
@@ -176,8 +173,6 @@ export default function CycleSetupPage() {
     const { error: stageError } = await supabase
       .from('cycle_stages')
       .insert(stageInserts);
-
-    console.log('Stages created:', stageError);
 
     if (stageError) {
       toast(stageError.message, 'error');
