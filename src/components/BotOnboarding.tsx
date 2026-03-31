@@ -46,18 +46,33 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
     }
 
     // Create bot conversation
-    const { error: convoError } = await supabase
+    const welcomeMsg = `Hi! I'm ${botName}, your AI business assistant. How can I help?`;
+    const { data: convoData, error: convoError } = await supabase
       .from('conversations')
       .insert({
         organization_id: organization.id,
         title: botName,
         is_bot_chat: true,
-        last_message: `Hi! I'm ${botName}, your AI business assistant. How can I help?`,
+        last_message: welcomeMsg,
         last_message_at: new Date().toISOString(),
-      });
+      })
+      .select('id')
+      .single();
 
     if (convoError) {
       console.error('Bot conversation error:', convoError);
+    }
+
+    // Insert the first bot message into messages table
+    if (convoData) {
+      await supabase.from('messages').insert({
+        conversation_id: convoData.id,
+        organization_id: organization.id,
+        sender_type: 'bot',
+        sender_name: botName,
+        message: welcomeMsg,
+        message_type: 'text',
+      });
     }
 
     setSaving(false);

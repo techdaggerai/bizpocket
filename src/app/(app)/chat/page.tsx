@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
 import BotOnboarding from '@/components/BotOnboarding';
+import InviteModal from '@/components/InviteModal';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 
 /* ---------- Types ---------- */
@@ -115,6 +116,7 @@ export default function PocketChatPage() {
   const [sending, setSending] = useState(false);
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const [recording, setRecording] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -1078,7 +1080,7 @@ export default function PocketChatPage() {
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <h1 className="text-lg font-bold text-[#0A0A0A]">PocketChat</h1>
         <div className="flex items-center gap-2">
-          <button className="bg-[#16A34A] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#15803D] transition-colors">
+          <button onClick={() => setShowInvite(true)} className="bg-[#16A34A] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#15803D] transition-colors">
             Invite
           </button>
           <button
@@ -1182,6 +1184,9 @@ export default function PocketChatPage() {
           })
         )}
       </div>
+
+      {/* Invite Modal */}
+      <InviteModal isOpen={showInvite} onClose={() => setShowInvite(false)} />
 
       {/* New Chat Modal */}
       {showNewChat && (
