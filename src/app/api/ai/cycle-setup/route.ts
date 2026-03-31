@@ -116,7 +116,7 @@ export async function POST(request: Request) {
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 2500,
       system: SYSTEM_PROMPT,
       messages: apiMessages,
     })
@@ -125,13 +125,40 @@ export async function POST(request: Request) {
 
     let result
     try {
-      const cleaned = rawText.replace(/```json\s*|```\s*/g, '').trim()
+      // Multiple cleaning strategies
+      let cleaned = rawText.trim()
+
+      // Remove markdown code fences (```json ... ``` or ``` ... ```)
+      cleaned = cleaned.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
+
+      // If still not starting with {, try to extract JSON from the text
+      if (!cleaned.startsWith('{')) {
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          cleaned = jsonMatch[0]
+        }
+      }
+
       result = JSON.parse(cleaned)
     } catch {
-      result = {
-        type: 'message',
-        message: rawText,
-        ready_to_generate: false,
+      // Final fallback: try to find JSON anywhere in the raw text
+      try {
+        const jsonMatch = rawText.match(/\{[\s\S]*"type"\s*:\s*"(?:cycle|message)"[\s\S]*\}/)
+        if (jsonMatch) {
+          result = JSON.parse(jsonMatch[0])
+        } else {
+          result = {
+            type: 'message',
+            message: rawText.replace(/```json\s*|```\s*/g, '').trim(),
+            ready_to_generate: false,
+          }
+        }
+      } catch {
+        result = {
+          type: 'message',
+          message: rawText.replace(/```json\s*|```\s*/g, '').trim(),
+          ready_to_generate: false,
+        }
       }
     }
 
