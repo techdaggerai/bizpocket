@@ -63,6 +63,9 @@ export default function DashboardPage() {
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
   const [now, setNow] = useState(new Date());
+  const [activeCycle, setActiveCycle] = useState<{ id: string; name: string; business_type: string } | null>(null);
+  const [cycleStages, setCycleStages] = useState<{ name: string; color: string; stage_order: number }[]>([]);
+  const [cycleItemCount, setCycleItemCount] = useState(0);
 
   const DEFAULT_CLOCKS = [
     { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
@@ -137,6 +140,37 @@ export default function DashboardPage() {
       setFlows(flowRes.data || []);
       setInvoices(invRes.data || []);
       setUpcomingEvents(evtRes.data || []);
+
+      // Fetch active business cycle
+      const { data: cycleData } = await supabase
+        .from('business_cycles')
+        .select('id, name, business_type')
+        .eq('organization_id', organization.id)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      if (cycleData) {
+        setActiveCycle(cycleData);
+        const { data: stages } = await supabase
+          .from('cycle_stages')
+          .select('name, color, stage_order')
+          .eq('cycle_id', cycleData.id)
+          .order('stage_order', { ascending: true });
+        setCycleStages(stages || []);
+
+        const { count } = await supabase
+          .from('cycle_items')
+          .select('id', { count: 'exact', head: true })
+          .eq('cycle_id', cycleData.id)
+          .eq('status', 'active');
+        setCycleItemCount(count || 0);
+      } else {
+        setActiveCycle(null);
+        setCycleStages([]);
+        setCycleItemCount(0);
+      }
+
       setLoading(false);
     }
     load();
@@ -248,6 +282,60 @@ export default function DashboardPage() {
       {/* Business Health Score */}
       <HealthScore />
 
+      {/* ═══ BUSINESS CYCLE — Active pipeline ═══ */}
+      {activeCycle ? (
+        <div className="rounded-[14px] border border-[#E5E5E5] bg-white p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
+              </svg>
+              <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">{activeCycle.name}</h2>
+            </div>
+            <span className="text-[10px] text-[var(--text-4)]">{cycleItemCount} items in pipeline</span>
+          </div>
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+            {cycleStages.map((stage, i) => (
+              <div key={i} className="flex items-center shrink-0">
+                <div className="rounded-md px-2 py-1.5 text-center min-w-[60px]" style={{ backgroundColor: stage.color + '15', borderLeft: `2px solid ${stage.color}` }}>
+                  <p className="text-[9px] font-bold" style={{ color: stage.color }}>{stage.stage_order}</p>
+                  <p className="text-[8px] font-medium text-[var(--text-2)] whitespace-nowrap">{stage.name}</p>
+                </div>
+                {i < cycleStages.length - 1 && (
+                  <svg className="h-3 w-3 text-[var(--text-4)] shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                  </svg>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex gap-2">
+            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-[#E5E5E5] py-2 text-center text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">
+              Edit Cycle
+            </Link>
+            <span className="flex-1 rounded-lg bg-[#4F46E5]/50 py-2 text-center text-[10px] font-medium text-white cursor-default" title="Ops Radar — coming soon">
+              Ops Radar (Soon)
+            </span>
+          </div>
+        </div>
+      ) : (
+        <Link href="/cycle-setup" className="block rounded-[14px] border border-dashed border-[#4F46E5]/30 bg-[#4F46E5]/[0.02] p-4 transition-all hover:bg-[#4F46E5]/[0.05]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4F46E5]/10">
+              <svg className="h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[var(--text-1)]">Set up your business cycle</p>
+              <p className="text-[10px] text-[var(--text-3)]">AI creates your custom operations pipeline in 2 minutes</p>
+            </div>
+            <svg className="h-4 w-4 text-[var(--text-4)] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+        </Link>
+      )}
 
       {/* ═══ UPGRADE BANNER — Free users only ═══ */}
       {(organization.plan === 'free' || !organization.plan) && (
