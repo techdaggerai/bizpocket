@@ -668,8 +668,8 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-lg flex-shrink-0">
-              {botEmoji}
+            <div className="h-10 w-10 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
+              <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
             </div>
           ) : (
             <div
@@ -912,16 +912,16 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-base flex-shrink-0">
-                    {botEmoji}
+                  <div className="h-8 w-8 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
+                    <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                   </div>
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
-                    <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
+                    <p className="text-[12px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
                   )}
                   {isBot && (
-                    <p className="text-[10px] text-[#7C3AED] mb-1 ml-1 font-medium">{botName}</p>
+                    <p className="text-[12px] text-[#7C3AED] mb-1 ml-1 font-medium">{botName}</p>
                   )}
                   <div
                     className={`rounded-[12px] px-3.5 py-2.5 ${
@@ -932,14 +932,14 @@ export default function PocketChatPage() {
                           : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap break-words">{displayText}</p>
+                    <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
-                    {langFlag && <span className="text-[10px]">{langFlag}</span>}
+                    {langFlag && <span className="text-[11px]">{langFlag}</span>}
                     {showTranslated && (
                       <button
                         onClick={() => setShowOriginal(p => ({ ...p, [msg.id]: !p[msg.id] }))}
-                        className={`text-[10px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                        className={`text-[11px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
                       >
                         {showOriginal[msg.id] ? 'Translated' : 'Original'}
                       </button>
@@ -947,12 +947,12 @@ export default function PocketChatPage() {
                     {!hasTranslation && origLang && origLang !== userLang && (
                       <button
                         onClick={() => translateMessage(msg.id, userLang)}
-                        className={`text-[10px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                        className={`text-[11px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
                       >
                         Translate
                       </button>
                     )}
-                    <span className="text-[10px] text-[#A3A3A3]">
+                    <span className="text-[11px] text-[#A3A3A3]">
                       {formatTimestamp(msg.created_at)}
                     </span>
                     {isOwner && (
@@ -1230,8 +1230,8 @@ export default function PocketChatPage() {
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] flex items-center justify-center text-lg flex-shrink-0">
-                    {botEmoji}
+                  <div className="h-10 w-10 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
+                    <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                   </div>
                 ) : (
                   <div

@@ -90,14 +90,14 @@ export default function InvoicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('invoices.title')}</h1>
-          <p className="text-xs text-[var(--text-3)]">{t('invoices.subtitle')}</p>
+          <h1 className="text-xl font-bold text-[#0A0A0A]">Your Invoices</h1>
+          <p className="text-xs text-[#999]">{invoices.length} total · {invoices.filter(i => i.status === 'paid').length} paid</p>
         </div>
         <a
           href="/invoices/new"
           className="rounded-btn bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px"
         >
-          {t('invoices.new_invoice')}
+          Fire New Invoice
         </a>
       </div>
 
