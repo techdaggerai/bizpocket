@@ -7,6 +7,8 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
 import BotOnboarding from '@/components/BotOnboarding';
 import InviteModal from '@/components/InviteModal';
+import QuickReplies from '@/components/QuickReplies';
+import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 
 /* ---------- Types ---------- */
@@ -32,6 +34,8 @@ interface Conversation {
   unread_count: number;
   created_at: string;
   is_bot_chat?: boolean;
+  label?: string | null;
+  label_color?: string | null;
   contact?: Contact | null;
 }
 
@@ -117,6 +121,8 @@ export default function PocketChatPage() {
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const [recording, setRecording] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -675,16 +681,46 @@ export default function PocketChatPage() {
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
-            {activeConvo.is_bot_chat ? (
-              <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">
-                AI Assistant
-              </span>
-            ) : contactType ? (
-              <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
-                {contactType}
-              </span>
-            ) : null}
+            <div className="flex items-center gap-1.5">
+              {activeConvo.is_bot_chat ? (
+                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">
+                  AI Assistant
+                </span>
+              ) : contactType ? (
+                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
+                  {contactType}
+                </span>
+              ) : null}
+              {activeConvo.label && (
+                <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${activeConvo.label_color || '#999'}15`, color: activeConvo.label_color || '#999' }}>
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeConvo.label_color || '#999' }} />
+                  {activeConvo.label}
+                </span>
+              )}
+            </div>
           </div>
+          {/* Label button */}
+          {!activeConvo.is_bot_chat && (
+            <div className="relative">
+              <button onClick={() => setShowLabels(!showLabels)} className="p-1.5 hover:bg-[#F3F3F1] rounded-lg transition-colors" title="Label">
+                <svg className="h-5 w-5 text-[#A3A3A3] hover:text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                </svg>
+              </button>
+              <ChatLabels
+                conversationId={activeConvo.id}
+                currentLabel={activeConvo.label || null}
+                currentColor={activeConvo.label_color || null}
+                onUpdate={(label, color) => {
+                  setConversations(prev => prev.map(c => c.id === activeConvo.id ? { ...c, label, label_color: color } : c));
+                  setShowLabels(false);
+                }}
+                isOpen={showLabels}
+                onClose={() => setShowLabels(false)}
+              />
+            </div>
+          )}
         </div>
 
         {/* Messages */}
@@ -729,6 +765,14 @@ export default function PocketChatPage() {
 
             // Document message
             if (msg.message_type === 'document' && msg.attachment_url) {
+              const fileName = msg.message || '';
+              const ext = fileName.split('.').pop()?.toLowerCase() || '';
+              const isPdf = ext === 'pdf';
+              const isDoc = ['doc', 'docx'].includes(ext);
+              const isXls = ['xls', 'xlsx', 'csv'].includes(ext);
+              const iconColor = isPdf ? '#DC2626' : isDoc ? '#2563EB' : isXls ? '#16A34A' : '#6B7280';
+              const iconBg = isPdf ? '#DC2626' : isDoc ? '#2563EB' : isXls ? '#16A34A' : '#6B7280';
+
               return (
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[80%]">
@@ -739,14 +783,14 @@ export default function PocketChatPage() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 rounded-[12px] border border-[#E5E5E5] bg-white px-3.5 py-2.5 hover:bg-[#F9F9F8] transition-colors"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#DC2626]/10">
-                        <svg className="h-5 w-5 text-[#DC2626]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: `${iconBg}15` }}>
+                        <svg className="h-5 w-5" style={{ color: iconColor }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                         </svg>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[#0A0A0A] truncate">{msg.message}</p>
-                        <p className="text-[10px] text-[#A3A3A3]">Tap to download</p>
+                        <p className="text-sm font-medium text-[#0A0A0A] truncate">{fileName}</p>
+                        <p className="text-[10px] text-[#A3A3A3]">{ext.toUpperCase()} — Tap to download</p>
                       </div>
                     </a>
                     <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
@@ -911,6 +955,19 @@ export default function PocketChatPage() {
                     <span className="text-[10px] text-[#A3A3A3]">
                       {formatTimestamp(msg.created_at)}
                     </span>
+                    {isOwner && (
+                      <span className="inline-flex ml-0.5">
+                        {msg.read_at ? (
+                          <svg className="h-3 w-3 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18 7l-1.41-1.41L10 12.17l-3.59-3.58L5 10l5 5L18 7zm-2.41-1.41L9 12.17l-1.59-1.58L6 12l3 3 8-8-1.41-1.41z"/>
+                          </svg>
+                        ) : (
+                          <svg className="h-3 w-3 text-[#CCC]" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                          </svg>
+                        )}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -923,7 +980,7 @@ export default function PocketChatPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*,.pdf,.doc,.docx,.xlsx,.xls"
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
           onChange={handleFileUpload}
           className="hidden"
         />
@@ -942,6 +999,14 @@ export default function PocketChatPage() {
 
         {/* Input area */}
         <div className="p-3 border-t border-[#E5E5E5] bg-white">
+          <div className="relative">
+            <QuickReplies
+              isOpen={showQuickReplies}
+              onClose={() => setShowQuickReplies(false)}
+              onSelect={(msg) => { setNewMessage(msg); setShowQuickReplies(false); }}
+              inputValue={newMessage}
+            />
+          </div>
           <div className="flex items-end gap-2">
             {/* Language selector */}
             <select
@@ -965,14 +1030,28 @@ export default function PocketChatPage() {
               <option value="es">🇪🇸</option>
             </select>
 
+            {/* Quick reply trigger */}
+            <button
+              onClick={() => setShowQuickReplies(!showQuickReplies)}
+              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors"
+              title="Quick replies"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
+            </button>
+
             {/* Message input */}
             <textarea
               ref={inputRef}
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+                if (e.target.value.startsWith('/')) setShowQuickReplies(true);
+                else setShowQuickReplies(false);
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
+                  setShowQuickReplies(false);
                   sendMessage();
                 }
               }}
@@ -1161,7 +1240,10 @@ export default function PocketChatPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-[#0A0A0A] truncate">{name}</p>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <p className="text-sm font-semibold text-[#0A0A0A] truncate">{name}</p>
+                      {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
+                    </div>
                     {convo.last_message_at && (
                       <span className="text-[10px] text-[#A3A3A3] flex-shrink-0">
                         {timeAgo(convo.last_message_at)}

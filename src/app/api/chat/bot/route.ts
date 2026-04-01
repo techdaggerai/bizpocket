@@ -94,6 +94,34 @@ export async function POST(request: Request) {
 
   const { message, organizationId, language } = body
 
+  // Check away message
+  const { data: awayData } = await supabase
+    .from('organizations')
+    .select('away_enabled, away_message, business_hours_start, business_hours_end')
+    .eq('id', organizationId)
+    .single()
+
+  if (awayData?.away_enabled) {
+    const now = new Date()
+    const currentMinutes = now.getHours() * 60 + now.getMinutes()
+    const start = awayData.business_hours_start || '09:00'
+    const end = awayData.business_hours_end || '18:00'
+    const [sh, sm] = start.split(':').map(Number)
+    const [eh, em] = end.split(':').map(Number)
+    const startMinutes = sh * 60 + sm
+    const endMinutes = eh * 60 + em
+
+    // Handle both normal ranges (09:00-18:00) and overnight ranges (22:00-06:00)
+    const isInBusinessHours = startMinutes <= endMinutes
+      ? currentMinutes >= startMinutes && currentMinutes < endMinutes
+      : currentMinutes >= startMinutes || currentMinutes < endMinutes
+
+    if (!isInBusinessHours) {
+      const awayMsg = awayData.away_message || 'We are currently outside business hours. We will respond when we return.'
+      return NextResponse.json({ message: awayMsg })
+    }
+  }
+
   // Gather business context
   const [orgRes, flowsRes, invoicesRes, contactsRes, cycleRes] = await Promise.all([
     supabase.from('organizations').select('name, business_type, currency, plan').eq('id', organizationId).single(),

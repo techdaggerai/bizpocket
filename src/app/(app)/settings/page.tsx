@@ -17,6 +17,11 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'staff' | 'accountant'>('accountant');
   const [inviting, setInviting] = useState(false);
+  const [awayEnabled, setAwayEnabled] = useState(organization.away_enabled || false);
+  const [awayMessage, setAwayMessage] = useState(organization.away_message || '');
+  const [businessHoursStart, setBusinessHoursStart] = useState(organization.business_hours_start || '09:00');
+  const [businessHoursEnd, setBusinessHoursEnd] = useState(organization.business_hours_end || '18:00');
+  const [savingAway, setSavingAway] = useState(false);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -41,6 +46,19 @@ export default function SettingsPage() {
       toast(`Invitation sent to ${inviteEmail}`, 'success');
       setInviteEmail('');
     }
+  }
+
+  async function handleSaveAway() {
+    setSavingAway(true);
+    const { error } = await supabase.from('organizations').update({
+      away_enabled: awayEnabled,
+      away_message: awayMessage,
+      business_hours_start: businessHoursStart,
+      business_hours_end: businessHoursEnd,
+    }).eq('id', organization.id);
+    setSavingAway(false);
+    if (error) toast(error.message, 'error');
+    else toast('Away settings saved', 'success');
   }
 
   async function handleLanguageChange(newLang: string) {
@@ -128,6 +146,62 @@ export default function SettingsPage() {
           <option value="IDR">Rp IDR — Indonesian Rupiah</option>
         </select>
       </section>
+
+      {/* Away Message */}
+      {profile.role === 'owner' && (
+        <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+          <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Away Message</h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[var(--text-1)]">Enable away message</span>
+              <button
+                onClick={() => setAwayEnabled(!awayEnabled)}
+                className={`w-11 h-6 rounded-full transition-colors relative ${awayEnabled ? 'bg-[#4F46E5]' : 'bg-[#E5E5E5]'}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${awayEnabled ? 'left-[22px]' : 'left-0.5'}`} />
+              </button>
+            </div>
+            {awayEnabled && (
+              <>
+                <textarea
+                  value={awayMessage}
+                  onChange={(e) => setAwayMessage(e.target.value)}
+                  placeholder="Thanks for reaching out! We're currently away and will respond during business hours."
+                  rows={3}
+                  className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+                />
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-[#A3A3A3] uppercase tracking-wider">Start</label>
+                    <input
+                      type="time"
+                      value={businessHoursStart}
+                      onChange={(e) => setBusinessHoursStart(e.target.value)}
+                      className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[10px] text-[#A3A3A3] uppercase tracking-wider">End</label>
+                    <input
+                      type="time"
+                      value={businessHoursEnd}
+                      onChange={(e) => setBusinessHoursEnd(e.target.value)}
+                      className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            <button
+              onClick={handleSaveAway}
+              disabled={savingAway}
+              className="w-full rounded-lg bg-[#4F46E5] py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4338CA] disabled:opacity-50"
+            >
+              {savingAway ? 'Saving...' : 'Save Away Settings'}
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Team Management */}
       {profile.role === 'owner' && (
