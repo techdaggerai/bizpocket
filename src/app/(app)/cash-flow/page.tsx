@@ -7,11 +7,14 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, getCurrentMonth, getMonthRange, formatDate } from '@/lib/utils';
 import NoteEditor from '@/components/NoteEditor';
+import AIQuickEntry from '@/components/AIQuickEntry';
 import type { CashFlow, FlowType, ClassifyAs } from '@/types/database';
 
-const CATEGORIES = [
-  'Auction Purchase', 'Repair Cost', 'Parts', 'Sale', 'Rent', 'Fuel',
-  'Food', 'Salary', 'Utility', 'Shipping', 'Tax', 'Insurance', 'Other',
+const DEFAULT_CATEGORIES = [
+  'Sale', 'Purchase', 'Repair Cost', 'Parts', 'Rent', 'Fuel',
+  'Food', 'Salary', 'Utility', 'Shipping', 'Tax', 'Insurance',
+  'Marketing', 'Supplies', 'Delivery', 'Service Fee', 'Commission',
+  'Subscription', 'Equipment', 'Other',
 ];
 
 const FREQUENCIES = ['daily', 'weekly', 'monthly', 'yearly'] as const;
@@ -19,7 +22,7 @@ const FREQUENCIES = ['daily', 'weekly', 'monthly', 'yearly'] as const;
 const emptyForm = {
   date: new Date().toISOString().slice(0, 10),
   flow_type: 'IN' as FlowType,
-  category: CATEGORIES[0],
+  category: DEFAULT_CATEGORIES[0],
   from_to: '',
   description: '',
   amount: '',
@@ -32,7 +35,7 @@ const emptyForm = {
 };
 
 export default function CashFlowPage() {
-  const { organization } = useAuth();
+  const { organization, profile } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
   const supabase = createClient();
@@ -46,6 +49,12 @@ export default function CashFlowPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
+  const [fromToHistory, setFromToHistory] = useState<string[]>([]);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [showAddFromTo, setShowAddFromTo] = useState(false);
+  const [newFromTo, setNewFromTo] = useState('');
 
   const fetchFlows = useCallback(async () => {
     setLoading(true);
@@ -57,11 +66,24 @@ export default function CashFlowPage() {
       .lte('date', month + '-31')
       .order('date', { ascending: true });
     if (error) toast(error.message, 'error');
-    else setFlows(data || []);
+    else {
+      setFlows(data || []);
+      const existingFromTo = [...new Set((data || []).map((f: CashFlow) => f.from_to).filter(Boolean))];
+      const org = organization as Record<string, unknown>;
+      const savedFromTo = (org.custom_from_to as string[]) || [];
+      setFromToHistory([...new Set([...savedFromTo, ...existingFromTo])]);
+    }
     setLoading(false);
   }, [month, organization.id, supabase, toast]);
 
   useEffect(() => { fetchFlows(); }, [fetchFlows]);
+
+  useEffect(() => {
+    const org = organization as Record<string, unknown>;
+    setCustomCategories((org.custom_categories as string[]) || []);
+  }, [organization]);
+
+  const allCategories = [...DEFAULT_CATEGORIES, ...customCategories];
 
   useEffect(() => {
     if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('new')) {
@@ -78,6 +100,32 @@ export default function CashFlowPage() {
     runningBalance += f.flow_type === 'IN' ? f.amount : -f.amount;
     return { ...f, balance: runningBalance };
   });
+
+  async function addCustomCategory() {
+    if (!newCategory.trim()) return;
+    const trimmed = newCategory.trim();
+    const updated = [...new Set([...customCategories, trimmed])];
+    const { error } = await supabase.from('organizations').update({ custom_categories: updated }).eq('id', organization.id);
+    if (error) { toast('Failed to save category: ' + error.message, 'error'); return; }
+    setCustomCategories(updated);
+    setForm({ ...form, category: trimmed });
+    setNewCategory('');
+    setShowAddCategory(false);
+    toast('Category added!', 'success');
+  }
+
+  async function addCustomFromTo() {
+    if (!newFromTo.trim()) return;
+    const trimmed = newFromTo.trim();
+    const updated = [...new Set([...fromToHistory, trimmed])];
+    const { error } = await supabase.from('organizations').update({ custom_from_to: updated }).eq('id', organization.id);
+    if (error) { toast('Failed to save: ' + error.message, 'error'); return; }
+    setFromToHistory(updated);
+    setForm({ ...form, from_to: trimmed });
+    setNewFromTo('');
+    setShowAddFromTo(false);
+    toast('Saved!', 'success');
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -162,6 +210,9 @@ export default function CashFlowPage() {
         </button>
       </div>
 
+      {/* AI Quick Entry */}
+      <AIQuickEntry onEntryAdded={fetchFlows} />
+
       {/* Month Selector */}
       <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
         {months.map((m) => (
@@ -227,21 +278,68 @@ export default function CashFlowPage() {
             </button>
           </div>
 
-          <select
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className={inputClass}
-          >
-            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <div>
+            <select
+              value={form.category}
+              onChange={(e) => {
+                if (e.target.value === '__add__') { setShowAddCategory(true); return; }
+                setForm({ ...form, category: e.target.value });
+              }}
+              className={inputClass}
+            >
+              {allCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+              <option value="__add__">+ Add custom category...</option>
+            </select>
+            {showAddCategory && (
+              <div className="flex gap-2 mt-2">
+                <input value={newCategory} onChange={e => setNewCategory(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomCategory(); }}}
+                  placeholder="New category name" className={inputClass + ' flex-1'} autoFocus />
+                <button type="button" onClick={addCustomCategory}
+                  className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Add</button>
+                <button type="button" onClick={() => setShowAddCategory(false)}
+                  className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs text-[#666]">Cancel</button>
+              </div>
+            )}
+          </div>
 
-          <input
-            placeholder={t('cash_flow.from_to')}
-            value={form.from_to}
-            onChange={(e) => setForm({ ...form, from_to: e.target.value })}
-            className={inputClass}
-            required
-          />
+          <div>
+            <div className="flex gap-2">
+              <select
+                value={form.from_to}
+                onChange={(e) => {
+                  if (e.target.value === '__add__') { setShowAddFromTo(true); return; }
+                  if (e.target.value === '__type__') { setForm({ ...form, from_to: '' }); return; }
+                  setForm({ ...form, from_to: e.target.value });
+                }}
+                className={inputClass + ' flex-1'}
+              >
+                <option value="">Select or type...</option>
+                {fromToHistory.map(f => <option key={f} value={f}>{f}</option>)}
+                <option value="__type__">Type manually...</option>
+                <option value="__add__">+ Save new contact...</option>
+              </select>
+            </div>
+            {(form.from_to === '' || showAddFromTo) && (
+              <div className="flex gap-2 mt-2">
+                <input
+                  value={showAddFromTo ? newFromTo : form.from_to}
+                  onChange={e => showAddFromTo ? setNewFromTo(e.target.value) : setForm({ ...form, from_to: e.target.value })}
+                  onKeyDown={e => { if (e.key === 'Enter' && showAddFromTo) { e.preventDefault(); addCustomFromTo(); }}}
+                  placeholder={showAddFromTo ? 'Save this name for future use' : t('cash_flow.from_to')}
+                  className={inputClass + ' flex-1'} autoFocus={showAddFromTo} required={!showAddFromTo}
+                />
+                {showAddFromTo && (
+                  <>
+                    <button type="button" onClick={addCustomFromTo}
+                      className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Save</button>
+                    <button type="button" onClick={() => setShowAddFromTo(false)}
+                      className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs text-[#666]">Cancel</button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
 
           <input
             placeholder={t('cash_flow.description')}
