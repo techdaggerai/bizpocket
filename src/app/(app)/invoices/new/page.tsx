@@ -338,7 +338,7 @@ export default function NewInvoicePage() {
       {/* Split View */}
       <div className="flex gap-6 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
         {/* LEFT: Form */}
-        <div className="flex-1 min-w-0 space-y-4 lg:max-w-[480px]">
+        <div className="flex-1 min-w-0 space-y-4 lg:max-w-[580px]">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-[#0A0A0A]">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
@@ -414,22 +414,27 @@ export default function NewInvoicePage() {
                   </div>
                 )}
                 <div className="flex gap-1.5 items-center">
-                  <div className="w-16"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
-                  <div className="flex-1"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Unit price" className={inputClass} /></div>
-                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' w-16 text-[10px]'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
-                  <p className="font-mono text-sm font-semibold text-[#0A0A0A] w-24 text-right">{formatCurrency(item.total_price, currency)}</p>
+                  <div className="w-20"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
+                  <div className="flex-1 min-w-[120px]"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
+                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' w-[70px] text-[10px] shrink-0'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
+                  <p className="font-mono text-sm font-semibold text-[#0A0A0A] w-24 text-right shrink-0">{formatCurrency(item.total_price, currency)}</p>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
               </div>
             ))}
-            <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-[10px] text-[#999] font-medium">+ Add Column</button>
-              {customColumns.map(col => (
-                <button key={col} onClick={() => { const u = customColumns.filter(c => c !== col); setCustomColumns(u); supabase.from('organizations').update({ custom_invoice_columns: u }).eq('id', organization.id); }}
-                  className="rounded-full bg-[#F5F5F5] px-2 py-0.5 text-[9px] text-[#666] hover:bg-[#E5E5E5]">{col} x</button>
-              ))}
+            <div className="flex gap-3">
+              <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
+              <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-xs text-[#F59E0B] font-medium">+ Add Column</button>
             </div>
+            {customColumns.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] text-[#999]">Custom:</span>
+                {customColumns.map(col => (
+                  <button key={col} onClick={() => { const u = customColumns.filter(c => c !== col); setCustomColumns(u); supabase.from('organizations').update({ custom_invoice_columns: u }).eq('id', organization.id); }}
+                    className="rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/20 px-2.5 py-0.5 text-[10px] font-medium text-[#92400E] hover:bg-[#F59E0B]/20">{col} ✕</button>
+                ))}
+              </div>
+            )}
             {showAddColumn && (
               <div className="flex gap-2">
                 <input value={newColumnName} onChange={e => setNewColumnName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomColumn(); }}}
@@ -476,14 +481,14 @@ export default function NewInvoicePage() {
         </div>
 
         {/* RIGHT: Live Preview (desktop) */}
-        <div className="hidden lg:block w-[420px] shrink-0">
+        <div className="hidden lg:block w-[500px] shrink-0">
           <div className="sticky top-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
               <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
-              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.52)', width: '192%', transformOrigin: 'top left' }}>
+              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.6)', width: '167%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>
             </div>
