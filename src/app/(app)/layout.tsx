@@ -46,7 +46,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
                 <TopNav />
               </div>
-              <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-8 py-4">
+              <div className="mx-auto max-w-2xl px-4 lg:max-w-6xl lg:px-8 py-4">
                 {children}
               </div>
             </main>

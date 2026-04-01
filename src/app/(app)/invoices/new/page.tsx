@@ -92,6 +92,9 @@ export default function NewInvoicePage() {
   // UI
   const [showTemplatePicker, setShowTemplatePicker] = useState(!editId);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [customColumns, setCustomColumns] = useState<string[]>((org.custom_invoice_columns as string[]) || []);
+  const [showAddColumn, setShowAddColumn] = useState(false);
+  const [newColumnName, setNewColumnName] = useState('');
   const [cycleItems, setCycleItems] = useState<{ name: string; purchase_price: number; sale_price: number; category: string }[]>([]);
 
   // Computed
@@ -107,6 +110,15 @@ export default function NewInvoicePage() {
   const grandTotal = afterAllDiscounts + taxTotal;
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
   const filteredCustomers = customerSearch ? customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()) || (c.email && c.email.toLowerCase().includes(customerSearch.toLowerCase()))) : customers;
+
+  async function addCustomColumn() {
+    if (!newColumnName.trim()) return;
+    const updated = [...new Set([...customColumns, newColumnName.trim()])];
+    setCustomColumns(updated);
+    const { error } = await supabase.from('organizations').update({ custom_invoice_columns: updated }).eq('id', organization.id);
+    if (error) toast('Failed to save column', 'error');
+    setNewColumnName(''); setShowAddColumn(false);
+  }
 
   // Fetch
   const fetchData = useCallback(async () => {
@@ -210,7 +222,8 @@ export default function NewInvoicePage() {
     if (!selectedCustomer) { toast('Please select a customer', 'error'); return; }
     setSaving(true);
     const invoiceNumber = editId ? undefined : await generateInvoiceNumber();
-    const itemsJson = lineItems.filter(i => i.description).map(i => { const ls = i.quantity * i.unit_price; const disc = i.discount_percent ? Math.round(ls * i.discount_percent / 100) : 0; return { description: i.description, quantity: i.quantity, unit_price: i.unit_price, discount_percent: i.discount_percent || 0, amount: ls - disc }; });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const itemsJson = lineItems.filter(i => i.description).map(i => { const ls = i.quantity * i.unit_price; const disc = i.discount_percent ? Math.round(ls * i.discount_percent / 100) : 0; return { description: i.description, quantity: i.quantity, unit_price: i.unit_price, discount_percent: i.discount_percent || 0, amount: ls - disc, ...customColumns.reduce((acc, col) => ({ ...acc, [col]: (i as any)[col] || '' }), {}) }; });
     const invoicePayload = {
       organization_id: organization.id, ...(invoiceNumber ? { invoice_number: invoiceNumber } : {}),
       customer_id: selectedCustomer.id, customer_name: selectedCustomer.name, customer_address: selectedCustomer.address,
@@ -269,7 +282,8 @@ export default function NewInvoicePage() {
     bank_name: paymentMethod === 'bank_transfer' ? bankName : undefined, bank_branch: paymentMethod === 'bank_transfer' ? bankBranch : undefined,
     bank_account_name: paymentMethod === 'bank_transfer' ? bankAccountName : undefined, bank_account_number: paymentMethod === 'bank_transfer' ? bankAccountNumber : undefined,
     customer_name: selectedCustomer?.name || 'Customer Name', customer_address: selectedCustomer?.address || '', customer_phone: selectedCustomer?.phone || '',
-    items: lineItems.filter(i => i.description).length > 0 ? lineItems.filter(i => i.description).map(i => ({ description: i.description, quantity: i.quantity, unit_price: i.unit_price, total: i.total_price })) : [{ description: 'Your items appear here', quantity: 1, unit_price: 0, total: 0 }],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: lineItems.filter(i => i.description).length > 0 ? lineItems.filter(i => i.description).map(i => ({ description: i.description + customColumns.map(col => (i as any)[col] ? ` | ${col}: ${(i as any)[col]}` : '').join(''), quantity: i.quantity, unit_price: i.unit_price, total: i.total_price })) : [{ description: 'Your items appear here', quantity: 1, unit_price: 0, total: 0 }],
     subtotal, tax_rate: lineItems[0]?.tax_rate || 0.10, tax_amount: taxTotal, grand_total: grandTotal, currency, notes: invoiceNotes || undefined, status: 'draft',
   };
 
@@ -386,16 +400,38 @@ export default function NewInvoicePage() {
             {lineItems.map((item, i) => (
               <div key={i} className="space-y-1.5 pb-3 border-b border-[#F0F0F0] last:border-0 last:pb-0" onTouchStart={e => handleTouchStart(e, i)} onTouchEnd={e => handleTouchEnd(e, i)}>
                 <input value={item.description} onChange={e => updateLineItem(i, 'description', e.target.value)} placeholder="Item description" className={inputClass} />
-                <div className="flex gap-1.5">
-                  <div className="w-20"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
-                  <div className="flex-1"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
-                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' w-20'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
-                  <p className="flex items-center font-mono text-sm font-medium text-[#0A0A0A] w-20 text-right">{formatCurrency(item.total_price, currency)}</p>
+                {customColumns.length > 0 && (
+                  <div className="flex gap-1.5">
+                    {customColumns.map(col => (
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      <input key={col} placeholder={col} value={(item as any)[col] || ''} onChange={e => { const u = [...lineItems]; (u[i] as any)[col] = e.target.value; setLineItems(u); }} className={inputClass + ' flex-1'} />
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-1.5 items-center">
+                  <div className="w-16"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
+                  <div className="flex-1"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Unit price" className={inputClass} /></div>
+                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' w-16 text-[10px]'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
+                  <p className="font-mono text-sm font-semibold text-[#0A0A0A] w-24 text-right">{formatCurrency(item.total_price, currency)}</p>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
               </div>
             ))}
             <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-[10px] text-[#999] font-medium">+ Add Column</button>
+              {customColumns.map(col => (
+                <button key={col} onClick={() => { const u = customColumns.filter(c => c !== col); setCustomColumns(u); supabase.from('organizations').update({ custom_invoice_columns: u }).eq('id', organization.id); }}
+                  className="rounded-full bg-[#F5F5F5] px-2 py-0.5 text-[9px] text-[#666] hover:bg-[#E5E5E5]">{col} x</button>
+              ))}
+            </div>
+            {showAddColumn && (
+              <div className="flex gap-2">
+                <input value={newColumnName} onChange={e => setNewColumnName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustomColumn(); }}}
+                  placeholder="Column name (e.g. Chassis #, Color, Model)" className={inputClass + ' flex-1'} autoFocus />
+                <button onClick={addCustomColumn} className="rounded-lg bg-[#4F46E5] px-3 py-2 text-xs text-white">Add</button>
+              </div>
+            )}
             <div className="border-t border-[#F0F0F0] pt-3">
               <div className="flex gap-1.5 mb-2">{(['none','percent','fixed'] as const).map(d => (<button key={d} onClick={() => setDiscountType(d)} className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${discountType === d ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{d === 'none' ? 'No discount' : d === 'percent' ? '% Off' : currency + ' Off'}</button>))}</div>
               {discountType !== 'none' && <input type="number" value={discountValue || ''} onChange={e => setDiscountValue(parseInt(e.target.value) || 0)} placeholder={discountType === 'percent' ? 'Discount %' : 'Discount amount'} className={inputClass} />}
