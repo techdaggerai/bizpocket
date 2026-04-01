@@ -29,6 +29,7 @@ const NAV_SECTIONS = [
       { href: '/documents', label: 'Vault', icon: 'M3 3h18v18H3zM7 7h10M7 11h7M7 15h4' },
       { href: '/planner', label: 'Planner', icon: 'M3 4h18v18H3zM3 10h18M8 2v4M16 2v4' },
       { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
+      { href: '/team', label: 'Team', icon: 'M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 006.375-7.5c0-5.523-4.477-10-10-10S4 6.477 4 12a9.337 9.337 0 006.375 7.5M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M10.5 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z' },
     ],
   },
   {
