@@ -298,7 +298,12 @@ export default function NewInvoicePage() {
           <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <div><h2 className="text-xl font-bold text-[#0A0A0A]">Choose Your Template</h2><p className="text-sm text-[#999]">Select a template for your invoice</p></div>
-              <button onClick={() => setShowTemplatePicker(false)} className="rounded-lg bg-[#4F46E5] px-5 py-2 text-sm font-medium text-white hover:bg-[#4338CA]">Use {TEMPLATES[selectedTemplate]?.name || 'Classic'}</button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setShowTemplatePicker(false)} className="rounded-lg bg-[#4F46E5] px-5 py-2 text-sm font-medium text-white hover:bg-[#4338CA]">Use {TEMPLATES[selectedTemplate]?.name || 'Classic'}</button>
+                <button onClick={() => { setShowTemplatePicker(false); router.back(); }} className="text-[#999] hover:text-[#0A0A0A] p-1">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(TEMPLATES).map(([key, tpl]) => (
@@ -339,7 +344,7 @@ export default function NewInvoicePage() {
               <h1 className="text-xl font-bold text-[#0A0A0A]">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
               <button onClick={() => setShowTemplatePicker(true)} className="text-xs text-[#4F46E5] font-medium hover:underline mt-0.5">Template: {TEMPLATES[selectedTemplate]?.name || 'Classic'} — Change</button>
             </div>
-            <button onClick={() => router.back()} className="text-sm text-[#999]">Cancel</button>
+            <button onClick={() => router.push('/invoices')} className="text-sm text-[#999]">Cancel</button>
           </div>
 
           {/* Customer */}
@@ -463,7 +468,7 @@ export default function NewInvoicePage() {
               <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
             ) : (
               <>
-                <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-[#E5E5E5] py-3 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save Draft'}</button>
+                <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-[#E5E5E5] py-3 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
                 <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save & Send'}</button>
               </>
             )}
