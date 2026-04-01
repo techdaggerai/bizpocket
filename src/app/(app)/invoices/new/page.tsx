@@ -415,8 +415,8 @@ export default function NewInvoicePage() {
                 )}
                 <div className="flex gap-1.5 items-center">
                   <div className="w-20"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
-                  <div className="flex-1 min-w-[120px]"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
-                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' w-[70px] text-[10px] shrink-0'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
+                  <div className="flex-1 min-w-[140px]"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
+                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className="rounded-lg border border-[#E5E5E5] bg-white px-2 py-2.5 text-xs text-[#0A0A0A] focus:border-[#4F46E5] focus:outline-none w-[65px] shrink-0">{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
                   <p className="font-mono text-sm font-semibold text-[#0A0A0A] w-24 text-right shrink-0">{formatCurrency(item.total_price, currency)}</p>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
