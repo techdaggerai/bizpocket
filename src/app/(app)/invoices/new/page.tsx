@@ -680,7 +680,7 @@ export default function NewInvoicePage() {
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">Choose Invoice Template</h2>
             <p className="text-sm text-[var(--text-3)]">Select a style for your invoice PDF</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {Object.entries(TEMPLATES).map(([key, tpl]) => (
                 <button
                   key={key}
@@ -689,7 +689,7 @@ export default function NewInvoicePage() {
                     selectedTemplate === key ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
                   }`}
                 >
-                  <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                  <div className="min-h-[180px] w-full overflow-hidden bg-white relative">
                     <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
                       <tpl.Component data={invoicePreviewData} />
                     </div>
@@ -736,8 +736,14 @@ export default function NewInvoicePage() {
         {/* ===== STEP 1: CUSTOMER SELECTION ===== */}
         {step === 1 && (
           <div className="space-y-4">
-            <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.customer')}</h2>
-            <input value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} className={inputClass} placeholder={t('invoices.select_customer')} />
+            <div>
+              <h2 className="text-lg font-bold text-[var(--text-1)]">Who is this invoice for?</h2>
+              <p className="text-xs text-[var(--text-4)] mt-0.5">Select an existing customer or add a new one</p>
+            </div>
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+              <input value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} className={inputClass + ' pl-10 !py-3 !text-base'} placeholder="Search customers..." />
+            </div>
             <div className="max-h-[280px] space-y-2 overflow-y-auto">
               {filteredCustomers.map((c) => (
                 <button key={c.id} onClick={() => setSelectedCustomerId(c.id)}

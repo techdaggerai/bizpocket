@@ -123,7 +123,7 @@ export default function AccountantPage() {
         <div className="flex gap-1.5">
           <button onClick={exportCSV} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Export CSV</button>
           <button onClick={shareWithAccountant} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Share</button>
-          <button onClick={generateReport} disabled={reportLoading} className="rounded-lg bg-[#4F46E5] px-2.5 py-1.5 text-[10px] font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50 transition-colors">{reportLoading ? 'Generating...' : 'AI Report'}</button>
+          <button onClick={generateReport} disabled={reportLoading} className="rounded-lg bg-[#4F46E5] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50 transition-colors">{reportLoading ? 'Generating...' : 'AI Report'}</button>
         </div>
       </div>
 
@@ -136,10 +136,10 @@ export default function AccountantPage() {
         ))}
       </div>
 
-      <div className="flex rounded-lg border border-[#E5E5E5] overflow-hidden">
+      <div className="flex border-b border-[#E5E5E5] overflow-x-auto">
         {tabs.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-2 text-[10px] font-medium transition-colors ${tab === t ? 'bg-[#4F46E5]/10 text-[#4F46E5]' : 'text-[var(--text-4)] hover:text-[var(--text-2)]'}`}>
+            className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[#999] hover:text-[#333]'}`}>
             {t === 'report' ? 'AI Report' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}

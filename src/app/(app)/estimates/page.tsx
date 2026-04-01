@@ -102,7 +102,7 @@ export default function EstimatesPage() {
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-xl font-semibold text-[#0A0A0A]">Estimates</h1><p className="text-xs text-[#999]">{estimates.length} total</p></div>
+        <div><h1 className="text-xl font-bold text-[#0A0A0A]">Estimates / Quotations</h1><p className="text-xs text-[#999]">Create quotes, send for approval, convert to invoices</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ New Estimate'}</button>
       </div>
 
