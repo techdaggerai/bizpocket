@@ -7,18 +7,35 @@ import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
 
 const STYLES = [
-  { key: 'modern', label: 'Modern', desc: 'Clean lines, bold typography', color: '#4F46E5' },
-  { key: 'elegant', label: 'Elegant', desc: 'Refined, luxury feel', color: '#0F172A' },
-  { key: 'vibrant', label: 'Vibrant', desc: 'Colorful, energetic', color: '#EC4899' },
-  { key: 'minimal', label: 'Minimal', desc: 'Less is more', color: '#16A34A' },
-  { key: 'warm', label: 'Warm', desc: 'Friendly, approachable', color: '#F59E0B' },
-  { key: 'dark', label: 'Dark', desc: 'Sleek dark theme', color: '#1E293B' },
+  { key: 'classic', label: 'Classic', desc: 'Clean, professional, trusted', preview: 'bg-white border-t-4 border-[#0A0A0A]' },
+  { key: 'modern', label: 'Modern', desc: 'Bold typography, sharp edges', preview: 'bg-white border-t-4 border-[#4F46E5]' },
+  { key: 'elegant', label: 'Elegant', desc: 'Refined, luxury, serif fonts', preview: 'bg-[#FAF9F6] border-t-4 border-[#8B7355]' },
+  { key: 'bold', label: 'Bold', desc: 'Dark, high contrast, striking', preview: 'bg-[#0A0A0A] border-t-4 border-[#FACC15]' },
+  { key: 'warm', label: 'Warm', desc: 'Friendly, approachable, soft', preview: 'bg-[#FFFBF5] border-t-4 border-[#EA580C]' },
+  { key: 'minimal', label: 'Minimal', desc: 'Less is more, whitespace', preview: 'bg-white border-t-4 border-[#E5E5E5]' },
 ];
 
-const BRAND_COLORS = [
-  '#4F46E5', '#0EA5E9', '#16A34A', '#DC2626', '#F59E0B', '#EC4899',
-  '#7C3AED', '#0F172A', '#14B8A6', '#F97316', '#8B5CF6', '#06B6D4',
+const SECTIONS = [
+  { key: 'hero', label: 'Hero Banner', desc: 'Business name + tagline + CTA', required: true },
+  { key: 'about', label: 'About', desc: 'Your story and mission' },
+  { key: 'services', label: 'Services / Products', desc: 'What you offer' },
+  { key: 'gallery', label: 'Gallery', desc: 'Photo showcase grid' },
+  { key: 'testimonials', label: 'Testimonials', desc: 'Customer reviews' },
+  { key: 'pricing', label: 'Pricing', desc: 'Plans or menu' },
+  { key: 'team', label: 'Team', desc: 'Meet the people' },
+  { key: 'contact', label: 'Contact', desc: 'Phone, email, address, map', required: true },
+  { key: 'faq', label: 'FAQ', desc: 'Common questions' },
+  { key: 'order', label: 'Order Now', desc: 'Link to your BizPocket order page' },
 ];
+
+interface ColorPalette {
+  name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  bg: string;
+  text: string;
+}
 
 export default function WebsiteBuilderPage() {
   const { organization, profile, user } = useAuth();
@@ -29,43 +46,104 @@ export default function WebsiteBuilderPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const org = organization as any;
 
-  const [form, setForm] = useState({
-    businessName: organization.name || '',
-    businessType: organization.business_type || '',
-    tagline: '',
-    services: '',
-    phone: org.phone || '',
-    email: profile.email || '',
-    address: org.address || '',
-    language: profile.language || 'en',
-    brandColor: '#4F46E5',
-    style: 'modern',
-  });
+  // Wizard state
+  const [step, setStep] = useState(1);
+  const totalSteps = 7;
 
+  // Step 1: Business info
+  const [businessName, setBusinessName] = useState(organization.name || '');
+  const [businessType, setBusinessType] = useState(organization.business_type || '');
+  const [tagline, setTagline] = useState('');
+  const [aboutText, setAboutText] = useState('');
+  const [services, setServices] = useState('');
+  const [phone, setPhone] = useState(org.phone || '');
+  const [email, setEmail] = useState(profile.email || '');
+  const [address, setAddress] = useState(org.address || '');
+
+  // Step 2: Style
+  const [selectedStyle, setSelectedStyle] = useState('classic');
+
+  // Step 3: Colors (AI-generated)
+  const [palettes, setPalettes] = useState<ColorPalette[]>([]);
+  const [selectedPalette, setSelectedPalette] = useState<number>(0);
+  const [loadingPalettes, setLoadingPalettes] = useState(false);
+
+  // Step 4: Sections
+  const [selectedSections, setSelectedSections] = useState<string[]>(['hero', 'about', 'services', 'contact']);
+
+  // Step 5-6: Generate & Preview
   const [generating, setGenerating] = useState(false);
   const [generatedHTML, setGeneratedHTML] = useState<string | null>(null);
-  const [step, setStep] = useState<'form' | 'preview'>('form');
 
-  async function generateWebsite() {
-    if (!form.businessName.trim()) {
-      toast('Enter your business name', 'error');
-      return;
-    }
-    setGenerating(true);
+  // Step 7: Publish
+  const [publishing, setPublishing] = useState(false);
+  const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
+  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
+
+  // Generate AI color palettes
+  async function generatePalettes() {
+    setLoadingPalettes(true);
     try {
       const res = await fetch('/api/ai/website-builder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'palettes',
+          businessType,
+          style: selectedStyle,
+        }),
+      });
+      const data = await res.json();
+      if (data.palettes) {
+        setPalettes(data.palettes);
+      } else {
+        // Fallback palettes
+        setPalettes([
+          { name: 'Professional', primary: '#0A0A0A', secondary: '#4F46E5', accent: '#4F46E5', bg: '#FFFFFF', text: '#0A0A0A' },
+          { name: 'Natural', primary: '#1B4332', secondary: '#2D6A4F', accent: '#40916C', bg: '#F0FFF4', text: '#1B4332' },
+          { name: 'Warm', primary: '#7C2D12', secondary: '#C2410C', accent: '#EA580C', bg: '#FFFBF5', text: '#431407' },
+        ]);
+      }
+    } catch {
+      setPalettes([
+        { name: 'Professional', primary: '#0A0A0A', secondary: '#4F46E5', accent: '#4F46E5', bg: '#FFFFFF', text: '#0A0A0A' },
+        { name: 'Natural', primary: '#1B4332', secondary: '#2D6A4F', accent: '#40916C', bg: '#F0FFF4', text: '#1B4332' },
+        { name: 'Warm', primary: '#7C2D12', secondary: '#C2410C', accent: '#EA580C', bg: '#FFFBF5', text: '#431407' },
+      ]);
+    }
+    setLoadingPalettes(false);
+  }
+
+  // Generate website
+  async function generateWebsite() {
+    setGenerating(true);
+    const palette = palettes[selectedPalette] || palettes[0];
+    try {
+      const res = await fetch('/api/ai/website-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate',
           organizationId: organization.id,
-          ...form,
+          businessName,
+          businessType,
+          tagline,
+          aboutText,
+          services,
+          phone,
+          email,
+          address,
+          language: profile.language || 'en',
+          style: selectedStyle,
+          palette,
+          sections: selectedSections,
         }),
       });
       const data = await res.json();
       if (data.html) {
         setGeneratedHTML(data.html);
-        setStep('preview');
+        setStep(6);
       } else {
         toast(data.error || 'Failed to generate', 'error');
       }
@@ -75,309 +153,426 @@ export default function WebsiteBuilderPage() {
     setGenerating(false);
   }
 
-  async function downloadHTML() {
-    if (!generatedHTML) return;
-    const blob = new Blob([generatedHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${form.businessName.replace(/\s+/g, '-').toLowerCase()}-website.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Website downloaded!', 'success');
-  }
-
-  async function copyHTML() {
-    if (!generatedHTML) return;
-    await navigator.clipboard.writeText(generatedHTML);
-    toast('HTML copied to clipboard!', 'success');
-  }
-
-  const [publishing, setPublishing] = useState(false);
-  const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
-
+  // Publish
   async function publishWebsite() {
     if (!generatedHTML) return;
     setPublishing(true);
 
-    const slug = form.businessName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 50);
+    const slug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 
     const { data: existing } = await supabase
       .from('published_websites')
       .select('id')
       .eq('organization_id', organization.id)
       .limit(1)
-      .maybeSingle();
+      .single();
 
-    let error;
-    if (existing) {
-      // Update existing
-      const res = await supabase
-        .from('published_websites')
-        .update({
-          slug,
-          business_name: form.businessName,
-          html: generatedHTML,
-          style: form.style,
-          brand_color: form.brandColor,
-          is_published: true,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
-      error = res.error;
-    } else {
-      // Create new
-      const res = await supabase
-        .from('published_websites')
-        .insert({
-          organization_id: organization.id,
-          slug,
-          business_name: form.businessName,
-          html: generatedHTML,
-          style: form.style,
-          brand_color: form.brandColor,
-          created_by: user.id,
-        });
-      error = res.error;
-    }
+    const payload = {
+      organization_id: organization.id,
+      slug,
+      business_name: businessName,
+      html: generatedHTML,
+      style: selectedStyle,
+      brand_color: palettes[selectedPalette]?.primary || '#4F46E5',
+      is_published: true,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { error } = existing
+      ? await supabase.from('published_websites').update(payload).eq('id', existing.id)
+      : await supabase.from('published_websites').insert({ ...payload, created_by: user.id });
 
     if (error) {
       toast('Failed to publish: ' + error.message, 'error');
     } else {
-      const url = `${window.location.origin}/site/${slug}`;
-      setPublishedUrl(url);
-      toast('Website is LIVE!', 'success');
+      setPublishedUrl(`${window.location.origin}/site/${slug}`);
+      setStep(7);
+      toast('Website published!', 'success');
     }
     setPublishing(false);
   }
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
-
-  if (step === 'preview' && generatedHTML) {
-    return (
-      <div className="flex flex-col h-[calc(100vh-80px)]">
-        {/* Preview Header */}
-        <div className="border-b border-[#E5E5E5] bg-white px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setStep('form')} className="text-[var(--text-3)]">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-sm font-bold text-[var(--text-1)]">Website Preview</h1>
-              <p className="text-[10px] text-[var(--text-3)]">{form.businessName}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => { setStep('form'); setGeneratedHTML(null); setPublishedUrl(null); }}
-              className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors"
-            >
-              Regenerate
-            </button>
-            <button
-              onClick={downloadHTML}
-              className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors"
-            >
-              Download
-            </button>
-            <button
-              onClick={publishWebsite}
-              disabled={publishing}
-              className="rounded-lg bg-[#16A34A] px-3 py-2 text-xs font-semibold text-white hover:bg-[#15803D] transition-colors disabled:opacity-50"
-            >
-              {publishing ? 'Publishing...' : publishedUrl ? 'Update' : 'Publish Live'}
-            </button>
-          </div>
-        </div>
-
-        {/* Published URL Banner */}
-        {publishedUrl && (
-          <div className="mx-4 mt-2 rounded-lg bg-[#16A34A]/10 border border-[#16A34A]/20 p-3 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold text-[#16A34A]">Your website is LIVE!</p>
-              <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#16A34A] underline break-all">{publishedUrl}</a>
-            </div>
-            <button
-              onClick={async () => {
-                await navigator.clipboard.writeText(publishedUrl);
-                toast('URL copied!', 'success');
-              }}
-              className="shrink-0 rounded-md bg-[#16A34A] px-2.5 py-1.5 text-[10px] font-semibold text-white"
-            >
-              Copy URL
-            </button>
-          </div>
-        )}
-
-        {/* Website Preview */}
-        <div className="flex-1 bg-[#F0F0F0] p-4 overflow-hidden">
-          <div className="h-full bg-white rounded-xl shadow-lg overflow-hidden border border-[#E5E5E5]">
-            {/* Browser chrome */}
-            <div className="flex items-center gap-2 bg-[#F5F5F5] px-3 py-2 border-b border-[#E5E5E5]">
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
-              </div>
-              <div className="flex-1 text-center">
-                <div className="inline-flex items-center gap-1 bg-white rounded px-3 py-1 text-[10px] text-[#999]">
-                  <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75" />
-                  </svg>
-                  {form.businessName.replace(/\s+/g, '-').toLowerCase()}.bizpocket.io
-                </div>
-              </div>
-            </div>
-            {/* Iframe */}
-            <iframe
-              ref={iframeRef}
-              srcDoc={generatedHTML}
-              className="w-full h-[calc(100%-36px)]"
-              sandbox="allow-scripts"
-              title="Website Preview"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Progress bar
+  const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="text-[var(--text-3)]">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
-        </Link>
-        <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">AI Website Builder</h1>
-          <p className="text-xs text-[var(--text-3)]">Generate a professional website for your business in 60 seconds</p>
+      <div className="sticky top-0 z-10 bg-white border-b border-[#F0F0F0] px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard" className="text-[#999]">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </Link>
+            <div>
+              <h1 className="text-[15px] font-semibold text-[#0A0A0A]">Website Builder</h1>
+              <p className="text-[10px] text-[#999]">Step {step} of {totalSteps}</p>
+            </div>
+          </div>
+          {step < 6 && step > 1 && (
+            <button onClick={() => setStep(step - 1)} className="text-[12px] text-[#4F46E5] font-medium">Back</button>
+          )}
+        </div>
+        <div className="mt-2 h-1 bg-[#F0F0F0] rounded-full overflow-hidden">
+          <div className="h-full bg-[#4F46E5] transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
         </div>
       </div>
 
-      {/* Business Info */}
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)]">Your Business</h2>
-        <input
-          type="text"
-          placeholder="Business Name *"
-          value={form.businessName}
-          onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-          className={inputClass}
-        />
-        <input
-          type="text"
-          placeholder="Business Type (e.g., Car Dealer, Bakery, IT Consulting)"
-          value={form.businessType}
-          onChange={(e) => setForm({ ...form, businessType: e.target.value })}
-          className={inputClass}
-        />
-        <input
-          type="text"
-          placeholder="Tagline (e.g., 'Quality Cars, Fair Prices')"
-          value={form.tagline}
-          onChange={(e) => setForm({ ...form, tagline: e.target.value })}
-          className={inputClass}
-        />
-        <textarea
-          placeholder="Services or Products (one per line)"
-          value={form.services}
-          onChange={(e) => setForm({ ...form, services: e.target.value })}
-          rows={3}
-          className={inputClass}
-        />
-      </div>
+      <div className="p-4 max-w-lg mx-auto">
 
-      {/* Contact Info */}
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)]">Contact Details</h2>
-        <input
-          type="tel"
-          placeholder="Phone"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          className={inputClass}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className={inputClass}
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={form.address}
-          onChange={(e) => setForm({ ...form, address: e.target.value })}
-          className={inputClass}
-        />
-      </div>
-
-      {/* Style Selection */}
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Website Style</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {STYLES.map((s) => (
-            <button
-              key={s.key}
-              onClick={() => setForm({ ...form, style: s.key })}
-              className={`rounded-lg p-3 text-left transition-all ${
-                form.style === s.key
-                  ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'
-                  : 'border border-[#E5E5E5] hover:bg-[var(--bg-2)]'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-xs font-semibold text-[var(--text-1)]">{s.label}</span>
+        {/* ═══ STEP 1: Business Info ═══ */}
+        {step === 1 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#0A0A0A]">Tell us about your business</h2>
+              <p className="text-[13px] text-[#666] mt-1">This info shapes your website. You can edit everything later.</p>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Business name</label>
+                <input value={businessName} onChange={e => setBusinessName(e.target.value)} className={inputClass} placeholder="Sweet Cakes by Sarah" />
               </div>
-              <p className="text-[9px] text-[var(--text-3)]">{s.desc}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Brand Color */}
-      <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Brand Color</h2>
-        <div className="flex flex-wrap gap-2">
-          {BRAND_COLORS.map((c) => (
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">What do you do?</label>
+                <input value={businessType} onChange={e => setBusinessType(e.target.value)} className={inputClass} placeholder="Custom cakes & pastries" />
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Tagline</label>
+                <input value={tagline} onChange={e => setTagline(e.target.value)} className={inputClass} placeholder="Handcrafted with love since 2020" />
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">About your business</label>
+                <textarea value={aboutText} onChange={e => setAboutText(e.target.value)} rows={3} className={inputClass} placeholder="What makes your business special? Your story..." />
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Services / Products</label>
+                <textarea value={services} onChange={e => setServices(e.target.value)} rows={2} className={inputClass} placeholder="Wedding cakes, Birthday cakes, Cupcakes, Pastries" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Phone</label>
+                  <input value={phone} onChange={e => setPhone(e.target.value)} className={inputClass} placeholder="+81..." />
+                </div>
+                <div>
+                  <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Email</label>
+                  <input value={email} onChange={e => setEmail(e.target.value)} className={inputClass} />
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Address</label>
+                <input value={address} onChange={e => setAddress(e.target.value)} className={inputClass} placeholder="Nagoya, Japan" />
+              </div>
+            </div>
             <button
-              key={c}
-              onClick={() => setForm({ ...form, brandColor: c })}
-              className={`w-9 h-9 rounded-lg transition-all ${
-                form.brandColor === c ? 'ring-2 ring-offset-2 ring-[#4F46E5] scale-110' : 'hover:scale-105'
-              }`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Generate Button */}
-      <button
-        onClick={generateWebsite}
-        disabled={generating || !form.businessName.trim()}
-        className="w-full rounded-xl bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] py-4 text-sm font-bold text-white transition-all hover:shadow-lg disabled:opacity-50"
-      >
-        {generating ? (
-          <span className="flex items-center justify-center gap-2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            AI is building your website...
-          </span>
-        ) : (
-          'Generate My Website'
+              onClick={() => setStep(2)}
+              disabled={!businessName.trim()}
+              className="w-full rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-medium text-white disabled:opacity-30 hover:bg-[#333] transition-colors"
+            >
+              Continue
+            </button>
+          </div>
         )}
-      </button>
+
+        {/* ═══ STEP 2: Style ═══ */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#0A0A0A]">Choose a style</h2>
+              <p className="text-[13px] text-[#666] mt-1">This sets the overall feel of your website.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {STYLES.map(s => (
+                <button
+                  key={s.key}
+                  onClick={() => setSelectedStyle(s.key)}
+                  className={`rounded-xl overflow-hidden text-left transition-all ${
+                    selectedStyle === s.key ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-[#E5E5E5]'
+                  }`}
+                >
+                  <div className={`h-20 ${s.preview} p-3`}>
+                    <div className="h-2 w-16 rounded-full bg-current opacity-20 mb-2" />
+                    <div className="h-1.5 w-24 rounded-full bg-current opacity-10" />
+                    <div className="h-1.5 w-20 rounded-full bg-current opacity-10 mt-1" />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-[13px] font-semibold text-[#0A0A0A]">{s.label}</p>
+                    <p className="text-[10px] text-[#999]">{s.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => { setStep(3); generatePalettes(); }}
+              className="w-full rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-medium text-white hover:bg-[#333] transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {/* ═══ STEP 3: Colors ═══ */}
+        {step === 3 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#0A0A0A]">Pick your colors</h2>
+              <p className="text-[13px] text-[#666] mt-1">AI suggested these based on your {businessType} business.</p>
+            </div>
+            {loadingPalettes ? (
+              <div className="flex justify-center py-12">
+                <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {palettes.map((p, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedPalette(i)}
+                    className={`w-full rounded-xl p-4 text-left transition-all ${
+                      selectedPalette === i ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-[#E5E5E5]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[13px] font-medium text-[#0A0A0A]">{p.name}</span>
+                      {selectedPalette === i && (
+                        <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {[p.primary, p.secondary, p.accent, p.bg, p.text].map((c, j) => (
+                        <div key={j} className="flex-1">
+                          <div className="h-8 rounded-md border border-black/5" style={{ backgroundColor: c }} />
+                          <p className="text-[8px] text-[#999] mt-1 text-center">{c}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Mini preview */}
+                    <div className="mt-3 rounded-lg overflow-hidden border border-[#E5E5E5]" style={{ backgroundColor: p.bg }}>
+                      <div className="h-1.5" style={{ backgroundColor: p.primary }} />
+                      <div className="p-2">
+                        <div className="h-2 w-16 rounded-full mb-1" style={{ backgroundColor: p.primary }} />
+                        <div className="h-1.5 w-24 rounded-full opacity-30" style={{ backgroundColor: p.text }} />
+                        <div className="mt-2 h-5 w-14 rounded text-center text-[7px] leading-5 text-white" style={{ backgroundColor: p.accent }}>
+                          Button
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setStep(4)}
+              disabled={palettes.length === 0}
+              className="w-full rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-medium text-white disabled:opacity-30 hover:bg-[#333] transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {/* ═══ STEP 4: Sections ═══ */}
+        {step === 4 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#0A0A0A]">Choose your sections</h2>
+              <p className="text-[13px] text-[#666] mt-1">Select what pages appear on your website.</p>
+            </div>
+            <div className="space-y-2">
+              {SECTIONS.map(s => {
+                const isSelected = selectedSections.includes(s.key);
+                const isRequired = s.required;
+                return (
+                  <button
+                    key={s.key}
+                    onClick={() => {
+                      if (isRequired) return;
+                      setSelectedSections(prev =>
+                        isSelected ? prev.filter(k => k !== s.key) : [...prev, s.key]
+                      );
+                    }}
+                    className={`w-full flex items-center gap-3 rounded-xl p-3.5 text-left transition-all ${
+                      isSelected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'border border-[#E5E5E5] hover:bg-[#FAFAFA]'
+                    }`}
+                  >
+                    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
+                      isSelected ? 'bg-[#4F46E5]' : 'border border-[#DDD]'
+                    }`}>
+                      {isSelected && (
+                        <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[13px] font-medium text-[#0A0A0A]">{s.label}</p>
+                      <p className="text-[10px] text-[#999]">{s.desc}</p>
+                    </div>
+                    {isRequired && <span className="text-[9px] text-[#999]">Required</span>}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setStep(5)}
+              className="w-full rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-medium text-white hover:bg-[#333] transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {/* ═══ STEP 5: Generate ═══ */}
+        {step === 5 && (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold text-[#0A0A0A]">Ready to build</h2>
+              <p className="text-[13px] text-[#666] mt-1">Review your choices, then let AI create your website.</p>
+            </div>
+            <div className="rounded-xl border border-[#E5E5E5] p-4 space-y-3">
+              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Business</span><span className="font-medium">{businessName}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Type</span><span className="font-medium">{businessType}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Style</span><span className="font-medium capitalize">{selectedStyle}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Colors</span><span className="font-medium">{palettes[selectedPalette]?.name || 'Default'}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Sections</span><span className="font-medium">{selectedSections.length} selected</span></div>
+            </div>
+            <button
+              onClick={generateWebsite}
+              disabled={generating}
+              className="w-full rounded-xl bg-[#4F46E5] py-4 text-[14px] font-semibold text-white disabled:opacity-50 hover:bg-[#4338CA] transition-colors"
+            >
+              {generating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Building your website...
+                </span>
+              ) : (
+                'Build my website'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* ═══ STEP 6: Preview & Customize ═══ */}
+        {step === 6 && generatedHTML && (
+          <div className="-mx-4 -mt-4">
+            {/* Preview header */}
+            <div className="px-4 py-3 bg-white border-b border-[#F0F0F0] flex items-center justify-between">
+              <button onClick={() => setStep(5)} className="text-[12px] text-[#999]">Back</button>
+              <span className="text-[13px] font-medium text-[#0A0A0A]">Preview</span>
+              <div className="flex gap-2">
+                <button onClick={() => { setGeneratedHTML(null); setStep(5); }} className="text-[12px] text-[#999]">Regenerate</button>
+              </div>
+            </div>
+
+            {/* Browser frame */}
+            <div className="mx-4 mt-3 rounded-xl border border-[#E5E5E5] overflow-hidden bg-white">
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-[#FAFAFA] border-b border-[#F0F0F0]">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 rounded-full bg-[#FF5F57]" />
+                  <div className="w-2 h-2 rounded-full bg-[#FEBC2E]" />
+                  <div className="w-2 h-2 rounded-full bg-[#28C840]" />
+                </div>
+                <div className="flex-1 text-center text-[10px] text-[#BBB]">
+                  {businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.bizpocket.io
+                </div>
+              </div>
+              <iframe
+                ref={iframeRef}
+                srcDoc={generatedHTML}
+                className="w-full h-[400px]"
+                sandbox="allow-scripts"
+                title="Website Preview"
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="px-4 mt-4 space-y-2 pb-4">
+              <button
+                onClick={publishWebsite}
+                disabled={publishing}
+                className="w-full rounded-xl bg-[#16A34A] py-3.5 text-[14px] font-semibold text-white disabled:opacity-50 hover:bg-[#15803D] transition-colors"
+              >
+                {publishing ? 'Publishing...' : 'Publish — Go Live'}
+              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    if (!generatedHTML) return;
+                    const blob = new Blob([generatedHTML], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${businessName.replace(/\s+/g, '-').toLowerCase()}.html`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    toast('Downloaded!', 'success');
+                  }}
+                  className="rounded-xl border border-[#E5E5E5] py-2.5 text-[12px] font-medium text-[#666]"
+                >
+                  Download HTML
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!generatedHTML) return;
+                    await navigator.clipboard.writeText(generatedHTML);
+                    toast('HTML copied!', 'success');
+                  }}
+                  className="rounded-xl border border-[#E5E5E5] py-2.5 text-[12px] font-medium text-[#666]"
+                >
+                  Copy HTML
+                </button>
+              </div>
+              <p className="text-[10px] text-[#999] text-center">You can move this to your own domain anytime</p>
+            </div>
+          </div>
+        )}
+
+        {/* ═══ STEP 7: Published ═══ */}
+        {step === 7 && publishedUrl && (
+          <div className="text-center py-8">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#16A34A]/10">
+              <svg className="h-8 w-8 text-[#16A34A]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-semibold text-[#0A0A0A] mb-2">Your website is live!</h2>
+            <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[14px] text-[#4F46E5] font-medium underline break-all">
+              {publishedUrl}
+            </a>
+            <p className="text-[12px] text-[#999] mt-4">Share this link on Instagram, WhatsApp, or anywhere.</p>
+
+            <div className="mt-6 space-y-2">
+              <button
+                onClick={async () => {
+                  await navigator.clipboard.writeText(publishedUrl);
+                  toast('URL copied!', 'success');
+                }}
+                className="w-full rounded-xl bg-[#4F46E5] py-3 text-[13px] font-semibold text-white"
+              >
+                Copy URL
+              </button>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: businessName, url: publishedUrl });
+                  }
+                }}
+                className="w-full rounded-xl border border-[#E5E5E5] py-3 text-[13px] font-medium text-[#666]"
+              >
+                Share
+              </button>
+              <button
+                onClick={() => { setStep(6); }}
+                className="w-full py-2 text-[12px] text-[#999]"
+              >
+                Edit website
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
