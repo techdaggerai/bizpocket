@@ -4,6 +4,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import { I18nProvider } from '@/lib/i18n';
 import BottomNav from '@/components/BottomNav';
 import TopNav from '@/components/TopNav';
+import Sidebar from '@/components/Sidebar';
 import type { Language } from '@/lib/i18n';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -31,12 +32,30 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <AuthProvider user={user} profile={profile} organization={organization}>
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
-        <div className="min-h-screen bg-[var(--bg)] pb-20">
-          <TopNav />
-          <main className="mx-auto max-w-2xl px-4">
-            {children}
-          </main>
-          <BottomNav />
+        <div className="min-h-screen bg-[var(--bg)]">
+          {/* Mobile: TopNav */}
+          <div className="lg:hidden">
+            <TopNav />
+          </div>
+
+          {/* Desktop: Sidebar + Content | Mobile: Full width */}
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1 min-h-screen pb-20 lg:pb-0">
+              {/* Desktop mini top bar */}
+              <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
+                <TopNav />
+              </div>
+              <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-8 py-4">
+                {children}
+              </div>
+            </main>
+          </div>
+
+          {/* Mobile: Bottom Nav */}
+          <div className="lg:hidden">
+            <BottomNav />
+          </div>
         </div>
       </I18nProvider>
     </AuthProvider>

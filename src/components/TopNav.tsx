@@ -14,13 +14,6 @@ export default function TopNav() {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
 
-  const initials = (profile.full_name || profile.name || 'U')
-    .split(' ')
-    .map((w: string) => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
   const currentPlan = organization.plan || 'free';
 
   async function handleSignOut() {
@@ -29,8 +22,8 @@ export default function TopNav() {
   }
 
   return (
-    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E5E5E5] bg-white/95 px-4 py-2 backdrop-blur-sm">
-      <Link href="/" className="text-base font-bold text-[#4F46E5]">
+    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E5E5E5] bg-white/95 px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:static lg:px-0 lg:py-0">
+      <Link href="/dashboard" className="text-base font-bold text-[#4F46E5] lg:hidden">
         BizPocket
       </Link>
       <div className="flex items-center gap-2">
