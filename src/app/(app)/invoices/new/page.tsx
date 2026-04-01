@@ -685,18 +685,18 @@ export default function NewInvoicePage() {
                 <button
                   key={key}
                   onClick={() => { setSelectedTemplate(key); setStep(1); }}
-                  className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                    selectedTemplate === key ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                  className={`relative rounded-card border text-left transition-all hover:shadow-md overflow-hidden min-h-[200px] ${
+                    selectedTemplate === key ? 'border-[var(--accent)] ring-2 ring-[#4F46E5]' : 'border-[#E5E5E5] bg-white'
                   }`}
                 >
-                  <div className="min-h-[180px] w-full overflow-hidden bg-white relative">
-                    <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                  <div className="w-full h-full overflow-hidden bg-white">
+                    <div style={{ transform: 'scale(0.22)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
                       <tpl.Component data={invoicePreviewData} />
                     </div>
                   </div>
-                  <div className="p-3 border-t border-[#E5E5E5]">
-                    <p className="text-sm font-medium text-[var(--text-1)]">{tpl.name}</p>
-                    <p className="text-xs text-[var(--text-4)]">{tpl.description}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/90 to-transparent pt-8 pb-3 px-3">
+                    <p className="text-sm font-semibold text-[#0A0A0A]">{tpl.name}</p>
+                    <p className="text-[10px] text-[#999]">{tpl.description}</p>
                   </div>
                 </button>
               ))}
