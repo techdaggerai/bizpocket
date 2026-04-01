@@ -685,12 +685,12 @@ export default function NewInvoicePage() {
                 <button
                   key={key}
                   onClick={() => { setSelectedTemplate(key); setStep(1); }}
-                  className={`relative rounded-card border text-left transition-all hover:shadow-md overflow-hidden min-h-[200px] ${
+                  className={`relative rounded-card border text-left transition-all hover:shadow-md overflow-hidden ${
                     selectedTemplate === key ? 'border-[var(--accent)] ring-2 ring-[#4F46E5]' : 'border-[#E5E5E5] bg-white'
                   }`}
                 >
-                  <div className="w-full h-full overflow-hidden bg-white">
-                    <div style={{ transform: 'scale(0.22)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                  <div className="w-full h-[200px] overflow-hidden bg-white relative">
+                    <div style={{ transform: 'scale(0.28)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
                       <tpl.Component data={invoicePreviewData} />
                     </div>
                   </div>
