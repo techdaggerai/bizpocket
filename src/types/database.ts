@@ -91,6 +91,8 @@ export interface InvoiceLineItem {
   tax_rate: number;
   tax_amount: number;
   total_price: number;
+  discount_percent?: number;
+  image_url?: string;
 }
 
 export interface Invoice {

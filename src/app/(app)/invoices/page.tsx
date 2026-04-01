@@ -189,6 +189,18 @@ export default function InvoicesPage() {
         </a>
       </div>
 
+      {/* Quick Links — Estimates & Time */}
+      <div className="flex gap-2">
+        <a href="/estimates" className="flex-1 flex items-center gap-2 rounded-[10px] border border-[#E5E5E5] bg-white px-3 py-2.5 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
+          <svg className="h-4 w-4 text-[#7C3AED]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V8.25L14.25 1.5H5.625ZM9 12h6M9 15h4" /></svg>
+          Estimates
+        </a>
+        <a href="/time-tracking" className="flex-1 flex items-center gap-2 rounded-[10px] border border-[#E5E5E5] bg-white px-3 py-2.5 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
+          <svg className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" /></svg>
+          Time Tracking
+        </a>
+      </div>
+
       {/* Create Invoice Form */}
       {showForm && (
         <div className="space-y-4 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
@@ -358,6 +370,11 @@ export default function InvoicesPage() {
                     <span className={`inline-block rounded-btn border px-1.5 py-0.5 text-[10px] font-medium ${statusColors[inv.status]}`}>
                       {inv.status.toUpperCase()}
                     </span>
+                    {(inv as any).viewed_at && inv.status === 'sent' && (
+                      <span className="inline-block rounded-btn border border-[#0EA5E9]/20 bg-[#0EA5E9]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#0EA5E9]">
+                        VIEWED
+                      </span>
+                    )}
                   </div>
                 </div>
                 </div>

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import AIInvoiceHelper from '@/components/AIInvoiceHelper';
 import type { Customer, InvoiceLineItem, ItemTemplate, InvoiceStatus } from '@/types/database';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,13 +33,17 @@ const emptyLineItem = (): InvoiceLineItem => ({
 });
 
 function calcLineItem(item: InvoiceLineItem): InvoiceLineItem {
-  const subtotal = item.quantity * item.unit_price;
-  const tax_amount = Math.round(subtotal * item.tax_rate);
-  return { ...item, tax_amount, total_price: subtotal + tax_amount };
+  const lineSubtotal = item.quantity * item.unit_price;
+  const discountAmount = item.discount_percent ? Math.round(lineSubtotal * item.discount_percent / 100) : 0;
+  const afterDiscount = lineSubtotal - discountAmount;
+  const tax_amount = Math.round(afterDiscount * item.tax_rate);
+  return { ...item, tax_amount, total_price: afterDiscount + tax_amount };
 }
 
 export default function NewInvoicePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get('edit');
   const { organization, user } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
@@ -93,14 +98,39 @@ export default function NewInvoicePage() {
   const [bankAccountName, setBankAccountName] = useState((org.bank_account_name as string) || '');
   const [bankAccountNumber, setBankAccountNumber] = useState((org.bank_account_number as string) || '');
   const [bankAccountType, setBankAccountType] = useState((org.bank_account_type as string) || 'Futsu');
+  const [paymentMethod, setPaymentMethod] = useState((org.default_payment_method as string) || 'bank_transfer');
+  const [disclaimer, setDisclaimer] = useState((org.invoice_disclaimer as string) || '');
+
+  // Overall discount
+  const [discountType, setDiscountType] = useState<'none' | 'percent' | 'fixed'>('none');
+  const [discountValue, setDiscountValue] = useState(0);
+
+  // Edit mode — preserve original status
+  const [editOriginalStatus, setEditOriginalStatus] = useState<InvoiceStatus | null>(null);
 
   // Step 5 — Preview & Save
   const [saving, setSaving] = useState(false);
 
   // Computed
+  const itemDiscountTotal = lineItems.reduce((s, i) => {
+    const lineSub = i.quantity * i.unit_price;
+    return s + (i.discount_percent ? Math.round(lineSub * i.discount_percent / 100) : 0);
+  }, 0);
   const subtotal = lineItems.reduce((s, i) => s + i.quantity * i.unit_price, 0);
-  const taxTotal = lineItems.reduce((s, i) => s + i.tax_amount, 0);
-  const grandTotal = subtotal + taxTotal;
+  const afterItemDiscounts = subtotal - itemDiscountTotal;
+  const rawOverallDiscount = discountType === 'percent'
+    ? Math.round(afterItemDiscounts * discountValue / 100)
+    : discountType === 'fixed' ? discountValue : 0;
+  const overallDiscountAmount = Math.min(rawOverallDiscount, afterItemDiscounts);
+  const afterAllDiscounts = Math.max(0, afterItemDiscounts - overallDiscountAmount);
+  // Compute tax on discounted amount (proportional reduction)
+  const lineTaxTotal = lineItems.reduce((s, i) => s + i.tax_amount, 0);
+  const taxReductionRatio = subtotal > 0 && overallDiscountAmount > 0
+    ? (afterAllDiscounts + itemDiscountTotal) / subtotal : 1;
+  const taxTotal = overallDiscountAmount > 0
+    ? Math.round(lineTaxTotal * taxReductionRatio)
+    : lineTaxTotal;
+  const grandTotal = afterAllDiscounts + taxTotal;
   const selectedCustomer = customers.find((c) => c.id === selectedCustomerId);
   const filteredCustomers = customerSearch
     ? customers.filter((c) =>
@@ -109,17 +139,151 @@ export default function NewInvoicePage() {
       )
     : customers;
 
+  // Cycle items for "From Saved" picker
+  const [cycleItems, setCycleItems] = useState<{ name: string; purchase_price: number; sale_price: number; category: string }[]>([]);
+
   // Fetch data
   const fetchData = useCallback(async () => {
-    const [custRes, tplRes] = await Promise.all([
+    const [custRes, tplRes, cycleRes] = await Promise.all([
       supabase.from('customers').select('*').eq('organization_id', organization.id).order('name'),
       supabase.from('item_templates').select('*').eq('organization_id', organization.id).order('name'),
+      supabase.from('cycle_items').select('name, purchase_price, sale_price, category').eq('organization_id', organization.id).eq('status', 'active'),
     ]);
     setCustomers(custRes.data || []);
     setTemplates(tplRes.data || []);
+    setCycleItems(cycleRes.data || []);
   }, [organization.id, supabase]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Load existing invoice for editing
+  useEffect(() => {
+    if (!editId || !organization.id) return;
+    async function loadInvoice() {
+      const { data: inv } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('id', editId)
+        .eq('organization_id', organization.id)
+        .single();
+      if (!inv) return;
+
+      // Load invoice items
+      const { data: items } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', editId)
+        .order('line_number', { ascending: true });
+
+      setEditOriginalStatus(inv.status);
+      // Restore discount settings
+      if (inv.discount_type) setDiscountType(inv.discount_type);
+      if (inv.discount_value) setDiscountValue(inv.discount_value);
+      setSelectedTemplate(inv.template || 'classic');
+      setInvoiceType(inv.invoice_type || 'commercial');
+      setSelectedCustomerId(inv.customer_id);
+      setCustomerSearch(inv.customer_name || '');
+      setInvoiceDate(inv.created_at ? formatDate(inv.created_at) : invoiceDate);
+      setInvoiceNotes(inv.notes || '');
+      setInvoiceLang(inv.language || 'ja');
+      // Use invoice values directly (even if null) to avoid injecting org defaults
+      setBankName(inv.bank_name ?? '');
+      setBankBranch(inv.bank_branch ?? '');
+      setBankAccountName(inv.bank_account_name ?? '');
+      setBankAccountNumber(inv.bank_account_number ?? '');
+      setBankAccountType(inv.bank_account_type ?? 'Futsu');
+      setPaymentMethod(inv.payment_method ?? 'bank_transfer');
+      setDisclaimer(inv.disclaimer ?? '');
+      // Restore transport fields
+      if (inv.invoice_type === 'transport') {
+        setTransportFields({
+          vessel: inv.vessel || '',
+          port_loading: inv.port_loading || '',
+          port_discharge: inv.port_discharge || '',
+          shipping_terms: inv.shipping_terms || 'FOB',
+          container_no: inv.container_no || '',
+          bill_of_lading: inv.bill_of_lading || '',
+        });
+      }
+
+      if (items && items.length > 0) {
+        setLineItems(items.map((item: any) => calcLineItem({
+          line_number: item.line_number,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          tax_rate: item.tax_rate,
+          tax_amount: 0,
+          total_price: 0,
+          chassis_no: item.chassis_no || undefined,
+          discount_percent: item.discount_percent || 0,
+        })));
+      }
+
+      setStep(1); // Go to step 1 (skip template picker)
+    }
+    loadInvoice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId, organization.id]);
+
+  // Import from estimate
+  const fromEstimate = searchParams.get('from_estimate');
+  useEffect(() => {
+    if (!fromEstimate || !organization.id) return;
+    async function loadEstimate() {
+      const { data: est } = await supabase
+        .from('estimates')
+        .select('*')
+        .eq('id', fromEstimate)
+        .eq('organization_id', organization.id)
+        .single();
+      if (!est) return;
+      setSelectedCustomerId(est.customer_id);
+      setCustomerSearch(est.customer_name || '');
+      setInvoiceNotes(est.notes || '');
+      if (est.items && Array.isArray(est.items)) {
+        setLineItems(est.items.map((item: any, i: number) => calcLineItem({
+          ...emptyLineItem(),
+          line_number: i + 1,
+          description: item.description || '',
+          quantity: item.quantity || 1,
+          unit_price: item.unit_price || 0,
+          discount_percent: item.discount_percent || 0,
+        })));
+      }
+      setStep(1);
+    }
+    loadEstimate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromEstimate, organization.id]);
+
+  // Import from time tracking
+  const fromTime = searchParams.get('from_time');
+  const [importedTimeEntryIds, setImportedTimeEntryIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (fromTime !== 'unbilled' || !organization.id) return;
+    async function loadTimeEntries() {
+      const { data: entries } = await supabase
+        .from('time_entries')
+        .select('*')
+        .eq('organization_id', organization.id)
+        .eq('is_billable', true)
+        .eq('is_invoiced', false)
+        .order('date', { ascending: true });
+      if (!entries || entries.length === 0) return;
+      setImportedTimeEntryIds(entries.map((e: any) => e.id));
+      setLineItems(entries.map((entry: any, i: number) => calcLineItem({
+        ...emptyLineItem(),
+        line_number: i + 1,
+        description: `${entry.description || 'Time entry'} (${Math.round(entry.duration_minutes / 60 * 10) / 10}h)`,
+        quantity: Math.round(entry.duration_minutes / 60 * 100) / 100,
+        unit_price: entry.hourly_rate || 0,
+      })));
+      setStep(1);
+    }
+    loadTimeEntries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromTime, organization.id]);
 
   // Save new customer
   async function handleSaveCustomer() {
@@ -217,61 +381,101 @@ export default function NewInvoicePage() {
   }
 
   // Save invoice
-  async function handleSave(status: InvoiceStatus = 'draft') {
+  async function handleSave(status: InvoiceStatus = editOriginalStatus || 'draft') {
     if (!selectedCustomer) {
       toast('Please select a customer', 'error');
       return;
     }
     setSaving(true);
 
-    const invoiceNumber = await generateInvoiceNumber();
-    const itemsJson = lineItems.filter((i) => i.description).map((i) => ({
-      description: i.description,
-      quantity: i.quantity,
-      unit_price: i.unit_price,
-      amount: i.quantity * i.unit_price,
-    }));
+    const invoiceNumber = editId ? undefined : await generateInvoiceNumber();
+    const itemsJson = lineItems.filter((i) => i.description).map((i) => {
+      const lineSub = i.quantity * i.unit_price;
+      const disc = i.discount_percent ? Math.round(lineSub * i.discount_percent / 100) : 0;
+      return {
+        description: i.description,
+        quantity: i.quantity,
+        unit_price: i.unit_price,
+        discount_percent: i.discount_percent || 0,
+        amount: lineSub - disc,
+      };
+    });
 
-    const { data: invoice, error } = await supabase
-      .from('invoices')
-      .insert({
-        organization_id: organization.id,
-        invoice_number: invoiceNumber,
-        customer_id: selectedCustomer.id,
-        customer_name: selectedCustomer.name,
-        customer_address: selectedCustomer.address,
-        items: itemsJson,
-        subtotal,
-        tax: taxTotal,
-        total: grandTotal,
-        tax_rate: 0.10,
-        tax_amount: taxTotal,
-        grand_total: grandTotal,
-        notes: invoiceNotes || null,
+    const invoicePayload = {
+      organization_id: organization.id,
+      ...(invoiceNumber ? { invoice_number: invoiceNumber } : {}),
+      customer_id: selectedCustomer.id,
+      customer_name: selectedCustomer.name,
+      customer_address: selectedCustomer.address,
+      items: itemsJson,
+      subtotal,
+      tax: taxTotal,
+      total: grandTotal,
+      tax_rate: 0.10,
+      tax_amount: taxTotal,
+      grand_total: grandTotal,
+      notes: invoiceNotes || null,
+      ...(paymentMethod === 'bank_transfer' ? {
         bank_name: bankName || null,
         bank_branch: bankBranch || null,
         bank_account_name: bankAccountName || null,
         bank_account_number: bankAccountNumber || null,
         bank_account_type: bankAccountType || 'Futsu',
-        invoice_prefix: 'INV',
-        template: selectedTemplate,
-        invoice_type: invoiceType,
-        ...(invoiceType === 'transport' ? {
-          vessel: transportFields.vessel || null,
-          port_loading: transportFields.port_loading || null,
-          port_discharge: transportFields.port_discharge || null,
-          shipping_terms: transportFields.shipping_terms || null,
-          container_no: transportFields.container_no || null,
-          bill_of_lading: transportFields.bill_of_lading || null,
-        } : {}),
-        currency,
-        status,
-        language: invoiceLang,
-        created_by: user.id,
-        ...(status === 'sent' ? { sent_at: new Date().toISOString() } : {}),
-      })
-      .select()
-      .single();
+      } : {
+        bank_name: null,
+        bank_branch: null,
+        bank_account_name: null,
+        bank_account_number: null,
+        bank_account_type: null,
+      }),
+      payment_method: paymentMethod,
+      disclaimer: disclaimer || null,
+      discount_type: discountType !== 'none' ? discountType : null,
+      discount_value: discountType !== 'none' ? discountValue : null,
+      discount_amount: overallDiscountAmount + itemDiscountTotal,
+      ...(fromEstimate ? { source_estimate_id: fromEstimate } : {}),
+      invoice_prefix: 'INV',
+      template: selectedTemplate,
+      invoice_type: invoiceType,
+      ...(invoiceType === 'transport' ? {
+        vessel: transportFields.vessel || null,
+        port_loading: transportFields.port_loading || null,
+        port_discharge: transportFields.port_discharge || null,
+        shipping_terms: transportFields.shipping_terms || null,
+        container_no: transportFields.container_no || null,
+        bill_of_lading: transportFields.bill_of_lading || null,
+      } : {}),
+      currency,
+      status,
+      language: invoiceLang,
+      created_by: user.id,
+      ...(status === 'sent' ? { sent_at: new Date().toISOString() } : {}),
+    };
+
+    let invoice;
+    let error;
+
+    if (editId) {
+      // Update existing invoice
+      const res = await supabase
+        .from('invoices')
+        .update(invoicePayload)
+        .eq('id', editId)
+        .eq('organization_id', organization.id)
+        .select()
+        .single();
+      invoice = res.data;
+      error = res.error;
+    } else {
+      // Create new invoice
+      const res = await supabase
+        .from('invoices')
+        .insert(invoicePayload)
+        .select()
+        .single();
+      invoice = res.data;
+      error = res.error;
+    }
 
     if (error) {
       setSaving(false);
@@ -281,6 +485,10 @@ export default function NewInvoicePage() {
 
     // Save line items to invoice_items table
     if (invoice) {
+      // Delete old line items on edit
+      if (editId) {
+        await supabase.from('invoice_items').delete().eq('invoice_id', invoice.id);
+      }
       const dbItems = lineItems
         .filter((i) => i.description)
         .map((i, idx) => ({
@@ -294,12 +502,47 @@ export default function NewInvoicePage() {
           tax_rate: i.tax_rate,
           tax_amount: i.tax_amount,
           total_price: i.total_price,
+          discount_percent: i.discount_percent || 0,
           is_manual_entry: true,
         }));
 
       if (dbItems.length > 0) {
-        await supabase.from('invoice_items').insert(dbItems);
+        const { error: itemsError } = await supabase.from('invoice_items').insert(dbItems);
+        if (itemsError) {
+          toast('Invoice saved but line items failed: ' + itemsError.message, 'error');
+          setSaving(false);
+          return;
+        }
       }
+    }
+
+    // Save defaults to org for future invoices
+    const orgUpdates: Record<string, unknown> = {};
+    if (disclaimer !== (org.invoice_disclaimer as string || '')) {
+      orgUpdates.invoice_disclaimer = disclaimer || null;
+    }
+    if (paymentMethod !== (org.default_payment_method as string || 'bank_transfer')) {
+      orgUpdates.default_payment_method = paymentMethod;
+    }
+    if (Object.keys(orgUpdates).length > 0) {
+      await supabase.from('organizations').update(orgUpdates).eq('id', organization.id);
+    }
+
+    // Mark specific time entries as invoiced (only when sending, not drafts)
+    if (fromTime === 'unbilled' && invoice && importedTimeEntryIds.length > 0 && status !== 'draft') {
+      await supabase
+        .from('time_entries')
+        .update({ is_invoiced: true, invoice_id: invoice.id })
+        .in('id', importedTimeEntryIds);
+    }
+
+    // Mark estimate as converted if imported from estimate
+    if (fromEstimate && invoice) {
+      await supabase
+        .from('estimates')
+        .update({ status: 'converted' })
+        .eq('id', fromEstimate)
+        .eq('organization_id', organization.id);
     }
 
     setSaving(false);
@@ -911,7 +1154,7 @@ export default function NewInvoicePage() {
             <div className="flex items-center justify-between">
               <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.items')}</h2>
               <div className="flex gap-2">
-                {templates.length > 0 && (
+                {(templates.length > 0 || cycleItems.length > 0) && (
                   <button
                     onClick={() => setShowTemplates(!showTemplates)}
                     className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-xs text-[var(--text-3)] hover:text-[var(--text-1)]"
@@ -922,22 +1165,58 @@ export default function NewInvoicePage() {
               </div>
             </div>
 
-            {/* Templates Picker */}
+            {/* Templates & Inventory Picker */}
             {showTemplates && (
               <div className="animate-slide-up space-y-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3">
-                <p className="text-xs font-medium text-[var(--text-3)]">{t('invoices.from_templates')}</p>
-                {templates.map((tpl) => (
-                  <button
-                    key={tpl.id}
-                    onClick={() => addFromTemplate(tpl)}
-                    className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]"
-                  >
-                    <p className="text-sm text-[var(--text-1)]">{tpl.name}</p>
-                    <p className="font-mono text-xs text-[var(--text-4)]">
-                      {formatCurrency(tpl.default_price, currency)} · Tax {(tpl.default_tax_rate * 100).toFixed(0)}%
-                    </p>
-                  </button>
-                ))}
+                {templates.length > 0 && (
+                  <>
+                    <p className="text-xs font-medium text-[var(--text-3)]">{t('invoices.from_templates')}</p>
+                    {templates.map((tpl) => (
+                      <button
+                        key={tpl.id}
+                        onClick={() => addFromTemplate(tpl)}
+                        className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]"
+                      >
+                        <p className="text-sm text-[var(--text-1)]">{tpl.name}</p>
+                        <p className="font-mono text-xs text-[var(--text-4)]">
+                          {formatCurrency(tpl.default_price, currency)} · Tax {(tpl.default_tax_rate * 100).toFixed(0)}%
+                        </p>
+                      </button>
+                    ))}
+                  </>
+                )}
+                {cycleItems.length > 0 && (
+                  <>
+                    <p className="text-xs font-medium text-[var(--text-3)] mt-2">From Inventory</p>
+                    {cycleItems.map((ci, idx) => (
+                      <button
+                        key={`ci-${idx}`}
+                        onClick={() => {
+                          setLineItems((prev) => [
+                            ...prev,
+                            calcLineItem({
+                              line_number: prev.length + 1,
+                              description: ci.name,
+                              quantity: 1,
+                              unit_price: ci.sale_price || ci.purchase_price || 0,
+                              tax_rate: 0.10,
+                              tax_amount: 0,
+                              total_price: 0,
+                            }),
+                          ]);
+                          setShowTemplates(false);
+                        }}
+                        className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]"
+                      >
+                        <p className="text-sm text-[var(--text-1)]">{ci.name}</p>
+                        <p className="font-mono text-xs text-[var(--text-4)]">
+                          {formatCurrency(ci.sale_price || ci.purchase_price || 0, currency)}
+                          {ci.category ? ` · ${ci.category}` : ''}
+                        </p>
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             )}
 
@@ -1016,6 +1295,23 @@ export default function NewInvoicePage() {
                     ))}
                   </div>
 
+                  {/* Per-item Discount */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs text-[var(--text-4)]">Discount %</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={item.discount_percent || ''}
+                      onChange={(e) => updateLineItem(idx, 'discount_percent', parseFloat(e.target.value) || 0)}
+                      placeholder="0"
+                      className="w-20 rounded-input border border-[var(--border)] bg-[var(--bg-2)] px-2 py-1.5 text-xs text-[var(--text-3)] text-center"
+                    />
+                    {(item.discount_percent || 0) > 0 && (
+                      <span className="text-xs text-[#16A34A]">-{formatCurrency(Math.round(item.quantity * item.unit_price * (item.discount_percent || 0) / 100), currency)}</span>
+                    )}
+                  </div>
+
                   {/* Chassis No (optional) */}
                   <input
                     value={item.chassis_no || ''}
@@ -1044,48 +1340,150 @@ export default function NewInvoicePage() {
             >
               + {t('invoices.add_item')}
             </button>
+
+            {/* Overall Discount */}
+            <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3.5">
+              <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Overall Discount</label>
+              <div className="flex gap-2 mt-2">
+                {(['none', 'percent', 'fixed'] as const).map((dt) => (
+                  <button
+                    key={dt}
+                    type="button"
+                    onClick={() => { setDiscountType(dt); if (dt === 'none') setDiscountValue(0); }}
+                    className={`flex-1 rounded-btn border py-2 text-xs font-medium transition-colors ${
+                      discountType === dt
+                        ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]'
+                        : 'border-[#E5E5E5] text-[var(--text-3)]'
+                    }`}
+                  >
+                    {dt === 'none' ? 'None' : dt === 'percent' ? '% Off' : `${currency} Off`}
+                  </button>
+                ))}
+              </div>
+              {discountType !== 'none' && (
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="number"
+                    min="0"
+                    value={discountValue || ''}
+                    onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
+                    placeholder={discountType === 'percent' ? '10' : '5000'}
+                    className="w-24 rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text-1)]"
+                  />
+                  <span className="text-xs text-[var(--text-3)]">{discountType === 'percent' ? '%' : currency}</span>
+                  {overallDiscountAmount > 0 && (
+                    <span className="text-xs text-[#16A34A]">-{formatCurrency(overallDiscountAmount, currency)}</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Totals Summary */}
+            <div className="space-y-1.5 border-t border-[var(--border)] pt-3">
+              <div className="flex justify-between text-xs text-[var(--text-3)]">
+                <span>Subtotal</span>
+                <span className="font-mono">{formatCurrency(subtotal, currency)}</span>
+              </div>
+              {(itemDiscountTotal + overallDiscountAmount) > 0 && (
+                <div className="flex justify-between text-xs text-[#16A34A]">
+                  <span>Discount</span>
+                  <span className="font-mono">-{formatCurrency(itemDiscountTotal + overallDiscountAmount, currency)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-xs text-[var(--text-3)]">
+                <span>Tax</span>
+                <span className="font-mono">{formatCurrency(taxTotal, currency)}</span>
+              </div>
+              <div className="flex justify-between text-sm font-semibold text-[var(--text-1)]">
+                <span>Total</span>
+                <span className="font-mono">{formatCurrency(grandTotal, currency)}</span>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* ===== STEP 4: BANK DETAILS ===== */}
+        {/* ===== STEP 4: PAYMENT & BANK DETAILS ===== */}
         {step === 4 && (
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.bank_details')}</h2>
             <p className="text-xs text-[var(--text-4)]">Payment destination for your customer</p>
 
+            {/* Payment Method Selector */}
             <div>
-              <label className={labelClass}>{t('invoices.bank_name')}</label>
-              <input value={bankName} onChange={(e) => setBankName(e.target.value)} className={inputClass} placeholder="MUFG Bank" />
-            </div>
-            <div>
-              <label className={labelClass}>{t('invoices.bank_branch')}</label>
-              <input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} className={inputClass} placeholder="Shibuya Branch" />
-            </div>
-            <div>
-              <label className={labelClass}>{t('invoices.bank_account_name')}</label>
-              <input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className={inputClass} placeholder="MS Dynamics LLC" />
-            </div>
-            <div>
-              <label className={labelClass}>{t('invoices.bank_account_number')}</label>
-              <input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)} className={inputClass} placeholder="1234567" />
-            </div>
-            <div>
-              <label className={labelClass}>{t('invoices.bank_account_type')}</label>
-              <div className="flex gap-2">
-                {['Futsu', 'Touza'].map((type) => (
+              <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Payment Method</label>
+              <div className="grid grid-cols-3 gap-2 mt-2">
+                {[
+                  { key: 'bank_transfer', label: 'Bank Transfer' },
+                  { key: 'cash', label: 'Cash' },
+                  { key: 'credit_card', label: 'Credit Card' },
+                ].map((m) => (
                   <button
-                    key={type}
-                    onClick={() => setBankAccountType(type)}
-                    className={`flex-1 rounded-btn border py-2.5 text-sm transition-colors ${
-                      bankAccountType === type
-                        ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]'
-                        : 'border-[var(--border-strong)] text-[var(--text-3)]'
+                    key={m.key}
+                    type="button"
+                    onClick={() => setPaymentMethod(m.key)}
+                    className={`rounded-lg border py-2 text-xs font-medium transition-colors ${
+                      paymentMethod === m.key
+                        ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]'
+                        : 'border-[#E5E5E5] text-[var(--text-3)]'
                     }`}
                   >
-                    {type === 'Futsu' ? '普通 (Futsu)' : '当座 (Touza)'}
+                    {m.label}
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Bank Details — only show for bank_transfer */}
+            {paymentMethod === 'bank_transfer' && (
+              <>
+                <div>
+                  <label className={labelClass}>{t('invoices.bank_name')}</label>
+                  <input value={bankName} onChange={(e) => setBankName(e.target.value)} className={inputClass} placeholder="MUFG Bank" />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('invoices.bank_branch')}</label>
+                  <input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} className={inputClass} placeholder="Shibuya Branch" />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('invoices.bank_account_name')}</label>
+                  <input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className={inputClass} placeholder="MS Dynamics LLC" />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('invoices.bank_account_number')}</label>
+                  <input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)} className={inputClass} placeholder="1234567" />
+                </div>
+                <div>
+                  <label className={labelClass}>{t('invoices.bank_account_type')}</label>
+                  <div className="flex gap-2">
+                    {['Futsu', 'Touza'].map((type) => (
+                      <button
+                        key={type}
+                        onClick={() => setBankAccountType(type)}
+                        className={`flex-1 rounded-btn border py-2.5 text-sm transition-colors ${
+                          bankAccountType === type
+                            ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]'
+                            : 'border-[var(--border-strong)] text-[var(--text-3)]'
+                        }`}
+                      >
+                        {type === 'Futsu' ? '普通 (Futsu)' : '当座 (Touza)'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Disclaimer Section */}
+            <div className="mt-4">
+              <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Disclaimer / Policy (optional)</label>
+              <textarea
+                value={disclaimer}
+                onChange={(e) => setDisclaimer(e.target.value)}
+                placeholder="e.g., All sales are final. Returns accepted within 7 days with receipt."
+                rows={3}
+                className={inputClass + ' mt-2'}
+              />
+              <p className="text-[10px] text-[var(--text-4)] mt-1">This will be saved and appear on all future invoices</p>
             </div>
           </div>
         )}
@@ -1160,6 +1558,12 @@ export default function NewInvoicePage() {
                   <span>Subtotal</span>
                   <span className="font-mono">{formatCurrency(subtotal, currency)}</span>
                 </div>
+                {(itemDiscountTotal + overallDiscountAmount) > 0 && (
+                  <div className="flex justify-between text-xs text-green-600">
+                    <span>Discount</span>
+                    <span className="font-mono">-{formatCurrency(itemDiscountTotal + overallDiscountAmount, currency)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xs text-gray-600">
                   <span>Tax</span>
                   <span className="font-mono">{formatCurrency(taxTotal, currency)}</span>
@@ -1170,13 +1574,20 @@ export default function NewInvoicePage() {
                 </div>
               </div>
 
-              {/* Bank Details */}
-              {bankName && (
+              {/* Bank Details — only in preview for bank transfer */}
+              {paymentMethod === 'bank_transfer' && bankName && (
                 <div className="mt-6 rounded bg-gray-50 p-3">
                   <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Bank Details</p>
                   <p className="text-xs text-gray-700">{bankName} — {bankBranch}</p>
                   <p className="text-xs text-gray-700">{bankAccountType} {bankAccountNumber}</p>
                   <p className="text-xs text-gray-700">{bankAccountName}</p>
+                </div>
+              )}
+              {/* Payment Method (non-bank) */}
+              {paymentMethod !== 'bank_transfer' && (
+                <div className="mt-6 rounded bg-gray-50 p-3">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Payment Method</p>
+                  <p className="text-xs text-gray-700">{paymentMethod === 'cash' ? 'Cash' : 'Credit Card'}</p>
                 </div>
               )}
 
@@ -1212,20 +1623,33 @@ export default function NewInvoicePage() {
 
             {/* Save Buttons */}
             <div className="flex gap-2">
-              <button
-                onClick={() => handleSave('draft')}
-                disabled={saving}
-                className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg-2)] py-3 text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] disabled:opacity-50"
-              >
-                {saving ? t('common.loading') : t('invoices.save_draft')}
-              </button>
-              <button
-                onClick={() => handleSave('sent')}
-                disabled={saving}
-                className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
-              >
-                {saving ? t('common.loading') : t('invoices.save_send')}
-              </button>
+              {editId && editOriginalStatus === 'paid' ? (
+                /* Editing a paid invoice — preserve status */
+                <button
+                  onClick={() => handleSave()}
+                  disabled={saving}
+                  className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
+                >
+                  {saving ? t('common.loading') : 'Save Changes'}
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleSave('draft')}
+                    disabled={saving}
+                    className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg-2)] py-3 text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] disabled:opacity-50"
+                  >
+                    {saving ? t('common.loading') : t('invoices.save_draft')}
+                  </button>
+                  <button
+                    onClick={() => handleSave('sent')}
+                    disabled={saving}
+                    className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
+                  >
+                    {saving ? t('common.loading') : t('invoices.save_send')}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -1267,6 +1691,31 @@ export default function NewInvoicePage() {
           )}
         </div>}
       </div>
+
+      {/* AI Invoice Helper */}
+      <AIInvoiceHelper onSuggestion={(data) => {
+        if (data.items) {
+          const newItems = data.items.map((item, i) => calcLineItem({
+            ...emptyLineItem(),
+            line_number: lineItems.length + i + 1,
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+          }));
+          setLineItems((prev) => [...prev, ...newItems]);
+        }
+        if (data.disclaimer) setDisclaimer(data.disclaimer);
+        if (data.payment_method) setPaymentMethod(data.payment_method);
+        if (data.notes) setInvoiceNotes(data.notes);
+        if (data.customer_name) {
+          setCustomerSearch(data.customer_name);
+          // Auto-select matching customer
+          const match = customers.find((c) =>
+            c.name.toLowerCase().includes(data.customer_name!.toLowerCase())
+          );
+          if (match) setSelectedCustomerId(match.id);
+        }
+      }} />
     </div>
   );
 }

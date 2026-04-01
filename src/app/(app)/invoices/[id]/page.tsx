@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
@@ -17,6 +17,7 @@ const statusColors: Record<InvoiceStatus, string> = {
 
 export default function InvoiceDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const { organization, profile } = useAuth();
   const { toast } = useToast();
@@ -27,6 +28,8 @@ export default function InvoiceDetailPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -160,6 +163,88 @@ export default function InvoiceDetailPage() {
     }
   }
 
+  async function handleDelete() {
+    if (!invoice) return;
+    setDeleting(true);
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', invoice.id)
+      .eq('organization_id', organization.id);
+
+    if (error) {
+      toast(error.message, 'error');
+      setDeleting(false);
+    } else {
+      toast('Invoice deleted', 'success');
+      router.push('/invoices');
+    }
+  }
+
+  async function handleDuplicate() {
+    if (!invoice) return;
+    const { count } = await supabase
+      .from('invoices')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', organization.id);
+    const seq = String((count || 0) + 1).padStart(4, '0');
+    const prefix = organization.name?.slice(0, 3).toUpperCase() || 'BIZ';
+    const ymd = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+    const newNumber = `INV/${prefix}/${ymd}-${seq}`;
+
+    const { data: newInv, error } = await supabase
+      .from('invoices')
+      .insert({
+        organization_id: organization.id,
+        invoice_number: newNumber,
+        customer_id: invoice.customer_id,
+        customer_name: invoice.customer_name,
+        customer_address: invoice.customer_address,
+        items: invoice.items,
+        subtotal: invoice.subtotal,
+        tax: invoice.tax,
+        total: invoice.total,
+        tax_rate: invoice.tax_rate,
+        tax_amount: invoice.tax_amount,
+        grand_total: invoice.grand_total,
+        notes: invoice.notes,
+        bank_name: invoice.bank_name,
+        bank_branch: invoice.bank_branch,
+        bank_account_name: invoice.bank_account_name,
+        bank_account_number: invoice.bank_account_number,
+        bank_account_type: invoice.bank_account_type,
+        currency: invoice.currency,
+        template: (invoice as any).template,
+        invoice_type: (invoice as any).invoice_type,
+        language: (invoice as any).language,
+        payment_method: (invoice as any).payment_method,
+        disclaimer: (invoice as any).disclaimer,
+        status: 'draft',
+        created_by: profile.user_id || (invoice as any).created_by,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast('Duplicate failed: ' + error.message, 'error');
+    } else if (newInv) {
+      // Clone invoice_items
+      const { data: sourceItems } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoice.id);
+      if (sourceItems && sourceItems.length > 0) {
+        const clonedItems = sourceItems.map(({ id, invoice_id, ...rest }: any) => ({
+          ...rest,
+          invoice_id: newInv.id,
+        }));
+        await supabase.from('invoice_items').insert(clonedItems);
+      }
+      toast('Invoice duplicated', 'success');
+      router.push(`/invoices/${newInv.id}`);
+    }
+  }
+
   function copyPublicLink() {
     if (!invoice?.chat_token) {
       toast('No public link available', 'error');
@@ -289,7 +374,56 @@ export default function InvoiceDetailPage() {
           >
             Share
           </button>
+          {invoice.status !== 'paid' && (
+            <button
+              onClick={() => updateStatus('paid')}
+              className="rounded-[10px] bg-[#16A34A] px-4 py-2 text-sm font-medium text-white hover:bg-[#15803D] transition-colors"
+            >
+              Mark Paid
+            </button>
+          )}
+          <Link
+            href={`/invoices/new?edit=${invoice.id}`}
+            className="rounded-[10px] border border-[#E5E5E5] bg-white px-4 py-2 text-sm font-medium text-[#0A0A0A] hover:bg-[#F9F9F9] transition-colors"
+          >
+            Edit
+          </Link>
+          <button
+            onClick={handleDuplicate}
+            className="rounded-[10px] border border-[#E5E5E5] bg-white px-4 py-2 text-sm font-medium text-[#0A0A0A] hover:bg-[#F9F9F9] transition-colors"
+          >
+            Duplicate
+          </button>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="rounded-[10px] border border-[#DC2626]/20 bg-[#DC2626]/5 px-4 py-2 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors"
+          >
+            Delete
+          </button>
         </div>
+
+        {/* Delete Confirmation */}
+        {showDeleteConfirm && (
+          <div className="mt-3 rounded-[10px] border border-[#DC2626]/20 bg-[#DC2626]/5 p-4">
+            <p className="text-sm text-[#DC2626] font-medium mb-2">Delete this invoice?</p>
+            <p className="text-xs text-[#DC2626]/70 mb-3">This action cannot be undone.</p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-lg bg-[#DC2626] px-4 py-2 text-xs font-medium text-white hover:bg-[#B91C1C] disabled:opacity-50 transition-colors"
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="rounded-lg border border-[#E5E5E5] px-4 py-2 text-xs font-medium text-[#525252] hover:bg-[#F9F9F9] transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* PocketChat Section */}

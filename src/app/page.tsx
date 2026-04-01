@@ -1,33 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { PocketMark, LogoWordmark } from '@/components/Logo';
 
 const LANG_OPTIONS = [
-  { value: 'en', flag: '🇺🇸', label: 'English (US)' },
-  { value: 'ja', flag: '🇯🇵', label: '日本語' },
-  { value: 'ur', flag: '🇵🇰', label: 'اردو' },
-  { value: 'ar', flag: '🇦🇪', label: 'العربية' },
-  { value: 'bn', flag: '🇧🇩', label: 'বাংলা' },
-  { value: 'pt', flag: '🇧🇷', label: 'Português' },
-  { value: 'tl', flag: '🇵🇭', label: 'Filipino' },
-  { value: 'vi', flag: '🇻🇳', label: 'Tiếng Việt' },
-  { value: 'tr', flag: '🇹🇷', label: 'Türkçe' },
-  { value: 'zh', flag: '🇨🇳', label: '中文' },
-  { value: 'fr', flag: '🇫🇷', label: 'Français' },
-  { value: 'nl', flag: '🇳🇱', label: 'Nederlands' },
-  { value: 'es', flag: '🇪🇸', label: 'Español' },
+  { value: 'en', flag: '\u{1F1FA}\u{1F1F8}', label: 'English (US)' },
+  { value: 'ja', flag: '\u{1F1EF}\u{1F1F5}', label: '\u65E5\u672C\u8A9E' },
+  { value: 'ur', flag: '\u{1F1F5}\u{1F1F0}', label: '\u0627\u0631\u062F\u0648' },
+  { value: 'ar', flag: '\u{1F1E6}\u{1F1EA}', label: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629' },
+  { value: 'bn', flag: '\u{1F1E7}\u{1F1E9}', label: '\u09AC\u09BE\u0982\u09B2\u09BE' },
+  { value: 'pt', flag: '\u{1F1E7}\u{1F1F7}', label: 'Portugu\u00EAs' },
+  { value: 'tl', flag: '\u{1F1F5}\u{1F1ED}', label: 'Filipino' },
+  { value: 'vi', flag: '\u{1F1FB}\u{1F1F3}', label: 'Ti\u1EBFng Vi\u1EC7t' },
+  { value: 'tr', flag: '\u{1F1F9}\u{1F1F7}', label: 'T\u00FCrk\u00E7e' },
+  { value: 'zh', flag: '\u{1F1E8}\u{1F1F3}', label: '\u4E2D\u6587' },
+  { value: 'fr', flag: '\u{1F1EB}\u{1F1F7}', label: 'Fran\u00E7ais' },
+  { value: 'nl', flag: '\u{1F1F3}\u{1F1F1}', label: 'Nederlands' },
+  { value: 'es', flag: '\u{1F1EA}\u{1F1F8}', label: 'Espa\u00F1ol' },
 ];
 
-const WORLD_CLOCKS = [
-  { flag: '🇯🇵', city: 'Tokyo', tz: 'Asia/Tokyo' },
-  { flag: '🇵🇰', city: 'Karachi', tz: 'Asia/Karachi' },
-  { flag: '🇦🇪', city: 'Dubai', tz: 'Asia/Dubai' },
-  { flag: '🇬🇧', city: 'London', tz: 'Europe/London' },
-  { flag: '🇺🇸', city: 'New York', tz: 'America/New_York' },
-  { flag: '🇨🇳', city: 'Shanghai', tz: 'Asia/Shanghai' },
-];
+type Lang = 'en' | 'ja' | 'ur' | 'ar' | 'bn' | 'pt' | 'tl' | 'vi' | 'tr' | 'zh' | 'fr' | 'nl' | 'es';
 
 const PLANS = [
   {
@@ -35,14 +28,13 @@ const PLANS = [
     price: '¥0',
     period: '',
     desc: 'Start with a 14-day Pro trial',
-    features: ['14-day free trial (full Pro)', '3 invoices/month', 'AI Document Detector (unlimited)', 'PocketChat (10 AI translations/day)', 'AI Website Builder', 'Business Health Score', 'Basic cash flow'],
+    features: ['14-day free trial (full Pro)', '3 invoices/month', 'AI Document Detector', 'PocketChat (10 AI translations/day)', 'AI Website Builder', 'Business Health Score', 'Basic cash flow'],
     cta: 'Start Free Trial',
     highlight: false,
   },
   {
     name: 'Pro',
     price: '¥2,980',
-    priceAlt: '~$20 · ~€18',
     period: '/mo',
     desc: 'Your AI business autopilot',
     features: ['Unlimited invoices', 'AI Morning Briefing', 'Unlimited AI translations', 'Expense Planner + AI', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', '5 languages'],
@@ -52,10 +44,9 @@ const PLANS = [
   {
     name: 'Business',
     price: '¥5,980',
-    priceAlt: '~$40 · ~€36',
     period: '/mo',
     desc: 'Your entire office — automated',
-    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Business Radar + AI insights', 'Voice translation', '13 languages', 'Japanese compliance toolkit', 'Custom branding', 'Social media integration'],
+    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Business Radar + AI insights', 'Voice translation', '13 languages', 'Custom branding', 'Social media integration'],
     cta: 'Go Business',
     highlight: false,
   },
@@ -70,260 +61,160 @@ const PLANS = [
   },
 ];
 
-type Lang = 'en' | 'ja' | 'ur' | 'ar' | 'bn' | 'pt' | 'tl' | 'vi' | 'tr' | 'zh' | 'fr' | 'nl' | 'es';
+const FEATURES = [
+  { name: 'Fire Invoice\u2122', desc: 'Professional invoices in 60 seconds. 5 templates. PDF export. 10 languages.' },
+  { name: 'PocketChat\u2122', desc: 'Business messenger with real-time AI translation across 13 languages.' },
+  { name: 'Money View', desc: 'Cash flow tracking with IN/OUT visualization and running balance.' },
+  { name: 'AI Command Hub', desc: 'Morning briefings, action recommendations, and overnight summaries.' },
+  { name: 'Snap & Vault\u2122', desc: 'Document scanner with cloud storage. Point, shoot, filed.' },
+  { name: 'Accountant Portal\u2122', desc: 'Read-only access for your accountant. Tax data, reports, exports.' },
+  { name: 'AI Website Builder', desc: 'Generate and publish a professional website in 60 seconds.' },
+  { name: 'Ops Radar', desc: 'Pipeline tracking, bottleneck detection, and AI-powered business insights.' },
+];
 
-const selectClass = "rounded-[8px] border border-[rgba(0,0,0,0.12)] bg-white px-2.5 py-1.5 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none pr-7 bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_8px_center]";
+const AI_CARDS = [
+  { title: 'Morning Briefing', desc: 'Wake up to a summary of overnight payments, new messages, and AI recommendations for the day.' },
+  { title: 'Auto-Translate', desc: 'Every message, invoice, and document translated in real-time across 13 languages.' },
+  { title: 'Smart Pipeline', desc: 'AI learns your business patterns and predicts bottlenecks before they happen.' },
+];
 
-function getTime(tz: string): string {
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: tz,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  }).format(new Date());
-}
+const LANGUAGES = [
+  'English (US)', '日本語', 'اردو', 'العربية', 'বাংলা', 'Português',
+  'Filipino', 'Tiếng Việt', 'Türkçe', '中文', 'Français', 'Nederlands', 'Español',
+];
+
+const PRICE_MAP: Record<string, Record<string, string>> = {
+  '¥0': { JPY: '¥0', USD: '$0', EUR: '€0' },
+  '¥2,980': { JPY: '¥2,980', USD: '$20', EUR: '€18' },
+  '¥5,980': { JPY: '¥5,980', USD: '$40', EUR: '€36' },
+  'Custom': { JPY: 'Custom', USD: 'Custom', EUR: 'Custom' },
+};
 
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>('en');
-  const [now, setNow] = useState(new Date());
+  const [heroEmail, setHeroEmail] = useState('');
   const [priceCurrency, setPriceCurrency] = useState<'JPY' | 'USD' | 'EUR'>('JPY');
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Suppress unused var warning — now drives clock re-renders
-  void now;
-
-  const PRICE_MAP: Record<string, Record<string, string>> = {
-    '¥0': { JPY: '¥0', USD: '$0', EUR: '€0' },
-    '¥2,980': { JPY: '¥2,980', USD: '$20', EUR: '€18' },
-    '¥5,980': { JPY: '¥5,980', USD: '$40', EUR: '€36' },
-    'Custom': { JPY: 'Custom', USD: 'Custom', EUR: 'Custom' },
-  };
 
   function getPrice(basePrice: string): string {
     return PRICE_MAP[basePrice]?.[priceCurrency] || basePrice;
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text-1)]" dir={lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+    <div className="min-h-screen bg-white text-[#0A0A0A]" dir={lang === 'ur' || lang === 'ar' ? 'rtl' : 'ltr'}>
+      {/* ─── Frosted glass nav ─── */}
+      <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5">
           <div className="flex items-center gap-2.5">
             <PocketMark variant="xl" />
             <LogoWordmark />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as Lang)}
-              className={selectClass}
+              className="rounded-full border border-[#E5E5E5] bg-white px-2.5 py-1.5 text-xs text-[#525252] focus:border-[#4F46E5] focus:outline-none appearance-none pr-6 bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2210%22%20height%3D%2210%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_6px_center]"
             >
               {LANG_OPTIONS.map((l) => (
                 <option key={l.value} value={l.value}>{l.flag} {l.label}</option>
               ))}
             </select>
-            <Link href="/login" className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-sm text-[var(--text-2)] hover:text-[var(--text-1)] transition-colors">
-              Log In
+            <Link href="/login" className="text-sm text-[#525252] hover:text-[#0A0A0A] transition-colors">
+              Log in
             </Link>
-            <Link href="/signup" className="rounded-btn bg-[var(--accent)] px-4 py-1.5 text-sm font-medium text-white hover:bg-[var(--accent-hover)] transition-colors">
-              Open Your Pocket
+            <Link href="/signup" className="rounded-full bg-[#0A0A0A] px-5 py-2 text-sm font-medium text-white transition-all hover:bg-[#1a1a1a]">
+              Open account
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-5xl px-4 py-20 text-center sm:py-28">
-        <div className="mx-auto max-w-2xl">
-          <div className="mb-5 inline-flex items-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-2)] px-3.5 py-1.5 text-xs text-[var(--text-3)]">
-            13 languages &middot; 16 currencies &middot; Zero barriers
-          </div>
-          <h1 className="mb-3 text-3xl font-light text-[var(--text-1)] sm:text-[42px] sm:leading-[1.1]">
-            Your AI Business{' '}
-            <span className="font-semibold text-[var(--accent)]">Autopilot.</span>
-          </h1>
-          <p className="mb-6 text-md leading-relaxed text-[var(--text-3)]">
-            Invoices. Cash flow. PocketChat with real-time translation in 13 languages. 16 currencies. All from your phone. AI runs your business while you sleep.
-          </p>
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/signup" className="w-full rounded-btn bg-[var(--accent)] px-8 py-3 text-center text-sm font-medium text-white shadow-sm transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px sm:w-auto">
-              Open Your Pocket
-            </Link>
-            <a href="#pocketchat" className="w-full rounded-btn border border-[var(--border-strong)] bg-[var(--bg-2)] px-8 py-3 text-center text-sm font-medium text-[var(--text-2)] transition-colors hover:text-[var(--text-1)] sm:w-auto">
-              See PocketChat
-            </a>
-          </div>
+      {/* ─── Hero ─── */}
+      <section className="mx-auto max-w-6xl px-5 pt-24 pb-20 text-center sm:pt-32 sm:pb-28">
+        <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-[#0A0A0A] sm:text-6xl">
+          Run your business.{' '}
+          <span className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">
+            From your pocket.
+          </span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[#737373]">
+          Invoices. Cash flow. AI translation in 13 languages. Everything your business needs, all in one mobile-first app.
+        </p>
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <input
+            type="email"
+            placeholder="you@company.com"
+            value={heroEmail}
+            onChange={(e) => setHeroEmail(e.target.value)}
+            className="w-full rounded-full border border-[#E5E5E5] bg-white px-5 py-3 text-sm text-[#0A0A0A] placeholder-[#A3A3A3] focus:border-[#4F46E5] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 sm:w-72"
+          />
+          <Link
+            href={heroEmail ? `/signup?email=${encodeURIComponent(heroEmail)}` : '/signup'}
+            className="w-full rounded-full bg-[#4F46E5] px-8 py-3 text-center text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#4338CA] hover:shadow-md sm:w-auto"
+          >
+            Start free
+          </Link>
         </div>
-      </section>
 
-      {/* Pain Points — Bold Statements */}
-      <section className="border-y border-[var(--border)] bg-[var(--bg-2)]">
-        <div className="mx-auto max-w-3xl px-4 py-16 space-y-10">
-          <div className="text-center">
-            <p className="text-md leading-relaxed text-[var(--text-1)]">
-              Your customer speaks one language. Your supplier speaks another.{' '}
-              Your accountant speaks a third.
-            </p>
-            <p className="mt-2 text-sm text-[var(--text-3)]">They all speak different languages. <span className="font-semibold text-[var(--accent)]">You shouldn&apos;t have to.</span></p>
-          </div>
-          <div className="text-center">
-            <p className="text-md leading-relaxed text-[var(--text-1)]">
-              You&apos;re always moving. Meetings. Deliveries. Clients. Deadlines.
-            </p>
-            <p className="mt-2 text-sm text-[var(--text-3)]">Your business doesn&apos;t stop. Your tools shouldn&apos;t either.</p>
-          </div>
-          <div className="text-center">
-            <p className="text-md leading-relaxed text-[var(--text-1)]">
-              Language barriers kill deals. Time zones kill momentum.
-            </p>
-            <p className="mt-2 text-sm font-semibold text-[var(--accent)]">BizPocket kills both.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature 1 — Fire Invoice */}
-      <section className="mx-auto max-w-5xl px-4 py-20">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Fire Invoice™</p>
-            <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">Invoice fired.<br/>Before you leave the parking lot.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-3)]">Professional invoices in 60 seconds. 5 templates. PDF export. Share via PocketChat, LINE, or WhatsApp. 10 languages. Bank details auto-filled.</p>
-          </div>
-          <div className="flex-1 rounded-[14px] border border-[#E5E5E5] bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-xs font-semibold text-[#0A0A0A]">BIZPOCKET CO.</p>
-                <p className="text-[10px] text-[#A3A3A3]">Invoice #INV/BIZ/260330-0001</p>
+        {/* Fake browser — dashboard preview */}
+        <div className="mx-auto mt-16 max-w-3xl">
+          <div className="rounded-2xl border border-[#E5E5E5] bg-white shadow-2xl shadow-black/[0.08] overflow-hidden">
+            <div className="flex items-center gap-2 bg-[#FAFAFA] px-4 py-2.5 border-b border-[#E5E5E5]">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+                <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+                <div className="w-3 h-3 rounded-full bg-[#28C840]" />
               </div>
-              <span className="rounded-full bg-[#16A34A]/10 px-2 py-0.5 text-[10px] font-semibold text-[#16A34A]">PAID</span>
-            </div>
-            <div className="mb-3 text-[10px] text-[#737373]">
-              <span className="font-medium text-[#0A0A0A]">Bill To:</span> Al-Rashid Motors LLC
-            </div>
-            <div className="border-t border-[#E5E5E5] pt-2 mb-2">
-              <div className="flex justify-between text-[10px] text-[#737373] mb-1">
-                <span>Toyota Alphard 2025</span>
-                <span className="font-mono text-[#0A0A0A]">¥850,000</span>
-              </div>
-              <div className="flex justify-between text-[10px] text-[#737373]">
-                <span>Tax (10%)</span>
-                <span className="font-mono text-[#0A0A0A]">¥85,000</span>
+              <div className="flex-1 text-center">
+                <span className="inline-block rounded-md bg-white border border-[#E5E5E5] px-4 py-1 text-[11px] text-[#A3A3A3]">
+                  app.bizpocket.io/dashboard
+                </span>
               </div>
             </div>
-            <div className="flex justify-between border-t border-[#0A0A0A] pt-2">
-              <span className="text-xs font-semibold text-[#0A0A0A]">Total</span>
-              <span className="font-mono text-sm font-bold text-[#4F46E5]">¥935,000</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature 2 — PocketChat (BIG dark section) */}
-      <section id="pocketchat" className="bg-[#0A0A0A] text-white">
-        <div className="mx-auto max-w-5xl px-4 py-20">
-          <div className="flex flex-col gap-10 sm:flex-row sm:items-center">
-            <div className="flex-1">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#818CF8]">PocketChat™</p>
-              <h2 className="mb-4 text-xl font-semibold text-white sm:text-2xl leading-tight">
-                They speak Japanese.<br/>You speak English.<br/>Nobody notices the difference.
-              </h2>
-              <p className="text-sm leading-relaxed text-[#A1A1AA]">
-                The world&apos;s first business messenger with real-time AI translation. Send messages, voice notes, photos and documents in your language. Your customer reads it in theirs. 13 languages. 16 currencies. Zero friction.
-              </p>
-              <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-[#4F46E5]/30 bg-[#4F46E5]/10 px-4 py-2">
-                <span className="text-sm">🇺🇸 🇯🇵 🇵🇰 🇦🇪 🇧🇩 🇧🇷 🇵🇭 🇻🇳 🇹🇷 🇨🇳 🇫🇷 🇳🇱 🇪🇸</span>
+            <div className="p-6 bg-[#FAFAFA]">
+              <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="rounded-xl bg-white border border-[#E5E5E5] p-3">
+                  <p className="text-[9px] text-[#A3A3A3] uppercase tracking-wider">Balance</p>
+                  <p className="font-mono text-lg font-semibold text-[#4F46E5]">$42,800</p>
+                </div>
+                <div className="rounded-xl bg-white border border-[#E5E5E5] p-3">
+                  <p className="text-[9px] text-[#A3A3A3] uppercase tracking-wider">Unpaid</p>
+                  <p className="font-mono text-lg font-semibold text-[#F59E0B]">3</p>
+                </div>
+                <div className="rounded-xl bg-white border border-[#E5E5E5] p-3">
+                  <p className="text-[9px] text-[#A3A3A3] uppercase tracking-wider">Income</p>
+                  <p className="font-mono text-lg font-semibold text-[#16A34A]">$12,400</p>
+                </div>
+                <div className="rounded-xl bg-white border border-[#E5E5E5] p-3">
+                  <p className="text-[9px] text-[#A3A3A3] uppercase tracking-wider">Expenses</p>
+                  <p className="font-mono text-lg font-semibold text-[#DC2626]">$3,200</p>
+                </div>
               </div>
-            </div>
-            <div className="flex-1">
-              <div className="rounded-[16px] border border-[#333] bg-[#141414] p-4 space-y-3">
-                {/* Mock chat bubbles */}
-                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-xs text-[#A1A1AA]">Customer</p><p className="text-sm text-white">お車の価格を教えてください</p><p className="text-[10px] text-[#525252] mt-1">🇯🇵 Translated from Japanese</p></div></div>
-                <div className="flex justify-end"><div className="rounded-[12px] bg-[#4F46E5] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">The Toyota Hiace is $7,200 FOB Yokohama. Shall I send the invoice?</p><p className="text-[10px] text-white/50 mt-1">🇬🇧 Auto-translated to Japanese for customer</p></div></div>
-                <div className="flex justify-start"><div className="rounded-[12px] bg-[#1C1C1C] px-3.5 py-2.5 max-w-[80%]"><p className="text-sm text-white">はい、請求書をお願いします</p><p className="text-[10px] text-[#525252] mt-1">🇯🇵 &quot;Yes, please send the invoice&quot;</p></div></div>
-                <div className="flex justify-center"><div className="rounded-full bg-[#059669]/20 px-3 py-1.5 text-[10px] text-[#34D399] font-medium">Invoice sent via PocketChat</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature 3 — AI Command Hub */}
-      <section className="mx-auto max-w-5xl px-4 py-20">
-        <div className="flex flex-col gap-8 sm:flex-row-reverse sm:items-center">
-          <div className="flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Command Hub</p>
-            <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">You slept.<br/>Your AI worked.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-3)]">Wake up to your morning briefing. Overnight: invoices auto-sent, payments logged, accountant updated. Cash flow insights. Action recommendations. You just approve.</p>
-          </div>
-          <div className="flex-1 rounded-card border border-[var(--card-border)] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
-              <span className="text-xs font-medium text-[#4F46E5]">AI Briefing</span>
-            </div>
-            <p className="text-sm text-[var(--text-2)] leading-relaxed mb-3">Good morning, Doc. While you slept:</p>
-            <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">2 invoices auto-sent</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#16A34A]">✅</span><span className="text-[var(--text-2)]">¥340,000 payment received</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#DC2626]">⚠️</span><span className="text-[var(--text-2)]">Cash gap predicted on Apr 15</span></div>
-              <div className="flex items-center gap-2"><span className="text-[#4F46E5]">→</span><span className="text-[var(--text-2)]">Recommend: sell white Prius first</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features 4-6 Grid */}
-      <section className="border-y border-[var(--border)] bg-[var(--bg-2)]">
-        <div className="mx-auto max-w-5xl px-4 py-20">
-          <div className="grid gap-6 sm:grid-cols-3">
-            {/* Money View */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Money View</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Know your numbers.</h3>
-              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-3">
-                <p className="text-[10px] text-[#A3A3A3] uppercase">Cash Balance</p>
-                <p className="font-mono text-lg font-bold text-[#4F46E5]">¥4,280,500</p>
-              </div>
-              <div className="flex items-end gap-1 h-10">
-                {[65, 40, 80, 55, 90, 70].map((h, i) => (
-                  <div key={i} className="flex-1 flex flex-col gap-0.5">
-                    <div className="rounded-sm bg-[#16A34A]/20" style={{ height: `${h * 0.4}px` }} />
-                    <div className="rounded-sm bg-[#DC2626]/20" style={{ height: `${(100 - h) * 0.25}px` }} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-gradient-to-br from-[#4F46E5]/5 to-[#7C3AED]/10 border border-[#4F46E5]/10 p-3">
+                  <p className="text-[9px] font-medium text-[#4F46E5] mb-1">AI Briefing</p>
+                  <div className="space-y-1">
+                    <div className="h-2 w-full rounded bg-[#4F46E5]/10" />
+                    <div className="h-2 w-4/5 rounded bg-[#4F46E5]/10" />
+                    <div className="h-2 w-3/5 rounded bg-[#4F46E5]/10" />
                   </div>
-                ))}
-              </div>
-            </div>
-            {/* Snap & Vault */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Snap & Vault™</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Point. Shoot. Filed.</h3>
-              <div className="grid grid-cols-3 gap-1.5">
-                {['Mar 28', 'Mar 25', 'Mar 20'].map((date) => (
-                  <div key={date} className="rounded-lg bg-[var(--bg-2)] p-2 text-center">
-                    <div className="h-10 mb-1.5 rounded bg-[var(--border)] flex items-center justify-center">
-                      <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                    </div>
-                    <p className="text-[9px] text-[var(--text-4)]">{date}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-lg bg-[#4F46E5] p-2.5 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-white/20" />
+                    <p className="text-[8px] text-white font-medium">Invoice</p>
                   </div>
-                ))}
-              </div>
-            </div>
-            {/* Accountant Portal */}
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5">
-              <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Accountant Portal™</p>
-              <h3 className="mb-3 text-base font-semibold text-[var(--text-1)]">Always the full picture.</h3>
-              <div className="rounded-lg bg-[var(--bg-2)] p-3 mb-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-medium text-[var(--text-1)]">Client Overview</span>
-                  <span className="rounded-full bg-[#DC2626]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#DC2626]">READ ONLY</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div><p className="text-[9px] text-[#A3A3A3]">Income</p><p className="font-mono text-xs font-bold text-[#16A34A]">¥2.1M</p></div>
-                  <div><p className="text-[9px] text-[#A3A3A3]">Expenses</p><p className="font-mono text-xs font-bold text-[#DC2626]">¥890K</p></div>
-                  <div><p className="text-[9px] text-[#A3A3A3]">Net</p><p className="font-mono text-xs font-bold text-[#4F46E5]">¥1.2M</p></div>
+                  <div className="rounded-lg bg-[#16A34A] p-2.5 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-white/20" />
+                    <p className="text-[8px] text-white font-medium">Cash Flow</p>
+                  </div>
+                  <div className="rounded-lg bg-[#7C3AED] p-2.5 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-white/20" />
+                    <p className="text-[8px] text-white font-medium">Chat</p>
+                  </div>
+                  <div className="rounded-lg bg-[#0EA5E9] p-2.5 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded bg-white/20" />
+                    <p className="text-[8px] text-white font-medium">Detect</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -331,112 +222,91 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI Website Builder */}
-      <section className="mx-auto max-w-5xl px-4 py-20">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[#16A34A]">AI Website Builder</p>
-            <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)] sm:text-2xl leading-tight">Your website.<br/>Built in 60 seconds.</h2>
-            <p className="text-sm leading-relaxed text-[var(--text-3)]">Fill in your business details, pick a style, and AI generates a professional website instantly. One click to publish &mdash; your business is live on the internet with its own URL. No coding. No designers. No waiting.</p>
-          </div>
-          <div className="flex-1 rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] overflow-hidden">
-            <div className="flex items-center gap-1.5 bg-[#F5F5F5] px-3 py-2">
-              <div className="flex gap-1"><div className="w-2 h-2 rounded-full bg-[#FF5F57]" /><div className="w-2 h-2 rounded-full bg-[#FEBC2E]" /><div className="w-2 h-2 rounded-full bg-[#28C840]" /></div>
-              <div className="flex-1 text-center text-[9px] text-[#999]">your-business.bizpocket.io</div>
-            </div>
-            <div className="p-4 bg-gradient-to-br from-[#16A34A]/5 to-[#16A34A]/10">
-              <div className="bg-white rounded-lg p-3 shadow-sm">
-                <div className="h-3 w-24 bg-[#16A34A]/20 rounded mb-2" />
-                <div className="h-2 w-full bg-[#E5E5E5] rounded mb-1" />
-                <div className="h-2 w-3/4 bg-[#E5E5E5] rounded mb-3" />
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="h-12 bg-[#16A34A]/10 rounded" />
-                  <div className="h-12 bg-[#16A34A]/10 rounded" />
-                  <div className="h-12 bg-[#16A34A]/10 rounded" />
-                </div>
+      {/* ─── Features header ─── */}
+      <section className="border-t border-[#E5E5E5]">
+        <div className="mx-auto max-w-6xl px-5 py-24">
+          <h2 className="text-center text-3xl font-semibold tracking-tight text-[#0A0A0A] sm:text-4xl">
+            Everything your business needs.{' '}
+            <span className="text-[#A3A3A3]">All in one app.</span>
+          </h2>
+
+          {/* 8 features in two clean rows */}
+          <div className="mt-16 grid grid-cols-2 sm:grid-cols-4">
+            {FEATURES.map((f, i) => (
+              <div
+                key={f.name}
+                className={`p-6 ${
+                  i < 4 ? 'border-b border-[#E5E5E5]' : ''
+                } ${i % 4 !== 3 ? 'border-r border-[#E5E5E5]' : ''}`}
+              >
+                <h3 className="text-sm font-semibold text-[#0A0A0A] mb-2">{f.name}</h3>
+                <p className="text-xs leading-relaxed text-[#737373]">{f.desc}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Ops Radar + Business Cycle */}
-      <section className="border-y border-[var(--border)] bg-gradient-to-br from-[rgba(79,70,229,0.02)] to-[rgba(124,58,237,0.04)]">
-        <div className="mx-auto max-w-5xl px-4 py-20">
-          <div className="text-center mb-10">
-            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">AI Business Cycle Engine</p>
-            <h2 className="mb-3 text-xl font-semibold text-[var(--text-1)] sm:text-2xl">Your business. Your pipeline. Your AI.</h2>
-            <p className="text-sm text-[var(--text-3)] max-w-xl mx-auto">Tell AI about your business in 2 minutes. It creates a custom operations pipeline &mdash; then tracks everything, detects bottlenecks, and gets smarter every day.</p>
+      {/* ─── AI Section ─── */}
+      <section className="border-t border-[#E5E5E5] bg-[#FAFAFA]">
+        <div className="mx-auto max-w-6xl px-5 py-24">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#0A0A0A] sm:text-4xl">
+              Your business runs itself.{' '}
+              <span className="text-[#4F46E5]">You just approve.</span>
+            </h2>
+            <p className="mt-4 text-base text-[#737373] max-w-lg mx-auto">
+              AI handles translations, payments, briefings, and pipeline tracking while you focus on growing.
+            </p>
           </div>
+
           <div className="grid gap-5 sm:grid-cols-3">
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#4F46E5]/10">
-                <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+            {AI_CARDS.map((card) => (
+              <div key={card.title} className="rounded-2xl border border-[#E5E5E5] bg-white p-7">
+                <h3 className="text-base font-semibold text-[#0A0A0A] mb-2">{card.title}</h3>
+                <p className="text-sm leading-relaxed text-[#737373]">{card.desc}</p>
               </div>
-              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">AI Creates Your Cycle</h3>
-              <p className="text-xs text-[var(--text-3)]">Chat with AI about your business. It builds your custom pipeline &mdash; whether you sell cars, cakes, or consulting.</p>
-            </div>
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED]/10">
-                <svg className="h-6 w-6 text-[#7C3AED]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6Z" /></svg>
-              </div>
-              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">Ops Radar</h3>
-              <p className="text-xs text-[var(--text-3)]">Your command center. See every item in your pipeline, detect bottlenecks, track costs, measure performance &mdash; all in real time.</p>
-            </div>
-            <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EC4899]/10">
-                <svg className="h-6 w-6 text-[#EC4899]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>
-              </div>
-              <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">AI Gets Smarter</h3>
-              <p className="text-xs text-[var(--text-3)]">Every day the AI learns your patterns. After a month, it predicts bottlenecks before they happen and recommends what to do next.</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Connect Everywhere */}
-      <section className="mx-auto max-w-5xl px-4 py-20">
-        <div className="text-center mb-10">
-          <p className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Connect Everywhere</p>
-          <h2 className="mb-3 text-xl font-semibold text-[var(--text-1)] sm:text-2xl">Link your platforms. Expand your reach.</h2>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-4">
-          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">📸</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Instagram</p><p className="text-[9px] text-[var(--text-4)]">Showcase your work</p></div>
-          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">💬</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">WhatsApp</p><p className="text-[9px] text-[var(--text-4)]">Direct customer chat</p></div>
-          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">🌐</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Your Website</p><p className="text-[9px] text-[var(--text-4)]">AI-built, instant publish</p></div>
-          <div className="rounded-[14px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-center"><span className="text-2xl">✈️</span><p className="mt-2 text-xs font-semibold text-[var(--text-1)]">Telegram</p><p className="text-[9px] text-[var(--text-4)]">Run business by text</p></div>
-        </div>
-      </section>
-
-      {/* World Clock */}
-      <section className="mx-auto max-w-5xl px-4 py-14">
-        <p className="mb-6 text-center text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Your business runs across time zones</p>
-        <div className="flex justify-center gap-3 overflow-x-auto hide-scrollbar pb-1">
-          {WORLD_CLOCKS.map((c) => (
-            <div key={c.tz} className="flex-shrink-0 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3 text-center min-w-[100px]">
-              <span className="text-lg">{c.flag}</span>
-              <p className="font-mono text-lg font-semibold text-[var(--text-1)]">{getTime(c.tz)}</p>
-              <p className="text-[10px] text-[var(--text-4)]">{c.city}</p>
-            </div>
-          ))}
+      {/* ─── Languages ─── */}
+      <section className="border-t border-[#E5E5E5]">
+        <div className="mx-auto max-w-6xl px-5 py-16 text-center">
+          <p className="text-xs font-medium uppercase tracking-widest text-[#A3A3A3] mb-6">
+            13 languages. 16 currencies. Zero barriers.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {LANGUAGES.map((lang) => (
+              <span
+                key={lang}
+                className="rounded-full border border-[#E5E5E5] bg-white px-3.5 py-1.5 text-xs text-[#525252]"
+              >
+                {lang}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="border-t border-[var(--border)]">
-        <div className="mx-auto max-w-5xl px-4 py-20">
-          <p className="mb-2 text-center text-xs font-medium uppercase tracking-widest text-[var(--accent)]">Pricing</p>
-          <h2 className="mb-6 text-center text-xl font-semibold text-[var(--text-1)]">Simple, transparent pricing</h2>
+      {/* ─── Pricing ─── */}
+      <section id="pricing" className="border-t border-[#E5E5E5] bg-[#FAFAFA]">
+        <div className="mx-auto max-w-6xl px-5 py-24">
+          <h2 className="text-center text-3xl font-semibold tracking-tight text-[#0A0A0A] sm:text-4xl mb-3">
+            Simple, transparent pricing
+          </h2>
+          <p className="text-center text-sm text-[#737373] mb-10">Start free. Upgrade when you&apos;re ready. No surprises.</p>
           <div className="mb-10 flex justify-center">
-            <div className="inline-flex rounded-[10px] border border-[var(--border-strong)] bg-[var(--bg-2)] p-1">
+            <div className="inline-flex rounded-full border border-[#E5E5E5] bg-white p-1">
               {(['JPY', 'USD', 'EUR'] as const).map((c) => (
                 <button
                   key={c}
                   onClick={() => setPriceCurrency(c)}
-                  className={`rounded-[8px] px-4 py-1.5 text-xs font-medium transition-colors ${
+                  className={`rounded-full px-5 py-1.5 text-xs font-medium transition-colors ${
                     priceCurrency === c
-                      ? 'bg-[var(--accent)] text-white'
-                      : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
+                      ? 'bg-[#0A0A0A] text-white'
+                      : 'text-[#737373] hover:text-[#0A0A0A]'
                   }`}
                 >
                   {c === 'JPY' ? '¥ JPY' : c === 'USD' ? '$ USD' : '€ EUR'}
@@ -448,30 +318,27 @@ export default function LandingPage() {
             {PLANS.map((plan) => (
               <div
                 key={plan.name}
-                className={`rounded-card-lg border p-7 transition-all ${
+                className={`rounded-2xl border p-7 transition-all ${
                   plan.highlight
-                    ? 'border-[var(--accent)] bg-[var(--card-bg)] shadow-md ring-1 ring-[var(--accent)]/10'
-                    : 'border-[var(--card-border)] bg-[var(--card-bg)] hover:shadow-sm'
+                    ? 'border-[#4F46E5] bg-white shadow-lg ring-1 ring-[#4F46E5]/10'
+                    : 'border-[#E5E5E5] bg-white hover:shadow-sm'
                 }`}
               >
                 {plan.highlight && (
-                  <div className="mb-3 inline-block rounded-full bg-[var(--accent-light)] px-2.5 py-1 text-xs font-medium text-[var(--accent)]">
+                  <div className="mb-3 inline-block rounded-full bg-[#4F46E5]/10 px-3 py-1 text-xs font-medium text-[#4F46E5]">
                     Most Popular
                   </div>
                 )}
-                <h4 className="text-md font-medium text-[var(--text-1)]">{plan.name}</h4>
-                <p className="mb-4 text-sm text-[var(--text-3)]">{plan.desc}</p>
+                <h4 className="text-base font-semibold text-[#0A0A0A]">{plan.name}</h4>
+                <p className="mb-4 text-xs text-[#737373]">{plan.desc}</p>
                 <div className="mb-6">
-                  <span className="font-mono text-2xl font-medium text-[var(--text-1)]">{getPrice(plan.price)}</span>
-                  <span className="text-sm text-[var(--text-3)]">{plan.period}</span>
-                  {priceCurrency !== 'JPY' && plan.price !== 'Custom' && plan.price !== '¥0' && (
-                    <p className="text-[10px] text-[var(--text-4)] mt-0.5">{plan.price}/mo in JPY</p>
-                  )}
+                  <span className="font-mono text-3xl font-semibold text-[#0A0A0A]">{getPrice(plan.price)}</span>
+                  <span className="text-sm text-[#A3A3A3]">{plan.period}</span>
                 </div>
                 <ul className="mb-6 space-y-2.5">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-2)]">
-                      <svg className="h-4 w-4 flex-shrink-0 text-[var(--green)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <li key={f} className="flex items-start gap-2 text-sm text-[#525252]">
+                      <svg className="h-4 w-4 flex-shrink-0 mt-0.5 text-[#16A34A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                       </svg>
                       {f}
@@ -480,10 +347,10 @@ export default function LandingPage() {
                 </ul>
                 <Link
                   href="/signup"
-                  className={`block w-full rounded-btn py-2.5 text-center text-sm font-medium transition-all ${
+                  className={`block w-full rounded-full py-2.5 text-center text-sm font-medium transition-all ${
                     plan.highlight
-                      ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] hover:-translate-y-px'
-                      : 'bg-[var(--bg-2)] border border-[var(--border-strong)] text-[var(--text-2)] hover:text-[var(--text-1)]'
+                      ? 'bg-[#4F46E5] text-white hover:bg-[#4338CA]'
+                      : 'bg-[#F5F5F5] text-[#525252] hover:bg-[#EBEBEB] hover:text-[#0A0A0A]'
                   }`}
                 >
                   {plan.cta}
@@ -494,47 +361,39 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="bg-[var(--bg-2)]">
-        <div className="mx-auto max-w-5xl px-4 py-20 text-center">
-          <h2 className="mb-4 text-xl font-semibold text-[var(--text-1)]">Ready to autopilot your business?</h2>
-          <p className="mb-8 text-md text-[var(--text-3)]">Free forever. Pro when you need it. No credit card required.</p>
+      {/* ─── Dark CTA footer ─── */}
+      <section className="bg-[#0A0A0A]">
+        <div className="mx-auto max-w-6xl px-5 py-24 text-center">
+          <h2 className="text-3xl font-semibold text-white sm:text-4xl tracking-tight">
+            Ready to run your business from your pocket?
+          </h2>
+          <p className="mt-4 text-base text-[#737373]">Free forever. Pro when you need it. No credit card required.</p>
           <Link
             href="/signup"
-            className="inline-block rounded-btn bg-[var(--accent)] px-10 py-3.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px"
+            className="mt-8 inline-block rounded-full bg-white px-10 py-3.5 text-sm font-semibold text-[#0A0A0A] transition-all hover:bg-[#F5F5F5]"
           >
-            Open Your Pocket
+            Open your free account
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)]">
-        <div className="mx-auto max-w-5xl px-4 py-10">
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
-            <div className="flex items-center gap-2">
+      {/* ─── Minimal footer ─── */}
+      <footer className="border-t border-[#1a1a1a] bg-[#0A0A0A]">
+        <div className="mx-auto max-w-6xl px-5 py-8">
+          <div className="flex flex-col items-center gap-5 sm:flex-row sm:justify-between">
+            <div className="flex items-center gap-2 opacity-60">
               <PocketMark variant="sm" />
-              <LogoWordmark />
+              <span className="font-sans text-md font-bold">
+                <span className="text-white">Biz</span>
+                <span className="text-[#4F46E5]">Pocket</span>
+              </span>
             </div>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-[var(--text-4)]">
-              <a href="#features" className="hover:text-[var(--text-2)] transition-colors">Features</a>
-              <a href="#pocketchat" className="hover:text-[var(--text-2)] transition-colors">PocketChat</a>
-              <a href="#pricing" className="hover:text-[var(--text-2)] transition-colors">Pricing</a>
-              <span>Privacy</span>
-              <span>Terms</span>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-[#525252]">
+              <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+              <span className="text-[#333]">Privacy</span>
+              <span className="text-[#333]">Terms</span>
             </div>
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value as Lang)}
-              className={selectClass + ' text-[var(--text-3)]'}
-            >
-              {LANG_OPTIONS.map((l) => (
-                <option key={l.value} value={l.value}>{l.flag} {l.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="mt-6 text-center">
-            <p className="text-xs text-[var(--text-4)]">A TechDagger Product &middot; MS Dynamics LLC &middot; bizpocket.jp</p>
+            <p className="text-[11px] text-[#525252]">A TechDagger Product</p>
           </div>
         </div>
       </footer>

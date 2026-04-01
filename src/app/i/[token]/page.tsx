@@ -82,6 +82,11 @@ export default function PublicInvoicePage() {
 
       setInvoice(inv as Invoice)
 
+      // Track that invoice was viewed (via secure RPC)
+      if (!(inv as any).viewed_at) {
+        supabase.rpc('track_invoice_view', { p_token: token }).then(() => {});
+      }
+
       // Fetch org for business name + bank details
       const { data: orgData } = await supabase
         .from('organizations')
