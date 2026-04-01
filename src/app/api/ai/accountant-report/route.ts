@@ -46,20 +46,20 @@ export async function POST(request: Request) {
     supabase.from('organizations').select('name, business_type, currency').eq('id', organizationId).single(),
     supabase.from('cash_flows').select('amount, flow_type, category, description, date')
       .eq('organization_id', organizationId)
-      .gte('date', month + '-01').lte('date', month + '-31')
+      .gte('date', month + '-01').lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })())
       .order('date', { ascending: true }),
     supabase.from('cash_flows').select('amount, category, description, date')
       .eq('organization_id', organizationId)
       .eq('classify_as', 'expense')
-      .gte('date', month + '-01').lte('date', month + '-31')
+      .gte('date', month + '-01').lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })())
       .order('category', { ascending: true }),
     supabase.from('invoices').select('invoice_number, customer_name, total, status, currency')
       .eq('organization_id', organizationId)
       .gte('created_at', month + '-01T00:00:00Z')
-      .lte('created_at', month + '-31T23:59:59Z'),
+      .lt('created_at', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString(); })()),
     supabase.from('documents').select('id, title, category')
       .eq('organization_id', organizationId)
-      .gte('date', month + '-01').lte('date', month + '-31'),
+      .gte('date', month + '-01').lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })()),
   ]);
 
   const org = orgRes.data;

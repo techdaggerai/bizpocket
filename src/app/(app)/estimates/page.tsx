@@ -35,6 +35,7 @@ export default function EstimatesPage() {
   const [validUntil, setValidUntil] = useState(() => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); });
   const [items, setItems] = useState<LineItem[]>([{ description: '', quantity: 1, unit_price: 0, tax_rate: 0.10 }]);
   const [notes, setNotes] = useState('');
+  const [terms, setTerms] = useState('');
   const [discountType, setDiscountType] = useState('none');
   const [discountValue, setDiscountValue] = useState('');
 
@@ -63,7 +64,7 @@ export default function EstimatesPage() {
       customer_name: customerName, customer_address: selectedCust?.address || '', customer_email: selectedCust?.email || '',
       date, valid_until: validUntil, currency, items: items.filter(i => i.description.trim()),
       subtotal, tax_amount: taxTotal, discount_type: discountType, discount_value: parseFloat(discountValue) || 0,
-      discount_amount: discountAmt, total, notes, status: 'draft', created_by: user.id,
+      discount_amount: discountAmt, total, notes, terms: terms || null, status: 'draft', created_by: user.id,
     });
     if (error) toast('Failed: ' + error.message, 'error');
     else { toast('Estimate created!', 'success'); setShowForm(false); fetchEstimates(); }
@@ -72,6 +73,7 @@ export default function EstimatesPage() {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function convertToInvoice(est: any) {
+    await supabase.from('estimates').update({ status: 'converted' }).eq('id', est.id);
     const params = new URLSearchParams({ from_estimate: est.id, customer_name: est.customer_name, customer_id: est.customer_id || '', items: JSON.stringify(est.items), notes: est.notes || '' });
     router.push(`/invoices/new?${params.toString()}`);
   }
@@ -119,11 +121,21 @@ export default function EstimatesPage() {
             <div><label className="text-[10px] text-[#999]">Valid until</label><input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className={inputClass} /></div>
           </div>
           {items.map((item, i) => (
-            <div key={i} className="flex gap-1.5">
-              <input value={item.description} onChange={e => { const n = [...items]; n[i].description = e.target.value; setItems(n); }} placeholder="Description" className={inputClass + ' flex-1'} />
-              <input type="number" value={item.quantity} onChange={e => { const n = [...items]; n[i].quantity = parseInt(e.target.value) || 0; setItems(n); }} placeholder="Qty" className={inputClass + ' w-16'} />
-              <input type="number" value={item.unit_price} onChange={e => { const n = [...items]; n[i].unit_price = parseInt(e.target.value) || 0; setItems(n); }} placeholder="Price" className={inputClass + ' w-24'} />
-              {items.length > 1 && <button onClick={() => setItems(items.filter((_, j) => j !== i))} className="text-[#DC2626] text-xs px-1">&times;</button>}
+            <div key={i} className="space-y-1.5">
+              <div className="flex gap-1.5">
+                <input value={item.description} onChange={e => { const n = [...items]; n[i].description = e.target.value; setItems(n); }} placeholder="Description" className={inputClass + ' flex-1'} />
+                <input type="number" value={item.quantity} onChange={e => { const n = [...items]; n[i].quantity = parseInt(e.target.value) || 0; setItems(n); }} placeholder="Qty" className={inputClass + ' w-16'} />
+                <input type="number" value={item.unit_price} onChange={e => { const n = [...items]; n[i].unit_price = parseInt(e.target.value) || 0; setItems(n); }} placeholder="Price" className={inputClass + ' w-24'} />
+                {items.length > 1 && <button onClick={() => setItems(items.filter((_, j) => j !== i))} className="text-[#DC2626] text-xs px-1">&times;</button>}
+              </div>
+              <div className="flex gap-1 ml-0">
+                {[{ label: '10%', value: 0.10 }, { label: '8%', value: 0.08 }, { label: '0%', value: 0 }].map(r => (
+                  <button key={r.value} type="button" onClick={() => { const n = [...items]; n[i].tax_rate = r.value; setItems(n); }}
+                    className={`px-2 py-0.5 text-[10px] rounded border ${item.tax_rate === r.value ? 'border-[#4F46E5] text-[#4F46E5] bg-[#4F46E5]/5' : 'border-[#E5E5E5] text-[#999]'}`}>
+                    Tax {r.label}
+                  </button>
+                ))}
+              </div>
             </div>
           ))}
           <button onClick={() => setItems([...items, { description: '', quantity: 1, unit_price: 0, tax_rate: 0.10 }])} className="text-xs text-[#4F46E5] font-medium">+ Add item</button>
@@ -136,6 +148,7 @@ export default function EstimatesPage() {
           </div>
           {discountType !== 'none' && <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percentage' ? '% off' : '¥ off'} className={inputClass} />}
           <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes" rows={2} className={inputClass} />
+          <textarea value={terms} onChange={e => setTerms(e.target.value)} placeholder="Terms & Conditions (optional)" rows={2} className={inputClass} />
           <div className="flex justify-between text-sm border-t pt-3"><span className="text-[#999]">Total</span><span className="font-semibold font-mono">{formatCurrency(total, currency)}</span></div>
           <button onClick={handleSave} disabled={saving || !customerName.trim()} className="w-full rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white disabled:opacity-50">{saving ? 'Saving...' : 'Create Estimate'}</button>
         </div>
@@ -146,7 +159,16 @@ export default function EstimatesPage() {
       : <div className="space-y-2">{estimates.map(est => (
           <div key={est.id} className="rounded-xl border border-[#E5E5E5] bg-white p-4">
             <div className="flex items-center justify-between mb-2">
-              <div><p className="text-sm font-medium">{est.customer_name}</p><p className="text-[10px] text-[#999]">{est.estimate_number} &middot; {formatDate(est.date)}</p></div>
+              <div>
+                <p className="text-sm font-medium">{est.customer_name}</p>
+                <p className="text-[10px] text-[#999]">{est.estimate_number} · {formatDate(est.date)}</p>
+                {est.valid_until && (() => {
+                  const daysLeft = Math.ceil((new Date(est.valid_until).getTime() - Date.now()) / 86400000);
+                  return daysLeft <= 0 ? <span className="text-[9px] font-semibold text-[#DC2626] bg-[#DC2626]/10 px-1.5 py-0.5 rounded-full">Expired</span>
+                    : daysLeft <= 3 ? <span className="text-[9px] font-semibold text-[#F59E0B] bg-[#F59E0B]/10 px-1.5 py-0.5 rounded-full">Expires in {daysLeft}d</span>
+                    : <span className="text-[9px] text-[#999]">Valid {daysLeft}d</span>;
+                })()}
+              </div>
               <div className="text-right"><p className="text-sm font-mono font-medium">{formatCurrency(est.total, currency)}</p><span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-medium ${statusColors[est.status] || ''}`}>{est.status}</span></div>
             </div>
             <div className="flex gap-1.5 mt-3">

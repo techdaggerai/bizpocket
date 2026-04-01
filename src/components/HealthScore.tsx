@@ -50,7 +50,7 @@ export default function HealthScore() {
         .select('amount, flow_type, classify_as')
         .eq('organization_id', organization.id)
         .gte('date', month + '-01')
-        .lte('date', month + '-31'),
+        .lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })()),
       supabase
         .from('invoices')
         .select('status, total')

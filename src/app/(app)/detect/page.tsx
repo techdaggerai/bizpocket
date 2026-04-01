@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
@@ -39,6 +39,48 @@ export default function DetectPage() {
   const [saving, setSaving] = useState(false);
   const [addingPlanner, setAddingPlanner] = useState(false);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [showContactPicker, setShowContactPicker] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [sendingTo, setSendingTo] = useState<string | null>(null);
+
+  // Load contacts for "Send to Contact"
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { supabase.from('contacts').select('id, name, contact_type').eq('organization_id', organization.id).order('name').then(({ data }) => setContacts(data || [])); }, [organization.id]);
+
+  async function handleSendToContact(contactId: string) {
+    if (!result || !originalFile) return;
+    setSendingTo(contactId);
+    let convoId;
+    const { data: existing } = await supabase.from('conversations')
+      .select('id').eq('organization_id', organization.id).eq('contact_id', contactId).limit(1).maybeSingle();
+    if (existing) {
+      convoId = existing.id;
+      await supabase.from('conversations').update({ last_message: 'Document shared', last_message_at: new Date().toISOString() }).eq('id', existing.id);
+    }
+    else {
+      const contact = contacts.find(c => c.id === contactId);
+      const { data: newConvo } = await supabase.from('conversations').insert({
+        organization_id: organization.id, contact_id: contactId,
+        title: contact?.name || 'Contact', last_message: 'Document shared',
+        last_message_at: new Date().toISOString(),
+      }).select('id').single();
+      convoId = newConvo?.id;
+    }
+    if (!convoId) { toast('Failed to create conversation', 'error'); setSendingTo(null); return; }
+    const path = `${organization.id}/detect/${Date.now()}-${originalFile.name}`;
+    const { error: uploadErr } = await supabase.storage.from('documents').upload(path, originalFile);
+    if (uploadErr) { toast('Upload failed', 'error'); setSendingTo(null); return; }
+    const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+    const reportText = `AI Document Report\n\nType: ${result.document_type}\nCategory: ${result.category}\n\n${result.translation}\n\nSuggested Action: ${result.suggested_action}`;
+    await supabase.from('messages').insert({
+      conversation_id: convoId, organization_id: organization.id,
+      sender_type: 'owner', sender_name: profile.full_name || profile.name || 'Owner',
+      message: reportText, message_type: 'document', attachment_url: urlData.publicUrl,
+    });
+    toast('Sent to contact!', 'success');
+    setSendingTo(null); setShowContactPicker(false);
+  }
 
   function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
@@ -389,6 +431,26 @@ export default function DetectPage() {
                   {saving ? 'Saving...' : 'Save to Vault'}
                 </button>
               </div>
+
+              {/* Send to Contact */}
+              <button onClick={() => setShowContactPicker(!showContactPicker)}
+                className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#4F46E5]/20 bg-[#4F46E5]/5 py-3 text-sm font-medium text-[#4F46E5] transition-colors hover:bg-[#4F46E5]/10">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+                Send to Contact
+              </button>
+              {showContactPicker && (
+                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-1.5">
+                  <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider">Choose contact</p>
+                  {contacts.length === 0 && <p className="text-xs text-[#999] py-2">No contacts yet</p>}
+                  {contacts.map(c => (
+                    <button key={c.id} onClick={() => handleSendToContact(c.id)} disabled={sendingTo === c.id}
+                      className="w-full flex items-center justify-between rounded-lg border border-[#E5E5E5] px-3 py-2 text-left hover:bg-[#FAFAFA] disabled:opacity-50">
+                      <span className="text-sm font-medium text-[#0A0A0A]">{c.name}</span>
+                      <span className="text-[10px] text-[#999] capitalize">{c.contact_type}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Scan Another */}
               <button

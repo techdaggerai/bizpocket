@@ -99,7 +99,7 @@ export default function DashboardPage() {
       const today = new Date().toISOString().slice(0, 10);
       const nextWeek = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
       const [flowRes, invRes, evtRes] = await Promise.all([
-        supabase.from('cash_flows').select('*').eq('organization_id', organization.id).gte('date', month + '-01').lte('date', month + '-31').order('date', { ascending: false }),
+        supabase.from('cash_flows').select('*').eq('organization_id', organization.id).gte('date', month + '-01').lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })()).order('date', { ascending: false }),
         supabase.from('invoices').select('*').eq('organization_id', organization.id).neq('status', 'paid'),
         supabase.from('planner_events').select('*').eq('organization_id', organization.id).gte('event_date', today).lte('event_date', nextWeek).eq('status', 'pending').order('event_date', { ascending: true }).limit(3),
       ]);

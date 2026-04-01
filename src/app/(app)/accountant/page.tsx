@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate, getMonthRange } from '@/lib/utils';
+import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 
 export default function AccountantPage() {
@@ -28,7 +29,7 @@ export default function AccountantPage() {
       setLoading(true);
       const [flowRes, invRes] = await Promise.all([
         supabase.from('cash_flows').select('*').eq('organization_id', organization.id)
-          .gte('date', month + '-01').lte('date', month + '-31').order('date', { ascending: true }),
+          .gte('date', month + '-01').lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })()).order('date', { ascending: true }),
         supabase.from('invoices').select('*').eq('organization_id', organization.id).order('created_at', { ascending: false }),
       ]);
       setFlows(flowRes.data || []);
@@ -208,6 +209,12 @@ export default function AccountantPage() {
                   <div><p className="text-[10px] text-[#A3A3A3]">Unpaid</p><p className="text-sm font-bold text-[#DC2626]">{unpaidInvoices.length}</p></div>
                 </div>
               </div>
+
+              {/* Chat with Accountant */}
+              <Link href="/chat?type=accountant" className="flex items-center justify-center gap-2 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4338CA]">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z" /></svg>
+                Chat with Accountant
+              </Link>
             </div>
           )}
 
