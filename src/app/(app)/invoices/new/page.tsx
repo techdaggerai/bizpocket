@@ -8,6 +8,8 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import AIInvoiceHelper from '@/components/AIInvoiceHelper';
+import { TEMPLATES } from '@/components/InvoiceTemplates';
+import type { InvoiceData } from '@/components/InvoiceTemplates';
 import type { Customer, InvoiceLineItem, ItemTemplate, InvoiceStatus } from '@/types/database';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,7 +125,6 @@ export default function NewInvoicePage() {
     : discountType === 'fixed' ? discountValue : 0;
   const overallDiscountAmount = Math.min(rawOverallDiscount, afterItemDiscounts);
   const afterAllDiscounts = Math.max(0, afterItemDiscounts - overallDiscountAmount);
-  // Compute tax on discounted amount (proportional reduction)
   const lineTaxTotal = lineItems.reduce((s, i) => s + i.tax_amount, 0);
   const taxReductionRatio = subtotal > 0 && overallDiscountAmount > 0
     ? (afterAllDiscounts + itemDiscountTotal) / subtotal : 1;
@@ -168,7 +169,6 @@ export default function NewInvoicePage() {
         .single();
       if (!inv) return;
 
-      // Load invoice items
       const { data: items } = await supabase
         .from('invoice_items')
         .select('*')
@@ -176,7 +176,6 @@ export default function NewInvoicePage() {
         .order('line_number', { ascending: true });
 
       setEditOriginalStatus(inv.status);
-      // Restore discount settings
       if (inv.discount_type) setDiscountType(inv.discount_type);
       if (inv.discount_value) setDiscountValue(inv.discount_value);
       setSelectedTemplate(inv.template || 'classic');
@@ -186,7 +185,6 @@ export default function NewInvoicePage() {
       setInvoiceDate(inv.created_at ? formatDate(inv.created_at) : invoiceDate);
       setInvoiceNotes(inv.notes || '');
       setInvoiceLang(inv.language || 'ja');
-      // Use invoice values directly (even if null) to avoid injecting org defaults
       setBankName(inv.bank_name ?? '');
       setBankBranch(inv.bank_branch ?? '');
       setBankAccountName(inv.bank_account_name ?? '');
@@ -194,7 +192,6 @@ export default function NewInvoicePage() {
       setBankAccountType(inv.bank_account_type ?? 'Futsu');
       setPaymentMethod(inv.payment_method ?? 'bank_transfer');
       setDisclaimer(inv.disclaimer ?? '');
-      // Restore transport fields
       if (inv.invoice_type === 'transport') {
         setTransportFields({
           vessel: inv.vessel || '',
@@ -207,6 +204,7 @@ export default function NewInvoicePage() {
       }
 
       if (items && items.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setLineItems(items.map((item: any) => calcLineItem({
           line_number: item.line_number,
           description: item.description,
@@ -220,7 +218,7 @@ export default function NewInvoicePage() {
         })));
       }
 
-      setStep(1); // Go to step 1 (skip template picker)
+      setStep(1);
     }
     loadInvoice();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,6 +240,7 @@ export default function NewInvoicePage() {
       setCustomerSearch(est.customer_name || '');
       setInvoiceNotes(est.notes || '');
       if (est.items && Array.isArray(est.items)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setLineItems(est.items.map((item: any, i: number) => calcLineItem({
           ...emptyLineItem(),
           line_number: i + 1,
@@ -271,7 +270,9 @@ export default function NewInvoicePage() {
         .eq('is_invoiced', false)
         .order('date', { ascending: true });
       if (!entries || entries.length === 0) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setImportedTimeEntryIds(entries.map((e: any) => e.id));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setLineItems(entries.map((entry: any, i: number) => calcLineItem({
         ...emptyLineItem(),
         line_number: i + 1,
@@ -356,7 +357,6 @@ export default function NewInvoicePage() {
     setShowTemplates(false);
   }
 
-  // Touch swipe to delete
   function handleTouchStart(e: React.TouchEvent, idx: number) {
     touchStartX.current = e.touches[0].clientX;
     setSwipingIdx(idx);
@@ -368,7 +368,6 @@ export default function NewInvoicePage() {
     setSwipingIdx(null);
   }
 
-  // Generate invoice number
   async function generateInvoiceNumber(): Promise<string> {
     const { count } = await supabase
       .from('invoices')
@@ -380,7 +379,6 @@ export default function NewInvoicePage() {
     return `INV/${prefix}/${ymd}-${seq}`;
   }
 
-  // Save invoice
   async function handleSave(status: InvoiceStatus = editOriginalStatus || 'draft') {
     if (!selectedCustomer) {
       toast('Please select a customer', 'error');
@@ -456,7 +454,6 @@ export default function NewInvoicePage() {
     let error;
 
     if (editId) {
-      // Update existing invoice
       const res = await supabase
         .from('invoices')
         .update(invoicePayload)
@@ -467,7 +464,6 @@ export default function NewInvoicePage() {
       invoice = res.data;
       error = res.error;
     } else {
-      // Create new invoice
       const res = await supabase
         .from('invoices')
         .insert(invoicePayload)
@@ -483,9 +479,7 @@ export default function NewInvoicePage() {
       return;
     }
 
-    // Save line items to invoice_items table
     if (invoice) {
-      // Delete old line items on edit
       if (editId) {
         await supabase.from('invoice_items').delete().eq('invoice_id', invoice.id);
       }
@@ -516,7 +510,6 @@ export default function NewInvoicePage() {
       }
     }
 
-    // Save defaults to org for future invoices
     const orgUpdates: Record<string, unknown> = {};
     if (disclaimer !== (org.invoice_disclaimer as string || '')) {
       orgUpdates.invoice_disclaimer = disclaimer || null;
@@ -528,7 +521,6 @@ export default function NewInvoicePage() {
       await supabase.from('organizations').update(orgUpdates).eq('id', organization.id);
     }
 
-    // Mark specific time entries as invoiced (only when sending, not drafts)
     if (fromTime === 'unbilled' && invoice && importedTimeEntryIds.length > 0 && status !== 'draft') {
       await supabase
         .from('time_entries')
@@ -536,7 +528,6 @@ export default function NewInvoicePage() {
         .in('id', importedTimeEntryIds);
     }
 
-    // Mark estimate as converted if imported from estimate
     if (fromEstimate && invoice) {
       await supabase
         .from('estimates')
@@ -550,7 +541,6 @@ export default function NewInvoicePage() {
     router.push('/invoices');
   }
 
-  // PDF generation
   async function generatePDF(): Promise<Blob | null> {
     const el = document.getElementById('invoice-preview');
     if (!el || !html2pdf) return null;
@@ -591,7 +581,6 @@ export default function NewInvoicePage() {
     toast('PDF downloaded', 'success');
   }
 
-  // Share via Web Share API
   async function handleShare() {
     const blob = await generatePDF();
     if (!blob) {
@@ -616,13 +605,43 @@ export default function NewInvoicePage() {
         }
       }
     } else {
-      // Fallback: download the PDF
       handleDownloadPDF();
     }
   }
 
   const inputClass = "w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]";
   const labelClass = "mb-1.5 block text-sm text-[var(--text-3)]";
+
+  // Build invoice data for preview
+  const invoicePreviewData: InvoiceData = {
+    invoice_number: `INV/${organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-...`,
+    date: invoiceDate,
+    due_date: dueDate,
+    company_name: organization.name || '',
+    company_address: (org.address as string) || '',
+    company_phone: (org.phone as string) || '',
+    company_email: user?.email || '',
+    bank_name: paymentMethod === 'bank_transfer' ? bankName : undefined,
+    bank_branch: paymentMethod === 'bank_transfer' ? bankBranch : undefined,
+    bank_account_name: paymentMethod === 'bank_transfer' ? bankAccountName : undefined,
+    bank_account_number: paymentMethod === 'bank_transfer' ? bankAccountNumber : undefined,
+    customer_name: selectedCustomer?.name || '',
+    customer_address: selectedCustomer?.address || '',
+    customer_phone: selectedCustomer?.phone || '',
+    items: lineItems.filter(i => i.description).map(i => ({
+      description: i.description,
+      quantity: i.quantity,
+      unit_price: i.unit_price,
+      total: i.total_price,
+    })),
+    subtotal,
+    tax_rate: lineItems[0]?.tax_rate || 0.10,
+    tax_amount: taxTotal,
+    grand_total: grandTotal,
+    currency,
+    notes: invoiceNotes || undefined,
+    status: 'draft',
+  };
 
   return (
     <div className="flex min-h-[calc(100vh-80px)] flex-col p-4">
@@ -662,211 +681,25 @@ export default function NewInvoicePage() {
             <h2 className="text-base font-medium text-[var(--text-1)]">Choose Invoice Template</h2>
             <p className="text-sm text-[var(--text-3)]">Select a style for your invoice PDF</p>
             <div className="grid grid-cols-2 gap-3">
-              {/* Classic */}
-              <button
-                onClick={() => { setSelectedTemplate('classic'); setStep(1); }}
-                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                  selectedTemplate === 'classic' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
-                }`}
-              >
-                <div className="h-[160px] w-full overflow-hidden bg-white relative">
-                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                    <div style={{ background: '#000', color: '#fff', padding: '20px 24px', fontSize: '18px', fontWeight: 700 }}>BIZPOCKET CO.</div>
-                    <div style={{ padding: '16px 24px' }}>
-                      <div style={{ fontSize: '11px', color: '#666', marginBottom: '12px' }}>INVOICE #INV/BIZ/260330-0001</div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#666', marginBottom: '14px' }}>
-                        <div><b style={{ color: '#000' }}>Bill To:</b><br/>Customer Corp<br/>Tokyo, Japan</div>
-                        <div style={{ textAlign: 'right' }}><b style={{ color: '#000' }}>Date:</b> 2026-03-30<br/><b style={{ color: '#000' }}>Due:</b> 2026-04-29</div>
-                      </div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
-                        <thead><tr style={{ background: '#000', color: '#fff' }}>
-                          <th style={{ padding: '6px 8px', textAlign: 'left' }}>Description</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Qty</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Price</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Total</th>
-                        </tr></thead>
-                        <tbody>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '6px 8px' }}>Used Vehicle — Toyota Hiace</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td></tr>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '6px 8px' }}>Shipping & Export</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td></tr>
-                        </tbody>
-                      </table>
-                      <div style={{ textAlign: 'right', fontSize: '10px', marginTop: '8px', borderTop: '2px solid #000', paddingTop: '6px' }}><b>Total: ¥970,000</b></div>
+              {Object.entries(TEMPLATES).map(([key, tpl]) => (
+                <button
+                  key={key}
+                  onClick={() => { setSelectedTemplate(key); setStep(1); }}
+                  className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
+                    selectedTemplate === key ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
+                  }`}
+                >
+                  <div className="h-[160px] w-full overflow-hidden bg-white relative">
+                    <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
+                      <tpl.Component data={invoicePreviewData} />
                     </div>
                   </div>
-                </div>
-                <div className="p-3 border-t border-[#E5E5E5]">
-                  <p className="text-sm font-medium text-[var(--text-1)]">Classic</p>
-                  <p className="text-xs text-[var(--text-4)]">Clean, traditional layout</p>
-                </div>
-              </button>
-
-              {/* Modern */}
-              <button
-                onClick={() => { setSelectedTemplate('modern'); setStep(1); }}
-                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                  selectedTemplate === 'modern' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
-                }`}
-              >
-                <div className="h-[160px] w-full overflow-hidden bg-white relative">
-                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                    <div style={{ background: '#4F46E5', color: '#fff', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: '20px', fontWeight: 700 }}>INVOICE</div>
-                      <div style={{ textAlign: 'right', fontSize: '11px' }}>BizPocket Co.<br/>#INV/BIZ/260330</div>
-                    </div>
-                    <div style={{ padding: '16px 24px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#666', marginBottom: '14px' }}>
-                        <div><b style={{ color: '#000' }}>Bill To:</b><br/>Customer Corp</div>
-                        <div style={{ textAlign: 'right' }}>Date: 2026-03-30<br/>Due: 2026-04-29</div>
-                      </div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
-                        <thead><tr style={{ background: '#4F46E5', color: '#fff' }}>
-                          <th style={{ padding: '6px 8px', textAlign: 'left' }}>Item</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Qty</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Rate</th>
-                          <th style={{ padding: '6px 8px', textAlign: 'right' }}>Amount</th>
-                        </tr></thead>
-                        <tbody>
-                          <tr style={{ background: '#F8F8FF' }}><td style={{ padding: '6px 8px' }}>Toyota Hiace 2024</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥850,000</td></tr>
-                          <tr><td style={{ padding: '6px 8px' }}>Export Handling</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>1</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '6px 8px', textAlign: 'right' }}>¥120,000</td></tr>
-                        </tbody>
-                      </table>
-                      <div style={{ textAlign: 'right', fontSize: '11px', marginTop: '8px', color: '#4F46E5', fontWeight: 700 }}>Total: ¥970,000</div>
-                    </div>
+                  <div className="p-3 border-t border-[#E5E5E5]">
+                    <p className="text-sm font-medium text-[var(--text-1)]">{tpl.name}</p>
+                    <p className="text-xs text-[var(--text-4)]">{tpl.description}</p>
                   </div>
-                </div>
-                <div className="p-3 border-t border-[#E5E5E5]">
-                  <p className="text-sm font-medium text-[var(--text-1)]">Modern</p>
-                  <p className="text-xs text-[var(--text-4)]">Bold indigo typography</p>
-                </div>
-              </button>
-
-              {/* Japanese Style */}
-              <button
-                onClick={() => { setSelectedTemplate('japanese'); setStep(1); }}
-                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                  selectedTemplate === 'japanese' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
-                }`}
-              >
-                <div className="h-[160px] w-full overflow-hidden bg-white relative">
-                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                    <div style={{ borderTop: '4px solid #000', padding: '20px 24px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '28px', fontWeight: 700, letterSpacing: '0.2em' }}>請求書</div>
-                      <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>INVOICE</div>
-                    </div>
-                    <div style={{ padding: '0 24px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '12px' }}>
-                        <div><b>御中:</b> Customer Corp 様</div>
-                        <div style={{ textAlign: 'right' }}>請求日: 2026/03/30<br/>支払期限: 2026/04/29</div>
-                      </div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #000' }}>
-                        <thead><tr style={{ background: '#f5f5f5' }}>
-                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'left' }}>品名</th>
-                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>数量</th>
-                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>単価</th>
-                          <th style={{ padding: '5px', border: '1px solid #000', textAlign: 'right' }}>金額</th>
-                        </tr></thead>
-                        <tbody>
-                          <tr><td style={{ padding: '5px', border: '1px solid #ddd' }}>中古車 トヨタ ハイエース</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>1</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '5px', border: '1px solid #ddd', textAlign: 'right' }}>¥850,000</td></tr>
-                        </tbody>
-                      </table>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 700 }}>合計: ¥850,000</div>
-                        <div style={{ width: '50px', height: '50px', border: '2px solid #DC2626', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626', fontSize: '10px', fontWeight: 700 }}>印</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 border-t border-[#E5E5E5]">
-                  <p className="text-sm font-medium text-[var(--text-1)]">Japanese Style</p>
-                  <p className="text-xs text-[var(--text-4)]">請求書 format with seal</p>
-                </div>
-              </button>
-
-              {/* Compact */}
-              <button
-                onClick={() => { setSelectedTemplate('compact'); setStep(1); }}
-                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                  selectedTemplate === 'compact' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
-                }`}
-              >
-                <div className="h-[160px] w-full overflow-hidden bg-white relative">
-                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                    <div style={{ borderTop: '3px solid #16A34A', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700 }}>INVOICE</div>
-                      <div style={{ fontSize: '9px', color: '#666' }}>#INV/BIZ/260330 · 2026-03-30</div>
-                    </div>
-                    <div style={{ padding: '0 24px', fontSize: '9px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#666' }}>
-                        <div><b style={{ color: '#000' }}>From:</b> BizPocket Co.</div>
-                        <div><b style={{ color: '#000' }}>To:</b> Customer Corp</div>
-                      </div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
-                        <thead><tr style={{ borderBottom: '1px solid #16A34A' }}>
-                          <th style={{ padding: '4px 6px', textAlign: 'left', color: '#16A34A' }}>Item</th>
-                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Qty</th>
-                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Price</th>
-                          <th style={{ padding: '4px 6px', textAlign: 'right', color: '#16A34A' }}>Total</th>
-                        </tr></thead>
-                        <tbody>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Toyota Hiace</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥850,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥850,000</td></tr>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Shipping</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥120,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥120,000</td></tr>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '3px 6px' }}>Insurance</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>1</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥45,000</td><td style={{ padding: '3px 6px', textAlign: 'right' }}>¥45,000</td></tr>
-                        </tbody>
-                      </table>
-                      <div style={{ textAlign: 'right', marginTop: '6px', fontWeight: 700, color: '#16A34A', fontSize: '10px' }}>Total: ¥1,015,000</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 border-t border-[#E5E5E5]">
-                  <p className="text-sm font-medium text-[var(--text-1)]">Compact</p>
-                  <p className="text-xs text-[var(--text-4)]">Dense, more items per page</p>
-                </div>
-              </button>
-
-              {/* Export */}
-              <button
-                onClick={() => { setSelectedTemplate('export'); setStep(1); }}
-                className={`flex flex-col rounded-card border text-left transition-all hover:shadow-sm overflow-hidden ${
-                  selectedTemplate === 'export' ? 'border-[var(--accent)] ring-1 ring-[var(--accent)]' : 'border-[#E5E5E5] bg-white'
-                }`}
-              >
-                <div className="h-[160px] w-full overflow-hidden bg-white relative">
-                  <div style={{ transform: 'scale(0.18)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                    <div style={{ background: '#111', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ color: '#7C3AED', fontSize: '16px', fontWeight: 700 }}>EXPORT INVOICE</div>
-                      <div style={{ color: '#999', fontSize: '10px', textAlign: 'right' }}>BizPocket Co.<br/>Tokyo, Japan</div>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', background: '#f8f8f8', fontSize: '8px', padding: '6px 24px', borderBottom: '1px solid #ddd' }}>
-                      <div><b>Port:</b> Yokohama</div>
-                      <div><b>Terms:</b> FOB</div>
-                      <div><b>Vessel:</b> TBD</div>
-                      <div><b>Country:</b> UAE</div>
-                    </div>
-                    <div style={{ padding: '10px 24px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '10px' }}>
-                        <div style={{ width: '48%' }}><b>Shipper:</b><br/>BizPocket Co.<br/>Tokyo, Japan</div>
-                        <div style={{ width: '48%' }}><b>Consignee:</b><br/>Al-Rashid Motors<br/>Dubai, UAE</div>
-                      </div>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
-                        <thead><tr style={{ background: '#7C3AED', color: '#fff' }}>
-                          <th style={{ padding: '5px 6px', textAlign: 'left' }}>Vehicle</th>
-                          <th style={{ padding: '5px 6px', textAlign: 'left' }}>Chassis</th>
-                          <th style={{ padding: '5px 6px', textAlign: 'right' }}>Price</th>
-                        </tr></thead>
-                        <tbody>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '4px 6px' }}>Toyota Hiace 2024</td><td style={{ padding: '4px 6px' }}>GDH-303</td><td style={{ padding: '4px 6px', textAlign: 'right' }}>$7,200</td></tr>
-                          <tr style={{ borderBottom: '1px solid #eee' }}><td style={{ padding: '4px 6px' }}>Suzuki Carry 2023</td><td style={{ padding: '4px 6px' }}>DA16T-K</td><td style={{ padding: '4px 6px', textAlign: 'right' }}>$3,800</td></tr>
-                        </tbody>
-                      </table>
-                      <div style={{ textAlign: 'right', marginTop: '6px', fontWeight: 700, color: '#7C3AED', fontSize: '10px' }}>Total: $11,000</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 border-t border-[#E5E5E5]">
-                  <p className="text-sm font-medium text-[var(--text-1)]">Export</p>
-                  <p className="text-xs text-[var(--text-4)]">International trade format</p>
-                </div>
-              </button>
+                </button>
+              ))}
             </div>
 
             {/* Invoice Type Selector */}
@@ -904,27 +737,11 @@ export default function NewInvoicePage() {
         {step === 1 && (
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.customer')}</h2>
-
-            {/* Search */}
-            <input
-              value={customerSearch}
-              onChange={(e) => setCustomerSearch(e.target.value)}
-              className={inputClass}
-              placeholder={t('invoices.select_customer')}
-            />
-
-            {/* Customer List */}
+            <input value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} className={inputClass} placeholder={t('invoices.select_customer')} />
             <div className="max-h-[280px] space-y-2 overflow-y-auto">
               {filteredCustomers.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedCustomerId(c.id)}
-                  className={`w-full rounded-card border p-3.5 text-left transition-all ${
-                    selectedCustomerId === c.id
-                      ? 'border-[var(--accent)] bg-[var(--accent-light)]'
-                      : 'border-[var(--card-border)] bg-[var(--card-bg)] hover:border-[var(--border-strong)]'
-                  }`}
-                >
+                <button key={c.id} onClick={() => setSelectedCustomerId(c.id)}
+                  className={`w-full rounded-card border p-3.5 text-left transition-all ${selectedCustomerId === c.id ? 'border-[var(--accent)] bg-[var(--accent-light)]' : 'border-[var(--card-border)] bg-[var(--card-bg)] hover:border-[var(--border-strong)]'}`}>
                   <p className="text-sm font-medium text-[var(--text-1)]">{c.name}</p>
                   {c.email && <p className="text-xs text-[var(--text-4)]">{c.email}</p>}
                   {c.phone && <p className="text-xs text-[var(--text-4)]">{c.phone}</p>}
@@ -934,97 +751,24 @@ export default function NewInvoicePage() {
                 <p className="py-4 text-center text-sm text-[var(--text-4)]">No customers found</p>
               )}
             </div>
-
-            {/* Add New Customer Button */}
             {!showNewCustomer && (
-              <button
-                onClick={() => setShowNewCustomer(true)}
-                className="w-full rounded-btn border border-dashed border-[var(--accent)]/40 bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:border-[var(--accent)]"
-              >
-                + {t('invoices.new_customer')}
-              </button>
+              <button onClick={() => setShowNewCustomer(true)} className="w-full rounded-btn border border-dashed border-[var(--accent)]/40 bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:border-[var(--accent)]">+ {t('invoices.new_customer')}</button>
             )}
-
-            {/* Inline New Customer Form — Slide Up */}
             {showNewCustomer && (
               <div className="animate-slide-up space-y-3 rounded-card border border-[var(--accent)]/30 bg-[var(--card-bg)] p-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-[var(--text-1)]">{t('invoices.new_customer')}</h3>
-                  <button
-                    onClick={() => setShowNewCustomer(false)}
-                    className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]"
-                  >
-                    {t('common.cancel')}
-                  </button>
+                  <button onClick={() => setShowNewCustomer(false)} className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]">{t('common.cancel')}</button>
                 </div>
-
-                <div>
-                  <label className={labelClass}>{t('invoices.customer_name')} *</label>
-                  <input
-                    value={newCustomer.name}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
-                    className={inputClass}
-                    placeholder="Tanaka Motors"
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.company')}</label>
-                  <input
-                    value={newCustomer.company}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, company: e.target.value })}
-                    className={inputClass}
-                    placeholder="ABC Trading Co."
-                  />
-                </div>
+                <div><label className={labelClass}>{t('invoices.customer_name')} *</label><input value={newCustomer.name} onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })} className={inputClass} placeholder="Tanaka Motors" /></div>
+                <div><label className={labelClass}>{t('invoices.company')}</label><input value={newCustomer.company} onChange={(e) => setNewCustomer({ ...newCustomer, company: e.target.value })} className={inputClass} placeholder="ABC Trading Co." /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>{t('invoices.phone')}</label>
-                    <input
-                      value={newCustomer.phone}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                      className={inputClass}
-                      placeholder="090-1234-5678"
-                      type="tel"
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>{t('invoices.email')}</label>
-                    <input
-                      value={newCustomer.email}
-                      onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })}
-                      className={inputClass}
-                      placeholder="info@company.jp"
-                      type="email"
-                    />
-                  </div>
+                  <div><label className={labelClass}>{t('invoices.phone')}</label><input value={newCustomer.phone} onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })} className={inputClass} placeholder="090-1234-5678" type="tel" /></div>
+                  <div><label className={labelClass}>{t('invoices.email')}</label><input value={newCustomer.email} onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })} className={inputClass} placeholder="info@company.jp" type="email" /></div>
                 </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.address')}</label>
-                  <input
-                    value={newCustomer.address}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })}
-                    className={inputClass}
-                    placeholder="Tokyo, Minato-ku..."
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.fax')}</label>
-                  <input
-                    value={newCustomer.fax}
-                    onChange={(e) => setNewCustomer({ ...newCustomer, fax: e.target.value })}
-                    className={inputClass}
-                    placeholder="03-1234-5678"
-                    type="tel"
-                  />
-                </div>
-
-                <button
-                  onClick={handleSaveCustomer}
-                  disabled={!newCustomer.name.trim() || savingCustomer}
-                  className="w-full rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50"
-                >
-                  {savingCustomer ? t('common.loading') : t('invoices.save_customer')}
-                </button>
+                <div><label className={labelClass}>{t('invoices.address')}</label><input value={newCustomer.address} onChange={(e) => setNewCustomer({ ...newCustomer, address: e.target.value })} className={inputClass} placeholder="Tokyo, Minato-ku..." /></div>
+                <div><label className={labelClass}>{t('invoices.fax')}</label><input value={newCustomer.fax} onChange={(e) => setNewCustomer({ ...newCustomer, fax: e.target.value })} className={inputClass} placeholder="03-1234-5678" type="tel" /></div>
+                <button onClick={handleSaveCustomer} disabled={!newCustomer.name.trim() || savingCustomer} className="w-full rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50">{savingCustomer ? t('common.loading') : t('invoices.save_customer')}</button>
               </div>
             )}
           </div>
@@ -1034,115 +778,43 @@ export default function NewInvoicePage() {
         {step === 2 && (
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">Invoice Details</h2>
-
-            {/* Invoice Number Preview */}
             <div className="rounded-card border border-[var(--card-border)] bg-[var(--bg-2)] p-3">
               <p className="text-xs text-[var(--text-4)]">{t('invoices.invoice_number')}</p>
-              <p className="font-mono text-sm font-medium text-[var(--text-1)]">
-                INV/{organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/Auto
-              </p>
+              <p className="font-mono text-sm font-medium text-[var(--text-1)]">INV/{organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/Auto</p>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelClass}>{t('invoices.invoice_date')}</label>
-                <input
-                  type="date"
-                  value={invoiceDate}
-                  onChange={(e) => setInvoiceDate(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>{t('invoices.due_date')}</label>
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
+              <div><label className={labelClass}>{t('invoices.invoice_date')}</label><input type="date" value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} className={inputClass} /></div>
+              <div><label className={labelClass}>{t('invoices.due_date')}</label><input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} /></div>
             </div>
-
-            {/* Invoice Language */}
             <div>
               <label className={labelClass}>Invoice Language</label>
               <div className="flex gap-2">
                 {['en', 'ja', 'ur'].map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setInvoiceLang(l)}
-                    className={`flex-1 rounded-btn border px-3 py-2.5 text-sm transition-colors ${
-                      invoiceLang === l
-                        ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]'
-                        : 'border-[var(--border-strong)] text-[var(--text-3)]'
-                    }`}
-                  >
+                  <button key={l} type="button" onClick={() => setInvoiceLang(l)} className={`flex-1 rounded-btn border px-3 py-2.5 text-sm transition-colors ${invoiceLang === l ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]' : 'border-[var(--border-strong)] text-[var(--text-3)]'}`}>
                     {l === 'en' ? 'English' : l === 'ja' ? '日本語' : 'اردو'}
                   </button>
                 ))}
               </div>
             </div>
-
-            {/* Notes */}
-            <div>
-              <label className={labelClass}>{t('invoices.notes')}</label>
-              <textarea
-                value={invoiceNotes}
-                onChange={(e) => setInvoiceNotes(e.target.value)}
-                className={inputClass + ' min-h-[80px] resize-none'}
-                placeholder="Additional notes..."
-                rows={3}
-              />
-            </div>
-
-            {/* Transport-specific fields */}
+            <div><label className={labelClass}>{t('invoices.notes')}</label><textarea value={invoiceNotes} onChange={(e) => setInvoiceNotes(e.target.value)} className={inputClass + ' min-h-[80px] resize-none'} placeholder="Additional notes..." rows={3} /></div>
             {invoiceType === 'transport' && (
               <div className="space-y-3 rounded-card border border-[#E5E5E5] bg-[var(--bg-2)] p-4">
                 <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Shipping Details</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelClass}>Vessel / Flight</label>
-                    <input value={transportFields.vessel} onChange={(e) => setTransportFields(p => ({ ...p, vessel: e.target.value }))} className={inputClass} placeholder="MV Pacific Star" />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Shipping Terms</label>
-                    <select value={transportFields.shipping_terms} onChange={(e) => setTransportFields(p => ({ ...p, shipping_terms: e.target.value }))} className={inputClass}>
-                      <option value="FOB">FOB</option>
-                      <option value="CIF">CIF</option>
-                      <option value="CFR">CFR</option>
-                      <option value="EXW">EXW</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={labelClass}>Port of Loading</label>
-                    <input value={transportFields.port_loading} onChange={(e) => setTransportFields(p => ({ ...p, port_loading: e.target.value }))} className={inputClass} placeholder="Yokohama" />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Port of Discharge</label>
-                    <input value={transportFields.port_discharge} onChange={(e) => setTransportFields(p => ({ ...p, port_discharge: e.target.value }))} className={inputClass} placeholder="Dubai" />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Container No.</label>
-                    <input value={transportFields.container_no} onChange={(e) => setTransportFields(p => ({ ...p, container_no: e.target.value }))} className={inputClass} placeholder="MSKU1234567" />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Bill of Lading</label>
-                    <input value={transportFields.bill_of_lading} onChange={(e) => setTransportFields(p => ({ ...p, bill_of_lading: e.target.value }))} className={inputClass} placeholder="BL-2026-0001" />
-                  </div>
+                  <div><label className={labelClass}>Vessel / Flight</label><input value={transportFields.vessel} onChange={(e) => setTransportFields(p => ({ ...p, vessel: e.target.value }))} className={inputClass} placeholder="MV Pacific Star" /></div>
+                  <div><label className={labelClass}>Shipping Terms</label><select value={transportFields.shipping_terms} onChange={(e) => setTransportFields(p => ({ ...p, shipping_terms: e.target.value }))} className={inputClass}><option value="FOB">FOB</option><option value="CIF">CIF</option><option value="CFR">CFR</option><option value="EXW">EXW</option></select></div>
+                  <div><label className={labelClass}>Port of Loading</label><input value={transportFields.port_loading} onChange={(e) => setTransportFields(p => ({ ...p, port_loading: e.target.value }))} className={inputClass} placeholder="Yokohama" /></div>
+                  <div><label className={labelClass}>Port of Discharge</label><input value={transportFields.port_discharge} onChange={(e) => setTransportFields(p => ({ ...p, port_discharge: e.target.value }))} className={inputClass} placeholder="Dubai" /></div>
+                  <div><label className={labelClass}>Container No.</label><input value={transportFields.container_no} onChange={(e) => setTransportFields(p => ({ ...p, container_no: e.target.value }))} className={inputClass} placeholder="MSKU1234567" /></div>
+                  <div><label className={labelClass}>Bill of Lading</label><input value={transportFields.bill_of_lading} onChange={(e) => setTransportFields(p => ({ ...p, bill_of_lading: e.target.value }))} className={inputClass} placeholder="BL-2026-0001" /></div>
                 </div>
               </div>
             )}
-
-            {/* Selected Customer Card */}
             {selectedCustomer && (
               <div className="rounded-card border border-[var(--accent)]/20 bg-[var(--accent-light)] p-3">
                 <p className="text-xs text-[var(--text-4)]">Bill To</p>
                 <p className="text-sm font-medium text-[var(--text-1)]">{selectedCustomer.name}</p>
-                {selectedCustomer.address && (
-                  <p className="text-xs text-[var(--text-3)]">{selectedCustomer.address}</p>
-                )}
+                {selectedCustomer.address && <p className="text-xs text-[var(--text-3)]">{selectedCustomer.address}</p>}
               </div>
             )}
           </div>
@@ -1155,32 +827,19 @@ export default function NewInvoicePage() {
               <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.items')}</h2>
               <div className="flex gap-2">
                 {(templates.length > 0 || cycleItems.length > 0) && (
-                  <button
-                    onClick={() => setShowTemplates(!showTemplates)}
-                    className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-xs text-[var(--text-3)] hover:text-[var(--text-1)]"
-                  >
-                    {t('invoices.from_templates')}
-                  </button>
+                  <button onClick={() => setShowTemplates(!showTemplates)} className="rounded-btn border border-[var(--border-strong)] px-3 py-1.5 text-xs text-[var(--text-3)] hover:text-[var(--text-1)]">{t('invoices.from_templates')}</button>
                 )}
               </div>
             </div>
-
-            {/* Templates & Inventory Picker */}
             {showTemplates && (
               <div className="animate-slide-up space-y-2 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3">
                 {templates.length > 0 && (
                   <>
                     <p className="text-xs font-medium text-[var(--text-3)]">{t('invoices.from_templates')}</p>
                     {templates.map((tpl) => (
-                      <button
-                        key={tpl.id}
-                        onClick={() => addFromTemplate(tpl)}
-                        className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]"
-                      >
+                      <button key={tpl.id} onClick={() => addFromTemplate(tpl)} className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]">
                         <p className="text-sm text-[var(--text-1)]">{tpl.name}</p>
-                        <p className="font-mono text-xs text-[var(--text-4)]">
-                          {formatCurrency(tpl.default_price, currency)} · Tax {(tpl.default_tax_rate * 100).toFixed(0)}%
-                        </p>
+                        <p className="font-mono text-xs text-[var(--text-4)]">{formatCurrency(tpl.default_price, currency)} · Tax {(tpl.default_tax_rate * 100).toFixed(0)}%</p>
                       </button>
                     ))}
                   </>
@@ -1189,215 +848,67 @@ export default function NewInvoicePage() {
                   <>
                     <p className="text-xs font-medium text-[var(--text-3)] mt-2">From Inventory</p>
                     {cycleItems.map((ci, idx) => (
-                      <button
-                        key={`ci-${idx}`}
-                        onClick={() => {
-                          setLineItems((prev) => [
-                            ...prev,
-                            calcLineItem({
-                              line_number: prev.length + 1,
-                              description: ci.name,
-                              quantity: 1,
-                              unit_price: ci.sale_price || ci.purchase_price || 0,
-                              tax_rate: 0.10,
-                              tax_amount: 0,
-                              total_price: 0,
-                            }),
-                          ]);
-                          setShowTemplates(false);
-                        }}
-                        className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]"
-                      >
+                      <button key={`ci-${idx}`} onClick={() => { setLineItems((prev) => [...prev, calcLineItem({ line_number: prev.length + 1, description: ci.name, quantity: 1, unit_price: ci.sale_price || ci.purchase_price || 0, tax_rate: 0.10, tax_amount: 0, total_price: 0 })]); setShowTemplates(false); }} className="w-full rounded-input border border-[var(--card-border)] bg-[var(--bg)] p-2.5 text-left transition-all hover:border-[var(--accent)]">
                         <p className="text-sm text-[var(--text-1)]">{ci.name}</p>
-                        <p className="font-mono text-xs text-[var(--text-4)]">
-                          {formatCurrency(ci.sale_price || ci.purchase_price || 0, currency)}
-                          {ci.category ? ` · ${ci.category}` : ''}
-                        </p>
+                        <p className="font-mono text-xs text-[var(--text-4)]">{formatCurrency(ci.sale_price || ci.purchase_price || 0, currency)}{ci.category ? ` · ${ci.category}` : ''}</p>
                       </button>
                     ))}
                   </>
                 )}
               </div>
             )}
-
-            {/* Line Items */}
             <div className="space-y-3">
               {lineItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="relative overflow-hidden rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3.5"
-                  onTouchStart={(e) => handleTouchStart(e, idx)}
-                  onTouchEnd={(e) => handleTouchEnd(e, idx)}
-                >
-                  {/* Swipe delete indicator */}
-                  {swipingIdx === idx && lineItems.length > 1 && (
-                    <div className="absolute right-0 top-0 flex h-full items-center bg-[var(--red)] px-4">
-                      <span className="text-xs font-medium text-white">{t('common.delete')}</span>
-                    </div>
-                  )}
-
+                <div key={idx} className="relative overflow-hidden rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3.5" onTouchStart={(e) => handleTouchStart(e, idx)} onTouchEnd={(e) => handleTouchEnd(e, idx)}>
+                  {swipingIdx === idx && lineItems.length > 1 && (<div className="absolute right-0 top-0 flex h-full items-center bg-[var(--red)] px-4"><span className="text-xs font-medium text-white">{t('common.delete')}</span></div>)}
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-[var(--text-4)]">#{idx + 1}</span>
-                    {lineItems.length > 1 && (
-                      <button
-                        onClick={() => removeLineItem(idx)}
-                        className="text-xs text-[var(--red)] hover:opacity-80"
-                      >
-                        {t('common.delete')}
-                      </button>
-                    )}
+                    {lineItems.length > 1 && (<button onClick={() => removeLineItem(idx)} className="text-xs text-[var(--red)] hover:opacity-80">{t('common.delete')}</button>)}
                   </div>
-
-                  <input
-                    value={item.description}
-                    onChange={(e) => updateLineItem(idx, 'description', e.target.value)}
-                    placeholder={t('invoices.description')}
-                    className={inputClass + ' mb-2'}
-                  />
-
+                  <input value={item.description} onChange={(e) => updateLineItem(idx, 'description', e.target.value)} placeholder={t('invoices.description')} className={inputClass + ' mb-2'} />
                   <div className="mb-2 grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="mb-1 block text-[10px] text-[var(--text-4)]">{t('invoices.quantity')}</label>
-                      <input
-                        type="number"
-                        value={item.quantity || ''}
-                        onChange={(e) => updateLineItem(idx, 'quantity', parseInt(e.target.value) || 0)}
-                        className={inputClass + ' font-mono'}
-                        min="1"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-[10px] text-[var(--text-4)]">{t('invoices.unit_price')}</label>
-                      <input
-                        type="number"
-                        value={item.unit_price || ''}
-                        onChange={(e) => updateLineItem(idx, 'unit_price', parseInt(e.target.value) || 0)}
-                        className={inputClass + ' font-mono'}
-                        min="0"
-                      />
-                    </div>
+                    <div><label className="mb-1 block text-[10px] text-[var(--text-4)]">{t('invoices.quantity')}</label><input type="number" value={item.quantity || ''} onChange={(e) => updateLineItem(idx, 'quantity', parseInt(e.target.value) || 0)} className={inputClass + ' font-mono'} min="1" /></div>
+                    <div><label className="mb-1 block text-[10px] text-[var(--text-4)]">{t('invoices.unit_price')}</label><input type="number" value={item.unit_price || ''} onChange={(e) => updateLineItem(idx, 'unit_price', parseInt(e.target.value) || 0)} className={inputClass + ' font-mono'} min="0" /></div>
                   </div>
-
-                  {/* Tax Rate Toggle */}
                   <div className="mb-2 flex gap-1.5">
                     {TAX_RATES.map((rate) => (
-                      <button
-                        key={rate.value}
-                        onClick={() => updateLineItem(idx, 'tax_rate', rate.value)}
-                        className={`flex-1 rounded-btn border py-1.5 text-xs transition-colors ${
-                          item.tax_rate === rate.value
-                            ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]'
-                            : 'border-[var(--border)] text-[var(--text-4)]'
-                        }`}
-                      >
-                        Tax {rate.label}
-                      </button>
+                      <button key={rate.value} onClick={() => updateLineItem(idx, 'tax_rate', rate.value)} className={`flex-1 rounded-btn border py-1.5 text-xs transition-colors ${item.tax_rate === rate.value ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]' : 'border-[var(--border)] text-[var(--text-4)]'}`}>Tax {rate.label}</button>
                     ))}
                   </div>
-
-                  {/* Per-item Discount */}
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs text-[var(--text-4)]">Discount %</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={item.discount_percent || ''}
-                      onChange={(e) => updateLineItem(idx, 'discount_percent', parseFloat(e.target.value) || 0)}
-                      placeholder="0"
-                      className="w-20 rounded-input border border-[var(--border)] bg-[var(--bg-2)] px-2 py-1.5 text-xs text-[var(--text-3)] text-center"
-                    />
-                    {(item.discount_percent || 0) > 0 && (
-                      <span className="text-xs text-[#16A34A]">-{formatCurrency(Math.round(item.quantity * item.unit_price * (item.discount_percent || 0) / 100), currency)}</span>
-                    )}
+                    <input type="number" min="0" max="100" value={item.discount_percent || ''} onChange={(e) => updateLineItem(idx, 'discount_percent', parseFloat(e.target.value) || 0)} placeholder="0" className="w-20 rounded-input border border-[var(--border)] bg-[var(--bg-2)] px-2 py-1.5 text-xs text-[var(--text-3)] text-center" />
+                    {(item.discount_percent || 0) > 0 && (<span className="text-xs text-[#16A34A]">-{formatCurrency(Math.round(item.quantity * item.unit_price * (item.discount_percent || 0) / 100), currency)}</span>)}
                   </div>
-
-                  {/* Chassis No (optional) */}
-                  <input
-                    value={item.chassis_no || ''}
-                    onChange={(e) => updateLineItem(idx, 'chassis_no', e.target.value)}
-                    placeholder={t('invoices.chassis_no') + ' (optional)'}
-                    className="w-full rounded-input border border-[var(--border)] bg-[var(--bg-2)] px-3 py-2 text-xs text-[var(--text-3)] placeholder-[var(--text-4)]"
-                  />
-
-                  {/* Line Total */}
+                  <input value={item.chassis_no || ''} onChange={(e) => updateLineItem(idx, 'chassis_no', e.target.value)} placeholder={t('invoices.chassis_no') + ' (optional)'} className="w-full rounded-input border border-[var(--border)] bg-[var(--bg-2)] px-3 py-2 text-xs text-[var(--text-3)] placeholder-[var(--text-4)]" />
                   <div className="mt-2 flex justify-between border-t border-[var(--border)] pt-2">
-                    <span className="text-xs text-[var(--text-4)]">
-                      Tax: {formatCurrency(item.tax_amount, currency)}
-                    </span>
-                    <span className="font-mono text-sm font-medium text-[var(--text-1)]">
-                      {formatCurrency(item.total_price, currency)}
-                    </span>
+                    <span className="text-xs text-[var(--text-4)]">Tax: {formatCurrency(item.tax_amount, currency)}</span>
+                    <span className="font-mono text-sm font-medium text-[var(--text-1)]">{formatCurrency(item.total_price, currency)}</span>
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Add Item Button */}
-            <button
-              onClick={addLineItem}
-              className="w-full rounded-btn border border-dashed border-[var(--accent)]/40 bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:border-[var(--accent)]"
-            >
-              + {t('invoices.add_item')}
-            </button>
-
-            {/* Overall Discount */}
+            <button onClick={addLineItem} className="w-full rounded-btn border border-dashed border-[var(--accent)]/40 bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:border-[var(--accent)]">+ {t('invoices.add_item')}</button>
             <div className="rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3.5">
               <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Overall Discount</label>
               <div className="flex gap-2 mt-2">
                 {(['none', 'percent', 'fixed'] as const).map((dt) => (
-                  <button
-                    key={dt}
-                    type="button"
-                    onClick={() => { setDiscountType(dt); if (dt === 'none') setDiscountValue(0); }}
-                    className={`flex-1 rounded-btn border py-2 text-xs font-medium transition-colors ${
-                      discountType === dt
-                        ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]'
-                        : 'border-[#E5E5E5] text-[var(--text-3)]'
-                    }`}
-                  >
-                    {dt === 'none' ? 'None' : dt === 'percent' ? '% Off' : `${currency} Off`}
-                  </button>
+                  <button key={dt} type="button" onClick={() => { setDiscountType(dt); if (dt === 'none') setDiscountValue(0); }} className={`flex-1 rounded-btn border py-2 text-xs font-medium transition-colors ${discountType === dt ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]' : 'border-[#E5E5E5] text-[var(--text-3)]'}`}>{dt === 'none' ? 'None' : dt === 'percent' ? '% Off' : `${currency} Off`}</button>
                 ))}
               </div>
               {discountType !== 'none' && (
                 <div className="flex items-center gap-2 mt-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={discountValue || ''}
-                    onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
-                    placeholder={discountType === 'percent' ? '10' : '5000'}
-                    className="w-24 rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text-1)]"
-                  />
+                  <input type="number" min="0" value={discountValue || ''} onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)} placeholder={discountType === 'percent' ? '10' : '5000'} className="w-24 rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text-1)]" />
                   <span className="text-xs text-[var(--text-3)]">{discountType === 'percent' ? '%' : currency}</span>
-                  {overallDiscountAmount > 0 && (
-                    <span className="text-xs text-[#16A34A]">-{formatCurrency(overallDiscountAmount, currency)}</span>
-                  )}
+                  {overallDiscountAmount > 0 && (<span className="text-xs text-[#16A34A]">-{formatCurrency(overallDiscountAmount, currency)}</span>)}
                 </div>
               )}
             </div>
-
-            {/* Totals Summary */}
             <div className="space-y-1.5 border-t border-[var(--border)] pt-3">
-              <div className="flex justify-between text-xs text-[var(--text-3)]">
-                <span>Subtotal</span>
-                <span className="font-mono">{formatCurrency(subtotal, currency)}</span>
-              </div>
-              {(itemDiscountTotal + overallDiscountAmount) > 0 && (
-                <div className="flex justify-between text-xs text-[#16A34A]">
-                  <span>Discount</span>
-                  <span className="font-mono">-{formatCurrency(itemDiscountTotal + overallDiscountAmount, currency)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-xs text-[var(--text-3)]">
-                <span>Tax</span>
-                <span className="font-mono">{formatCurrency(taxTotal, currency)}</span>
-              </div>
-              <div className="flex justify-between text-sm font-semibold text-[var(--text-1)]">
-                <span>Total</span>
-                <span className="font-mono">{formatCurrency(grandTotal, currency)}</span>
-              </div>
+              <div className="flex justify-between text-xs text-[var(--text-3)]"><span>Subtotal</span><span className="font-mono">{formatCurrency(subtotal, currency)}</span></div>
+              {(itemDiscountTotal + overallDiscountAmount) > 0 && (<div className="flex justify-between text-xs text-[#16A34A]"><span>Discount</span><span className="font-mono">-{formatCurrency(itemDiscountTotal + overallDiscountAmount, currency)}</span></div>)}
+              <div className="flex justify-between text-xs text-[var(--text-3)]"><span>Tax</span><span className="font-mono">{formatCurrency(taxTotal, currency)}</span></div>
+              <div className="flex justify-between text-sm font-semibold text-[var(--text-1)]"><span>Total</span><span className="font-mono">{formatCurrency(grandTotal, currency)}</span></div>
             </div>
           </div>
         )}
@@ -1407,82 +918,33 @@ export default function NewInvoicePage() {
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.bank_details')}</h2>
             <p className="text-xs text-[var(--text-4)]">Payment destination for your customer</p>
-
-            {/* Payment Method Selector */}
             <div>
               <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Payment Method</label>
               <div className="grid grid-cols-3 gap-2 mt-2">
-                {[
-                  { key: 'bank_transfer', label: 'Bank Transfer' },
-                  { key: 'cash', label: 'Cash' },
-                  { key: 'credit_card', label: 'Credit Card' },
-                ].map((m) => (
-                  <button
-                    key={m.key}
-                    type="button"
-                    onClick={() => setPaymentMethod(m.key)}
-                    className={`rounded-lg border py-2 text-xs font-medium transition-colors ${
-                      paymentMethod === m.key
-                        ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]'
-                        : 'border-[#E5E5E5] text-[var(--text-3)]'
-                    }`}
-                  >
-                    {m.label}
-                  </button>
+                {[{ key: 'bank_transfer', label: 'Bank Transfer' }, { key: 'cash', label: 'Cash' }, { key: 'credit_card', label: 'Credit Card' }].map((m) => (
+                  <button key={m.key} type="button" onClick={() => setPaymentMethod(m.key)} className={`rounded-lg border py-2 text-xs font-medium transition-colors ${paymentMethod === m.key ? 'border-[#4F46E5] bg-[#4F46E5]/5 text-[#4F46E5]' : 'border-[#E5E5E5] text-[var(--text-3)]'}`}>{m.label}</button>
                 ))}
               </div>
             </div>
-
-            {/* Bank Details — only show for bank_transfer */}
             {paymentMethod === 'bank_transfer' && (
               <>
-                <div>
-                  <label className={labelClass}>{t('invoices.bank_name')}</label>
-                  <input value={bankName} onChange={(e) => setBankName(e.target.value)} className={inputClass} placeholder="MUFG Bank" />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.bank_branch')}</label>
-                  <input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} className={inputClass} placeholder="Shibuya Branch" />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.bank_account_name')}</label>
-                  <input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className={inputClass} placeholder="MS Dynamics LLC" />
-                </div>
-                <div>
-                  <label className={labelClass}>{t('invoices.bank_account_number')}</label>
-                  <input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)} className={inputClass} placeholder="1234567" />
-                </div>
+                <div><label className={labelClass}>{t('invoices.bank_name')}</label><input value={bankName} onChange={(e) => setBankName(e.target.value)} className={inputClass} placeholder="MUFG Bank" /></div>
+                <div><label className={labelClass}>{t('invoices.bank_branch')}</label><input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} className={inputClass} placeholder="Shibuya Branch" /></div>
+                <div><label className={labelClass}>{t('invoices.bank_account_name')}</label><input value={bankAccountName} onChange={(e) => setBankAccountName(e.target.value)} className={inputClass} placeholder="MS Dynamics LLC" /></div>
+                <div><label className={labelClass}>{t('invoices.bank_account_number')}</label><input value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)} className={inputClass} placeholder="1234567" /></div>
                 <div>
                   <label className={labelClass}>{t('invoices.bank_account_type')}</label>
                   <div className="flex gap-2">
                     {['Futsu', 'Touza'].map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setBankAccountType(type)}
-                        className={`flex-1 rounded-btn border py-2.5 text-sm transition-colors ${
-                          bankAccountType === type
-                            ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]'
-                            : 'border-[var(--border-strong)] text-[var(--text-3)]'
-                        }`}
-                      >
-                        {type === 'Futsu' ? '普通 (Futsu)' : '当座 (Touza)'}
-                      </button>
+                      <button key={type} onClick={() => setBankAccountType(type)} className={`flex-1 rounded-btn border py-2.5 text-sm transition-colors ${bankAccountType === type ? 'border-[var(--accent)] bg-[var(--accent-light)] font-medium text-[var(--accent)]' : 'border-[var(--border-strong)] text-[var(--text-3)]'}`}>{type === 'Futsu' ? '普通 (Futsu)' : '当座 (Touza)'}</button>
                     ))}
                   </div>
                 </div>
               </>
             )}
-
-            {/* Disclaimer Section */}
             <div className="mt-4">
               <label className="text-xs font-medium text-[var(--text-4)] uppercase tracking-wider">Disclaimer / Policy (optional)</label>
-              <textarea
-                value={disclaimer}
-                onChange={(e) => setDisclaimer(e.target.value)}
-                placeholder="e.g., All sales are final. Returns accepted within 7 days with receipt."
-                rows={3}
-                className={inputClass + ' mt-2'}
-              />
+              <textarea value={disclaimer} onChange={(e) => setDisclaimer(e.target.value)} placeholder="e.g., All sales are final. Returns accepted within 7 days with receipt." rows={3} className={inputClass + ' mt-2'} />
               <p className="text-[10px] text-[var(--text-4)] mt-1">This will be saved and appear on all future invoices</p>
             </div>
           </div>
@@ -1492,162 +954,26 @@ export default function NewInvoicePage() {
         {step === 5 && (
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">{t('invoices.preview')}</h2>
-
-            {/* A4 Preview Card */}
-            <div id="invoice-preview" className="rounded-card border border-[var(--card-border)] bg-white p-5">
-              {/* Header */}
-              <div className="mb-6 flex justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{organization.name}</h3>
-                </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-gray-900">INVOICE</p>
-                  <p className="font-mono text-xs text-gray-500">
-                    INV/{organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/...
-                  </p>
-                  <p className="text-xs text-gray-500">{invoiceDate}</p>
-                </div>
-              </div>
-
-              {/* Bill To */}
-              {selectedCustomer && (
-                <div className="mb-6 rounded bg-gray-50 p-3">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Bill To</p>
-                  <p className="text-sm font-medium text-gray-900">{selectedCustomer.name}</p>
-                  {selectedCustomer.address && (
-                    <p className="whitespace-pre-line text-xs text-gray-600">{selectedCustomer.address}</p>
-                  )}
-                  {selectedCustomer.email && (
-                    <p className="text-xs text-gray-600">{selectedCustomer.email}</p>
-                  )}
-                </div>
-              )}
-
-              {/* Items Table */}
-              <table className="mb-4 w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="py-2 text-[10px] font-medium uppercase tracking-wider text-gray-400">S.No</th>
-                    <th className="py-2 text-[10px] font-medium uppercase tracking-wider text-gray-400">Particulars</th>
-                    <th className="py-2 text-right text-[10px] font-medium uppercase tracking-wider text-gray-400">Qty</th>
-                    <th className="py-2 text-right text-[10px] font-medium uppercase tracking-wider text-gray-400">Unit {currency === 'JPY' ? '¥' : '$'}</th>
-                    <th className="py-2 text-right text-[10px] font-medium uppercase tracking-wider text-gray-400">Total {currency === 'JPY' ? '¥' : '$'}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lineItems.filter((i) => i.description).map((item, idx) => (
-                    <tr key={idx} className="border-b border-gray-100">
-                      <td className="py-2 font-mono text-gray-600">{idx + 1}</td>
-                      <td className="py-2 text-gray-900">
-                        {item.description}
-                        {item.chassis_no && (
-                          <span className="ml-1 text-[10px] text-gray-400">[{item.chassis_no}]</span>
-                        )}
-                      </td>
-                      <td className="py-2 text-right font-mono text-gray-600">{item.quantity}</td>
-                      <td className="py-2 text-right font-mono text-gray-600">{formatCurrency(item.unit_price, currency)}</td>
-                      <td className="py-2 text-right font-mono font-medium text-gray-900">{formatCurrency(item.total_price, currency)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Totals */}
-              <div className="ml-auto w-48 space-y-1 border-t border-gray-200 pt-3">
-                <div className="flex justify-between text-xs text-gray-600">
-                  <span>Subtotal</span>
-                  <span className="font-mono">{formatCurrency(subtotal, currency)}</span>
-                </div>
-                {(itemDiscountTotal + overallDiscountAmount) > 0 && (
-                  <div className="flex justify-between text-xs text-green-600">
-                    <span>Discount</span>
-                    <span className="font-mono">-{formatCurrency(itemDiscountTotal + overallDiscountAmount, currency)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-xs text-gray-600">
-                  <span>Tax</span>
-                  <span className="font-mono">{formatCurrency(taxTotal, currency)}</span>
-                </div>
-                <div className="flex justify-between border-t border-gray-300 pt-1.5 text-sm font-bold text-gray-900">
-                  <span>Grand Total</span>
-                  <span className="font-mono">{formatCurrency(grandTotal, currency)}</span>
-                </div>
-              </div>
-
-              {/* Bank Details — only in preview for bank transfer */}
-              {paymentMethod === 'bank_transfer' && bankName && (
-                <div className="mt-6 rounded bg-gray-50 p-3">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Bank Details</p>
-                  <p className="text-xs text-gray-700">{bankName} — {bankBranch}</p>
-                  <p className="text-xs text-gray-700">{bankAccountType} {bankAccountNumber}</p>
-                  <p className="text-xs text-gray-700">{bankAccountName}</p>
-                </div>
-              )}
-              {/* Payment Method (non-bank) */}
-              {paymentMethod !== 'bank_transfer' && (
-                <div className="mt-6 rounded bg-gray-50 p-3">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Payment Method</p>
-                  <p className="text-xs text-gray-700">{paymentMethod === 'cash' ? 'Cash' : 'Credit Card'}</p>
-                </div>
-              )}
-
-              {/* Notes */}
-              {invoiceNotes && (
-                <div className="mt-4">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Notes</p>
-                  <p className="text-xs text-gray-600">{invoiceNotes}</p>
-                </div>
-              )}
-
-              {/* Due Date */}
-              <div className="mt-4 text-center text-[10px] text-gray-400">
-                Payment due by {dueDate} · Generated by BizPocket
-              </div>
+            <div id="invoice-preview" className="rounded-card border border-[var(--card-border)] bg-white overflow-hidden">
+              {(() => {
+                const tpl = TEMPLATES[selectedTemplate] || TEMPLATES.classic;
+                const TemplateComponent = tpl.Component;
+                return <TemplateComponent data={invoicePreviewData} />;
+              })()}
+              {disclaimer && (<div className="px-5 pb-4 text-[10px] text-gray-500 border-t border-gray-100 pt-3 mt-2">{disclaimer}</div>)}
+              {paymentMethod !== 'bank_transfer' && (<div className="px-5 pb-4 text-[10px] text-gray-500">Payment method: {paymentMethod === 'cash' ? 'Cash' : 'Credit Card'}</div>)}
             </div>
-
-            {/* PDF & Share Buttons */}
             <div className="flex gap-2">
-              <button
-                onClick={handleDownloadPDF}
-                className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]"
-              >
-                {t('invoices.download_pdf')}
-              </button>
-              <button
-                onClick={handleShare}
-                className="flex-1 rounded-btn border border-[var(--accent)] bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:bg-[var(--accent)]  hover:text-white"
-              >
-                {t('invoices.share')}
-              </button>
+              <button onClick={handleDownloadPDF} className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]">{t('invoices.download_pdf')}</button>
+              <button onClick={handleShare} className="flex-1 rounded-btn border border-[var(--accent)] bg-[var(--accent-light)] py-3 text-sm font-medium text-[var(--accent)] transition-all hover:bg-[var(--accent)] hover:text-white">{t('invoices.share')}</button>
             </div>
-
-            {/* Save Buttons */}
             <div className="flex gap-2">
               {editId && editOriginalStatus === 'paid' ? (
-                /* Editing a paid invoice — preserve status */
-                <button
-                  onClick={() => handleSave()}
-                  disabled={saving}
-                  className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
-                >
-                  {saving ? t('common.loading') : 'Save Changes'}
-                </button>
+                <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50">{saving ? t('common.loading') : 'Save Changes'}</button>
               ) : (
                 <>
-                  <button
-                    onClick={() => handleSave('draft')}
-                    disabled={saving}
-                    className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg-2)] py-3 text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] disabled:opacity-50"
-                  >
-                    {saving ? t('common.loading') : t('invoices.save_draft')}
-                  </button>
-                  <button
-                    onClick={() => handleSave('sent')}
-                    disabled={saving}
-                    className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50"
-                  >
-                    {saving ? t('common.loading') : t('invoices.save_send')}
-                  </button>
+                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg-2)] py-3 text-sm font-medium text-[var(--text-2)] hover:text-[var(--text-1)] disabled:opacity-50">{saving ? t('common.loading') : t('invoices.save_draft')}</button>
+                  <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white hover:bg-[var(--accent-hover)] disabled:opacity-50">{saving ? t('common.loading') : t('invoices.save_send')}</button>
                 </>
               )}
             </div>
@@ -1657,37 +983,16 @@ export default function NewInvoicePage() {
 
       {/* ===== STICKY BOTTOM BAR ===== */}
       <div className="sticky bottom-16 mt-4 rounded-card border border-[var(--card-border)] bg-[var(--card-bg)] p-3 shadow-lg">
-        {/* Running Total */}
         <div className="mb-3 flex items-center justify-between">
           <span className="text-xs text-[var(--text-3)]">{t('invoices.total')}</span>
-          <span className="font-mono text-lg font-semibold text-[var(--text-1)]">
-            {formatCurrency(grandTotal, currency)}
-          </span>
+          <span className="font-mono text-lg font-semibold text-[var(--text-1)]">{formatCurrency(grandTotal, currency)}</span>
         </div>
-
-        {/* Navigation */}
         {step > 0 && <div className="flex gap-2">
           {step >= 1 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]"
-            >
-              {step === 1 ? 'Templates' : t('invoices.back')}
-            </button>
+            <button onClick={() => setStep(step - 1)} className="flex-1 rounded-btn border border-[var(--border-strong)] bg-[var(--bg)] py-3 text-sm font-medium text-[var(--text-2)] transition-all hover:text-[var(--text-1)]">{step === 1 ? 'Templates' : t('invoices.back')}</button>
           )}
           {step < totalSteps && (
-            <button
-              onClick={() => {
-                if (step === 1 && !selectedCustomerId) {
-                  toast('Please select a customer', 'error');
-                  return;
-                }
-                setStep(step + 1);
-              }}
-              className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)]"
-            >
-              {t('invoices.next')}
-            </button>
+            <button onClick={() => { if (step === 1 && !selectedCustomerId) { toast('Please select a customer', 'error'); return; } setStep(step + 1); }} className="flex-1 rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)]">{t('invoices.next')}</button>
           )}
         </div>}
       </div>
@@ -1695,13 +1000,7 @@ export default function NewInvoicePage() {
       {/* AI Invoice Helper */}
       <AIInvoiceHelper onSuggestion={(data) => {
         if (data.items) {
-          const newItems = data.items.map((item, i) => calcLineItem({
-            ...emptyLineItem(),
-            line_number: lineItems.length + i + 1,
-            description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-          }));
+          const newItems = data.items.map((item, i) => calcLineItem({ ...emptyLineItem(), line_number: lineItems.length + i + 1, description: item.description, quantity: item.quantity, unit_price: item.unit_price }));
           setLineItems((prev) => [...prev, ...newItems]);
         }
         if (data.disclaimer) setDisclaimer(data.disclaimer);
@@ -1709,10 +1008,7 @@ export default function NewInvoicePage() {
         if (data.notes) setInvoiceNotes(data.notes);
         if (data.customer_name) {
           setCustomerSearch(data.customer_name);
-          // Auto-select matching customer
-          const match = customers.find((c) =>
-            c.name.toLowerCase().includes(data.customer_name!.toLowerCase())
-          );
+          const match = customers.find((c) => c.name.toLowerCase().includes(data.customer_name!.toLowerCase()));
           if (match) setSelectedCustomerId(match.id);
         }
       }} />

@@ -1008,27 +1008,32 @@ export default function PocketChatPage() {
             />
           </div>
           <div className="flex items-end gap-2">
-            {/* Language selector */}
-            <select
-              value={chatLang}
-              onChange={(e) => setChatLang(e.target.value)}
-              className="h-[42px] rounded-[10px] border border-[#E5E5E5] bg-white px-2 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
-              title="Message language"
-            >
-              <option value="en">🇬🇧</option>
-              <option value="ja">🇯🇵</option>
-              <option value="ur">🇵🇰</option>
-              <option value="ar">🇦🇪</option>
-              <option value="bn">🇧🇩</option>
-              <option value="pt">🇧🇷</option>
-              <option value="tl">🇵🇭</option>
-              <option value="vi">🇻🇳</option>
-              <option value="tr">🇹🇷</option>
-              <option value="zh">🇨🇳</option>
-              <option value="fr">🇫🇷</option>
-              <option value="nl">🇳🇱</option>
-              <option value="es">🇪🇸</option>
-            </select>
+            {/* Language selector — translate outgoing */}
+            {!activeConvo?.is_bot_chat && (
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[8px] text-[#999] font-medium">SEND AS</span>
+                <select
+                  value={chatLang}
+                  onChange={(e) => setChatLang(e.target.value)}
+                  className="h-[42px] rounded-[10px] border border-[#E5E5E5] bg-white px-2 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
+                  title="Message language"
+                >
+                  <option value="en">🇬🇧</option>
+                  <option value="ja">🇯🇵</option>
+                  <option value="ur">🇵🇰</option>
+                  <option value="ar">🇦🇪</option>
+                  <option value="bn">🇧🇩</option>
+                  <option value="pt">🇧🇷</option>
+                  <option value="tl">🇵🇭</option>
+                  <option value="vi">🇻🇳</option>
+                  <option value="tr">🇹🇷</option>
+                  <option value="zh">🇨🇳</option>
+                  <option value="fr">🇫🇷</option>
+                  <option value="nl">🇳🇱</option>
+                  <option value="es">🇪🇸</option>
+                </select>
+              </div>
+            )}
 
             {/* Quick reply trigger */}
             <button
