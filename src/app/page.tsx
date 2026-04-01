@@ -137,7 +137,7 @@ export default function LandingPage() {
                 </div>
                 <div className="h-[1px] bg-[#F0F0F0] mb-4" />
                 <div className="flex gap-3">
-                  {['Invoice sent — ¥440,000', 'AI Briefing ready', 'New order from Instagram'].map((item, i) => (
+                  {['Invoice sent \u2014 \u00A5440,000', 'AI Briefing ready', 'New order from Instagram'].map((item, i) => (
                     <div key={i} className="flex-1 rounded-lg border border-[#F0F0F0] p-3">
                       <p className="text-[11px] text-[#666]">{item}</p>
                     </div>
@@ -192,7 +192,7 @@ export default function LandingPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
-              { title: 'AI Business Cycle', desc: 'Tell AI about your business in 2 minutes. It creates a custom pipeline — cars, cakes, consulting, anything.' },
+              { title: 'AI Business Cycle', desc: 'Tell AI about your business in 2 minutes. It creates a custom pipeline \u2014 cars, cakes, consulting, anything.' },
               { title: 'Ops Radar', desc: 'Your command center. Every item tracked, every bottleneck detected, every cost visible in real time.' },
               { title: 'AI Gets Smarter', desc: 'The longer you use it, the smarter it gets. After a month, it predicts problems before they happen.' },
             ].map((f, i) => (
