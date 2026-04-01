@@ -58,6 +58,7 @@ export default function DashboardPage() {
 
   const [flows, setFlows] = useState<CashFlow[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [briefing, setBriefing] = useState<string | null>(null);
@@ -182,9 +183,6 @@ export default function DashboardPage() {
   const balance = totalIn - totalOut;
   const unpaidTotal = invoices.reduce((s, inv) => s + inv.total, 0);
   const recentFlows = flows.slice(0, 5);
-  const recurringFlows = flows.filter((f) => (f as any).is_recurring);
-  const recurringIn = recurringFlows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
-  const recurringOut = recurringFlows.filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const org = organization as any;
@@ -259,15 +257,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
           <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.cash_balance')}</p>
-          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">
-            {formatCurrency(balance, currency)}
-          </p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">{formatCurrency(balance, currency)}</p>
         </div>
         <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
           <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.unpaid_invoices')}</p>
-          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">
-            {invoices.length > 0 ? `${invoices.length} (${formatCurrency(unpaidTotal, currency)})` : '0'}
-          </p>
+          <p className="mt-1.5 font-mono text-xl font-semibold text-[#4F46E5]">{invoices.length > 0 ? `${invoices.length} (${formatCurrency(unpaidTotal, currency)})` : '0'}</p>
         </div>
         <div className="rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
           <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('dashboard.monthly_income')}</p>
@@ -282,7 +276,7 @@ export default function DashboardPage() {
       {/* Business Health Score */}
       <HealthScore />
 
-      {/* ═══ BUSINESS CYCLE — Active pipeline ═══ */}
+      {/* ═══ BUSINESS CYCLE ═══ */}
       {activeCycle ? (
         <div className="rounded-[14px] border border-[#E5E5E5] bg-white p-4">
           <div className="flex items-center justify-between mb-3">
@@ -310,12 +304,8 @@ export default function DashboardPage() {
             ))}
           </div>
           <div className="mt-3 flex gap-2">
-            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-[#E5E5E5] py-2 text-center text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">
-              Edit Cycle
-            </Link>
-            <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-center text-[10px] font-medium text-white hover:bg-[#4338CA] transition-colors">
-              Ops Radar &rarr;
-            </Link>
+            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-[#E5E5E5] py-2 text-center text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Edit Cycle</Link>
+            <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-center text-[10px] font-medium text-white hover:bg-[#4338CA] transition-colors">Ops Radar &rarr;</Link>
           </div>
         </div>
       ) : (
@@ -337,12 +327,9 @@ export default function DashboardPage() {
         </Link>
       )}
 
-      {/* ═══ UPGRADE BANNER — Free users only ═══ */}
+      {/* ═══ UPGRADE BANNER ═══ */}
       {(organization.plan === 'free' || !organization.plan) && (
-        <Link
-          href="/settings/upgrade"
-          className="block rounded-[16px] bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] p-4 transition-all hover:shadow-lg hover:-translate-y-0.5"
-        >
+        <Link href="/settings/upgrade" className="block rounded-[16px] bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] p-4 transition-all hover:shadow-lg hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
               <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -358,7 +345,7 @@ export default function DashboardPage() {
         </Link>
       )}
 
-      {/* ═══ WORLD CLOCK — Compact grid ═══ */}
+      {/* ═══ WORLD CLOCK ═══ */}
       <div>
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">World Clock</h2>
         <div className="grid grid-cols-6 gap-1.5">
@@ -376,89 +363,66 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ═══ QUICK ACTIONS — Bold colors with descriptions ═══ */}
+      {/* ═══ QUICK ACTIONS — Custom filled icons ═══ */}
       <div>
         <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">Quick Actions</h2>
         <div className="grid grid-cols-2 gap-2">
-          {/* Invoice — filled document */}
           <Link href="/invoices?new=1" className="flex items-center gap-3 rounded-[14px] border border-[#4F46E5]/15 bg-[#4F46E5]/5 p-3.5 transition-all hover:bg-[#4F46E5]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4F46E5]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V8.25L14.25 1.5H5.625ZM14.25 3.75v3.375c0 .621.504 1.125 1.125 1.125H18.75M8.25 15h7.5M8.25 18h4.5" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4F46E5]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h8v1H8v-1zm0 3h5v1H8v-1z"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Fire Invoice</p><p className="text-[10px] text-[var(--text-3)]">Send in 60 seconds</p></div>
           </Link>
-          {/* Cash Flow — growth bars with trend line */}
           <Link href="/cash-flow?new=1" className="flex items-center gap-3 rounded-[14px] border border-[#16A34A]/15 bg-[#16A34A]/5 p-3.5 transition-all hover:bg-[#16A34A]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#16A34A]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M4 19h2V9H4v10Zm4 0h2V5H8v14Zm4 0h2v-7h-2v7Zm4 0h2V11h-2v8Zm4 0h2V7h-2v12Z" /><path d="M2 17l5-5 4 2 5-6 4 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#16A34A]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="4" y="14" width="3.5" height="6" rx="1"/><rect x="10" y="8" width="3.5" height="12" rx="1"/><rect x="16" y="4" width="3.5" height="16" rx="1"/><path d="M4 14l6-6 4 2 6-6" stroke="white" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.4"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Cash Flow</p><p className="text-[10px] text-[var(--text-3)]">Track money in & out</p></div>
           </Link>
-          {/* AI Detect — scanner with magnifying glass */}
           <Link href="/detect" className="flex items-center gap-3 rounded-[14px] border border-[#0EA5E9]/15 bg-[#0EA5E9]/5 p-3.5 transition-all hover:bg-[#0EA5E9]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4V4Zm0 14h16v2H4v-2Zm0-4.5h10v1.5H4v-1.5Zm0-5h10v1.5H4V8.5Z" /><circle cx="18" cy="13" r="3" /><path d="M20.1 15.1l2.4 2.4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="11" r="4" fill="#0EA5E9"/><path d="M15 14l3.5 3.5" stroke="white" strokeWidth="2" strokeLinecap="round"/><path d="M7 18h10" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">AI Detect</p><p className="text-[10px] text-[var(--text-3)]">Snap & translate docs</p></div>
           </Link>
-          {/* PocketChat — filled speech bubble with dots */}
           <Link href="/chat" className="flex items-center gap-3 rounded-[14px] border border-[#7C3AED]/15 bg-[#7C3AED]/5 p-3.5 transition-all hover:bg-[#7C3AED]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7C3AED]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 5.813 2 10.5c0 2.685 1.488 5.074 3.813 6.618L4.5 21.5l4.1-2.05A11.48 11.48 0 0 0 12 20c5.523 0 10-3.813 10-8.5S17.523 2 12 2Z" /><circle cx="8" cy="10.5" r="1.25" fill="#7C3AED" /><circle cx="12" cy="10.5" r="1.25" fill="#7C3AED" /><circle cx="16" cy="10.5" r="1.25" fill="#7C3AED" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7C3AED]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><path d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h3l3.5 4 3.5-4H20a2 2 0 002-2V4a2 2 0 00-2-2z"/><circle cx="8" cy="10" r="1.2" fill="#7C3AED"/><circle cx="12" cy="10" r="1.2" fill="#7C3AED"/><circle cx="16" cy="10" r="1.2" fill="#7C3AED"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">PocketChat</p><p className="text-[10px] text-[var(--text-3)]">Chat in 13 languages</p></div>
           </Link>
-          {/* Expenses — filled credit card */}
           <Link href="/expenses" className="flex items-center gap-3 rounded-[14px] border border-[#EF4444]/15 bg-[#EF4444]/5 p-3.5 transition-all hover:bg-[#EF4444]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EF4444]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M2 6.5A2.5 2.5 0 0 1 4.5 4h15A2.5 2.5 0 0 1 22 6.5V9H2V6.5ZM2 11h20v6.5a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5V11Zm4 3a1 1 0 0 0 0 2h4a1 1 0 1 0 0-2H6Z" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EF4444]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20" stroke="#EF4444" strokeWidth="2"/><rect x="5" y="14" width="4" height="2" rx="0.5" fill="white" opacity="0.6"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Expenses</p><p className="text-[10px] text-[var(--text-3)]">Plan & track spending</p></div>
           </Link>
-          {/* Snap & Vault — filled document grid */}
           <Link href="/documents" className="flex items-center gap-3 rounded-[14px] border border-[#14B8A6]/15 bg-[#14B8A6]/5 p-3.5 transition-all hover:bg-[#14B8A6]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h7v9H3V3Zm11 0h7v6h-7V3ZM3 14h7v7H3v-7Zm11-2h7v9h-7v-9Z" /><rect x="4.5" y="4.5" width="4" height="2" rx="0.5" fill="#14B8A6" opacity="0.4" /><rect x="4.5" y="15.5" width="4" height="2" rx="0.5" fill="#14B8A6" opacity="0.4" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="10" height="2" rx="0.5" fill="#14B8A6"/><rect x="7" y="11" width="7" height="2" rx="0.5" fill="#14B8A6"/><rect x="7" y="15" width="4" height="2" rx="0.5" fill="#14B8A6" opacity="0.5"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Snap & Vault</p><p className="text-[10px] text-[var(--text-3)]">Scan & store documents</p></div>
           </Link>
-          {/* Planner — filled calendar */}
           <Link href="/planner" className="flex items-center gap-3 rounded-[14px] border border-[#EC4899]/15 bg-[#EC4899]/5 p-3.5 transition-all hover:bg-[#EC4899]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EC4899]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M8 2v2H6a3 3 0 0 0-3 3v13a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3h-2V2h-2v2h-4V2H8ZM5 10h14v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V10Zm2 3h3v3H7v-3Z" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EC4899]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18" stroke="#EC4899" strokeWidth="1.5"/><rect x="7" y="3" width="2" height="4" rx="1"/><rect x="15" y="3" width="2" height="4" rx="1"/><circle cx="8" cy="13" r="1.5"/><circle cx="12" cy="13" r="1.5" opacity="0.5"/><circle cx="8" cy="17" r="1.5" opacity="0.5"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Planner</p><p className="text-[10px] text-[var(--text-3)]">Deadlines & reminders</p></div>
           </Link>
-          {/* Contacts — filled people */}
           <Link href="/contacts" className="flex items-center gap-3 rounded-[14px] border border-[#F59E0B]/15 bg-[#F59E0B]/5 p-3.5 transition-all hover:bg-[#F59E0B]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F59E0B]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="7" r="3.5" /><path d="M2 19c0-3.314 3.134-6 7-6s7 2.686 7 6v1H2v-1Z" /><circle cx="17.5" cy="8.5" r="2.5" /><path d="M21 19h-3c0-2.186-1.07-4.133-2.73-5.39A6.48 6.48 0 0 1 17.5 13c2.761 0 5 1.79 5 4v1h-1.5V19Z" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F59E0B]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><circle cx="9" cy="8" r="4"/><path d="M2 20c0-3.5 3-6.5 7-6.5s7 3 7 6.5"/><circle cx="17" cy="9" r="3" opacity="0.6"/><path d="M18 20c0-2.5 1.5-4.5 4-5" opacity="0.6"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Contacts</p><p className="text-[10px] text-[var(--text-3)]">Manage your network</p></div>
           </Link>
-          {/* Website — browser with colored dots */}
           <Link href="/website-builder" className="flex items-center gap-3 rounded-[14px] border border-[#0F172A]/15 bg-[#0F172A]/5 p-3.5 transition-all hover:bg-[#0F172A]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0F172A]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="3" width="20" height="18" rx="3" /><rect x="2" y="3" width="20" height="5" rx="3" fill="white" opacity="0.2" /><circle cx="5.5" cy="5.5" r="1" fill="#FF5F57" /><circle cx="8.5" cy="5.5" r="1" fill="#FEBC2E" /><circle cx="11.5" cy="5.5" r="1" fill="#28C840" /><rect x="5" y="11" width="6" height="2" rx="1" fill="white" opacity="0.3" /><rect x="5" y="14.5" width="14" height="1.5" rx="0.75" fill="white" opacity="0.15" /><rect x="5" y="17.5" width="10" height="1.5" rx="0.75" fill="white" opacity="0.15" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0F172A]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8h18" stroke="#0F172A" strokeWidth="1.5"/><circle cx="6" cy="5.5" r="1" fill="#FF5F57"/><circle cx="9" cy="5.5" r="1" fill="#FEBC2E"/><circle cx="12" cy="5.5" r="1" fill="#28C840"/><rect x="6" y="11" width="5" height="7" rx="1" fill="#0F172A" opacity="0.3"/><rect x="13" y="11" width="5" height="3" rx="1" fill="#0F172A" opacity="0.3"/><rect x="13" y="15.5" width="5" height="2.5" rx="1" fill="#0F172A" opacity="0.3"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Build Website</p><p className="text-[10px] text-[var(--text-3)]">AI creates your site</p></div>
           </Link>
-          {/* Pipeline — 4 squares grid */}
           <Link href="/items" className="flex items-center gap-3 rounded-[14px] border border-[#6366F1]/15 bg-[#6366F1]/5 p-3.5 transition-all hover:bg-[#6366F1]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6366F1]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2" /><rect x="13" y="3" width="8" height="8" rx="2" /><rect x="3" y="13" width="8" height="8" rx="2" /><rect x="13" y="13" width="8" height="8" rx="2" /></svg></div>
-            <div><p className="text-sm font-semibold text-[var(--text-1)]">Pipeline Items</p><p className="text-[10px] text-[var(--text-3)]">Track your inventory</p></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6366F1]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+            <div><p className="text-sm font-semibold text-[var(--text-1)]">Pipeline</p><p className="text-[10px] text-[var(--text-3)]">Track your inventory</p></div>
           </Link>
-          {/* Social — Instagram shape */}
-          <Link href="/social-media" className="flex items-center gap-3 rounded-[14px] border border-[#EC4899]/15 bg-[#EC4899]/5 p-3.5 transition-all hover:bg-[#EC4899]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EC4899]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="6" /><circle cx="12" cy="12" r="4.5" fill="#EC4899" stroke="white" strokeWidth="1.5" /><circle cx="17.5" cy="6.5" r="1.5" /></svg></div>
+          <Link href="/social-media" className="flex items-center gap-3 rounded-[14px] border border-[#E4405F]/15 bg-[#E4405F]/5 p-3.5 transition-all hover:bg-[#E4405F]/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{background: 'linear-gradient(135deg, #E4405F, #F56040, #FCAF45)'}}><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="1.8"/><circle cx="17.5" cy="6.5" r="1.2"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Social Post</p><p className="text-[10px] text-[var(--text-3)]">AI creates your posts</p></div>
           </Link>
-          {/* Accountant — ledger book */}
           <Link href="/accountant" className="flex items-center gap-3 rounded-[14px] border border-[#14B8A6]/15 bg-[#14B8A6]/5 p-3.5 transition-all hover:bg-[#14B8A6]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h13V2H6Zm0 2h2v16H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm4 3h7v1.5h-7V7Zm0 3.5h7V12h-7v-1.5Zm0 3.5h5v1.5h-5V14Z" /></svg></div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="white"><path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/><path d="M17 4v16" stroke="#14B8A6" strokeWidth="1.5"/><rect x="5" y="8" width="5" height="1.5" rx="0.5" fill="#14B8A6" opacity="0.5"/><rect x="5" y="11" width="4" height="1.5" rx="0.5" fill="#14B8A6" opacity="0.5"/><rect x="5" y="14" width="6" height="1.5" rx="0.5" fill="#14B8A6" opacity="0.5"/></svg></div>
             <div><p className="text-sm font-semibold text-[var(--text-1)]">Accountant</p><p className="text-[10px] text-[var(--text-3)]">Reports & tax data</p></div>
           </Link>
-          {/* Ops Radar — radar sweep with green blip */}
-          <Link href="/ops-radar" className="flex items-center gap-3 rounded-[14px] border border-[#16A34A]/15 bg-[#16A34A]/5 p-3.5 transition-all hover:bg-[#16A34A]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#16A34A]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" opacity="0.2" /><circle cx="12" cy="12" r="6.5" opacity="0.15" /><circle cx="12" cy="12" r="3" opacity="0.15" /><path d="M12 2v10l6.93-4A10 10 0 0 0 12 2Z" opacity="0.5" /><circle cx="15" cy="8" r="1.5" /></svg></div>
-            <div><p className="text-sm font-semibold text-[var(--text-1)]">Ops Radar</p><p className="text-[10px] text-[var(--text-3)]">Track operations</p></div>
-          </Link>
-          {/* Estimates — filled document with checkmark */}
-          <Link href="/estimates" className="flex items-center gap-3 rounded-[14px] border border-[#7C3AED]/15 bg-[#7C3AED]/5 p-3.5 transition-all hover:bg-[#7C3AED]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#7C3AED]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V8.25L14.25 1.5H5.625ZM9 12h6M9 15h4" /></svg></div>
-            <div><p className="text-sm font-semibold text-[var(--text-1)]">Estimates</p><p className="text-[10px] text-[var(--text-3)]">Quotes & proposals</p></div>
-          </Link>
-          {/* Time Tracking — clock */}
-          <Link href="/time-tracking" className="flex items-center gap-3 rounded-[14px] border border-[#0EA5E9]/15 bg-[#0EA5E9]/5 p-3.5 transition-all hover:bg-[#0EA5E9]/10">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0EA5E9]"><svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" /></svg></div>
-            <div><p className="text-sm font-semibold text-[var(--text-1)]">Time Track</p><p className="text-[10px] text-[var(--text-3)]">Billable hours</p></div>
+          <Link href="/ops-radar" className="flex items-center gap-3 rounded-[14px] border border-[#1E293B]/15 bg-[#1E293B]/5 p-3.5 transition-all hover:bg-[#1E293B]/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1E293B]"><svg className="h-5 w-5" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" strokeWidth="1.5"/><circle cx="12" cy="12" r="5.5" stroke="white" strokeWidth="1" opacity="0.4"/><circle cx="12" cy="12" r="2" stroke="white" strokeWidth="1" opacity="0.4"/><line x1="12" y1="3" x2="12" y2="9" stroke="white" strokeWidth="1.5"/><circle cx="12" cy="8" r="2" fill="#4ADE80"/></svg></div>
+            <div><p className="text-sm font-semibold text-[var(--text-1)]">Ops Radar</p><p className="text-[10px] text-[var(--text-3)]">Command center</p></div>
           </Link>
         </div>
       </div>
 
-      {/* ═══ CONNECT CHANNELS — Coming Soon ═══ */}
+      {/* ═══ CONNECT CHANNELS ═══ */}
       <div className="rounded-[14px] border border-[#E5E5E5] bg-white p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">Connect Your Channels</h2>
@@ -467,33 +431,33 @@ export default function DashboardPage() {
         <p className="text-xs text-[var(--text-3)] mb-3">Message BizPocket from your favorite app — AI handles the rest.</p>
         <div className="flex gap-2">
           <div className="flex-1 flex items-center gap-2 rounded-lg border border-[#25D366]/20 bg-[#25D366]/5 px-3 py-2.5">
-            <span className="text-lg">💬</span>
+            <span className="text-lg">{'\uD83D\uDCAC'}</span>
             <div><p className="text-xs font-semibold text-[var(--text-1)]">WhatsApp</p><p className="text-[9px] text-[var(--text-4)]">Send invoices via chat</p></div>
           </div>
           <div className="flex-1 flex items-center gap-2 rounded-lg border border-[#0088CC]/20 bg-[#0088CC]/5 px-3 py-2.5">
-            <span className="text-lg">✈️</span>
+            <span className="text-lg">{'\u2708\uFE0F'}</span>
             <div><p className="text-xs font-semibold text-[var(--text-1)]">Telegram</p><p className="text-[9px] text-[var(--text-4)]">Run business by text</p></div>
           </div>
         </div>
       </div>
 
-      {/* ═══ TRY IT NOW — For new users with zero data ═══ */}
+      {/* ═══ TRY IT NOW ═══ */}
       {recentFlows.length === 0 && invoices.length === 0 && (
         <div>
           <h2 className="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-4)]">Try It Now</h2>
           <div className="space-y-2">
             <Link href="/invoices?new=1" className="flex items-center gap-3 rounded-[12px] border border-[#4F46E5]/10 bg-[#4F46E5]/[0.03] p-4 transition-all hover:bg-[#4F46E5]/[0.06]">
-              <span className="text-lg">⚡</span>
+              <span className="text-lg">{'\u26A1'}</span>
               <div className="flex-1"><p className="text-sm font-medium text-[var(--text-1)]">Send your first invoice in 60 seconds</p><p className="text-[10px] text-[var(--text-3)]">Professional PDF, 5 templates, share instantly</p></div>
               <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
             <Link href="/detect" className="flex items-center gap-3 rounded-[12px] border border-[#0EA5E9]/10 bg-[#0EA5E9]/[0.03] p-4 transition-all hover:bg-[#0EA5E9]/[0.06]">
-              <span className="text-lg">📸</span>
+              <span className="text-lg">{'\uD83D\uDCF8'}</span>
               <div className="flex-1"><p className="text-sm font-medium text-[var(--text-1)]">Snap a Japanese document — AI translates it</p><p className="text-[10px] text-[var(--text-3)]">Tax notices, contracts, forms — instant translation</p></div>
               <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
             <Link href="/chat" className="flex items-center gap-3 rounded-[12px] border border-[#7C3AED]/10 bg-[#7C3AED]/[0.03] p-4 transition-all hover:bg-[#7C3AED]/[0.06]">
-              <span className="text-lg">💬</span>
+              <span className="text-lg">{'\uD83D\uDCAC'}</span>
               <div className="flex-1"><p className="text-sm font-medium text-[var(--text-1)]">Start a PocketChat conversation</p><p className="text-[10px] text-[var(--text-3)]">Message in English — they read it in Japanese</p></div>
               <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>

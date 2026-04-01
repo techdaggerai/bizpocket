@@ -10,7 +10,7 @@ const NAV_ITEMS = [
     labelKey: 'nav.dashboard',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z" />
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
       </svg>
     ),
   },
@@ -19,7 +19,7 @@ const NAV_ITEMS = [
     labelKey: 'nav.invoices',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V8.25L14.25 1.5H5.625ZM14.25 3.75v3.375c0 .621.504 1.125 1.125 1.125H18.75M8.25 15h7.5M8.25 18h4.5" />
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM8 13h8v1H8v-1zm0 3h5v1H8v-1z"/>
       </svg>
     ),
   },
@@ -28,7 +28,7 @@ const NAV_ITEMS = [
     labelKey: 'nav.chat',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M4.913 2.658c2.075-.27 4.19-.408 6.337-.408 2.147 0 4.262.139 6.337.408 1.922.25 3.291 1.861 3.405 3.727a4.403 4.403 0 0 0-1.032-.211 50.89 50.89 0 0 0-8.42 0c-2.358.196-4.04 2.19-4.04 4.434v4.286a4.47 4.47 0 0 0 2.433 3.984L7.28 21.53A.75.75 0 0 1 6 20.97v-1.95a49.655 49.655 0 0 1-1.088-.085c-1.922-.25-3.291-1.861-3.405-3.727A51.658 51.658 0 0 1 1.5 12.01c0-1.074.015-2.14.088-3.196.114-1.866 1.483-3.477 3.405-3.727Zm6.337 2.592c-2.03 0-4.032.133-5.997.392C4.095 5.811 3.25 6.83 3.25 8.032v3.978c0 1.203.845 2.221 2.003 2.39a48.155 48.155 0 0 0 5.997.392c2.03 0 4.032-.133 5.997-.392 1.158-.169 2.003-1.187 2.003-2.39V8.032c0-1.203-.845-2.221-2.003-2.39a48.155 48.155 0 0 0-5.997-.392ZM9 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm3 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm3 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+        <path d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h3l3.5 4 3.5-4H20a2 2 0 002-2V4a2 2 0 00-2-2z"/>
       </svg>
     ),
   },
@@ -37,7 +37,7 @@ const NAV_ITEMS = [
     labelKey: 'nav.cash_flow',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M4 19h2V9H4v10Zm4 0h2V5H8v14Zm4 0h2v-7h-2v7Zm4 0h2V11h-2v8Zm4 0h2V7h-2v12Z" />
+        <rect x="4" y="14" width="3.5" height="6" rx="1"/><rect x="10" y="8" width="3.5" height="12" rx="1"/><rect x="16" y="4" width="3.5" height="16" rx="1"/>
       </svg>
     ),
   },
@@ -46,9 +46,7 @@ const NAV_ITEMS = [
     labelKey: 'nav.more',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="12" cy="5.5" r="2" />
-        <circle cx="12" cy="12" r="2" />
-        <circle cx="12" cy="18.5" r="2" />
+        <circle cx="12" cy="5" r="2.5"/><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="19" r="2.5"/>
       </svg>
     ),
   },
