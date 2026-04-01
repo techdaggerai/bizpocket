@@ -680,27 +680,57 @@ export default function NewInvoicePage() {
           <div className="space-y-4">
             <h2 className="text-base font-medium text-[var(--text-1)]">Choose Invoice Template</h2>
             <p className="text-sm text-[var(--text-3)]">Select a style for your invoice PDF</p>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              {Object.entries(TEMPLATES).map(([key, tpl]) => (
-                <button
-                  key={key}
-                  onClick={() => { setSelectedTemplate(key); setStep(1); }}
-                  className={`relative rounded-card border text-left transition-all hover:shadow-md overflow-hidden ${
-                    selectedTemplate === key ? 'border-[var(--accent)] ring-2 ring-[#4F46E5]' : 'border-[#E5E5E5] bg-white'
-                  }`}
-                >
-                  <div className="w-full h-[200px] overflow-hidden bg-white relative">
-                    <div style={{ transform: 'scale(0.28)', transformOrigin: 'top left', width: '555px', position: 'absolute', top: 0, left: 0 }}>
-                      <tpl.Component data={invoicePreviewData} />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/90 to-transparent pt-8 pb-3 px-3">
-                    <p className="text-sm font-semibold text-[#0A0A0A]">{tpl.name}</p>
-                    <p className="text-[10px] text-[#999]">{tpl.description}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            {(() => {
+              const sampleData: InvoiceData = {
+                invoice_number: 'INV/BIZ/260401-0001',
+                date: '2026-04-01',
+                due_date: '2026-05-01',
+                company_name: organization.name || 'Your Business',
+                company_address: 'Tokyo, Japan',
+                company_phone: '03-1234-5678',
+                company_email: user?.email || 'hello@bizpocket.io',
+                bank_name: 'MUFG Bank',
+                bank_branch: 'Shibuya',
+                bank_account_name: organization.name || 'Your Business',
+                bank_account_number: '1234567',
+                customer_name: 'Sample Client Co.',
+                customer_address: 'Osaka, Japan',
+                customer_phone: '06-9876-5432',
+                items: [
+                  { description: 'Product / Service A', quantity: 2, unit_price: 15000, total: 30000 },
+                  { description: 'Consulting fee', quantity: 1, unit_price: 8000, total: 8000 },
+                  { description: 'Shipping & handling', quantity: 1, unit_price: 2000, total: 2000 },
+                ],
+                subtotal: 40000,
+                tax_rate: 0.10,
+                tax_amount: 4000,
+                grand_total: 44000,
+                currency: currency,
+                notes: 'Thank you for your business',
+                status: 'draft',
+              };
+              return (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                  {Object.entries(TEMPLATES).map(([key, tpl]) => (
+                    <button
+                      key={key}
+                      onClick={() => { setSelectedTemplate(key); setStep(1); }}
+                      className={`relative rounded-xl border text-left transition-all hover:shadow-md overflow-hidden min-h-[220px] ${
+                        selectedTemplate === key ? 'border-[var(--accent)] ring-2 ring-[#4F46E5]' : 'border-[#E5E5E5] bg-white'
+                      }`}
+                    >
+                      <div className="absolute inset-0 origin-top-left" style={{ transform: 'scale(0.35)', width: '286%', height: '286%' }}>
+                        <tpl.Component data={sampleData} />
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-10 pb-3 px-3 z-10">
+                        <p className="text-sm font-semibold text-[#0A0A0A]">{tpl.name}</p>
+                        <p className="text-[10px] text-[#999]">{tpl.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Invoice Type Selector */}
             <div className="mt-6">
