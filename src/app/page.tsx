@@ -68,32 +68,40 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* HERO */}
+      {/* HERO — Split layout */}
       <section className="pt-32 pb-16 px-6">
-        <div className="mx-auto max-w-[1100px] text-center">
-          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#E5E5E5] mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] inline-block" />
-            <span className="text-[13px] text-[#6b7280] font-medium">World&apos;s first AI business messenger</span>
-          </div>
-          <h1 className="text-[clamp(2.25rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-tight text-[#111827]">
-            Your business speaks<br /><span className="text-[#4F46E5]">every language.</span>
-          </h1>
-          <p className="mt-4 text-lg text-[#6b7280] max-w-[540px] mx-auto leading-relaxed">
-            You type English. They read Japanese. Nobody notices the difference.
-            Invoices, chat, and your entire business — powered by <span className="text-[#F59E0B]">AI</span>.
-          </p>
-          <div className="mt-8 flex justify-center gap-3 flex-wrap">
-            <Link href="/signup" className="inline-flex items-center gap-2 bg-[#4F46E5] text-white px-8 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-[#4338CA] transition-colors">
-              Start free — 14 days full access
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </Link>
-            <a href="#features" className="bg-white text-[#374151] px-8 py-3.5 rounded-xl text-[15px] font-semibold border border-[#E5E5E5] hover:border-[#CCC] transition-colors">
-              See all features
-            </a>
+        <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 items-center">
+          {/* LEFT — Text */}
+          <div className="text-center lg:text-left">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#E5E5E5] mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] inline-block" />
+              <span className="text-[13px] text-[#6b7280] font-medium">World&apos;s first AI business messenger</span>
+            </div>
+            <h1 className="text-[clamp(2.25rem,5vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.02em] text-[#111827]">
+              Your business speaks<br /><span className="text-[#4F46E5]">every language.</span>
+            </h1>
+            <p className="mt-4 text-lg text-[#6b7280] max-w-[420px] mx-auto lg:mx-0 leading-relaxed">
+              You type English. They read Japanese. Nobody notices the difference.
+              Invoices, chat, and your entire business — powered by <span className="text-[#F59E0B]">AI</span>.
+            </p>
+            <div className="mt-8 flex justify-center lg:justify-start gap-3 flex-wrap">
+              <Link href="/signup" className="inline-flex items-center gap-2 bg-[#4F46E5] text-white px-7 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-[#4338CA] transition-colors">
+                Start free — 14 days
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </Link>
+              <a href="#features" className="bg-white text-[#374151] px-7 py-3.5 rounded-xl text-[15px] font-semibold border border-[#E5E5E5] hover:border-[#CCC] transition-colors">
+                See all features
+              </a>
+            </div>
+            <div className="flex justify-center lg:justify-start gap-5 mt-6 flex-wrap">
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">13 languages</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-[#6b7280] font-medium">Real-time AI</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">No app for clients</span></div>
+            </div>
           </div>
 
-          {/* Chat Mockup */}
-          <div className="max-w-[560px] mx-auto mt-12 bg-[#f9fafb] rounded-[20px] p-5">
+          {/* RIGHT — Chat Mockup */}
+          <div className="bg-[#f9fafb] rounded-[20px] p-5">
             <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden">
               <div className="px-4 py-3 border-b border-[#f3f4f6] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -117,11 +125,6 @@ export default function LandingPage() {
                 <span className="flex-1 px-3.5 py-2 rounded-[10px] border border-[#E5E5E5] text-[13px] text-[#9ca3af]">Type a message...</span>
                 <div className="w-[34px] h-[34px] rounded-[10px] bg-[#4F46E5] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg></div>
               </div>
-            </div>
-            <div className="flex justify-center gap-5 mt-4 flex-wrap">
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">13 languages</span></div>
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-[#6b7280] font-medium">Real-time AI translation</span></div>
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">No app needed for clients</span></div>
             </div>
           </div>
         </div>
