@@ -156,6 +156,17 @@ export default function DashboardPage() {
         </Link>
       )}
 
+      {/* Setup Prompt */}
+      {(!(organization as Record<string, unknown>).business_type || organization.name === 'My Business') && (
+        <a href="/onboarding" className="flex items-center justify-between bg-gradient-to-r from-[#4F46E5] to-[#7c3aed] rounded-[14px] px-5 py-4 mb-5 text-white no-underline hover:opacity-95 transition-opacity">
+          <div>
+            <p className="text-[15px] font-semibold">Complete your business setup</p>
+            <p className="text-[13px] text-white/80 mt-1">Add your business name, type, and details to unlock all features</p>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+        </a>
+      )}
+
       {/* Public Order Link */}
       <div className="rounded-xl bg-[#eef2ff] border border-[#c7d2fe] p-4 flex items-center justify-between flex-wrap gap-3">
         <div>

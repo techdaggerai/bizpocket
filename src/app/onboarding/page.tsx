@@ -89,8 +89,26 @@ function OnboardingInner() {
       .eq('user_id', user.id)
       .single();
 
+    const slug = form.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
+
     if (existingProfile?.organization_id) {
-      // Already onboarded — just redirect
+      // Update existing org (created during signup)
+      const { error: updateErr } = await supabase
+        .from('organizations')
+        .update({
+          name: form.business_name,
+          slug,
+          business_type: form.business_types.join(',') || 'other',
+          language: form.language,
+          currency: form.currency,
+        })
+        .eq('id', existingProfile.organization_id);
+
+      // Update profile language
+      await supabase.from('profiles').update({ language: form.language }).eq('user_id', user.id);
+
+      if (updateErr) { setError(updateErr.message); setLoading(false); return; }
+
       if (selectedPlan === 'pro' || selectedPlan === 'business') {
         router.push(`/settings/upgrade?plan=${selectedPlan}&auto=1`);
       } else {
@@ -99,8 +117,7 @@ function OnboardingInner() {
       return;
     }
 
-    // Create organization with 14-day trial
-    const slug = form.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
+    // Fallback: create organization if none exists
     const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
     const { data: org, error: orgError } = await supabase
       .from('organizations')

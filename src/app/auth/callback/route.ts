@@ -33,18 +33,42 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Check if user already has a profile (returning user)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, organization_id')
           .eq('user_id', user.id)
           .single();
 
-        // Existing user with profile → dashboard; new user → onboarding
-        const redirectTo = profile ? '/dashboard' : next;
-        return NextResponse.redirect(`${origin}${redirectTo}`);
+        if (profile) {
+          // Existing user — go to dashboard
+          return NextResponse.redirect(`${origin}/dashboard`);
+        }
+
+        // New user — auto-create org + profile, then dashboard
+        const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: org } = await supabase.from('organizations').insert({
+          name: 'My Business',
+          created_by: user.id,
+          plan: 'free',
+          language: 'en',
+          currency: 'JPY',
+          trial_ends_at: trialEnd,
+        }).select().single();
+
+        if (org) {
+          await supabase.from('profiles').insert({
+            user_id: user.id,
+            organization_id: org.id,
+            role: 'owner',
+            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+            email: user.email!,
+            language: 'en',
+          });
+        }
+
+        return NextResponse.redirect(`${origin}/dashboard`);
       }
     }
   }
