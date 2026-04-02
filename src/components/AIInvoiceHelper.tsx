@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 
 interface AIInvoiceHelperProps {
@@ -22,6 +22,10 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
   ]);
   const [loading, setLoading] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const didDrag = useRef(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -97,6 +101,40 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
     }
   }
 
+  useEffect(() => {
+    function onMouseMove(e: MouseEvent) {
+      if (!dragging) return;
+      didDrag.current = true;
+      setPosition({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y });
+    }
+    function onMouseUp() { setDragging(false); }
+    function onTouchMove(e: TouchEvent) {
+      if (!dragging) return;
+      didDrag.current = true;
+      setPosition({ x: e.touches[0].clientX - dragOffset.current.x, y: e.touches[0].clientY - dragOffset.current.y });
+    }
+    function onTouchEnd() { setDragging(false); }
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('touchmove', onTouchMove);
+    window.addEventListener('touchend', onTouchEnd);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [dragging]);
+
+  function handleDragStart(clientX: number, clientY: number) {
+    setDragging(true);
+    didDrag.current = false;
+    dragOffset.current = {
+      x: clientX - (position.x || window.innerWidth - 60),
+      y: clientY - (position.y || window.innerHeight - 120),
+    };
+  }
+
   function stopRecording() {
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
@@ -104,11 +142,18 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
     }
   }
 
+  const posStyle = position.x || position.y
+    ? { position: 'fixed' as const, top: position.y + 'px', left: position.x + 'px', bottom: 'auto' as const, right: 'auto' as const, zIndex: 40 }
+    : { position: 'fixed' as const, bottom: '5rem', right: '1rem', top: 'auto' as const, left: 'auto' as const, zIndex: 40 };
+
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#4F46E5] text-white shadow-lg hover:bg-[#4338CA] transition-all hover:scale-105"
+        onClick={() => { if (!didDrag.current) setIsOpen(true); }}
+        onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+        style={{ ...posStyle, cursor: dragging ? 'grabbing' : 'grab' }}
+        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#4F46E5] text-white shadow-lg hover:bg-[#4338CA] transition-all hover:scale-105"
       >
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
           <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
@@ -118,7 +163,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
   }
 
   return (
-    <div className="fixed bottom-20 right-4 z-40 w-[320px] rounded-2xl border border-[#E5E5E5] bg-white shadow-2xl overflow-hidden">
+    <div style={posStyle} className="w-[320px] rounded-2xl border border-[#E5E5E5] bg-white shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0]">
         <div className="flex items-center gap-2">
