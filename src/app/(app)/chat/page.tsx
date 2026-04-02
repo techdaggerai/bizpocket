@@ -1203,7 +1203,7 @@ export default function PocketChatPage() {
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`text-xs font-medium pb-2 whitespace-nowrap transition-colors ${
+            className={`text-xs font-medium px-4 pb-2 whitespace-nowrap transition-colors ${
               filter === f.key
                 ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]'
                 : 'text-[#6B7280] hover:text-[#0A0A0A]'
