@@ -41,6 +41,7 @@ const NAV_SECTIONS = [
       { href: '/ops-radar', label: 'Ops Radar', icon: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8a5 5 0 100 10M12 3v6' },
       { href: '/items', label: 'Pipeline', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
       { href: '/accountant', label: 'Accountant', icon: 'M2 4h20v16H2zM17 4v16M5 8h5M5 11h4M5 14h6' },
+      { href: '/form-fill', label: 'Form Fill', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M9 13h6M9 17h4' },
     ],
   },
 ];
