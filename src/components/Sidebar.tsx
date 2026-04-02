@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { PocketMark, LogoWordmark } from '@/components/Logo';
+import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 
 const NAV_SECTIONS = [
   {
@@ -15,9 +15,9 @@ const NAV_SECTIONS = [
   {
     label: 'CORE',
     items: [
+      { href: '/chat', label: 'PocketChat', icon: '__pocketchat__' },
       { href: '/invoices', label: 'Invoices', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M8 13h8M8 17h5' },
       { href: '/cash-flow', label: 'Cash Flow', icon: 'M4 14h3.5v6H4zM10 8h3.5v12H10zM16 4h3.5v16H16z' },
-      { href: '/chat', label: 'Chat', icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z' },
       { href: '/detect', label: 'AI Detect', icon: 'M3 3h18v18H3zM11 11a4 4 0 100-8M15 15l4 4' },
     ],
   },
@@ -84,17 +84,21 @@ export default function Sidebar() {
                         : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
                     }`}
                   >
-                    <svg
-                      className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d={item.icon} />
-                    </svg>
+                    {item.icon === '__pocketchat__' ? (
+                      <PocketChatMark size={18} />
+                    ) : (
+                      <svg
+                        className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d={item.icon} />
+                      </svg>
+                    )}
                     {item.label}
                   </Link>
                 );
