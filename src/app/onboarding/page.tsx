@@ -169,7 +169,7 @@ function OnboardingInner() {
     }
   }
 
-  const totalSteps = 4;
+  const totalSteps = 3;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-4">
@@ -289,23 +289,6 @@ function OnboardingInner() {
           </div>
         )}
 
-        {/* Step 4: Invite Accountant */}
-        {step === 4 && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-[var(--text-1)]">Invite your accountant</h2>
-              <p className="mt-1 text-sm text-[var(--text-3)]">They&apos;ll get read-only access to everything. You can skip this.</p>
-            </div>
-            <input
-              type="email"
-              value={form.accountant_email}
-              onChange={(e) => setForm({ ...form, accountant_email: e.target.value })}
-              className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
-              placeholder="accountant@example.com"
-            />
-          </div>
-        )}
-
         {/* Navigation buttons */}
         <div className="mt-8 flex gap-3">
           {step > 1 && (
@@ -335,7 +318,7 @@ function OnboardingInner() {
           )}
         </div>
 
-        {step === 4 && (
+        {false && (
           <button
             onClick={() => handleFinish(true)}
             disabled={loading}
