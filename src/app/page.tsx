@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
+import InvoiceShowcase from '@/components/InvoiceShowcase';
 
 const PLANS = [
   {
@@ -257,28 +258,7 @@ export default function LandingPage() {
       {/* FIRE INVOICE */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div className="bg-[#f9fafb] rounded-[20px] p-6">
-            <div className="bg-white rounded-[14px] border border-[#e5e7eb] overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#f3f4f6] flex justify-between items-start">
-                <div><p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">INVOICE</p><p className="text-base font-bold text-[#111827] mt-1">INV/PDJ/260402-042</p><p className="text-xs text-[#9ca3af] mt-0.5">April 2, 2026</p></div>
-                <span className="px-3 py-1 rounded-full bg-[#f0fdf4] text-xs font-semibold text-[#16a34a]">PAID</span>
-              </div>
-              <div className="p-5">
-                <div className="grid grid-cols-2 gap-5 mb-5"><div><p className="text-[10px] text-[#9ca3af] font-semibold uppercase">From</p><p className="text-[13px] font-semibold text-[#111827] mt-1">Premium Drives Japan</p><p className="text-xs text-[#6b7280]">Nagoya, Japan</p><p className="text-[11px] text-[#9ca3af]">登録番号: T1234567890123</p></div><div><p className="text-[10px] text-[#9ca3af] font-semibold uppercase">To</p><p className="text-[13px] font-semibold text-[#111827] mt-1">Al-Rashid Motors</p><p className="text-xs text-[#6b7280]">Karachi, Pakistan</p></div></div>
-                <div className="bg-[#f9fafb] rounded-[10px] p-3 mb-4 space-y-1.5">
-                  <div className="flex justify-between text-xs"><span className="text-[#6b7280]">Toyota Alphard 2022 — White</span><span className="font-semibold text-[#111827]">¥850,000</span></div>
-                  <div className="flex justify-between text-xs border-t border-[#f3f4f6] pt-1.5"><span className="text-[#6b7280]">Full inspection + repair</span><span className="font-semibold text-[#111827]">¥85,000</span></div>
-                  <div className="flex justify-between text-xs border-t border-[#f3f4f6] pt-1.5 text-[#6b7280]"><span>Tax (10%)</span><span>¥93,500</span></div>
-                </div>
-                <div className="flex justify-between pt-3 border-t-2 border-[#111827]"><span className="text-base font-bold">Total</span><span className="text-base font-bold">¥1,028,500</span></div>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
-              {['Classic', 'Modern', 'Japanese', 'Compact', 'Export', 'Elegant', 'Bold', 'Receipt', 'Corporate', 'Minimal'].map((t, i) => (
-                <span key={i} className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${i === 0 ? 'bg-[#4F46E5] text-white' : 'bg-white text-[#6b7280] border border-[#e5e7eb]'}`}>{t}</span>
-              ))}
-            </div>
-          </div>
+          <InvoiceShowcase />
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#eef2ff] text-xs font-semibold text-[#4338ca] mb-4">CANVA-STYLE BUILDER</span>
             <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">Invoice fired.<br />Before you leave<br /><span className="text-[#4F46E5]">the parking lot.</span></h2>
