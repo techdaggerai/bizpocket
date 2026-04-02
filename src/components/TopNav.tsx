@@ -23,8 +23,13 @@ export default function TopNav() {
 
   return (
     <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E5E5E5] bg-white/95 px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:static lg:px-0 lg:py-0">
-      <Link href="/dashboard" className="text-base font-bold text-[#4F46E5] lg:hidden">
-        BizPocket
+      <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
+        <div className="h-7 w-7 rounded-lg bg-[#4F46E5] flex items-center justify-center">
+          <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <span className="text-base font-bold text-[#4F46E5]">BizPocket</span>
       </Link>
       <div className="flex items-center gap-2">
         <NotificationBell />

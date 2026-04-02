@@ -54,12 +54,9 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-4 py-4 border-b border-[#F0F0F0]">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-lg bg-[#4F46E5] flex items-center justify-center">
+          <div className="h-8 w-8 rounded-lg bg-[#4F46E5] flex items-center justify-center">
             <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-              <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-              <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-              <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
           </div>
           <span className="text-[15px] font-semibold text-[#0A0A0A]">BizPocket</span>
