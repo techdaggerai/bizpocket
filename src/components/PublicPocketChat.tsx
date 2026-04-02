@@ -94,6 +94,11 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
         content: text, original_text: text, original_language: customerLanguage, translations,
         org_id: orgId, type: 'text', is_public: true, created_at: new Date().toISOString(),
       });
+      // Trigger bot auto-response
+      fetch('/api/ai/bot-respond', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId, senderName: customerName, senderMessage: text, senderLanguage: customerLanguage, orgId }),
+      }).catch(() => {});
     } catch (err) { console.error('Send error:', err); }
     finally { setSending(false); }
   };
