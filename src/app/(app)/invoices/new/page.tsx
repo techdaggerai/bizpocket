@@ -399,11 +399,14 @@ export default function NewInvoicePage() {
                 <button onClick={handleSaveCustomer} disabled={savingCustomer} className="w-full rounded-lg bg-[#0A0A0A] py-2 text-xs font-medium text-white disabled:opacity-50">{savingCustomer ? 'Saving...' : 'Save Customer'}</button>
               </div>
             )}
-            <div className="border-t border-[#F0F0F0] pt-2">
-              <div className="flex gap-2 items-end">
-                <div className="flex-1"><label className="text-[10px] text-[#999]">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
-                <div className="flex-1"><label className="text-[10px] text-[#999]">Due Date</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} /></div>
-                <div className="flex gap-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-2 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>))}</div>
+            <div className="border-t border-[#F0F0F0] pt-2.5 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div><label className="text-[10px] text-[#999]">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
+                <div><label className="text-[10px] text-[#999]">Due Date</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} /></div>
+              </div>
+              <div>
+                <label className="text-[10px] text-[#999]">Language</label>
+                <div className="flex gap-1.5 mt-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-3 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>))}</div>
               </div>
             </div>
           </div>
@@ -431,25 +434,23 @@ export default function NewInvoicePage() {
                     ))}
                   </div>
                 )}
-                <div className="flex gap-1.5 items-center">
-                  <div className="w-20"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
-                  <div className="flex-1 min-w-[140px]"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
-                  <select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className="rounded-lg border border-[#E5E5E5] bg-white px-2 py-2.5 text-xs text-[#0A0A0A] focus:border-[#4F46E5] focus:outline-none w-[65px] shrink-0">{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select>
-                  <p className="font-mono text-sm font-semibold text-[#0A0A0A] w-24 text-right shrink-0">{formatCurrency(item.total_price, currency)}</p>
+                <div className="grid grid-cols-12 gap-1.5 items-center">
+                  <div className="col-span-2"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
+                  <div className="col-span-5"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
+                  <div className="col-span-2"><select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' text-[10px]'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select></div>
+                  <div className="col-span-3 text-right"><p className="font-mono text-sm font-semibold text-[#0A0A0A]">{formatCurrency(item.total_price, currency)}</p></div>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
               </div>
             ))}
-            <div className="flex gap-3">
+            <div className="flex items-center gap-4 pt-1">
               <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
               <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-xs text-[#F59E0B] font-medium">+ Add Column</button>
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-[#0EA5E9] font-medium cursor-pointer hover:underline">
-                  + Attach Photo/File
-                  <input type="file" className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleAttachmentUpload} disabled={uploadingAttachment} />
-                </label>
-                {uploadingAttachment && <span className="text-[10px] text-[#999]">Uploading...</span>}
-              </div>
+              <label className="text-xs text-[#0EA5E9] font-medium cursor-pointer">
+                + Attach Photo/File
+                <input type="file" className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleAttachmentUpload} disabled={uploadingAttachment} />
+              </label>
+              {uploadingAttachment && <span className="text-[10px] text-[#999]">Uploading...</span>}
             </div>
             {attachments.length > 0 && (
               <div className="flex gap-2 flex-wrap">
