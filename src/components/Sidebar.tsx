@@ -71,7 +71,7 @@ export default function Sidebar() {
         {NAV_SECTIONS.map((section, si) => (
           <div key={si}>
             {section.label && (
-              <p className={`px-3 mb-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] ${section.label === 'AI TOOLS' ? 'text-[#F59E0B]' : 'text-[#BBB]'}`}>
+              <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#F59E0B]">
                 {section.label}
               </p>
             )}
@@ -83,14 +83,14 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
+                    className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
                       isActive
                         ? isAI ? 'bg-[#F59E0B]/[0.06] text-[#F59E0B]' : 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
                         : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
                     }`}
                   >
                     <svg
-                      className={`h-[16px] w-[16px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
+                      className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -113,13 +113,13 @@ export default function Sidebar() {
       <div className="px-2 py-3 border-t border-[#F0F0F0] space-y-1">
         <Link
           href="/settings"
-          className={`flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
+          className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
             pathname === '/settings' || pathname?.startsWith('/settings/')
               ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
               : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
           }`}
         >
-          <svg className="h-[16px] w-[16px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
             <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
           </svg>

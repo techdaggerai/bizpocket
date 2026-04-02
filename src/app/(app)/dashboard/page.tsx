@@ -231,11 +231,11 @@ export default function DashboardPage() {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1">
             {cycleStages.map((stage, i) => (
               <div key={i} className="flex items-center shrink-0">
-                <div className="rounded-lg px-3 py-2 text-center min-w-[70px] border" style={{ borderColor: stage.color + '40', backgroundColor: stage.color + '08' }}>
-                  <p className="text-[10px] font-bold" style={{ color: stage.color }}>{stage.stage_order}</p>
-                  <p className="text-[9px] font-medium text-[#666] whitespace-nowrap">{stage.name}</p>
+                <div className="rounded-lg px-4 py-3 text-center min-w-[90px] border" style={{ borderColor: stage.color + '40', backgroundColor: stage.color + '08' }}>
+                  <p className="text-xs font-bold" style={{ color: stage.color }}>{stage.stage_order}</p>
+                  <p className="text-[11px] font-medium text-[#666] whitespace-nowrap">{stage.name}</p>
                 </div>
-                {i < cycleStages.length - 1 && <svg className="h-3 w-3 text-[#CCC] shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>}
+                {i < cycleStages.length - 1 && <svg className="h-4 w-4 text-[#CCC] shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>}
               </div>
             ))}
           </div>
