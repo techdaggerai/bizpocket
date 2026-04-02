@@ -10,7 +10,8 @@ import GlobalSearch from '@/components/GlobalSearch';
 import HealthScore from '@/components/HealthScore';
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
-import PocketChatQR from '@/components/PocketChatQR';
+import dynamic from 'next/dynamic';
+const PocketChatQR = dynamic(() => import('@/components/PocketChatQR'), { ssr: false });
 
 const BRIEFING_CACHE_KEY = 'bizpocket_ai_briefing';
 const BRIEFING_TTL = 4 * 60 * 60 * 1000; // 4 hours
@@ -56,7 +57,8 @@ export default function DashboardPage() {
   const { t } = useI18n();
   const { toast } = useToast();
   const [supabase] = useState(() => createClient());
-  const rawName = profile.full_name || user.user_metadata?.full_name || profile.name || '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawName = (profile as any).full_name || user.user_metadata?.full_name || profile.name || '';
   const firstName = rawName.split(' ')[0] || user.email?.split('@')[0] || '';
 
   const [flows, setFlows] = useState<CashFlow[]>([]);
@@ -86,10 +88,12 @@ export default function DashboardPage() {
 
   // Auto-generate slug for existing orgs that don't have one
   useEffect(() => {
-    if (!(organization as Record<string, unknown>).slug && organization.name) {
-      const slug = organization.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
-      supabase.from('organizations').update({ slug }).eq('id', organization.id).then(() => {});
-    }
+    try {
+      if (!(organization as Record<string, unknown>).slug && organization.name) {
+        const slug = organization.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
+        supabase.from('organizations').update({ slug }).eq('id', organization.id).then(() => {});
+      }
+    } catch { /* ignore slug generation errors */ }
   }, [organization.id]); // eslint-disable-line
 
   const fetchBriefing = useCallback(async () => {
