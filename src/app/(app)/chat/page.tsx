@@ -716,6 +716,14 @@ export default function PocketChatPage() {
                 </span>
               )}
             </div>
+            {!activeConvo.is_bot_chat && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5]">{(profile?.language || 'en').toUpperCase()}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2"><path d="M7 16l5-5 5 5"/><path d="M7 8l5 5 5-5"/></svg>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
+                <span className="text-[11px] text-[#9ca3af]">Auto-translating</span>
+              </div>
+            )}
           </div>
           {/* Label button */}
           {!activeConvo.is_bot_chat && (
@@ -951,15 +959,16 @@ export default function PocketChatPage() {
                     <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
-                    {langFlag && <span className="text-[11px]">{langFlag}</span>}
                     {showTranslated && (
                       <button
                         onClick={() => setShowOriginal(p => ({ ...p, [msg.id]: !p[msg.id] }))}
-                        className={`text-[11px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-white/50' : 'text-[#F59E0B]'} hover:opacity-70`}
                       >
-                        {showOriginal[msg.id] ? 'Translated' : 'Original'}
+                        {langFlag && <span>{langFlag}</span>}
+                        {showOriginal[msg.id] ? 'See translation' : 'Translated · tap for original'}
                       </button>
                     )}
+                    {!showTranslated && langFlag && <span className="text-[11px]">{langFlag}</span>}
                     {!hasTranslation && origLang && origLang !== userLang && (
                       <button
                         onClick={() => translateMessage(msg.id, userLang)}
