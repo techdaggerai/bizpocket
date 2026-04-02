@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import SignaturePad from '@/components/SignaturePad'
+import PublicPocketChat from '@/components/PublicPocketChat'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Invoice, InvoiceItem, InvoiceChat, Organization } from '@/types/database'
 
@@ -606,6 +607,19 @@ export default function PublicInvoicePage() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#0A0A0A] text-white text-[13px] font-medium px-4 py-2.5 rounded-[10px] shadow-lg animate-in fade-in slide-in-from-bottom-2 z-50">
           {toast}
         </div>
+      )}
+
+      {/* Public Chat Widget */}
+      {invoice && (
+        <PublicPocketChat
+          conversationId={invoice.id}
+          ownerId={invoice.organization_id}
+          ownerName={org?.name || 'Business'}
+          ownerLanguage="en"
+          orgId={invoice.organization_id}
+          publicToken={token}
+          context="invoice"
+        />
       )}
     </div>
   )

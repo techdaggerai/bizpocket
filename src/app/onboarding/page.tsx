@@ -100,11 +100,13 @@ function OnboardingInner() {
     }
 
     // Create organization with 14-day trial
+    const slug = form.business_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
     const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
     const { data: org, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name: form.business_name,
+        slug,
         business_type: form.business_types.join(',') || 'other',
         language: form.language,
         currency: form.currency,

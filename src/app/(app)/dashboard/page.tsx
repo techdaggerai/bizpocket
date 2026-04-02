@@ -80,6 +80,14 @@ export default function DashboardPage() {
   const month = getCurrentMonth();
   const currency = organization.currency || 'JPY';
 
+  // Auto-generate slug for existing orgs that don't have one
+  useEffect(() => {
+    if (!(organization as Record<string, unknown>).slug && organization.name) {
+      const slug = organization.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 50) || 'my-business';
+      supabase.from('organizations').update({ slug }).eq('id', organization.id).then(() => {});
+    }
+  }, [organization.id]); // eslint-disable-line
+
   const fetchBriefing = useCallback(async () => {
     const cached = getCachedBriefing(organization.id);
     if (cached) { setBriefing(cached.text); setBriefingLoading(false); return; }
@@ -147,6 +155,19 @@ export default function DashboardPage() {
           <svg className="h-4 w-4 text-[#DC2626]/50" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
         </Link>
       )}
+
+      {/* Public Order Link */}
+      <div className="rounded-xl bg-[#eef2ff] border border-[#c7d2fe] p-4 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <p className="text-[13px] font-semibold text-[#4338ca]">Your public order page</p>
+          <p className="text-sm text-[#374151] font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
+          <p className="text-xs text-[#6b7280] mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
+        </div>
+        <button onClick={() => { navigator.clipboard.writeText(`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`); toast('Link copied!', 'success'); }}
+          className="bg-[#4F46E5] text-white text-[13px] font-semibold px-5 py-2.5 rounded-lg whitespace-nowrap hover:bg-[#4338CA] transition-colors">
+          Copy link
+        </button>
+      </div>
 
       {/* 4 Quick Shortcuts */}
       <div className="grid grid-cols-4 gap-2">

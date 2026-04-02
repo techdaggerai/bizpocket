@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
+import PublicPocketChat from '@/components/PublicPocketChat';
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -204,8 +205,19 @@ export default function PublicOrderPage() {
       </div>
 
       <div className="border-t border-[#E5E5E5] bg-white px-4 py-4 text-center">
-        <p className="text-[9px] text-[#CCC]">Powered by <a href="https://www.bizpocket.io" className="text-[#4F46E5]">BizPocket</a></p>
+        <p className="text-[9px] text-[#CCC]">Powered by <a href="https://www.bizpocket.io?ref=order" className="text-[#4F46E5]">BizPocket</a> — AI Business Autopilot</p>
       </div>
+
+      {orgId && (
+        <PublicPocketChat
+          conversationId={orgId}
+          ownerId={orgId}
+          ownerName={business?.name || 'Business'}
+          ownerLanguage="en"
+          orgId={orgId}
+          context="order"
+        />
+      )}
     </div>
   );
 }
