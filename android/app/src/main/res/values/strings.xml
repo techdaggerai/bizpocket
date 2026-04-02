@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BizPocket</string>
+    <string name="title_activity_main">BizPocket</string>
+    <string name="package_name">io.bizpocket.app</string>
+    <string name="custom_url_scheme">io.bizpocket.app</string>
+</resources>
