@@ -1,6 +1,7 @@
 // Landing page — server component
 import Link from 'next/link';
 import { PocketMark } from '@/components/Logo';
+import HeroChatMockup from '@/components/HeroChatMockup';
 
 const PLANS = [
   {
@@ -100,33 +101,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* RIGHT — Chat Mockup */}
-          <div className="bg-[#f9fafb] rounded-[20px] p-5">
-            <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden">
-              <div className="px-4 py-3 border-b border-[#f3f4f6] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7c3aed] flex items-center justify-center text-white text-sm font-semibold">TK</div>
-                  <div><p className="text-sm font-semibold text-[#111827]">Tanaka CPA</p><p className="text-[11px] text-[#22c55e]">● Online</p></div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5] font-semibold">EN</span>
-                  <span className="text-[11px] text-[#d1d5db]">⇄</span>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] font-semibold">JP</span>
-                </div>
-              </div>
-              <div className="p-4 flex flex-col gap-3.5 min-h-[300px]">
-                <div className="flex justify-end"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_4px_14px] bg-[#4F46E5]"><p className="text-sm text-white leading-relaxed">Hi Tanaka-san, I sent invoice #042 for the Alphard repair</p><p className="text-[10px] text-white/50 mt-1">You typed in English</p></div></div>
-                <div className="flex justify-start"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#f3f4f6]"><p className="text-sm text-[#111827] leading-relaxed">受け取りました。金曜日までにお支払い処理します</p><p className="text-[10px] text-[#9ca3af] mt-1">🇯🇵 Tanaka typed in Japanese · translated for you</p></div></div>
-                <div className="flex justify-end"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_4px_14px] bg-[#4F46E5]"><p className="text-sm text-white leading-relaxed">Perfect. Are March receipts ready for tax filing?</p><p className="text-[10px] text-white/50 mt-1">You typed in English</p></div></div>
-                <div className="flex justify-start"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#f3f4f6]"><p className="text-sm text-[#111827] leading-relaxed">はい、Vaultにアップロード済みです。合計47枚の領収書</p><p className="text-[10px] text-[#9ca3af] mt-1">🇯🇵 Tanaka typed in Japanese · translated for you</p></div></div>
-              </div>
-              <div className="px-4 py-2.5 border-t border-[#f3f4f6] flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-lg border border-[#E5E5E5] text-xs text-[#6b7280]">🇬🇧 EN ▼</span>
-                <span className="flex-1 px-3.5 py-2 rounded-[10px] border border-[#E5E5E5] text-[13px] text-[#9ca3af]">Type a message...</span>
-                <div className="w-[34px] h-[34px] rounded-[10px] bg-[#4F46E5] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg></div>
-              </div>
-            </div>
-          </div>
+          {/* RIGHT — Animated Chat Mockup */}
+          <HeroChatMockup />
         </div>
       </section>
 
