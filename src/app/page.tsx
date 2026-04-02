@@ -159,7 +159,7 @@ export default function LandingPage() {
               ].map((item, i) => (
                 <div key={i} className="bg-[#1e293b] rounded-2xl p-4 border border-[#475569]">
                   <div className="flex items-center gap-2 mb-2.5"><span className="text-lg">{item.from}</span><span className="text-[11px] text-[#94a3b8]">→</span><span className="text-lg">{item.to}</span></div>
-                  <p className="text-[13px] text-white">{item.orig}</p>
+                  <p className="text-[13px] text-white font-medium">{item.orig}</p>
                   <p className={`text-[13px] ${item.color} mt-1.5`}>{item.trans}</p>
                 </div>
               ))}
