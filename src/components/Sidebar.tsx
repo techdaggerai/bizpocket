@@ -71,25 +71,26 @@ export default function Sidebar() {
         {NAV_SECTIONS.map((section, si) => (
           <div key={si}>
             {section.label && (
-              <p className="px-3 mb-1.5 text-[9px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">
+              <p className={`px-3 mb-1.5 text-[9px] font-semibold uppercase tracking-[0.1em] ${section.label === 'AI TOOLS' ? 'text-[#F59E0B]' : 'text-[#BBB]'}`}>
                 {section.label}
               </p>
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+                const isAI = ['/website-builder', '/social-media', '/ops-radar', '/items', '/accountant'].some(p => item.href.includes(p));
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
                       isActive
-                        ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
+                        ? isAI ? 'bg-[#F59E0B]/[0.06] text-[#F59E0B]' : 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
                         : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
                     }`}
                   >
                     <svg
-                      className={`h-[16px] w-[16px] shrink-0 ${isActive ? 'text-[#4F46E5]' : 'text-[#999]'}`}
+                      className={`h-[16px] w-[16px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -127,7 +128,7 @@ export default function Sidebar() {
         {plan === 'free' && (
           <Link
             href="/settings/upgrade"
-            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-[#4F46E5] text-white text-[12px] font-semibold hover:bg-[#4338CA] transition-colors"
+            className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-gradient-to-r from-[#F59E0B] to-[#EA580C] text-white text-[12px] font-semibold hover:opacity-90 transition-colors"
           >
             <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>

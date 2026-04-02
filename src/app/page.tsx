@@ -78,7 +78,7 @@ export default function LandingPage() {
             Run your business.<br />From your pocket.
           </h1>
           <p className="mt-6 text-lg text-[#666] leading-relaxed max-w-xl mx-auto">
-            AI-powered invoices, translated chat, operations tracking, and a website for your business &mdash; all from one app.
+            <span className="text-[#F59E0B]">AI</span>-powered invoices, translated chat, operations tracking, and a website for your business &mdash; all from one app.
           </p>
           <div className="mt-10 flex items-center justify-center gap-3 max-w-md mx-auto">
             <input
@@ -182,12 +182,12 @@ export default function LandingPage() {
       <section className="border-t border-[#F0F0F0] bg-[#FAFAFA]">
         <div className="mx-auto max-w-5xl px-6 py-24">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-medium uppercase tracking-widest text-[#4F46E5] mb-4">Built on AI</p>
+            <p className="text-[11px] font-medium uppercase tracking-widest text-[#F59E0B] mb-4">Built on <span className="text-[#F59E0B]">AI</span></p>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.5rem)] font-semibold leading-[1.15] tracking-tight mb-6">
               Your business runs itself.<br />You just approve.
             </h2>
             <p className="text-[15px] text-[#666] leading-relaxed mb-10">
-              Wake up to your AI morning briefing. Overnight: invoices tracked, cash flow updated, action items ready. AI creates your social media posts, builds your website, and learns your business every day.
+              Wake up to your <span className="text-[#F59E0B]">AI</span> morning briefing. Overnight: invoices tracked, cash flow updated, action items ready. <span className="text-[#F59E0B]">AI</span> creates your social media posts, builds your website, and learns your business every day.
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">

@@ -118,7 +118,7 @@ export default function OpsRadarPage() {
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">Ops Radar</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Ops Radar<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
           <p className="text-xs text-[var(--text-3)]">{cycleName}</p>
         </div>
         <div className="flex gap-2">

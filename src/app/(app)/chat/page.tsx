@@ -668,7 +668,7 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            <div className="h-10 w-10 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
+            <div className="h-10 w-10 rounded-full bg-[#F59E0B] flex items-center justify-center flex-shrink-0">
               <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
             </div>
           ) : (
@@ -912,7 +912,7 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
+                  <div className="h-8 w-8 rounded-full bg-[#F59E0B] flex items-center justify-center flex-shrink-0">
                     <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
                   </div>
                 )}
@@ -921,14 +921,14 @@ export default function PocketChatPage() {
                     <p className="text-[12px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
                   )}
                   {isBot && (
-                    <p className="text-[12px] text-[#7C3AED] mb-1 ml-1 font-medium">{botName}</p>
+                    <p className="text-[12px] text-[#F59E0B] mb-1 ml-1 font-medium">{botName}</p>
                   )}
                   <div
                     className={`rounded-[12px] px-3.5 py-2.5 ${
                       isOwner
                         ? 'bg-[#4F46E5] text-white'
                         : isBot
-                          ? 'bg-[#4F46E5]/5 text-[#0A0A0A] border border-[#4F46E5]/10'
+                          ? 'bg-[#F59E0B]/5 text-[#0A0A0A] border border-[#F59E0B]/10'
                           : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >

@@ -207,7 +207,7 @@ export default function WebsiteBuilderPage() {
               </svg>
             </Link>
             <div>
-              <h1 className="text-[15px] font-semibold text-[#0A0A0A]">Website Builder</h1>
+              <h1 className="text-[15px] font-semibold text-[#0A0A0A]">Website Builder<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
               <p className="text-[10px] text-[#999]">Step {step} of {totalSteps}</p>
             </div>
           </div>

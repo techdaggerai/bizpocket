@@ -202,15 +202,15 @@ export default function DashboardPage() {
 
       {/* AI Briefing */}
       {briefingLoading ? (
-        <div className="rounded-xl border border-[#4F46E5]/10 bg-gradient-to-br from-[#4F46E5]/[0.03] to-[#7C3AED]/[0.05] p-5">
-          <div className="flex items-center gap-2 mb-3"><div className="h-4 w-4 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /><span className="text-xs font-semibold text-[#4F46E5]">AI Briefing</span></div>
-          <div className="space-y-2"><div className="h-3 w-full animate-pulse rounded bg-[#4F46E5]/10" /><div className="h-3 w-4/5 animate-pulse rounded bg-[#4F46E5]/10" /><div className="h-3 w-3/5 animate-pulse rounded bg-[#4F46E5]/10" /></div>
+        <div className="rounded-xl border border-[#F59E0B]/20 border-l-4 border-l-[#F59E0B] bg-gradient-to-br from-[#F59E0B]/[0.03] to-[#EA580C]/[0.05] p-5">
+          <div className="flex items-center gap-2 mb-3"><div className="h-4 w-4 animate-spin rounded-full border-2 border-[#F59E0B] border-t-transparent" /><span className="text-xs font-semibold text-[#F59E0B]">AI Briefing</span></div>
+          <div className="space-y-2"><div className="h-3 w-full animate-pulse rounded bg-[#F59E0B]/10" /><div className="h-3 w-4/5 animate-pulse rounded bg-[#F59E0B]/10" /><div className="h-3 w-3/5 animate-pulse rounded bg-[#F59E0B]/10" /></div>
         </div>
       ) : briefing ? (
-        <div className="rounded-xl border border-[#4F46E5]/10 bg-gradient-to-br from-[#4F46E5]/[0.03] to-[#7C3AED]/[0.05] p-5">
+        <div className="rounded-xl border border-[#F59E0B]/20 border-l-4 border-l-[#F59E0B] bg-gradient-to-br from-[#F59E0B]/[0.03] to-[#EA580C]/[0.05] p-5">
           <div className="flex items-center gap-2 mb-3">
-            <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" /></svg>
-            <span className="text-xs font-semibold text-[#4F46E5]">AI Briefing</span>
+            <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" /></svg>
+            <span className="text-xs font-semibold text-[#F59E0B]">AI Briefing</span>
           </div>
           <p className="whitespace-pre-line text-[13px] leading-relaxed text-[#333]">{stripMarkdown(briefing)}</p>
         </div>
@@ -261,7 +261,7 @@ export default function DashboardPage() {
 
       {/* Upgrade Banner */}
       {(organization.plan === 'free' || !organization.plan) && (
-        <Link href="/settings/upgrade" className="block rounded-xl bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] p-4 transition-all hover:shadow-lg hover:-translate-y-0.5">
+        <Link href="/settings/upgrade" className="block rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#EA580C] p-4 transition-all hover:shadow-lg hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
               <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
@@ -270,7 +270,7 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-white">Unlock the full autopilot</p>
               <p className="text-xs text-white/70">Unlimited invoices, AI Briefing, 13 languages</p>
             </div>
-            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#4F46E5]">Go Pro &rarr;</span>
+            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#EA580C]">Go Pro &rarr;</span>
           </div>
         </Link>
       )}

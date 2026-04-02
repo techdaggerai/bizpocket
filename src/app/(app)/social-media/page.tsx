@@ -92,7 +92,7 @@ export default function SocialMediaPage() {
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">Social Media Assistant</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Social Media Assistant<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
           <p className="text-xs text-[var(--text-3)]">AI creates perfect posts, captions, and hashtags</p>
         </div>
       </div>
