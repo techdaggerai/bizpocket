@@ -102,13 +102,13 @@ export default function InvoicesPage() {
       </div>
 
       {/* Quick Links — Estimates & Time */}
-      <div className="flex gap-2">
-        <a href="/estimates" className="flex-1 flex items-center gap-2 rounded-[10px] border border-[#E5E5E5] bg-white px-3 py-2.5 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
-          <svg className="h-4 w-4 text-[#7C3AED]" viewBox="0 0 24 24" fill="currentColor"><path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V8.25L14.25 1.5H5.625ZM9 12h6M9 15h4" /></svg>
+      <div className="flex gap-3">
+        <a href="/estimates" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F59E0B]/[0.06] transition-colors">
+          <svg className="h-5 w-5 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 12h6M9 16h6M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M13 2v6h6"/></svg>
           Estimates
         </a>
-        <a href="/time-tracking" className="flex-1 flex items-center gap-2 rounded-[10px] border border-[#E5E5E5] bg-white px-3 py-2.5 text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
-          <svg className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round" /></svg>
+        <a href="/time-tracking" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-[#0A0A0A] hover:bg-[#F59E0B]/[0.06] transition-colors">
+          <svg className="h-5 w-5 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           Time Tracking
         </a>
       </div>
