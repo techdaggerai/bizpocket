@@ -129,14 +129,18 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col gap-3">
               {[
-                { from: '🇬🇧', to: '🇯🇵', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', color: 'text-[#a5b4fc]' },
-                { from: '🇵🇰', to: '🇦🇪', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', color: 'text-[#fbbf24]' },
-                { from: '🇧🇷', to: '🇨🇳', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', color: 'text-[#4ade80]' },
+                { from: 'GB', to: 'JP', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', transColor: '#a5b4fc' },
+                { from: 'PK', to: 'AE', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', transColor: '#fbbf24' },
+                { from: 'BR', to: 'CN', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', transColor: '#4ade80' },
               ].map((item, i) => (
                 <div key={i} className="bg-[#1e293b] rounded-2xl p-4 border border-[#475569]">
-                  <div className="flex items-center gap-2 mb-2.5"><span className="text-lg">{item.from}</span><span className="text-[11px] text-[#94a3b8]">→</span><span className="text-lg">{item.to}</span></div>
-                  <p className="text-[13px] text-white font-medium">{item.orig}</p>
-                  <p className={`text-[13px] ${item.color} mt-1.5`}>{item.trans}</p>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 600 }}>{item.from}</span>
+                    <span style={{ color: '#94a3b8', fontSize: 11 }}>→</span>
+                    <span style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 600 }}>{item.to}</span>
+                  </div>
+                  <p style={{ color: '#ffffff', fontSize: 13, fontWeight: 500, margin: 0 }}>{item.orig}</p>
+                  <p style={{ color: item.transColor, fontSize: 13, marginTop: 6 }}>{item.trans}</p>
                 </div>
               ))}
             </div>
