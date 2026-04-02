@@ -5,12 +5,20 @@ import { createClient } from '@/lib/supabase-client';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const BUSINESS_TYPES = [
-  { value: 'car_dealer', label: 'Car Dealer' },
+  { value: 'car_dealer', label: 'Car Dealer / Auto' },
   { value: 'parts', label: 'Parts & Export' },
   { value: 'restaurant', label: 'Restaurant / Food' },
+  { value: 'bakery', label: 'Bakery / Cakes' },
   { value: 'retail', label: 'Retail / Shop' },
   { value: 'construction', label: 'Construction' },
   { value: 'consulting', label: 'Consulting / Services' },
+  { value: 'beauty', label: 'Beauty / Salon' },
+  { value: 'freelance', label: 'Freelance / Creative' },
+  { value: 'ecommerce', label: 'E-Commerce / Online' },
+  { value: 'cleaning', label: 'Cleaning Services' },
+  { value: 'transport', label: 'Transport / Logistics' },
+  { value: 'education', label: 'Education / Tutoring' },
+  { value: 'healthcare', label: 'Healthcare / Medical' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -23,6 +31,20 @@ const LANGUAGES = [
 const CURRENCIES = [
   { value: 'JPY', label: '¥ JPY — Japanese Yen' },
   { value: 'USD', label: '$ USD — US Dollar' },
+  { value: 'EUR', label: '€ EUR — Euro' },
+  { value: 'GBP', label: '£ GBP — British Pound' },
+  { value: 'PKR', label: '₨ PKR — Pakistani Rupee' },
+  { value: 'AED', label: 'د.إ AED — UAE Dirham' },
+  { value: 'SAR', label: '﷼ SAR — Saudi Riyal' },
+  { value: 'BDT', label: '৳ BDT — Bangladeshi Taka' },
+  { value: 'PHP', label: '₱ PHP — Philippine Peso' },
+  { value: 'VND', label: '₫ VND — Vietnamese Dong' },
+  { value: 'TRY', label: '₺ TRY — Turkish Lira' },
+  { value: 'CNY', label: '¥ CNY — Chinese Yuan' },
+  { value: 'BRL', label: 'R$ BRL — Brazilian Real' },
+  { value: 'INR', label: '₹ INR — Indian Rupee' },
+  { value: 'CAD', label: '$ CAD — Canadian Dollar' },
+  { value: 'AUD', label: '$ AUD — Australian Dollar' },
 ];
 
 export default function OnboardingPage() {
@@ -159,7 +181,7 @@ function OnboardingInner() {
                 type="text"
                 value={form.business_name}
                 onChange={(e) => setForm({ ...form, business_name: e.target.value })}
-                className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
+                className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
                 placeholder="e.g., Tokyo Auto Export"
               />
               <div>
@@ -204,7 +226,7 @@ function OnboardingInner() {
             <select
               value={form.language}
               onChange={(e) => setForm({ ...form, language: e.target.value })}
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center]"
+              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3 py-2.5 text-base text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23A3A3A3%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center]"
             >
               <option value="en">🌐 English</option>
               <option value="ja">🌐 日本語</option>
@@ -259,7 +281,7 @@ function OnboardingInner() {
               type="email"
               value={form.accountant_email}
               onChange={(e) => setForm({ ...form, accountant_email: e.target.value })}
-              className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full rounded-lg border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
               placeholder="accountant@example.com"
             />
           </div>
