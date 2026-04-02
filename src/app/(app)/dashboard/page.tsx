@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, getGreeting, getCurrentMonth, formatDateShort } from '@/lib/utils';
 import GlobalSearch from '@/components/GlobalSearch';
 import HealthScore from '@/components/HealthScore';
@@ -53,6 +54,7 @@ function stripMarkdown(text: string): string {
 export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
+  const { toast } = useToast();
   const [supabase] = useState(() => createClient());
   const rawName = profile.full_name || user.user_metadata?.full_name || profile.name || '';
   const firstName = rawName.split(' ')[0] || user.email?.split('@')[0] || '';
