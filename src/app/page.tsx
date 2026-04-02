@@ -152,6 +152,24 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* POCKETCHAT STANDALONE BANNER */}
+      <section className="px-6 pb-10">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="bg-[#f9fafb] rounded-2xl px-8 py-6 flex items-center justify-between flex-wrap gap-4 border border-[#e5e7eb]">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <PocketChatMark size={24} />
+                <span className="text-[15px] font-bold text-[#111827]">PocketChat</span>
+              </div>
+              <p className="text-sm text-[#6b7280]">Just need translation chat? No business setup required. Free forever.</p>
+            </div>
+            <Link href="/signup?mode=pocketchat" className="bg-[#F59E0B] text-white px-6 py-2.5 rounded-[10px] text-sm font-semibold whitespace-nowrap hover:bg-[#d97706] transition-colors">
+              Get PocketChat free
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* STATS BAR */}
       <section className="px-6 pb-16">
         <div className="mx-auto max-w-[1100px]">

@@ -4,7 +4,7 @@ import { useState, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { PocketMark, LogoWordmark } from '@/components/Logo';
+import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 
 export default function SignupPage() {
   return (
@@ -19,6 +19,8 @@ function SignupInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan') || 'free';
+  const mode = searchParams.get('mode');
+  const isPocketChat = mode === 'pocketchat';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -47,7 +49,7 @@ function SignupInner() {
       return;
     }
 
-    router.push(`/onboarding?plan=${plan}`);
+    router.push(isPocketChat ? '/chat' : `/onboarding?plan=${plan}`);
   }
 
   return (
@@ -55,11 +57,11 @@ function SignupInner() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
-            <PocketMark variant="lg" />
-            <LogoWordmark />
+            {isPocketChat ? <PocketChatMark size={48} /> : <PocketMark variant="lg" />}
+            {!isPocketChat && <LogoWordmark />}
           </div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">Create your account</h1>
-          <p className="mt-1.5 text-sm text-[var(--text-3)]">Start managing your business</p>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">{isPocketChat ? 'Sign up for PocketChat' : 'Create your account'}</h1>
+          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Chat in any language. Free.' : 'Start managing your business'}</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
@@ -107,7 +109,7 @@ function SignupInner() {
             disabled={loading}
             className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px disabled:opacity-50 disabled:hover:translate-y-0"
           >
-            {loading ? 'Creating account...' : 'Open Your Pocket'}
+            {loading ? 'Creating account...' : isPocketChat ? 'Get PocketChat free' : 'Open Your Pocket'}
           </button>
         </form>
 
