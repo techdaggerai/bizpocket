@@ -9,6 +9,7 @@ import GlobalSearch from '@/components/GlobalSearch';
 import HealthScore from '@/components/HealthScore';
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
+import PocketChatQR from '@/components/PocketChatQR';
 
 const BRIEFING_CACHE_KEY = 'bizpocket_ai_briefing';
 const BRIEFING_TTL = 4 * 60 * 60 * 1000; // 4 hours
@@ -61,6 +62,7 @@ export default function DashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showQR, setShowQR] = useState(false);
   const [briefing, setBriefing] = useState<string | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
   const [now, setNow] = useState(new Date());
@@ -168,16 +170,29 @@ export default function DashboardPage() {
       )}
 
       {/* Public Order Link */}
-      <div className="rounded-xl bg-[#eef2ff] border border-[#c7d2fe] p-4 flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <p className="text-[13px] font-semibold text-[#4338ca]">Your public order page</p>
-          <p className="text-sm text-[#374151] font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
-          <p className="text-xs text-[#6b7280] mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
+      <div className="rounded-xl bg-[#eef2ff] border border-[#c7d2fe] p-4">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <p className="text-[13px] font-semibold text-[#4338ca]">Your public order page</p>
+            <p className="text-sm text-[#374151] font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
+            <p className="text-xs text-[#6b7280] mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setShowQR(!showQR)}
+              className="bg-white text-[#4F46E5] text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-[#c7d2fe] whitespace-nowrap hover:bg-[#eef2ff] transition-colors">
+              {showQR ? 'Hide QR' : 'Show QR'}
+            </button>
+            <button onClick={() => { navigator.clipboard.writeText(`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`); toast('Link copied!', 'success'); }}
+              className="bg-[#4F46E5] text-white text-[13px] font-semibold px-5 py-2.5 rounded-lg whitespace-nowrap hover:bg-[#4338CA] transition-colors">
+              Copy link
+            </button>
+          </div>
         </div>
-        <button onClick={() => { navigator.clipboard.writeText(`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`); toast('Link copied!', 'success'); }}
-          className="bg-[#4F46E5] text-white text-[13px] font-semibold px-5 py-2.5 rounded-lg whitespace-nowrap hover:bg-[#4338CA] transition-colors">
-          Copy link
-        </button>
+        {showQR && (
+          <div className="mt-4 pt-4 border-t border-[#c7d2fe]">
+            <PocketChatQR url={`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`} name={organization.name || 'business'} size={200} />
+          </div>
+        )}
       </div>
 
       {/* 4 Quick Shortcuts */}
