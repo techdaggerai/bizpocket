@@ -12,6 +12,7 @@ import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
+import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 
 /* ---------- Types ---------- */
 
@@ -1025,11 +1026,8 @@ export default function PocketChatPage() {
             );
           })}
           {typingUser && (
-            <div className="flex items-center gap-2 px-3.5 py-2">
-              <div className="flex gap-1 items-center">
-                {[0, 1, 2].map(d => (<div key={d} className="w-1.5 h-1.5 rounded-full bg-[#9ca3af]" style={{ animation: 'dotPulse 1.2s infinite', animationDelay: `${d * 0.2}s` }} />))}
-              </div>
-              <span className="text-xs text-[#9ca3af]">{typingUser} is typing...</span>
+            <div className="px-3.5">
+              <PocketChatTypingIndicator contactName={typingUser} />
             </div>
           )}
           <div ref={messagesEndRef} />
