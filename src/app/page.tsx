@@ -177,17 +177,17 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
-              { icon: '☀️', title: 'AI Morning Briefing', desc: 'Wake up to what happened overnight. AI tells you what to do today.' },
-              { icon: '📸', title: 'AI Document Detector', desc: 'Snap any Japanese document. Get instant English translation.' },
-              { icon: '🌐', title: 'AI Website Builder', desc: '7-step wizard builds your business website. Publish in minutes.' },
-              { icon: '📊', title: 'Ops Radar', desc: 'Your business command center. See bottlenecks before they cost you.' },
-              { icon: '💰', title: 'Cash Flow Tracker', desc: 'Log income and expenses. AI categorizes. See your real numbers.' },
-              { icon: '🧾', title: 'AI Form Fill', desc: 'Upload any form in any language. AI fills it out for you field by field.' },
-              { icon: '👨‍💼', title: 'Accountant Portal', desc: 'Your Japanese accountant gets read-only access. Monthly packages auto-generated.' },
-              { icon: '📱', title: 'Social Media AI', desc: 'AI generates posts, captions, and hashtags. Connect Instagram to orders.' },
+              { title: 'AI Morning Briefing', desc: 'Wake up to what happened overnight. AI tells you what to do today.', svg: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>', color: '#F59E0B' },
+              { title: 'AI Document Detector', desc: 'Snap any Japanese document. Get instant English translation.', svg: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="11" cy="11" r="4"/><path d="M15 15l4 4"/>', color: '#F59E0B' },
+              { title: 'AI Website Builder', desc: '7-step wizard builds your business website. Publish in minutes.', svg: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>', color: '#F59E0B' },
+              { title: 'Ops Radar', desc: 'Your business command center. See bottlenecks before they cost you.', svg: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>', color: '#4F46E5' },
+              { title: 'Cash Flow Tracker', desc: 'Log income and expenses. AI categorizes. See your real numbers.', svg: '<path d="M3 20h4l-1-4"/><path d="M9 20h4l-2-8"/><path d="M15 20h4l-3-12"/><line x1="4" y1="16" x2="20" y2="16" opacity="0.3"/>', color: '#4F46E5' },
+              { title: 'AI Form Fill', desc: 'Upload any form in any language. AI fills it out for you field by field.', svg: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>', color: '#F59E0B' },
+              { title: 'Accountant Portal', desc: 'Your Japanese accountant gets read-only access. Monthly packages auto-generated.', svg: '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>', color: '#4F46E5' },
+              { title: 'Social Media AI', desc: 'AI generates posts, captions, and hashtags. Connect Instagram to orders.', svg: '<rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>', color: '#F59E0B' },
             ].map((f, i) => (
               <div key={i} className="bg-white rounded-2xl border border-[#E5E5E5] p-5">
-                <span className="text-2xl block mb-2.5">{f.icon}</span>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-3" dangerouslySetInnerHTML={{ __html: f.svg }} />
                 <h4 className="text-[15px] font-semibold text-[#111827] mb-1.5">{f.title}</h4>
                 <p className="text-[13px] text-[#6b7280] leading-relaxed">{f.desc}</p>
               </div>
