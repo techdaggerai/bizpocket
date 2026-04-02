@@ -288,7 +288,7 @@ export default function NewInvoicePage() {
   };
 
   const TemplateComponent = (TEMPLATES[selectedTemplate] || TEMPLATES.classic).Component;
-  const inputClass = "w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
+  const inputClass = "w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
 
   return (
     <>
@@ -336,9 +336,9 @@ export default function NewInvoicePage() {
       )}
 
       {/* Split View */}
-      <div className="flex gap-6 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
+      <div className="flex gap-4 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
         {/* LEFT: Form */}
-        <div className="flex-1 min-w-0 space-y-4">
+        <div className="flex-1 min-w-0 space-y-3 lg:max-w-[480px]">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-[#0A0A0A]">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
@@ -348,7 +348,7 @@ export default function NewInvoicePage() {
           </div>
 
           {/* Customer */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-3">
             <h3 className="text-xs font-semibold text-[#BBB] uppercase tracking-[0.1em]">Customer</h3>
             <div className="relative">
               <input value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} placeholder="Search or type customer name..." className={inputClass + ' pl-9'} />
@@ -381,7 +381,7 @@ export default function NewInvoicePage() {
           </div>
 
           {/* Details */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-3">
             <h3 className="text-xs font-semibold text-[#BBB] uppercase tracking-[0.1em]">Details</h3>
             <div className="grid grid-cols-2 gap-2">
               <div><label className="text-[10px] text-[#999]">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
@@ -391,7 +391,7 @@ export default function NewInvoicePage() {
           </div>
 
           {/* Items */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold text-[#BBB] uppercase tracking-[0.1em]">Items</h3>
               {(templates.length > 0 || cycleItems.length > 0) && <button onClick={() => setShowTemplates(!showTemplates)} className="text-[10px] text-[#4F46E5] font-medium">From Saved</button>}
@@ -455,7 +455,7 @@ export default function NewInvoicePage() {
           </div>
 
           {/* Payment & Notes */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-3">
             <h3 className="text-xs font-semibold text-[#BBB] uppercase tracking-[0.1em]">Payment & Notes</h3>
             <div className="flex gap-1.5">{[{k:'bank_transfer',l:'Bank Transfer'},{k:'cash',l:'Cash'},{k:'credit_card',l:'Card'}].map(({k,l}) => (<button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-2 text-[10px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>))}</div>
             {paymentMethod === 'bank_transfer' && (<div className="space-y-2"><div className="grid grid-cols-2 gap-2"><input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="Bank name" className={inputClass} /><input value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="Branch" className={inputClass} /></div><div className="grid grid-cols-2 gap-2"><input value={bankAccountName} onChange={e => setBankAccountName(e.target.value)} placeholder="Account name" className={inputClass} /><input value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="Account number" className={inputClass} /></div></div>)}
@@ -483,14 +483,14 @@ export default function NewInvoicePage() {
         </div>
 
         {/* RIGHT: Live Preview (desktop) */}
-        <div className="hidden lg:block lg:w-[45%] shrink-0">
+        <div className="hidden lg:block flex-1 shrink-0">
           <div className="sticky top-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
               <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
-              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.75)', width: '133%', transformOrigin: 'top left' }}>
+              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>
             </div>
