@@ -1170,7 +1170,7 @@ export default function PocketChatPage() {
     { key: 'all', label: 'All' },
     { key: 'customer', label: 'Customers' },
     { key: 'supplier', label: 'Suppliers' },
-    { key: 'invoice', label: 'Invoice Threads' },
+    { key: 'invoice', label: 'Invoices' },
   ];
 
   return (
@@ -1198,12 +1198,12 @@ export default function PocketChatPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="px-4 pt-3 pb-0 flex flex-nowrap gap-4 overflow-x-auto border-b border-[#F0F0F0]">
+      <div className="px-4 pt-3 pb-0 flex flex-nowrap gap-6 overflow-x-auto border-b border-[#F0F0F0]">
         {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`text-xs font-medium px-4 pb-2 whitespace-nowrap flex-shrink-0 transition-colors ${
+            className={`text-sm font-medium pb-2 whitespace-nowrap flex-shrink-0 transition-colors ${
               filter === f.key
                 ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]'
                 : 'text-[#6B7280] hover:text-[#0A0A0A]'
