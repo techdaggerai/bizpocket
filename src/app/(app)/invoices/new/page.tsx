@@ -295,7 +295,7 @@ export default function NewInvoicePage() {
       {/* Template Picker Modal */}
       {showTemplatePicker && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto p-8">
+          <div className="bg-white rounded-2xl max-w-[95vw] w-full max-h-[90vh] overflow-y-auto p-8">
             <div className="flex items-center justify-between mb-4">
               <div><h2 className="text-xl font-bold text-[#0A0A0A]">Choose Your Template</h2><p className="text-sm text-[#999]">Select a template for your invoice</p></div>
               <div className="flex items-center gap-2">
@@ -308,8 +308,8 @@ export default function NewInvoicePage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {Object.entries(TEMPLATES).map(([key, tpl]) => (
                 <button key={key} onClick={() => setSelectedTemplate(key)} onDoubleClick={() => { setSelectedTemplate(key); setShowTemplatePicker(false); }}
-                  className={`relative rounded-xl border-2 overflow-hidden min-h-[280px] text-left transition-all ${selectedTemplate === key ? 'border-[#4F46E5] ring-2 ring-[#4F46E5]/20' : 'border-[#E5E5E5] hover:border-[#CCC]'}`}>
-                  <div className="absolute inset-0 origin-top-left pointer-events-none" style={{ transform: 'scale(0.38)', width: '263%', height: '263%' }}>
+                  className={`relative rounded-xl border-2 overflow-hidden min-h-[320px] text-left transition-all ${selectedTemplate === key ? 'border-[#4F46E5] ring-2 ring-[#4F46E5]/20' : 'border-[#E5E5E5] hover:border-[#CCC]'}`}>
+                  <div className="absolute inset-0 origin-top-left pointer-events-none" style={{ transform: 'scale(0.42)', width: '238%', height: '238%' }}>
                     <tpl.Component data={liveInvoiceData} />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent pt-10 pb-3 px-3">
@@ -483,14 +483,14 @@ export default function NewInvoicePage() {
         </div>
 
         {/* RIGHT: Live Preview (desktop) */}
-        <div className="hidden lg:block lg:w-[550px] xl:w-[600px] shrink-0">
+        <div className="hidden lg:block lg:w-[45%] shrink-0">
           <div className="sticky top-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
               <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
-              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.68)', width: '147%', transformOrigin: 'top left' }}>
+              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.75)', width: '133%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>
             </div>
