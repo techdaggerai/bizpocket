@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useEffect, useState, useRef, useCallback } from 'react'
+import SignaturePad from '@/components/SignaturePad'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Invoice, InvoiceItem, InvoiceChat, Organization } from '@/types/database'
 
@@ -32,6 +33,7 @@ export default function PublicInvoicePage() {
   const [messageText, setMessageText] = useState('')
   const [sending, setSending] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [signed, setSigned] = useState(false)
 
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -404,6 +406,43 @@ export default function PublicInvoicePage() {
               </div>
             </div>
           )}
+
+          {/* E-Signature */}
+          {!(invoice as any).signature_url && !signed ? (
+            <div className="mt-6">
+              <SignaturePad onSave={async (dataUrl, name) => {
+                try {
+                  const res = await fetch('/api/invoices/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, signature_url: dataUrl, signature_name: name }),
+                  });
+                  if (res.ok) {
+                    setSigned(true);
+                    showToast('Invoice signed successfully!');
+                  } else {
+                    const data = await res.json().catch(() => ({}));
+                    showToast(data.error || 'Failed to sign invoice');
+                  }
+                } catch {
+                  showToast('Failed to sign invoice');
+                }
+              }} />
+            </div>
+          ) : (invoice as any).signature_url ? (
+            <div className="mt-6 rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/5 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="h-4 w-4 text-[#16A34A]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                <p className="text-sm font-medium text-[#16A34A]">Signed by {(invoice as any).signature_name}</p>
+              </div>
+              <img src={(invoice as any).signature_url} alt="Signature" className="h-16 object-contain" />
+            </div>
+          ) : signed ? (
+            <div className="mt-6 rounded-xl border border-[#16A34A]/20 bg-[#16A34A]/5 p-4 text-center">
+              <svg className="h-5 w-5 text-[#16A34A] mx-auto mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+              <p className="text-sm font-medium text-[#16A34A]">Signed successfully!</p>
+            </div>
+          ) : null}
 
           {/* Action buttons */}
           <div className="flex gap-2.5">

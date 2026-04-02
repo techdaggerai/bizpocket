@@ -158,9 +158,14 @@ export default function InvoicesPage() {
                     <span className={`inline-block rounded-btn border px-1.5 py-0.5 text-[10px] font-medium ${statusColors[inv.status]}`}>
                       {inv.status.toUpperCase()}
                     </span>
-                    {(inv as any).viewed_at && inv.status === 'sent' && (
+                    {(inv as any).viewed_at && !['paid'].includes(inv.status) && (
                       <span className="inline-block rounded-btn border border-[#0EA5E9]/20 bg-[#0EA5E9]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#0EA5E9]">
                         VIEWED
+                      </span>
+                    )}
+                    {(inv as any).signature_url && (
+                      <span className="inline-block rounded-btn border border-[#16A34A]/20 bg-[#16A34A]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#16A34A]">
+                        SIGNED
                       </span>
                     )}
                   </div>

@@ -89,6 +89,10 @@ export default function NewInvoicePage() {
   const [editOriginalStatus, setEditOriginalStatus] = useState<InvoiceStatus | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // Attachments
+  const [attachments, setAttachments] = useState<{name: string; url: string; type: string}[]>([]);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+
   // UI
   const [showTemplatePicker, setShowTemplatePicker] = useState(!editId);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
@@ -153,6 +157,7 @@ export default function NewInvoicePage() {
       if (inv.invoice_type === 'transport') setTransportFields({ vessel: inv.vessel || '', port_loading: inv.port_loading || '', port_discharge: inv.port_discharge || '', shipping_terms: inv.shipping_terms || 'FOB', container_no: inv.container_no || '', bill_of_lading: inv.bill_of_lading || '' });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (items && items.length > 0) setLineItems(items.map((item: any) => calcLineItem({ line_number: item.line_number, description: item.description, quantity: item.quantity, unit_price: item.unit_price, tax_rate: item.tax_rate, tax_amount: 0, total_price: 0, chassis_no: item.chassis_no || undefined, discount_percent: item.discount_percent || 0 })));
+      if (inv.attachments && Array.isArray(inv.attachments)) setAttachments(inv.attachments);
       setShowTemplatePicker(false);
     }
     loadInvoice();
@@ -213,6 +218,21 @@ export default function NewInvoicePage() {
   function handleTouchStart(e: React.TouchEvent, idx: number) { touchStartX.current = e.touches[0].clientX; setSwipingIdx(idx); }
   function handleTouchEnd(e: React.TouchEvent, idx: number) { if (touchStartX.current - e.changedTouches[0].clientX > 80) removeLineItem(idx); setSwipingIdx(null); }
 
+  async function handleAttachmentUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAttachment(true);
+    try {
+      const path = `${organization.id}/invoices/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage.from('documents').upload(path, file);
+      if (error) { toast('Upload failed', 'error'); return; }
+      const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
+      setAttachments(prev => [...prev, { name: file.name, url: urlData.publicUrl, type: file.type }]);
+      toast('Attached!', 'success');
+    } catch { toast('Upload failed', 'error'); }
+    finally { setUploadingAttachment(false); }
+  }
+
   async function generateInvoiceNumber(): Promise<string> {
     const { count } = await supabase.from('invoices').select('*', { count: 'exact', head: true }).eq('organization_id', organization.id);
     return `INV/${organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/${new Date().toISOString().slice(2, 10).replace(/-/g, '')}-${String((count || 0) + 1).padStart(4, '0')}`;
@@ -235,6 +255,7 @@ export default function NewInvoicePage() {
       invoice_prefix: 'INV', template: selectedTemplate, invoice_type: invoiceType,
       ...(invoiceType === 'transport' ? { vessel: transportFields.vessel || null, port_loading: transportFields.port_loading || null, port_discharge: transportFields.port_discharge || null, shipping_terms: transportFields.shipping_terms || null, container_no: transportFields.container_no || null, bill_of_lading: transportFields.bill_of_lading || null } : {}),
       currency, status, language: invoiceLang, created_by: user.id,
+      attachments: attachments.length > 0 ? attachments : null,
       ...(status === 'sent' ? { sent_at: new Date().toISOString() } : {}),
     };
     let invoice, error;
@@ -425,7 +446,29 @@ export default function NewInvoicePage() {
             <div className="flex gap-3">
               <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
               <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-xs text-[#F59E0B] font-medium">+ Add Column</button>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-[#0EA5E9] font-medium cursor-pointer hover:underline">
+                  + Attach Photo/File
+                  <input type="file" className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleAttachmentUpload} disabled={uploadingAttachment} />
+                </label>
+                {uploadingAttachment && <span className="text-[10px] text-[#999]">Uploading...</span>}
+              </div>
             </div>
+            {attachments.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {attachments.map((att, i) => (
+                  <div key={i} className="flex items-center gap-1.5 rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] px-2 py-1">
+                    {att.type.startsWith('image/') ? (
+                      <img src={att.url} alt={att.name} className="h-8 w-8 rounded object-cover" />
+                    ) : (
+                      <svg className="h-4 w-4 text-[#DC2626]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>
+                    )}
+                    <span className="text-[10px] text-[#666] max-w-[80px] truncate">{att.name}</span>
+                    <button onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))} className="text-[10px] text-[#DC2626]">✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
             {customColumns.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[9px] text-[#999]">Custom:</span>
