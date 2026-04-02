@@ -11,6 +11,7 @@ import QuickReplies from '@/components/QuickReplies';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
+import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 /* ---------- Types ---------- */
 
@@ -119,14 +120,6 @@ export default function PocketChatPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [rotatingLang, setRotatingLang] = useState('EN');
-  const ROTATE_LANGS = ['EN', 'JA', 'UR', 'AR', 'BN', 'PT', 'FIL', 'VI', 'TR', 'ZH', 'FR', 'NL', 'ES'];
-  useEffect(() => {
-    if (!sending) return;
-    let i = 0;
-    const interval = setInterval(() => { setRotatingLang(ROTATE_LANGS[i % ROTATE_LANGS.length]); i++; }, 100);
-    return () => clearInterval(interval);
-  }, [sending]); // eslint-disable-line
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const [recording, setRecording] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
@@ -725,11 +718,12 @@ export default function PocketChatPage() {
               )}
             </div>
             {!activeConvo.is_bot_chat && (
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5] min-w-[36px] text-center transition-all duration-100">{sending ? rotatingLang : (profile?.language || 'en').toUpperCase()}</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={sending ? '#F59E0B' : '#d1d5db'} strokeWidth="2" className="transition-colors" style={sending ? { animation: 'spin 1s linear infinite' } : undefined}><path d="M7 16l5-5 5 5"/><path d="M7 8l5 5 5-5"/></svg>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] min-w-[36px] text-center transition-all duration-100">{sending ? ROTATE_LANGS[(ROTATE_LANGS.indexOf(rotatingLang) + 7) % 13] : (activeConvo.contact?.language || 'ja').toUpperCase()}</span>
-                <span className={`text-[11px] transition-colors ${sending ? 'text-[#F59E0B]' : 'text-[#9ca3af]'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
+              <div className="flex items-center gap-2 mt-1">
+                <AnimatedPocketChatLogo size={24} isTranslating={sending} />
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5]">{(profile?.language || 'en').toUpperCase()}</span>
+                <span className="text-[11px] text-[#d1d5db]">⇄</span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
+                <span className={`text-[11px] ${sending ? 'text-[#F59E0B]' : 'text-[#9ca3af]'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
               </div>
             )}
           </div>
