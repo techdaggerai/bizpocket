@@ -120,6 +120,9 @@ export default function PocketChatPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const typingChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const [recording, setRecording] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
@@ -291,6 +294,25 @@ export default function PocketChatPage() {
       supabase.removeChannel(channel);
     };
   }, [organization?.id, activeConvoId]);
+
+  /* ---------- Typing indicator ---------- */
+  useEffect(() => {
+    if (!activeConvoId) return;
+    const ch = supabase.channel(`typing:${activeConvoId}`);
+    typingChannelRef.current = ch;
+    ch.on('broadcast', { event: 'typing' }, ({ payload }) => {
+      if (payload.user_id !== user?.id) {
+        setTypingUser(payload.name);
+        if (typingTimeout.current) clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => setTypingUser(null), 3000);
+      }
+    }).subscribe();
+    return () => { ch.unsubscribe(); if (typingTimeout.current) clearTimeout(typingTimeout.current); setTypingUser(null); };
+  }, [activeConvoId, user?.id]); // eslint-disable-line
+
+  const broadcastTyping = useCallback(() => {
+    typingChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: user?.id, name: profile?.name || 'Someone' } });
+  }, [user?.id, profile?.name]);
 
   /* ---------- Voice recording ---------- */
 
@@ -536,21 +558,11 @@ export default function PocketChatPage() {
     setNewMessage('');
 
     try {
-      // Translate and send
+      // INSTANT SEND — save message immediately, translate in background
       const senderLang = chatLang || profile?.language || 'en';
       const recipientLang = activeConvo?.contact?.language || 'ja';
-      const translationRes = await fetch('/api/ai/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, fromLanguage: senderLang, toLanguage: recipientLang }),
-      });
-      let translations: Record<string, string> = { [senderLang]: text };
-      if (translationRes.ok && senderLang !== recipientLang) {
-        const tData = await translationRes.json();
-        if (tData.translatedText) translations[recipientLang] = tData.translatedText;
-      }
 
-      const { error } = await supabase.from('messages').insert({
+      const { data: msg, error } = await supabase.from('messages').insert({
         conversation_id: activeConvoId,
         organization_id: organization.id,
         sender_type: 'owner',
@@ -559,17 +571,29 @@ export default function PocketChatPage() {
         message_type: 'text',
         original_text: text,
         original_language: senderLang,
-        translations,
-      });
+        translations: { [senderLang]: text },
+      }).select().single();
 
       if (error) {
         toast('Failed to send message', 'error');
         setNewMessage(text);
       } else {
-        await supabase
-          .from('conversations')
-          .update({ last_message: text, last_message_at: new Date().toISOString() })
-          .eq('id', activeConvoId);
+        supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
+
+        // Background translation — don't block UI
+        if (msg && recipientLang !== senderLang) {
+          fetch('/api/ai/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, fromLanguage: senderLang, toLanguage: recipientLang }),
+          }).then(r => r.json()).then(data => {
+            if (data.translatedText) {
+              supabase.from('messages').update({
+                translations: { [senderLang]: text, [recipientLang]: data.translatedText },
+              }).eq('id', msg.id);
+            }
+          }).catch(() => {});
+        }
       }
     } catch {
       toast('Failed to send message', 'error');
@@ -958,7 +982,7 @@ export default function PocketChatPage() {
                           : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
-                    <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
+                    <p className="text-[15px] whitespace-pre-wrap break-words" style={/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : undefined}>{displayText}</p>
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
                     {showTranslated && (
@@ -1000,6 +1024,14 @@ export default function PocketChatPage() {
               </div>
             );
           })}
+          {typingUser && (
+            <div className="flex items-center gap-2 px-3.5 py-2">
+              <div className="flex gap-1 items-center">
+                {[0, 1, 2].map(d => (<div key={d} className="w-1.5 h-1.5 rounded-full bg-[#9ca3af]" style={{ animation: 'dotPulse 1.2s infinite', animationDelay: `${d * 0.2}s` }} />))}
+              </div>
+              <span className="text-xs text-[#9ca3af]">{typingUser} is typing...</span>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
@@ -1097,6 +1129,7 @@ export default function PocketChatPage() {
                 setNewMessage(e.target.value);
                 if (e.target.value.startsWith('/')) setShowQuickReplies(true);
                 else setShowQuickReplies(false);
+                broadcastTyping();
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
