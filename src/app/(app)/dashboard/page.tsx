@@ -261,16 +261,16 @@ export default function DashboardPage() {
 
       {/* Upgrade Banner */}
       {(organization.plan === 'free' || !organization.plan) && (
-        <Link href="/settings/upgrade" className="block rounded-xl bg-gradient-to-r from-[#F59E0B] to-[#EA580C] p-4 transition-all hover:shadow-lg hover:-translate-y-0.5">
+        <Link href="/settings/upgrade" className="block rounded-xl border border-[#E5E5E5] bg-white p-4 transition-all hover:shadow-md hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F59E0B]/10">
+              <svg className="h-5 w-5 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-white">Unlock the full autopilot</p>
-              <p className="text-xs text-white/70">Unlimited invoices, AI Briefing, 13 languages</p>
+              <p className="text-sm font-semibold text-[#0A0A0A]">Unlock the full autopilot</p>
+              <p className="text-xs text-[#999]">Unlimited invoices, AI Briefing, 13 languages</p>
             </div>
-            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#EA580C]">Go Pro &rarr;</span>
+            <span className="rounded-full border border-[#F59E0B] px-3 py-1.5 text-xs font-bold text-[#F59E0B]">Go Pro &rarr;</span>
           </div>
         </Link>
       )}
