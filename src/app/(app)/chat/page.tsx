@@ -1277,7 +1277,7 @@ export default function PocketChatPage() {
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
                     {convo.last_message_at && (
-                      <span className="text-[10px] text-[#A3A3A3] flex-shrink-0">
+                      <span className="text-xs text-amber-500 flex-shrink-0">
                         {timeAgo(convo.last_message_at)}
                       </span>
                     )}
