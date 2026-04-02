@@ -10,6 +10,7 @@ import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
+import { PocketMark } from '@/components/Logo';
 
 /* ---------- Types ---------- */
 
@@ -668,9 +669,7 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            <div className="h-10 w-10 rounded-full bg-[#F59E0B] flex items-center justify-center flex-shrink-0">
-              <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
-            </div>
+            <PocketMark variant="xl" />
           ) : (
             <div
               className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
@@ -912,9 +911,7 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 rounded-full bg-[#F59E0B] flex items-center justify-center flex-shrink-0">
-                    <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
-                  </div>
+                  <PocketMark variant="sm" />
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
@@ -996,6 +993,24 @@ export default function PocketChatPage() {
             </div>
           </div>
         )}
+
+        {/* Toolbar */}
+        <div className="flex items-center gap-1 px-3 py-1.5 border-t border-[#F0F0F0]">
+          <button className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Emoji">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
+          </button>
+          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Attach file">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Photo">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </button>
+          <button onClick={startRecording} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Voice note">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+          </button>
+          <div className="flex-1" />
+          <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
+        </div>
 
         {/* Input area */}
         <div className="p-3 border-t border-[#E5E5E5] bg-white">
@@ -1162,7 +1177,10 @@ export default function PocketChatPage() {
     <div className="h-[calc(100vh-80px)] flex flex-col bg-white">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
-        <h1 className="text-lg font-bold text-[#0A0A0A]">PocketChat</h1>
+        <div>
+          <h1 className="text-xl font-bold text-[#0A0A0A]">PocketChat</h1>
+          <p className="text-xs text-[#999]">Chat in 13 languages — AI translates in real-time</p>
+        </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowInvite(true)} className="bg-[#16A34A] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#15803D] transition-colors">
             Invite
@@ -1180,15 +1198,15 @@ export default function PocketChatPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="px-4 pt-3 pb-2 flex gap-2 overflow-x-auto">
+      <div className="px-4 pt-3 pb-0 flex gap-4 overflow-x-auto border-b border-[#F0F0F0]">
         {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
+            className={`text-xs font-medium pb-2 whitespace-nowrap transition-colors ${
               filter === f.key
-                ? 'bg-[#4F46E5] text-white'
-                : 'bg-[#F3F3F1] text-[#6B7280] hover:bg-[#E5E5E5]'
+                ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]'
+                : 'text-[#6B7280] hover:text-[#0A0A0A]'
             }`}
           >
             {f.label}
@@ -1214,10 +1232,20 @@ export default function PocketChatPage() {
             <div className="w-6 h-6 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : sortedConversations.length === 0 ? (
-          <div className="text-center py-12 px-4">
-            <p className="text-sm text-[#A3A3A3]">
-              {search || filter !== 'all' ? 'No conversations match your filter.' : 'No conversations yet. Start a new chat!'}
-            </p>
+          <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
+            {search || filter !== 'all' ? (
+              <p className="text-sm text-[#A3A3A3]">No conversations match your filter.</p>
+            ) : (
+              <>
+                <PocketMark variant="lg" />
+                <h2 className="mt-4 text-lg font-semibold text-[#0A0A0A]">Start a conversation</h2>
+                <p className="text-sm text-[#999] mt-1 text-center max-w-xs">Chat with your AI assistant, message customers in any language, or send invoices</p>
+                <div className="flex gap-2 mt-4">
+                  <button onClick={() => { const botConvo = conversations.find(c => c.is_bot_chat); if (botConvo) { setFilter('all'); setSearch(''); setActiveConvoId(botConvo.id); } }} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white">Chat with AI</button>
+                  <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="rounded-lg border border-[#E5E5E5] px-4 py-2 text-sm font-medium text-[#666]">+ New Chat</button>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           sortedConversations.map((convo) => {
@@ -1226,13 +1254,11 @@ export default function PocketChatPage() {
               <button
                 key={convo.id}
                 onClick={() => setActiveConvoId(convo.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#F3F3F1] text-left"
+                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] hover:shadow-sm transition-all border-b border-[#F3F3F1] text-left ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  <div className="h-10 w-10 rounded-full bg-[#4F46E5] flex items-center justify-center flex-shrink-0">
-                    <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
-                  </div>
+                  <PocketMark variant="xl" />
                 ) : (
                   <div
                     className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
@@ -1247,6 +1273,7 @@ export default function PocketChatPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className="text-sm font-semibold text-[#0A0A0A] truncate">{name}</p>
+                      {convo.is_bot_chat && <span className="text-[9px] text-[#F59E0B] font-medium">AI Assistant</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
                     {convo.last_message_at && (
