@@ -359,7 +359,7 @@ export default function NewInvoicePage() {
       {/* Split View */}
       <div className="flex gap-4 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
         {/* LEFT: Form */}
-        <div className="flex-1 min-w-0 space-y-2 lg:max-w-[480px]">
+        <div className="flex-1 min-w-0 space-y-2.5 lg:max-w-[480px]">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-[#0A0A0A]">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
@@ -498,11 +498,9 @@ export default function NewInvoicePage() {
           <div className="rounded-xl border border-[#E5E5E5] bg-white p-2.5 space-y-2">
             <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Payment & Notes</h3>
             <div className="flex gap-1.5">{[{k:'bank_transfer',l:'Bank Transfer'},{k:'cash',l:'Cash'},{k:'credit_card',l:'Card'}].map(({k,l}) => (<button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-1.5 text-[10px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>))}</div>
-            {paymentMethod === 'bank_transfer' && (<div className="grid grid-cols-4 gap-1.5"><input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="Bank" className={inputClass} /><input value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="Branch" className={inputClass} /><input value={bankAccountName} onChange={e => setBankAccountName(e.target.value)} placeholder="Acct name" className={inputClass} /><input value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="Acct #" className={inputClass} /></div>)}
-            <div className="grid grid-cols-2 gap-1.5">
-              <textarea value={invoiceNotes} onChange={e => setInvoiceNotes(e.target.value)} placeholder="Notes (optional)" rows={1} className={inputClass} />
-              <textarea value={disclaimer} onChange={e => setDisclaimer(e.target.value)} placeholder="Disclaimer / Policy" rows={1} className={inputClass} />
-            </div>
+            {paymentMethod === 'bank_transfer' && (<div className="space-y-2"><div className="grid grid-cols-2 gap-2"><input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="Bank name" className={inputClass} /><input value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="Branch" className={inputClass} /></div><div className="grid grid-cols-2 gap-2"><input value={bankAccountName} onChange={e => setBankAccountName(e.target.value)} placeholder="Account name" className={inputClass} /><input value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="Account number" className={inputClass} /></div></div>)}
+            <textarea value={invoiceNotes} onChange={e => setInvoiceNotes(e.target.value)} placeholder="Notes (optional)" rows={2} className={inputClass} />
+            <textarea value={disclaimer} onChange={e => setDisclaimer(e.target.value)} placeholder="Disclaimer / Policy" rows={2} className={inputClass} />
           </div>
 
           {/* Actions */}
@@ -526,13 +524,13 @@ export default function NewInvoicePage() {
 
         {/* RIGHT: Live Preview (desktop) */}
         <div className="hidden lg:block flex-1 shrink-0">
-          <div className="sticky top-4">
+          <div className="sticky top-4 h-[calc(100vh-2rem)]">
             <div className="flex items-center justify-between mb-3">
               <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
               <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
-              <div id="invoice-preview" className="origin-top-left" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>
+              <div id="invoice-preview" className="origin-top-left h-full" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>
             </div>
