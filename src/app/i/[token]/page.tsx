@@ -594,18 +594,10 @@ export default function PublicInvoicePage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
-          <span className="text-[11px] text-[#A3A3A3]">
-            Powered by{' '}
-            <a
-              href="https://bizpocket.io"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#4F46E5] hover:underline"
-            >
-              BizPocket
-            </a>
-          </span>
+        <div className="text-center mt-10 pt-4 border-t border-[#f3f4f6]">
+          <a href="https://www.bizpocket.io?ref=invoice" target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#9ca3af] no-underline">
+            Sent with <span className="text-[#4F46E5] font-semibold">BizPocket</span> — AI Business Autopilot
+          </a>
         </div>
       </div>
 

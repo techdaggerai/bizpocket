@@ -82,6 +82,7 @@ export default function NewInvoicePage() {
   const [bankAccountType, setBankAccountType] = useState((org.bank_account_type as string) || 'Futsu');
   const [paymentMethod, setPaymentMethod] = useState((org.default_payment_method as string) || 'bank_transfer');
   const [disclaimer, setDisclaimer] = useState((org.invoice_disclaimer as string) || '');
+  const [tNumber, setTNumber] = useState((org.t_number as string) || '');
 
   // Discount
   const [discountType, setDiscountType] = useState<'none' | 'percent' | 'fixed'>('none');
@@ -269,6 +270,7 @@ export default function NewInvoicePage() {
     }
     const orgUpdates: Record<string, unknown> = {};
     if (disclaimer !== (org.invoice_disclaimer as string || '')) orgUpdates.invoice_disclaimer = disclaimer || null;
+    if (tNumber !== (org.t_number as string || '')) orgUpdates.t_number = tNumber || null;
     if (paymentMethod !== (org.default_payment_method as string || 'bank_transfer')) orgUpdates.default_payment_method = paymentMethod;
     if (Object.keys(orgUpdates).length > 0) await supabase.from('organizations').update(orgUpdates).eq('id', organization.id);
     if (fromTime === 'unbilled' && invoice && importedTimeEntryIds.length > 0 && status !== 'draft') await supabase.from('time_entries').update({ is_invoiced: true, invoice_id: invoice.id }).in('id', importedTimeEntryIds);
@@ -299,7 +301,7 @@ export default function NewInvoicePage() {
   const liveInvoiceData: InvoiceData = {
     invoice_number: editId ? 'INV/...' : `INV/${organization.name?.slice(0, 3).toUpperCase() || 'BIZ'}/...`,
     date: invoiceDate, due_date: dueDate, company_name: organization.name || 'Your Business',
-    company_address: (org.address as string) || '', company_phone: (org.phone as string) || '', company_email: user?.email || '',
+    company_address: (org.address as string) || '', company_phone: (org.phone as string) || '', company_email: user?.email || '', t_number: tNumber || undefined,
     bank_name: paymentMethod === 'bank_transfer' ? bankName : undefined, bank_branch: paymentMethod === 'bank_transfer' ? bankBranch : undefined,
     bank_account_name: paymentMethod === 'bank_transfer' ? bankAccountName : undefined, bank_account_number: paymentMethod === 'bank_transfer' ? bankAccountNumber : undefined,
     customer_name: selectedCustomer?.name || 'Customer Name', customer_address: selectedCustomer?.address || '', customer_phone: selectedCustomer?.phone || '',
@@ -528,6 +530,10 @@ export default function NewInvoicePage() {
                 </div>
               </div>
             )}
+            <div>
+              <label className="text-[10px] text-[#999]">T-Number (インボイス制度)</label>
+              <input type="text" value={tNumber} onChange={e => setTNumber(e.target.value)} placeholder="T1234567890123" className={inputClass} />
+            </div>
             <div className="space-y-2">
               <textarea value={invoiceNotes} onChange={e => setInvoiceNotes(e.target.value)} placeholder="Notes (optional)" rows={2} className={inputClass} />
               <textarea value={disclaimer} onChange={e => setDisclaimer(e.target.value)} placeholder="Disclaimer / Policy (saved for future invoices)" rows={2} className={inputClass} />

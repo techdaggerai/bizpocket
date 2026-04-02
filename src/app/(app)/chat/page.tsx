@@ -534,26 +534,45 @@ export default function PocketChatPage() {
     const text = newMessage.trim();
     setNewMessage('');
 
-    const { error } = await supabase.from('messages').insert({
-      conversation_id: activeConvoId,
-      organization_id: organization.id,
-      sender_type: 'owner',
-      sender_name: profile?.name || 'You',
-      message: text,
-      message_type: 'text',
-      original_text: text,
-      original_language: chatLang,
-    });
+    try {
+      // Translate and send
+      const senderLang = chatLang || profile?.language || 'en';
+      const recipientLang = activeConvo?.contact?.language || 'ja';
+      const translationRes = await fetch('/api/ai/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, fromLanguage: senderLang, toLanguage: recipientLang }),
+      });
+      let translations: Record<string, string> = { [senderLang]: text };
+      if (translationRes.ok && senderLang !== recipientLang) {
+        const tData = await translationRes.json();
+        if (tData.translatedText) translations[recipientLang] = tData.translatedText;
+      }
 
-    if (error) {
+      const { error } = await supabase.from('messages').insert({
+        conversation_id: activeConvoId,
+        organization_id: organization.id,
+        sender_type: 'owner',
+        sender_name: profile?.name || 'You',
+        message: text,
+        message_type: 'text',
+        original_text: text,
+        original_language: senderLang,
+        translations,
+      });
+
+      if (error) {
+        toast('Failed to send message', 'error');
+        setNewMessage(text);
+      } else {
+        await supabase
+          .from('conversations')
+          .update({ last_message: text, last_message_at: new Date().toISOString() })
+          .eq('id', activeConvoId);
+      }
+    } catch {
       toast('Failed to send message', 'error');
       setNewMessage(text);
-    } else {
-      // Update conversation last_message
-      await supabase
-        .from('conversations')
-        .update({ last_message: text, last_message_at: new Date().toISOString() })
-        .eq('id', activeConvoId);
     }
     setSending(false);
   }, [newMessage, activeConvoId, organization?.id, sending, activeConvo, sendBotMessage, botName, chatLang, profile]);

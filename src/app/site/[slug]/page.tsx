@@ -68,12 +68,19 @@ export default function PublicSitePage() {
 
   if (html) {
     return (
-      <iframe
-        srcDoc={html}
-        className="w-full min-h-screen border-0"
-        sandbox="allow-scripts allow-same-origin"
-        title="Published Website"
-      />
+      <div className="flex flex-col min-h-screen">
+        <iframe
+          srcDoc={html}
+          className="w-full flex-1 border-0"
+          sandbox="allow-scripts allow-same-origin"
+          title="Published Website"
+        />
+        <div className="text-center py-3 border-t border-[#f3f4f6] bg-white">
+          <a href="https://www.bizpocket.io?ref=site" target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#9ca3af] no-underline">
+            Built with <span className="text-[#4F46E5] font-semibold">BizPocket</span> — AI Business Autopilot
+          </a>
+        </div>
+      </div>
     );
   }
 
