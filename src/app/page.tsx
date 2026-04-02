@@ -134,29 +134,29 @@ export default function LandingPage() {
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-[#F59E0B]/15 text-xs font-semibold text-[#F59E0B] mb-4">POCKETCHAT</span>
               <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-[1.2] text-white mb-4">
-                They speak Japanese.<br />You speak English.<br /><span className="text-[#818cf8]">Nobody notices.</span>
+                They speak Japanese.<br />You speak English.<br /><span className="text-[#a78bfa]">Nobody notices.</span>
               </h2>
-              <p className="text-[15px] text-[#9ca3af] leading-relaxed mb-6">
+              <p className="text-[15px] text-[#cbd5e1] leading-relaxed mb-6">
                 The world&apos;s first business messenger with real-time AI translation. Text, voice notes, photos, documents. Send in your language — they receive in theirs.
               </p>
               <div className="space-y-2.5">
                 {['13 languages, real-time translation', 'Voice notes auto-translated', 'Connected to your invoices & pipeline', 'No app needed for your customers', 'Use inside BizPocket or as standalone app'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg>
-                    <span className="text-sm text-[#d1d5db]">{f}</span>
+                    <span className="text-sm text-[#f1f5f9]">{f}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div className="flex flex-col gap-3">
               {[
-                { from: '🇬🇧', to: '🇯🇵', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', color: 'text-[#818cf8]' },
-                { from: '🇵🇰', to: '🇦🇪', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', color: 'text-[#F59E0B]' },
-                { from: '🇧🇷', to: '🇨🇳', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', color: 'text-[#22c55e]' },
+                { from: '🇬🇧', to: '🇯🇵', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', color: 'text-[#a5b4fc]' },
+                { from: '🇵🇰', to: '🇦🇪', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', color: 'text-[#fbbf24]' },
+                { from: '🇧🇷', to: '🇨🇳', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', color: 'text-[#4ade80]' },
               ].map((item, i) => (
-                <div key={i} className="bg-[#1f2937] rounded-2xl p-4 border border-[#374151]">
-                  <div className="flex items-center gap-2 mb-2.5"><span className="text-lg">{item.from}</span><span className="text-[11px] text-[#9ca3af]">→</span><span className="text-lg">{item.to}</span></div>
-                  <p className="text-[13px] text-[#e5e7eb]">{item.orig}</p>
+                <div key={i} className="bg-[#1e293b] rounded-2xl p-4 border border-[#475569]">
+                  <div className="flex items-center gap-2 mb-2.5"><span className="text-lg">{item.from}</span><span className="text-[11px] text-[#94a3b8]">→</span><span className="text-lg">{item.to}</span></div>
+                  <p className="text-[13px] text-white">{item.orig}</p>
                   <p className={`text-[13px] ${item.color} mt-1.5`}>{item.trans}</p>
                 </div>
               ))}
