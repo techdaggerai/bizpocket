@@ -52,7 +52,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-[#F0F0F0]">
+      <div className="px-4 py-4 border-b border-[#F0F0F0]">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-lg bg-[#4F46E5] flex items-center justify-center">
             <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -67,11 +67,11 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-3 space-y-4">
+      <nav className="flex-1 px-2 py-3 space-y-4">
         {NAV_SECTIONS.map((section, si) => (
           <div key={si}>
             {section.label && (
-              <p className="px-2 mb-1.5 text-[9px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">
+              <p className="px-3 mb-1.5 text-[9px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">
                 {section.label}
               </p>
             )}
@@ -82,7 +82,7 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
+                    className={`flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
                       isActive
                         ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
                         : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
@@ -109,10 +109,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom — Upgrade + Settings */}
-      <div className="px-3 py-3 border-t border-[#F0F0F0] space-y-1">
+      <div className="px-2 py-3 border-t border-[#F0F0F0] space-y-1">
         <Link
           href="/settings"
-          className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
+          className={`flex items-center gap-2.5 px-3 py-[7px] rounded-lg text-[13px] font-medium transition-all ${
             pathname === '/settings' || pathname?.startsWith('/settings/')
               ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
               : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
