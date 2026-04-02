@@ -144,6 +144,20 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* STATS BAR */}
+      <section className="px-6 pb-16">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="grid grid-cols-4 gap-[1px] bg-[#e5e7eb] rounded-2xl overflow-hidden">
+            {[{ n: '30+', l: 'Pages deployed', c: '#4F46E5' }, { n: '9', l: 'AI features', c: '#F59E0B' }, { n: '13', l: 'Languages', c: '#111827' }, { n: '16', l: 'Currencies', c: '#111827' }].map((s, i) => (
+              <div key={i} className="bg-white py-7 px-5 text-center">
+                <p className="text-[32px] font-bold mb-1" style={{ color: s.c }}>{s.n}</p>
+                <p className="text-[13px] text-[#6b7280]">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FEATURES GRID */}
       <section id="features" className="px-6 pb-16">
         <div className="mx-auto max-w-[1100px]">
@@ -172,52 +186,150 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* LANGUAGES */}
-      <section className="border-t border-[#F0F0F0] bg-[#FAFAFA]">
-        <div className="mx-auto max-w-5xl px-6 py-20 text-center">
-          <p className="text-[13px] text-[#999] mb-3">Built for entrepreneurs who do business in Japan</p>
-          <h2 className="text-[clamp(1.3rem,3vw,2rem)] font-semibold tracking-tight">
-            13 languages. 16 currencies. One app.
-          </h2>
-          <div className="mt-10 flex flex-wrap justify-center gap-2">
-            {['English', '\u65E5\u672C\u8A9E', '\u0627\u0631\u062F\u0648', '\u0627\u0644\u0639\u0631\u0628\u064A\u0629', '\u09AC\u09BE\u0982\u09B2\u09BE', 'Portugu\u00EAs', 'Filipino', 'Ti\u1EBFng Vi\u1EC7t', 'T\u00FCrk\u00E7e', '\u4E2D\u6587', 'Fran\u00E7ais', 'Nederlands', 'Espa\u00F1ol'].map((lang) => (
-              <span key={lang} className="rounded-full border border-[#E5E5E5] bg-white px-4 py-1.5 text-[12px] text-[#666]">{lang}</span>
+      {/* BUILT FOR YOU — Personas */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="text-center mb-10">
+            <h2 className="text-[32px] font-bold text-[#111827]">Built for you.</h2>
+            <p className="text-base text-[#6b7280] mt-3">Whether you just landed in Japan or manage 50 clients.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { title: 'The newcomer', desc: 'Just arrived in Japan. Starting a side business. Need to send your first invoice and read Japanese documents.', badge: 'Starter — Free', badgeBg: '#eef2ff', badgeColor: '#4F46E5', iconBg: '#eef2ff', iconColor: '#4F46E5', icon: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', icon2: 'M12 7 a4 4 0 100 0.01', border: '1px solid #e5e7eb' },
+              { title: 'The solo operator', desc: 'Running a real business. 10-50 transactions a month. Drowning in manual work. Need an autopilot.', badge: 'Pro — ¥1,980/mo', badgeBg: '#4F46E5', badgeColor: 'white', iconBg: '#eef2ff', iconColor: '#4F46E5', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', border: '2px solid #4F46E5', popular: true },
+              { title: 'The growing team', desc: '2-10 staff. Has an accountant. Needs team access, role-based permissions, and compliance tools.', badge: 'Business — ¥4,980/mo', badgeBg: '#fef3c7', badgeColor: '#92400e', iconBg: '#fef3c7', iconColor: '#F59E0B', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', icon2: 'M9 7 a4 4 0 100 0.01', border: '1px solid #e5e7eb' },
+              { title: 'The accounting firm', desc: 'Managing 10-50 foreign business clients. Need one dashboard for all of them. White-label everything.', badge: 'Enterprise — Custom', badgeBg: '#f3f4f6', badgeColor: '#374151', iconBg: '#f3f4f6', iconColor: '#374151', icon: 'M2 7h20v14H2z M16 7V5a4 4 0 00-8 0v2 M12 12v4', border: '1px solid #e5e7eb' },
+            ].map((p, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 relative" style={{ border: p.border }}>
+                {p.popular && <div className="absolute -top-2.5 left-5 bg-[#4F46E5] text-white text-[11px] font-semibold px-3 py-0.5 rounded-full">Most popular</div>}
+                <div className="w-10 h-10 rounded-[10px] flex items-center justify-center mb-4" style={{ background: p.iconBg }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={p.iconColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={p.icon} />{p.icon2 && <path d={p.icon2} />}</svg>
+                </div>
+                <h3 className="text-base font-bold text-[#111827] mb-1">{p.title}</h3>
+                <p className="text-[13px] text-[#6b7280] leading-relaxed mb-3">{p.desc}</p>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: p.badgeBg, color: p.badgeColor }}>{p.badge}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="border-t border-[#F0F0F0]">
-        <div className="mx-auto max-w-5xl px-6 py-24">
-          <div className="text-center mb-12">
-            <h2 className="text-[clamp(1.5rem,3vw,2.2rem)] font-semibold tracking-tight">Simple, transparent pricing</h2>
-            <p className="mt-2 text-[14px] text-[#666]">Start free. Upgrade when you&apos;re ready.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {PLANS.map((plan) => (
-              <div key={plan.name} className={`rounded-xl p-6 ${plan.highlight ? 'border-2 border-[#4F46E5] bg-white shadow-sm' : 'border border-[#E5E5E5] bg-white'}`}>
-                {plan.highlight && (
-                  <span className="inline-block mb-3 rounded-full bg-[#4F46E5]/10 px-3 py-1 text-[11px] font-medium text-[#4F46E5]">Most popular</span>
-                )}
-                <h3 className="text-[16px] font-semibold text-[#0A0A0A]">{plan.name}</h3>
-                <p className="text-[12px] text-[#999] mt-1">{plan.desc}</p>
-                <div className="mt-4 mb-6">
-                  <span className="text-3xl font-semibold text-[#0A0A0A] font-mono">{plan.price}</span>
-                  <span className="text-[13px] text-[#999]">{plan.period}</span>
-                  {plan.priceAlt && <p className="text-[11px] text-[#BBB] mt-0.5">{plan.priceAlt}/mo</p>}
+      {/* AI BUSINESS CYCLE ENGINE */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="bg-[#faf9f7] rounded-3xl p-[clamp(32px,5vw,56px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <span className="inline-block px-3 py-1 rounded-full bg-[#fef3c7] text-xs font-semibold text-[#92400e] mb-4">AI-POWERED</span>
+              <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">AI learns your business.<br />Builds your pipeline.<br /><span className="text-[#F59E0B]">Runs it for you.</span></h2>
+              <p className="text-[15px] text-[#6b7280] leading-relaxed mb-6">No two businesses are the same. BizPocket AI interviews you, understands your operations, and creates a custom pipeline that adapts as your business grows.</p>
+              <div className="space-y-2.5">
+                {['AI interviews you in your language', 'Generates custom pipeline stages', 'Tracks every item through your cycle', 'Learns and improves over time', 'Morning briefing on bottlenecks'].map((f, i) => (
+                  <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-white rounded-[14px] border border-[#e5e7eb] p-4">
+                <div className="flex items-center gap-2 mb-3"><div className="w-7 h-7 rounded-lg bg-[#F59E0B] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg></div><div><p className="text-[13px] font-semibold text-[#111827]">BizPocket AI</p><p className="text-[10px] text-[#F59E0B]">Setting up your business</p></div></div>
+                <div className="space-y-2">
+                  <div className="bg-[#f9fafb] rounded-[12px_12px_12px_4px] px-3.5 py-2.5 max-w-[90%] border border-[#f3f4f6]"><p className="text-[13px] text-[#374151] leading-relaxed">Tell me about your business. What do you sell or do?</p></div>
+                  <div className="bg-[#4F46E5] rounded-[12px_12px_4px_12px] px-3.5 py-2.5 max-w-[90%] ml-auto"><p className="text-[13px] text-white leading-relaxed">I buy used cars from auctions, repair them, and export to Pakistan and UAE</p></div>
+                  <div className="bg-[#f9fafb] rounded-[12px_12px_12px_4px] px-3.5 py-2.5 max-w-[90%] border border-[#f3f4f6]"><p className="text-[13px] text-[#374151] leading-relaxed">Got it! I&apos;ve created an 8-stage pipeline for your business:</p></div>
                 </div>
-                <Link href="/signup" className={`block w-full rounded-full py-2.5 text-center text-[13px] font-medium transition-colors ${plan.highlight ? 'bg-[#4F46E5] text-white hover:bg-[#4338CA]' : 'bg-[#0A0A0A] text-white hover:bg-[#333]'}`}>
-                  {plan.cta}
-                </Link>
-                <ul className="mt-5 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-[12px] text-[#666]">
-                      <svg className="h-3.5 w-3.5 text-[#4F46E5] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                      {f}
-                    </li>
+              </div>
+              <div className="bg-white rounded-[14px] border border-[#e5e7eb] p-4">
+                <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wider mb-3">Auto-generated pipeline</p>
+                <div className="flex flex-wrap gap-1.5 items-center">
+                  {[{ n: 'Source', bg: '#eef2ff', c: '#4F46E5' }, { n: 'Inspect', bg: '#fef3c7', c: '#92400e' }, { n: 'Repair', bg: '#fff7ed', c: '#9a3412' }, { n: 'Photo', bg: '#fdf2f8', c: '#9d174d' }, { n: 'List', bg: '#f5f3ff', c: '#6b21a8' }, { n: 'Negotiate', bg: '#ecfeff', c: '#155e75' }, { n: 'Ship', bg: '#f0fdf4', c: '#166534' }, { n: 'Get Paid', bg: '#ecfdf5', c: '#065f46' }].map((s, i) => (
+                    <span key={i} className="flex items-center gap-1"><span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold" style={{ background: s.bg, color: s.c }}>{s.n}</span>{i < 7 && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
                   ))}
-                </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FIRE INVOICE */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="bg-[#f9fafb] rounded-[20px] p-6">
+            <div className="bg-white rounded-[14px] border border-[#e5e7eb] overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#f3f4f6] flex justify-between items-start">
+                <div><p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">INVOICE</p><p className="text-base font-bold text-[#111827] mt-1">INV/PDJ/260402-042</p><p className="text-xs text-[#9ca3af] mt-0.5">April 2, 2026</p></div>
+                <span className="px-3 py-1 rounded-full bg-[#f0fdf4] text-xs font-semibold text-[#16a34a]">PAID</span>
+              </div>
+              <div className="p-5">
+                <div className="grid grid-cols-2 gap-5 mb-5"><div><p className="text-[10px] text-[#9ca3af] font-semibold uppercase">From</p><p className="text-[13px] font-semibold text-[#111827] mt-1">Premium Drives Japan</p><p className="text-xs text-[#6b7280]">Nagoya, Japan</p><p className="text-[11px] text-[#9ca3af]">登録番号: T1234567890123</p></div><div><p className="text-[10px] text-[#9ca3af] font-semibold uppercase">To</p><p className="text-[13px] font-semibold text-[#111827] mt-1">Al-Rashid Motors</p><p className="text-xs text-[#6b7280]">Karachi, Pakistan</p></div></div>
+                <div className="bg-[#f9fafb] rounded-[10px] p-3 mb-4 space-y-1.5">
+                  <div className="flex justify-between text-xs"><span className="text-[#6b7280]">Toyota Alphard 2022 — White</span><span className="font-semibold text-[#111827]">¥850,000</span></div>
+                  <div className="flex justify-between text-xs border-t border-[#f3f4f6] pt-1.5"><span className="text-[#6b7280]">Full inspection + repair</span><span className="font-semibold text-[#111827]">¥85,000</span></div>
+                  <div className="flex justify-between text-xs border-t border-[#f3f4f6] pt-1.5 text-[#6b7280]"><span>Tax (10%)</span><span>¥93,500</span></div>
+                </div>
+                <div className="flex justify-between pt-3 border-t-2 border-[#111827]"><span className="text-base font-bold">Total</span><span className="text-base font-bold">¥1,028,500</span></div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
+              {['Classic', 'Modern', 'Japanese', 'Compact', 'Export', 'Elegant', 'Bold', 'Receipt', 'Corporate', 'Minimal'].map((t, i) => (
+                <span key={i} className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${i === 0 ? 'bg-[#4F46E5] text-white' : 'bg-white text-[#6b7280] border border-[#e5e7eb]'}`}>{t}</span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <span className="inline-block px-3 py-1 rounded-full bg-[#eef2ff] text-xs font-semibold text-[#4338ca] mb-4">CANVA-STYLE BUILDER</span>
+            <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">Invoice fired.<br />Before you leave<br /><span className="text-[#4F46E5]">the parking lot.</span></h2>
+            <p className="text-[15px] text-[#6b7280] leading-relaxed mb-6">Professional invoices in 60 seconds. Split-view live preview so you see exactly what your client sees. 10 templates. 16 currencies. E-signature. Share via link or PDF.</p>
+            <div className="space-y-2.5">
+              {['10 invoice templates', 'Split-view live preview (Canva-style)', 'E-signature capture', 'PDF download + share link', 'T-number for Japanese compliance (インボイス制度)', '16 currencies with auto tax calculation', 'Custom columns, discounts, attachments'].map((f, i) => (
+                <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* INSTAGRAM → ORDERS */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,56px)] text-center text-white">
+            <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">INSTAGRAM → ORDERS → MONEY</span>
+            <h2 className="text-[28px] font-bold leading-[1.3] mb-4">Your Instagram bio becomes<br />a full order system.</h2>
+            <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link in your bio. Customers tap it, see your catalog, place orders, and chat with you — all in their language.</p>
+            <div className="flex justify-center items-center gap-3 flex-wrap mb-8">
+              {[{ l: 'Instagram post', c: '#e879f9' }, { l: 'Customer taps link', c: '#60a5fa' }, { l: 'Sees your catalog', c: '#34d399' }, { l: 'Chats in Japanese', c: '#a5b4fc' }, { l: 'Order in pipeline', c: '#fbbf24' }].map((s, i) => (
+                <span key={i} className="flex items-center gap-2"><span className="bg-[#1e293b] border border-[#334155] rounded-[14px] px-4 py-3 text-[11px] font-medium text-[#e2e8f0]">{s.l}</span>{i < 4 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
+              ))}
+            </div>
+            <p className="text-sm text-[#64748b]">Works for any business — cake shop, car dealer, import-export, freelancer, restaurant.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section id="pricing" className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="text-center mb-10">
+            <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
+            <p className="text-base text-[#6b7280] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { name: 'Starter', price: '¥0', sub: 'Free forever + 14-day Pro trial', color: '#22c55e', border: '1px solid #e5e7eb', features: ['Unlimited invoices', 'Unlimited PocketChat contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website', '"Powered by BizPocket" branding'], cta: 'Start free trial', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #e5e7eb', href: '/signup' },
+              { name: 'Pro', price: '¥1,980', sub: '~$13 · ~€12 /mo', color: '#4F46E5', border: '2px solid #4F46E5', popular: true, features: ['Everything in Starter', 'Unlimited AI translations', 'AI Morning Briefing', 'AI Form Fill (unlimited)', 'Social Media Assistant', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', 'Remove BizPocket branding', '5 languages'], cta: 'Go Pro', ctaBg: '#4F46E5', ctaColor: 'white', ctaBorder: 'none', href: '/signup?plan=pro' },
+              { name: 'Business', price: '¥4,980', sub: '~$33 · ~€30 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 10 staff accounts', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '13 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
+              { name: 'Enterprise', price: 'Custom', sub: 'For firms managing multiple clients', color: '#374151', border: '1px solid #e5e7eb', bg: '#f9fafb', features: ['Everything in Business', 'Multi-org dashboard', 'Unlimited staff', 'API access', 'White-label everything', 'Dedicated account manager', 'Custom onboarding'], cta: 'Contact us', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #d1d5db', href: 'mailto:hello@bizpocket.io' },
+            ].map((p, i) => (
+              <div key={i} className="rounded-[20px] p-7 flex flex-col relative" style={{ border: p.border, background: p.bg || 'white' }}>
+                {p.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#4F46E5] text-white text-xs font-semibold px-4 py-1 rounded-full whitespace-nowrap">Most popular</div>}
+                <p className="text-sm font-semibold mb-1" style={{ color: p.color }}>{p.name}</p>
+                <p className="text-[32px] font-bold text-[#111827] mb-1">{p.price}</p>
+                <p className="text-xs text-[#9ca3af] mb-5">{p.sub}</p>
+                <div className="space-y-2 flex-1 mb-6">
+                  {p.features.map((f, j) => (
+                    <div key={j} className="flex items-start gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" className="shrink-0 mt-0.5"><path d="M22 4L12 14.01l-3-3" /></svg><span className={`text-[13px] text-[#374151] ${j === 0 && i > 0 ? 'font-semibold' : ''}`}>{f}</span></div>
+                  ))}
+                </div>
+                <Link href={p.href} className="block text-center py-3 rounded-[10px] text-sm font-semibold" style={{ background: p.ctaBg, color: p.ctaColor, border: p.ctaBorder }}>{p.cta}</Link>
               </div>
             ))}
           </div>
