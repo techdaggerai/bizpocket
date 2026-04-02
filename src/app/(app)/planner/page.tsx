@@ -123,7 +123,7 @@ export default function PlannerPage() {
         .select('amount, flow_type')
         .eq('organization_id', organization.id)
         .gte('date', new Date().toISOString().slice(0, 7) + '-01')
-        .lte('date', new Date().toISOString().slice(0, 7) + '-31');
+        .lt('date', (() => { const d = new Date(Number(new Date().toISOString().slice(0, 7).split('-')[0]), Number(new Date().toISOString().slice(0, 7).split('-')[1]), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })());
 
       const totalIn = (flows || []).filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
       const totalOut = (flows || []).filter((f) => f.flow_type === 'OUT').reduce((s, f) => s + f.amount, 0);

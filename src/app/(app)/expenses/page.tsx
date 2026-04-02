@@ -79,7 +79,7 @@ export default function ExpensePlannerPage() {
         .eq('organization_id', organization.id)
         .eq('classify_as', 'expense')
         .gte('date', m + '-01')
-        .lte('date', m + '-31')
+        .lt('date', (() => { const d = new Date(Number(m.split('-')[0]), Number(m.split('-')[1]), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })())
         .order('date', { ascending: false }),
       supabase
         .from('planned_expenses')

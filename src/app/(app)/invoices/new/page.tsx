@@ -464,19 +464,21 @@ export default function NewInvoicePage() {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2">
-            {editId && editOriginalStatus === 'paid' ? (
-              <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
-            ) : (
-              <>
-                <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-[#E5E5E5] py-3 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
-                <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Sending...' : 'Send'}</button>
-              </>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Download PDF</button>
-            <button onClick={handleShare} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Share Link</button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              {editId && editOriginalStatus === 'paid' ? (
+                <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
+              ) : (
+                <>
+                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-[#E5E5E5] py-3 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
+                  <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Sending...' : 'Send to Client'}</button>
+                </>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Download PDF</button>
+              <button onClick={handleShare} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Share Link</button>
+            </div>
           </div>
         </div>
 

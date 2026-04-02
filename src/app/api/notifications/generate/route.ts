@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     .select('amount, flow_type')
     .eq('organization_id', orgId)
     .gte('date', currentMonth + '-01')
-    .lte('date', currentMonth + '-31');
+    .lt('date', (() => { const d = new Date(Number(currentMonth.split('-')[0]), Number(currentMonth.split('-')[1]), 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })());
 
   if (flows) {
     const totalIn = flows.filter((f) => f.flow_type === 'IN').reduce((s, f) => s + f.amount, 0);
