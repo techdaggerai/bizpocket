@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from 'react';
+// Landing page — server component
 import Link from 'next/link';
 import { PocketMark } from '@/components/Logo';
 
@@ -46,7 +44,6 @@ const PLANS = [
 ];
 
 export default function LandingPage() {
-  const [email, setEmail] = useState('');
 
   return (
     <div className="min-h-screen bg-white text-[#0A0A0A]">
@@ -72,152 +69,124 @@ export default function LandingPage() {
       </nav>
 
       {/* HERO */}
-      <section className="pt-32 pb-20 px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[1.05] tracking-tight text-[#0A0A0A]">
-            Run your business.<br />From your pocket.
-          </h1>
-          <p className="mt-6 text-lg text-[#666] leading-relaxed max-w-xl mx-auto">
-            <span className="text-[#F59E0B]">AI</span>-powered invoices, translated chat, operations tracking, and a website for your business &mdash; all from one app.
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 rounded-full border border-[#E5E5E5] bg-white px-5 py-3 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-            />
-            <Link
-              href={email ? `/signup?email=${encodeURIComponent(email)}` : '/signup'}
-              className="rounded-full bg-[#4F46E5] px-6 py-3 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors whitespace-nowrap"
-            >
-              Start free
-            </Link>
+      <section className="pt-32 pb-16 px-6">
+        <div className="mx-auto max-w-[1100px] text-center">
+          <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#E5E5E5] mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] inline-block" />
+            <span className="text-[13px] text-[#6b7280] font-medium">World&apos;s first AI business messenger</span>
           </div>
-          <p className="mt-4 text-[11px] text-[#BBB]">14-day free trial &middot; No credit card required</p>
-        </div>
-      </section>
+          <h1 className="text-[clamp(2.25rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-tight text-[#111827]">
+            Your business speaks<br /><span className="text-[#4F46E5]">every language.</span>
+          </h1>
+          <p className="mt-4 text-lg text-[#6b7280] max-w-[540px] mx-auto leading-relaxed">
+            You type English. They read Japanese. Nobody notices the difference.
+            Invoices, chat, and your entire business — powered by <span className="text-[#F59E0B]">AI</span>.
+          </p>
+          <div className="mt-8 flex justify-center gap-3 flex-wrap">
+            <Link href="/signup" className="inline-flex items-center gap-2 bg-[#4F46E5] text-white px-8 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-[#4338CA] transition-colors">
+              Start free — 14 days full access
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </Link>
+            <a href="#features" className="bg-white text-[#374151] px-8 py-3.5 rounded-xl text-[15px] font-semibold border border-[#E5E5E5] hover:border-[#CCC] transition-colors">
+              See all features
+            </a>
+          </div>
 
-      {/* PRODUCT PREVIEW */}
-      <section className="px-6 pb-24">
-        <div className="mx-auto max-w-5xl">
-          <div className="rounded-2xl border border-[#E5E5E5] bg-[#FAFAFA] p-2 sm:p-3">
-            <div className="rounded-xl bg-white border border-[#E5E5E5] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[#F0F0F0] bg-[#FAFAFA]">
-                <div className="flex gap-1.5">
-                  <div className="w-[10px] h-[10px] rounded-full bg-[#FF5F57]" />
-                  <div className="w-[10px] h-[10px] rounded-full bg-[#FEBC2E]" />
-                  <div className="w-[10px] h-[10px] rounded-full bg-[#28C840]" />
+          {/* Chat Mockup */}
+          <div className="max-w-[560px] mx-auto mt-12 bg-[#f9fafb] rounded-[20px] p-5">
+            <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#f3f4f6] flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7c3aed] flex items-center justify-center text-white text-sm font-semibold">TK</div>
+                  <div><p className="text-sm font-semibold text-[#111827]">Tanaka CPA</p><p className="text-[11px] text-[#22c55e]">● Online</p></div>
                 </div>
-                <div className="flex-1 text-center">
-                  <span className="text-[11px] text-[#BBB]">bizpocket.io</span>
-                </div>
-              </div>
-              <div className="p-6 sm:p-8">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="h-8 w-8 rounded-lg bg-[#4F46E5] flex items-center justify-center">
-                    <PocketMark className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-[#0A0A0A]">Dashboard</span>
-                </div>
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="rounded-lg bg-[#FAFAFA] p-4">
-                    <p className="text-[10px] text-[#999] uppercase tracking-wider">Balance</p>
-                    <p className="text-xl font-semibold mt-1 font-mono">&yen;4,280,500</p>
-                  </div>
-                  <div className="rounded-lg bg-[#FAFAFA] p-4">
-                    <p className="text-[10px] text-[#999] uppercase tracking-wider">This month</p>
-                    <p className="text-xl font-semibold mt-1 text-[#16A34A] font-mono">+&yen;1,200,000</p>
-                  </div>
-                  <div className="rounded-lg bg-[#FAFAFA] p-4">
-                    <p className="text-[10px] text-[#999] uppercase tracking-wider">Health</p>
-                    <p className="text-xl font-semibold mt-1 text-[#4F46E5]">92</p>
-                  </div>
-                </div>
-                <div className="h-[1px] bg-[#F0F0F0] mb-4" />
-                <div className="flex gap-3">
-                  {['Invoice sent \u2014 \u00A5440,000', 'AI Briefing ready', 'New order from Instagram'].map((item, i) => (
-                    <div key={i} className="flex-1 rounded-lg border border-[#F0F0F0] p-3">
-                      <p className="text-[11px] text-[#666]">{item}</p>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5] font-semibold">EN</span>
+                  <span className="text-[11px] text-[#d1d5db]">⇄</span>
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] font-semibold">JP</span>
                 </div>
               </div>
+              <div className="p-4 flex flex-col gap-3.5 min-h-[300px]">
+                <div className="flex justify-end"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_4px_14px] bg-[#4F46E5]"><p className="text-sm text-white leading-relaxed">Hi Tanaka-san, I sent invoice #042 for the Alphard repair</p><p className="text-[10px] text-white/50 mt-1">You typed in English</p></div></div>
+                <div className="flex justify-start"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#f3f4f6]"><p className="text-sm text-[#111827] leading-relaxed">受け取りました。金曜日までにお支払い処理します</p><p className="text-[10px] text-[#9ca3af] mt-1">🇯🇵 Tanaka typed in Japanese · translated for you</p></div></div>
+                <div className="flex justify-end"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_4px_14px] bg-[#4F46E5]"><p className="text-sm text-white leading-relaxed">Perfect. Are March receipts ready for tax filing?</p><p className="text-[10px] text-white/50 mt-1">You typed in English</p></div></div>
+                <div className="flex justify-start"><div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#f3f4f6]"><p className="text-sm text-[#111827] leading-relaxed">はい、Vaultにアップロード済みです。合計47枚の領収書</p><p className="text-[10px] text-[#9ca3af] mt-1">🇯🇵 Tanaka typed in Japanese · translated for you</p></div></div>
+              </div>
+              <div className="px-4 py-2.5 border-t border-[#f3f4f6] flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-lg border border-[#E5E5E5] text-xs text-[#6b7280]">🇬🇧 EN ▼</span>
+                <span className="flex-1 px-3.5 py-2 rounded-[10px] border border-[#E5E5E5] text-[13px] text-[#9ca3af]">Type a message...</span>
+                <div className="w-[34px] h-[34px] rounded-[10px] bg-[#4F46E5] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg></div>
+              </div>
+            </div>
+            <div className="flex justify-center gap-5 mt-4 flex-wrap">
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">13 languages</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-[#6b7280] font-medium">Real-time AI translation</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">No app needed for clients</span></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* TAGLINE */}
-      <section className="px-6 pb-20">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-[clamp(1.5rem,4vw,2.8rem)] font-semibold leading-[1.15] tracking-tight">
-            Everything your business needs.<br />
-            <span className="text-[#999]">All in one app.</span>
-          </h2>
-        </div>
-      </section>
-
-      {/* FEATURES ROW 1 */}
-      <section id="features" className="border-t border-[#F0F0F0]">
-        <div className="mx-auto max-w-5xl px-6 py-24">
-          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: 'Fire Invoice', desc: 'Professional invoices in 60 seconds. 5 templates. PDF export. Share via link, LINE, or WhatsApp.' },
-              { title: 'PocketChat', desc: 'Message anyone in 13 languages. AI translates in real-time. Voice messages. Photo sharing.' },
-              { title: 'AI Document Detector', desc: 'Snap any Japanese document. AI detects the type, translates it, explains it, suggests next steps.' },
-              { title: 'Cash Flow', desc: 'Track every yen in and out. Monthly summaries. Expense categories. Know your numbers instantly.' },
-            ].map((f, i) => (
-              <div key={i} className={`p-6 ${i > 0 ? 'sm:border-l border-t sm:border-t-0 border-[#F0F0F0]' : ''}`}>
-                <h3 className="text-[15px] font-semibold text-[#0A0A0A] mb-2">{f.title}</h3>
-                <p className="text-[13px] text-[#666] leading-relaxed">{f.desc}</p>
+      {/* POCKETCHAT CALLOUT */}
+      <section className="px-6 py-16">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,60px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <span className="inline-block px-3 py-1 rounded-full bg-[#F59E0B]/15 text-xs font-semibold text-[#F59E0B] mb-4">POCKETCHAT</span>
+              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-[1.2] text-white mb-4">
+                They speak Japanese.<br />You speak English.<br /><span className="text-[#818cf8]">Nobody notices.</span>
+              </h2>
+              <p className="text-[15px] text-[#9ca3af] leading-relaxed mb-6">
+                The world&apos;s first business messenger with real-time AI translation. Text, voice notes, photos, documents. Send in your language — they receive in theirs.
+              </p>
+              <div className="space-y-2.5">
+                {['13 languages, real-time translation', 'Voice notes auto-translated', 'Connected to your invoices & pipeline', 'No app needed for your customers', 'Use inside BizPocket or as standalone app'].map((f, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg>
+                    <span className="text-sm text-[#d1d5db]">{f}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div className="flex flex-col gap-3">
+              {[
+                { from: '🇬🇧', to: '🇯🇵', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', color: 'text-[#818cf8]' },
+                { from: '🇵🇰', to: '🇦🇪', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', color: 'text-[#F59E0B]' },
+                { from: '🇧🇷', to: '🇨🇳', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', color: 'text-[#22c55e]' },
+              ].map((item, i) => (
+                <div key={i} className="bg-[#1f2937] rounded-2xl p-4 border border-[#374151]">
+                  <div className="flex items-center gap-2 mb-2.5"><span className="text-lg">{item.from}</span><span className="text-[11px] text-[#9ca3af]">→</span><span className="text-lg">{item.to}</span></div>
+                  <p className="text-[13px] text-[#e5e7eb]">{item.orig}</p>
+                  <p className={`text-[13px] ${item.color} mt-1.5`}>{item.trans}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* AI SECTION */}
-      <section className="border-t border-[#F0F0F0] bg-[#FAFAFA]">
-        <div className="mx-auto max-w-5xl px-6 py-24">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-medium uppercase tracking-widest text-[#F59E0B] mb-4">Built on <span className="text-[#F59E0B]">AI</span></p>
-            <h2 className="text-[clamp(1.5rem,3.5vw,2.5rem)] font-semibold leading-[1.15] tracking-tight mb-6">
-              Your business runs itself.<br />You just approve.
-            </h2>
-            <p className="text-[15px] text-[#666] leading-relaxed mb-10">
-              Wake up to your <span className="text-[#F59E0B]">AI</span> morning briefing. Overnight: invoices tracked, cash flow updated, action items ready. <span className="text-[#F59E0B]">AI</span> creates your social media posts, builds your website, and learns your business every day.
-            </p>
+      {/* FEATURES GRID */}
+      <section id="features" className="px-6 pb-16">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="text-center mb-10">
+            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">Everything your business needs.</h2>
+            <p className="text-base text-[#6b7280] mt-2">9 AI features. 30+ pages. One pocket.</p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
-              { title: 'AI Business Cycle', desc: 'Tell AI about your business in 2 minutes. It creates a custom pipeline \u2014 cars, cakes, consulting, anything.' },
-              { title: 'Ops Radar', desc: 'Your command center. Every item tracked, every bottleneck detected, every cost visible in real time.' },
-              { title: 'AI Gets Smarter', desc: 'The longer you use it, the smarter it gets. After a month, it predicts problems before they happen.' },
+              { icon: '☀️', title: 'AI Morning Briefing', desc: 'Wake up to what happened overnight. AI tells you what to do today.' },
+              { icon: '📸', title: 'AI Document Detector', desc: 'Snap any Japanese document. Get instant English translation.' },
+              { icon: '🌐', title: 'AI Website Builder', desc: '7-step wizard builds your business website. Publish in minutes.' },
+              { icon: '📊', title: 'Ops Radar', desc: 'Your business command center. See bottlenecks before they cost you.' },
+              { icon: '💰', title: 'Cash Flow Tracker', desc: 'Log income and expenses. AI categorizes. See your real numbers.' },
+              { icon: '🧾', title: 'AI Form Fill', desc: 'Upload any form in any language. AI fills it out for you field by field.' },
+              { icon: '👨‍💼', title: 'Accountant Portal', desc: 'Your Japanese accountant gets read-only access. Monthly packages auto-generated.' },
+              { icon: '📱', title: 'Social Media AI', desc: 'AI generates posts, captions, and hashtags. Connect Instagram to orders.' },
             ].map((f, i) => (
-              <div key={i} className="rounded-xl border border-[#E5E5E5] bg-white p-6">
-                <h3 className="text-[14px] font-semibold text-[#0A0A0A] mb-2">{f.title}</h3>
-                <p className="text-[13px] text-[#666] leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURES ROW 2 */}
-      <section className="border-t border-[#F0F0F0]">
-        <div className="mx-auto max-w-5xl px-6 py-24">
-          <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { title: 'Website Builder', desc: 'AI generates a professional website for your business. Pick a style, publish in one click. Live instantly.' },
-              { title: 'Social Media', desc: 'Upload a photo, AI writes the perfect caption and 15 hashtags. Best time to post. Story ideas included.' },
-              { title: 'Accountant Portal', desc: 'Monthly reports, tax estimates, CSV export. Share with your accountant or generate AI reports instantly.' },
-              { title: 'Online Orders', desc: 'Customers order from your Instagram bio link. Orders flow into your pipeline automatically.' },
-            ].map((f, i) => (
-              <div key={i} className={`p-6 ${i > 0 ? 'sm:border-l border-t sm:border-t-0 border-[#F0F0F0]' : ''}`}>
-                <h3 className="text-[15px] font-semibold text-[#0A0A0A] mb-2">{f.title}</h3>
-                <p className="text-[13px] text-[#666] leading-relaxed">{f.desc}</p>
+              <div key={i} className="bg-white rounded-2xl border border-[#E5E5E5] p-5">
+                <span className="text-2xl block mb-2.5">{f.icon}</span>
+                <h4 className="text-[15px] font-semibold text-[#111827] mb-1.5">{f.title}</h4>
+                <p className="text-[13px] text-[#6b7280] leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
