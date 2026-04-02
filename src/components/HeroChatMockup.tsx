@@ -30,7 +30,6 @@ export default function HeroChatMockup() {
   const [showDots, setShowDots] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const running = useRef(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -82,9 +81,7 @@ export default function HeroChatMockup() {
     return () => { running.current = false; };
   }, [runConversation]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [visibleMessages, showDots]);
+  // No scroll — fixed height, overflow hidden
 
   return (
     <div className="bg-[#f9fafb] rounded-[20px] p-5">
@@ -107,7 +104,7 @@ export default function HeroChatMockup() {
         </div>
 
         {/* Messages */}
-        <div className="p-4 flex flex-col gap-3.5 min-h-[300px] max-h-[340px] overflow-hidden">
+        <div className="p-4 flex flex-col gap-3.5 h-[320px] overflow-hidden relative">
           {visibleMessages.map((msg, i) => (
             msg.sender === 'user' ? (
               <div key={i} className="flex justify-end animate-[fadeSlideUp_0.3s_ease-out]">
@@ -134,7 +131,6 @@ export default function HeroChatMockup() {
               </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Input bar */}
