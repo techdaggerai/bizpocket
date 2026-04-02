@@ -49,7 +49,7 @@ function SignupInner() {
       return;
     }
 
-    router.push(isPocketChat ? '/chat' : `/onboarding?plan=${plan}`);
+    router.push(isPocketChat ? '/chat/bot-setup' : `/onboarding?plan=${plan}`);
   }
 
   return (
