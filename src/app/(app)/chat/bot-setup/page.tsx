@@ -119,8 +119,12 @@ export default function BotSetupPage() {
     }
 
     setSaving(false);
-    // Signal chat page to refetch bot config
-    sessionStorage.setItem('bot_config_updated', Date.now().toString());
+    // Pass new config directly to chat page via sessionStorage
+    sessionStorage.setItem('bot_config_updated', JSON.stringify({
+      bot_name: botName,
+      bot_icon: botIcon,
+      ts: Date.now(),
+    }));
     router.push('/chat');
   };
 

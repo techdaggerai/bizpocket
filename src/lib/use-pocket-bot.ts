@@ -40,8 +40,9 @@ export function usePocketBot() {
     fetchCountRef.current += 1;
     const { data } = await supabaseRef.current
       .from('pocket_bot_config')
-      .select('bot_name, bot_icon, bot_personality, is_setup_complete')
+      .select('bot_name, bot_icon, bot_personality, is_setup_complete, updated_at')
       .eq('organization_id', organization.id)
+      .limit(1)
       .single();
 
     if (data) {
@@ -50,6 +51,10 @@ export function usePocketBot() {
     setBotConfigLoaded(true);
     return data;
   }, [organization?.id]);
+
+  const updateBotLocally = useCallback((name: string, icon: string) => {
+    setBotConfig(prev => prev ? { ...prev, bot_name: name, bot_icon: icon } : { bot_name: name, bot_icon: icon, bot_personality: 'professional', is_setup_complete: true });
+  }, []);
 
   const sendBotMessage = useCallback(
     async (
@@ -147,6 +152,7 @@ export function usePocketBot() {
     isSetupComplete,
     fetchBotConfig,
     sendBotMessage,
+    updateBotLocally,
     BOT_ICON_MAP,
   };
 }

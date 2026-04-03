@@ -147,7 +147,7 @@ export default function PocketChatPage() {
   const {
     botConfig, botName, botEmoji, botLoading,
     botConfigLoaded, isSetupComplete,
-    fetchBotConfig, sendBotMessage
+    fetchBotConfig, sendBotMessage, updateBotLocally
   } = usePocketBot();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -228,16 +228,19 @@ export default function PocketChatPage() {
 
   useEffect(() => {
     // Check if bot config was just updated (from bot-setup page)
-    const updated = sessionStorage.getItem('bot_config_updated');
-    if (updated) {
+    const raw = sessionStorage.getItem('bot_config_updated');
+    if (raw) {
       sessionStorage.removeItem('bot_config_updated');
-      // Small delay to ensure DB write is fully propagated
-      setTimeout(() => { fetchBotConfig(); fetchConversations(); }, 300);
+      try {
+        const { bot_name, bot_icon } = JSON.parse(raw);
+        if (bot_name) updateBotLocally(bot_name, bot_icon || '');
+      } catch { /* ignore parse errors */ }
+      // Also refetch from DB in background for full sync
+      fetchConversations();
     } else {
       fetchConversations();
-      fetchBotConfig();
     }
-  }, [fetchConversations, fetchBotConfig]);
+  }, [fetchConversations, updateBotLocally]);
 
   // Refetch bot config when user returns from bot-setup
   useEffect(() => {
