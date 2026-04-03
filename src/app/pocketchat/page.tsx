@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PocketChatMark, PocketMark } from '@/components/Logo';
+import HeroChatMockup from '@/components/HeroChatMockup';
 
 const greetings = [
   { to: 'やあ', lang: 'Japanese' }, { to: 'Hola', lang: 'Spanish' },
@@ -41,27 +42,35 @@ export default function PocketChatLanding() {
       </nav>
 
       {/* Hero */}
-      <section style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px 60px', textAlign: 'center' }}>
-        <div style={{ marginBottom: 12 }}><PocketChatMark size={72} /></div>
-        <p style={{ fontSize: 22, fontWeight: 700, margin: '0 0 24px', fontFamily: "'DM Sans', sans-serif" }}>Pocket<span style={{ color: '#F59E0B' }}>Chat</span></p>
-        <div style={{ display: 'inline-flex', padding: '4px 16px', borderRadius: 100, border: '1px solid #333', marginBottom: 24 }}>
-          <span style={{ fontSize: 13, color: '#9ca3af' }}>Voice calls · Voice messages · Text · All translated</span>
-        </div>
-        <h1 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, lineHeight: 1.05, margin: '0 0 8px', letterSpacing: '-0.03em' }}>
-          Your business speaks<br/><span style={{ color: '#F59E0B', transition: 'opacity 0.2s', opacity: fade ? 1 : 0 }}>every language</span>
-          <span style={{ fontSize: 16, color: '#9ca3af', marginLeft: 8, transition: 'opacity 0.2s', opacity: fade ? 1 : 0 }}>{g.to} · {g.lang}</span>
-        </h1>
-        <p style={{ fontSize: 18, color: '#9ca3af', maxWidth: 520, margin: '16px auto 40px', lineHeight: 1.6 }}>
-          Instant translation chat for business. Text, voice, video — in 13 languages.
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 60, flexWrap: 'wrap' }}>
-          <Link href="/signup?mode=pocketchat" style={{ background: '#F59E0B', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>Start Free</Link>
-          <a href="#features" style={{ background: 'transparent', color: 'white', padding: '14px 32px', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', border: '1px solid #333' }}>See it in action</a>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap', maxWidth: 600, margin: '0 auto' }}>
-          {['English', 'Japanese', 'Urdu', 'Arabic', 'Bengali', 'Portuguese', 'Filipino', 'Vietnamese', 'Turkish', 'Chinese', 'French', 'Dutch', 'Spanish'].map((l, i) => (
-            <span key={i} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 100, border: '1px solid #333', color: '#9ca3af' }}>{l}</span>
-          ))}
+      <section style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px 60px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          {/* LEFT — Live Chat Mockup */}
+          <div className="max-w-[400px] w-full mx-auto lg:mx-0">
+            <HeroChatMockup />
+          </div>
+
+          {/* RIGHT — Hero Text */}
+          <div className="text-center lg:text-left">
+            <div style={{ display: 'inline-flex', padding: '4px 16px', borderRadius: 100, border: '1px solid #333', marginBottom: 24 }}>
+              <span style={{ fontSize: 13, color: '#9ca3af' }}>Voice calls · Voice messages · Text · All translated</span>
+            </div>
+            <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 700, lineHeight: 1.08, margin: '0 0 8px', letterSpacing: '-0.03em' }}>
+              Your business speaks<br/><span style={{ color: '#F59E0B', transition: 'opacity 0.2s', opacity: fade ? 1 : 0 }}>every language</span>
+              <span style={{ fontSize: 16, color: '#9ca3af', marginLeft: 8, transition: 'opacity 0.2s', opacity: fade ? 1 : 0 }}>{g.to} · {g.lang}</span>
+            </h1>
+            <p className="mx-auto lg:mx-0 mt-4 mb-8" style={{ fontSize: 18, color: '#9ca3af', maxWidth: 520, lineHeight: 1.6 }}>
+              Instant translation chat for business. Text, voice, video — in 13 languages.
+            </p>
+            <div className="flex gap-3 mb-8 flex-wrap justify-center lg:justify-start">
+              <Link href="/signup?mode=pocketchat" style={{ background: '#F59E0B', color: '#0a0a0a', padding: '14px 32px', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>Start Free</Link>
+              <a href="#features" style={{ background: 'transparent', color: 'white', padding: '14px 32px', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none', border: '1px solid #333' }}>See it in action</a>
+            </div>
+            <div className="flex gap-2 flex-wrap justify-center lg:justify-start">
+              {['English', 'Japanese', 'Urdu', 'Arabic', 'Bengali', 'Portuguese', 'Filipino', 'Vietnamese', 'Turkish', 'Chinese', 'French', 'Dutch', 'Spanish'].map((l, i) => (
+                <span key={i} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 100, border: '1px solid #333', color: '#9ca3af' }}>{l}</span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
