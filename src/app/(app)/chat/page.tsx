@@ -103,7 +103,7 @@ function avatarColor(name: string): string {
 /* ---------- Component ---------- */
 
 export default function PocketChatPage() {
-  const { organization, profile } = useAuth();
+  const { user, organization, profile } = useAuth();
   const { toast } = useToast();
   const supabase = createClient();
 
