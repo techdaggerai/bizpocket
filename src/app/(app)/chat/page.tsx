@@ -111,6 +111,9 @@ export default function PocketChatPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+
   useEffect(() => { document.title = 'PocketChat'; }, []);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -731,7 +734,7 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            <PocketMark variant="xl" />
+            isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
           ) : (
             <div
               className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
@@ -744,7 +747,7 @@ export default function PocketChatPage() {
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
-                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">
+                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${isPocketChatMode ? 'bg-[#F59E0B]/10 text-[#F59E0B]' : 'bg-[#4F46E5]/10 text-[#4F46E5]'}`}>
                   AI Assistant
                 </span>
               ) : contactType ? (
@@ -1003,7 +1006,7 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 shrink-0"><PocketMark variant="xl" /></div>
+                  <div className="h-8 w-8 shrink-0">{isPocketChatMode ? <AnimatedPocketChatLogo size={32} /> : <PocketMark variant="xl" />}</div>
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
@@ -1066,6 +1069,11 @@ export default function PocketChatPage() {
           {typingUser && (
             <div className="px-3.5">
               <PocketChatTypingIndicator contactName={typingUser} />
+            </div>
+          )}
+          {sending && activeConvo?.is_bot_chat && (
+            <div className="px-3.5">
+              <PocketChatTypingIndicator contactName={botName} compact={true} size="sm" />
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -1358,7 +1366,7 @@ export default function PocketChatPage() {
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  <PocketMark variant="xl" />
+                  isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
                 ) : (
                   <div
                     className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
