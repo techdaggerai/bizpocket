@@ -104,7 +104,7 @@ export default function HeroChatMockup() {
         </div>
 
         {/* Messages */}
-        <div className="flex flex-col gap-2.5 overflow-hidden relative" style={{ height: 320, minHeight: 320, maxHeight: 320, padding: 14 }}>
+        <div className="relative" style={{ height: '320px', minHeight: '320px', maxHeight: '320px', overflow: 'hidden', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {visibleMessages.map((msg, i) => (
             msg.sender === 'user' ? (
               <div key={i} className="flex justify-end animate-[fadeSlideUp_0.3s_ease-out]">
