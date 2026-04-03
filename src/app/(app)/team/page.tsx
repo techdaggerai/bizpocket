@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
+import OutlinePillButton from '@/components/OutlinePillButton';
 
 const ROLES = [
   { key: 'staff', label: 'Staff', desc: 'View dashboard, create invoices, log cash flow' },
@@ -172,10 +173,19 @@ export default function TeamHubPage() {
           <p className="text-sm text-[#999]">{members.length} member{members.length !== 1 ? 's' : ''} · {organization.name}</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setShowInvite(!showInvite)}
-            className="rounded-lg bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA]">
-            {showInvite ? 'Cancel' : '+ Invite'}
-          </button>
+          showInvite ? (
+            <button onClick={() => setShowInvite(false)}
+              className="rounded-[20px] border-[1.5px] border-[#DC2626] px-3.5 py-[7px] text-[13px] font-medium text-[#DC2626] hover:bg-[#DC2626] hover:text-white transition-colors">
+              Cancel
+            </button>
+          ) : (
+            <OutlinePillButton
+              label="Invite"
+              icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>}
+              color="#F59E0B"
+              onClick={() => setShowInvite(true)}
+            />
+          )
         )}
       </div>
 

@@ -16,6 +16,7 @@ import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 import PocketSendIcon from '@/components/PocketSendIcon';
+import OutlinePillButton from '@/components/OutlinePillButton';
 
 /* ---------- Types ---------- */
 
@@ -1287,18 +1288,18 @@ export default function PocketChatPage() {
           <p className="text-xs text-[#999]">Chat in 13 languages — AI translates in real-time</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowInvite(true)} className="bg-[#16A34A] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#15803D] transition-colors">
-            Invite
-          </button>
-          <button
-            onClick={() => {
-              fetchContacts();
-              setShowNewChat(true);
-            }}
-            className="bg-[#4F46E5] text-white text-xs font-semibold px-3 py-2 rounded-[10px] hover:bg-[#4338CA] transition-colors"
-          >
-            + New Chat
-          </button>
+          <OutlinePillButton
+            label="Invite"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>}
+            color="#F59E0B"
+            onClick={() => setShowInvite(true)}
+          />
+          <OutlinePillButton
+            label="New chat"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
+            color="#4F46E5"
+            onClick={() => { fetchContacts(); setShowNewChat(true); }}
+          />
         </div>
       </div>
 
@@ -1352,7 +1353,12 @@ export default function PocketChatPage() {
                 </div>
                 <div className="flex gap-2 mt-5">
                   <button onClick={() => { const botConvo = conversations.find(c => c.is_bot_chat); if (botConvo) { setFilter('all'); setSearch(''); setActiveConvoId(botConvo.id); } }} className="rounded-lg bg-[#4F46E5] px-4 py-2.5 text-sm font-medium text-white">Chat with AI</button>
-                  <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="rounded-lg border border-[#E5E5E5] px-4 py-2.5 text-sm font-medium text-[#666]">+ New Chat</button>
+                  <OutlinePillButton
+                    label="New chat"
+                    icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
+                    color="#4F46E5"
+                    onClick={() => { fetchContacts(); setShowNewChat(true); }}
+                  />
                 </div>
               </>
             )}
