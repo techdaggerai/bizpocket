@@ -115,6 +115,8 @@ export default function BotSetupPage() {
     }
 
     setSaving(false);
+    // Signal chat page to refetch bot config
+    sessionStorage.setItem('bot_config_updated', Date.now().toString());
     router.push('/chat');
   };
 

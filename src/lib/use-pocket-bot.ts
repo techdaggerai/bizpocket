@@ -33,16 +33,20 @@ export function usePocketBot() {
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
   const [botLoading, setBotLoading] = useState(false);
   const [botConfigLoaded, setBotConfigLoaded] = useState(false);
+  const fetchCountRef = useRef(0);
 
   const fetchBotConfig = useCallback(async () => {
     if (!organization?.id) return null;
+    fetchCountRef.current += 1;
     const { data } = await supabaseRef.current
       .from('pocket_bot_config')
-      .select('*')
+      .select('bot_name, bot_icon, bot_personality, is_setup_complete')
       .eq('organization_id', organization.id)
       .single();
 
-    setBotConfig(data as BotConfig | null);
+    if (data) {
+      setBotConfig(data as BotConfig);
+    }
     setBotConfigLoaded(true);
     return data;
   }, [organization?.id]);

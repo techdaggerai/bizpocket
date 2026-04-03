@@ -227,8 +227,16 @@ export default function PocketChatPage() {
   /* ---------- Effects ---------- */
 
   useEffect(() => {
-    fetchConversations();
-    fetchBotConfig();
+    // Check if bot config was just updated (from bot-setup page)
+    const updated = sessionStorage.getItem('bot_config_updated');
+    if (updated) {
+      sessionStorage.removeItem('bot_config_updated');
+      // Small delay to ensure DB write is fully propagated
+      setTimeout(() => { fetchBotConfig(); fetchConversations(); }, 300);
+    } else {
+      fetchConversations();
+      fetchBotConfig();
+    }
   }, [fetchConversations, fetchBotConfig]);
 
   // Refetch bot config when user returns from bot-setup
