@@ -99,7 +99,13 @@ export default function PocketChatLanding() {
           <svg width="20" height="20" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="20" fill="#4F46E5"/><path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/><path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/></svg>
           <span style={{ fontSize: 13, color: '#6b7280' }}>PocketChat by <span style={{ color: '#4F46E5' }}>BizPocket</span></span>
         </div>
-        <span style={{ fontSize: 12, color: '#4b5563' }}>© 2026 TechDagger Studio</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <a href="/privacy" style={{ fontSize: 12, color: '#6b7280', textDecoration: 'none' }}>Privacy</a>
+          <span style={{ color: '#4b5563' }}>·</span>
+          <a href="/terms" style={{ fontSize: 12, color: '#6b7280', textDecoration: 'none' }}>Terms</a>
+          <span style={{ color: '#4b5563' }}>·</span>
+          <span style={{ fontSize: 12, color: '#4b5563' }}>© 2026 TechDagger Studio</span>
+        </div>
       </footer>
     </div>
   );

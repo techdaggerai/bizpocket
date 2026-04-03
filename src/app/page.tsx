@@ -379,6 +379,9 @@ export default function LandingPage() {
               <a href="#features" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Features</a>
               <a href="#pricing" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Pricing</a>
               <Link href="/login" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Log in</Link>
+              <a href="/privacy" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Privacy</a>
+              <span className="text-[#d1d5db]">&middot;</span>
+              <a href="/terms" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Terms</a>
             </div>
             <p className="text-[11px] text-[#CCC]">&copy; 2026 TechDagger Inc.</p>
           </div>

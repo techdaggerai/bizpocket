@@ -113,6 +113,12 @@ function SignupInner() {
           </button>
         </form>
 
+        <p className="mt-3 text-center text-xs text-[#9ca3af]">
+          By signing up you agree to our{' '}
+          <Link href="/terms" className="text-[#4F46E5]">Terms</Link> and{' '}
+          <Link href="/privacy" className="text-[#4F46E5]">Privacy Policy</Link>
+        </p>
+
         <p className="mt-6 text-center text-sm text-[var(--text-3)]">
           Already have an account?{' '}
           <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
