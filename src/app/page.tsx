@@ -306,16 +306,17 @@ export default function LandingPage() {
             <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link on Instagram, TikTok, Facebook, LINE, WhatsApp, your business card — anywhere. Customers tap it, see your catalog, and chat with you in their language.</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 32, flexWrap: 'wrap' }}>
               {[
-                { name: 'Instagram', color: '#E1306C' },
-                { name: 'TikTok', color: '#00f2ea' },
-                { name: 'Facebook', color: '#1877F2' },
-                { name: 'LINE', color: '#06C755' },
-                { name: 'WhatsApp', color: '#25D366' },
-                { name: 'X', color: '#9ca3af' },
-                { name: 'QR Code', color: '#F59E0B' },
-                { name: 'Email', color: '#a5b4fc' },
+                { name: 'Instagram', bg: 'linear-gradient(135deg, #833AB4, #C13584, #E4405F)', text: '#fff' },
+                { name: 'TikTok', bg: '#000000', text: '#fff' },
+                { name: 'Facebook', bg: '#1877F2', text: '#fff' },
+                { name: 'YouTube', bg: '#FF0000', text: '#fff' },
+                { name: 'LINE', bg: '#06C755', text: '#fff' },
+                { name: 'X', bg: '#000000', text: '#fff' },
+                { name: 'WhatsApp', bg: '#128C7E', text: '#fff' },
+                { name: 'QR Code', bg: '#92400e', text: '#fff' },
+                { name: 'Email', bg: '#4F46E5', text: '#fff' },
               ].map((p, i) => (
-                <span key={i} style={{ fontSize: 12, fontWeight: 600, color: p.color, padding: '5px 16px', borderRadius: 100, border: `1px solid ${p.color}40`, background: `${p.color}10` }}>{p.name}</span>
+                <span key={i} style={{ fontSize: 12, fontWeight: 600, color: p.text, padding: '5px 16px', borderRadius: 100, background: p.bg }}>{p.name}</span>
               ))}
             </div>
             <div className="flex justify-center items-center gap-3 flex-wrap mb-8">
