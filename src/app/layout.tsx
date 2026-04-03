@@ -38,6 +38,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            var h = window.location.hostname;
+            if (h.indexOf('pocketchat') !== -1) {
+              document.title = 'PocketChat';
+              var link = document.querySelector('link[rel="icon"]');
+              if (link) link.href = '/favicon-pocketchat.svg';
+              else {
+                var l = document.createElement('link');
+                l.rel = 'icon'; l.href = '/favicon-pocketchat.svg'; l.type = 'image/svg+xml';
+                document.head.appendChild(l);
+              }
+            }
+          })();
+        `}} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
