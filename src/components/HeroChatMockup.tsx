@@ -107,10 +107,10 @@ export default function HeroChatMockup() {
         </div>
       </div>
 
-      {/* Messages area — fixed 340px */}
+      {/* Messages area — fixed height for ~420px total container */}
       <div
         className="flex flex-col gap-2.5 px-3.5"
-        style={{ height: 340, minHeight: 340, maxHeight: 340, overflow: 'hidden', paddingTop: 14, paddingBottom: 14, animation: fading ? 'heroFadeOut 0.5s ease-out forwards' : undefined }}
+        style={{ height: 316, minHeight: 316, maxHeight: 316, overflow: 'hidden', paddingTop: 14, paddingBottom: 14, animation: fading ? 'heroFadeOut 0.5s ease-out forwards' : undefined }}
       >
         {messages.map((msg, i) => (
           msg.sender === 'user' ? (
