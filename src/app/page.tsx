@@ -161,7 +161,7 @@ export default function LandingPage() {
                 <PocketChatMark size={40} />
                 <span className="text-[15px] font-bold text-[#111827]">PocketChat</span>
               </div>
-              <p className="text-sm text-[#6b7280]">Just need translation chat? No business setup required. Free forever.</p>
+              <p className="text-sm text-[#374151]">Just need translation chat? No business setup required. Free forever.</p>
             </div>
             <Link href="/signup?mode=pocketchat" className="bg-[#F59E0B] text-white px-6 py-2.5 rounded-[10px] text-sm font-semibold whitespace-nowrap hover:bg-[#d97706] transition-colors">
               Get PocketChat free
@@ -189,7 +189,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1100px]">
           <div className="text-center mb-10">
             <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">Everything your business needs.</h2>
-            <p className="text-base text-[#6b7280] mt-2">9 AI features. 30+ pages. One pocket.</p>
+            <p className="text-base text-[#374151] mt-2">9 AI features. 30+ pages. One pocket.</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
@@ -205,7 +205,7 @@ export default function LandingPage() {
               <div key={i} className="bg-white rounded-2xl border border-[#E5E5E5] p-5">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-3" dangerouslySetInnerHTML={{ __html: f.svg }} />
                 <h4 className="text-[15px] font-semibold text-[#111827] mb-1.5">{f.title}</h4>
-                <p className="text-[13px] text-[#6b7280] leading-relaxed">{f.desc}</p>
+                <p className="text-[13px] text-[#374151] leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -217,7 +217,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1100px]">
           <div className="text-center mb-10">
             <h2 className="text-[32px] font-bold text-[#111827]">Built for you.</h2>
-            <p className="text-base text-[#6b7280] mt-3">Whether you just landed in Japan or manage 50 clients.</p>
+            <p className="text-base text-[#374151] mt-3">Whether you just landed in Japan or manage 50 clients.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -232,7 +232,7 @@ export default function LandingPage() {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={p.iconColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={p.icon} />{p.icon2 && <path d={p.icon2} />}</svg>
                 </div>
                 <h3 className="text-base font-bold text-[#111827] mb-1">{p.title}</h3>
-                <p className="text-[13px] text-[#6b7280] leading-relaxed mb-3">{p.desc}</p>
+                <p className="text-[13px] text-[#374151] leading-relaxed mb-3">{p.desc}</p>
                 <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: p.badgeBg, color: p.badgeColor }}>{p.badge}</span>
               </div>
             ))}
@@ -247,7 +247,7 @@ export default function LandingPage() {
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-[#fef3c7] text-xs font-semibold text-[#92400e] mb-4">AI-POWERED</span>
               <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">AI learns your business.<br />Builds your pipeline.<br /><span className="text-[#F59E0B]">Runs it for you.</span></h2>
-              <p className="text-[15px] text-[#6b7280] leading-relaxed mb-6">No two businesses are the same. BizPocket AI interviews you, understands your operations, and creates a custom pipeline that adapts as your business grows.</p>
+              <p className="text-[15px] text-[#374151] leading-relaxed mb-6">No two businesses are the same. BizPocket AI interviews you, understands your operations, and creates a custom pipeline that adapts as your business grows.</p>
               <div className="space-y-2.5">
                 {['AI interviews you in your language', 'Generates custom pipeline stages', 'Tracks every item through your cycle', 'Learns and improves over time', 'Morning briefing on bottlenecks'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
@@ -264,7 +264,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="bg-white rounded-[14px] border border-[#e5e7eb] p-4">
-                <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wider mb-3">Auto-generated pipeline</p>
+                <p className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Auto-generated pipeline</p>
                 <div className="flex flex-wrap gap-1.5 items-center">
                   {[{ n: 'Source', bg: '#eef2ff', c: '#4F46E5' }, { n: 'Inspect', bg: '#fef3c7', c: '#92400e' }, { n: 'Repair', bg: '#fff7ed', c: '#9a3412' }, { n: 'Photo', bg: '#fdf2f8', c: '#9d174d' }, { n: 'List', bg: '#f5f3ff', c: '#6b21a8' }, { n: 'Negotiate', bg: '#ecfeff', c: '#155e75' }, { n: 'Ship', bg: '#f0fdf4', c: '#166534' }, { n: 'Get Paid', bg: '#ecfdf5', c: '#065f46' }].map((s, i) => (
                     <span key={i} className="flex items-center gap-1"><span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold" style={{ background: s.bg, color: s.c }}>{s.n}</span>{i < 7 && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
@@ -283,7 +283,7 @@ export default function LandingPage() {
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#eef2ff] text-xs font-semibold text-[#4338ca] mb-4">CANVA-STYLE BUILDER</span>
             <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">Invoice fired.<br />Before you leave<br /><span className="text-[#4F46E5]">the parking lot.</span></h2>
-            <p className="text-[15px] text-[#6b7280] leading-relaxed mb-6">Professional invoices in 60 seconds. Split-view live preview so you see exactly what your client sees. 10 templates. 16 currencies. E-signature. Share via link or PDF.</p>
+            <p className="text-[15px] text-[#374151] leading-relaxed mb-6">Professional invoices in 60 seconds. Split-view live preview so you see exactly what your client sees. 10 templates. 16 currencies. E-signature. Share via link or PDF.</p>
             <div className="space-y-2.5">
               {['10 invoice templates', 'Split-view live preview (Canva-style)', 'E-signature capture', 'PDF download + share link', 'T-number for Japanese compliance (インボイス制度)', '16 currencies with auto tax calculation', 'Custom columns, discounts, attachments'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
@@ -339,7 +339,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-1.5"><PocketChatMark size={24} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
-            <p className="text-base text-[#6b7280] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
+            <p className="text-base text-[#374151] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -352,7 +352,7 @@ export default function LandingPage() {
                 {p.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#4F46E5] text-white text-xs font-semibold px-4 py-1 rounded-full whitespace-nowrap">Most popular</div>}
                 <p className="text-sm font-semibold mb-1" style={{ color: p.color }}>{p.name}</p>
                 <p className="text-[32px] font-bold text-[#111827] mb-1">{p.price}</p>
-                <p className="text-xs text-[#9ca3af] mb-5">{p.sub}</p>
+                <p className="text-xs text-[#6b7280] mb-5">{p.sub}</p>
                 <div className="space-y-2 flex-1 mb-6">
                   {p.features.map((f, j) => (
                     <div key={j} className="flex items-start gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" className="shrink-0 mt-0.5"><path d="M22 4L12 14.01l-3-3" /></svg><span className={`text-[13px] text-[#374151] ${j === 0 && i > 0 ? 'font-semibold' : ''}`}>{f}</span></div>
@@ -371,7 +371,7 @@ export default function LandingPage() {
           <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-semibold tracking-tight text-white leading-tight">
             Your business deserves better tools.
           </h2>
-          <p className="mt-4 text-[15px] text-[#999]">Join entrepreneurs across Japan who run their entire business from one app.</p>
+          <p className="mt-4 text-[15px] text-[#d1d5db]">Join entrepreneurs across Japan who run their entire business from one app.</p>
           <Link href="/signup" className="mt-8 inline-block rounded-full bg-[#4F46E5] px-8 py-3.5 text-[14px] font-medium text-white hover:bg-[#4338CA] transition-colors">
             Start your free trial
           </Link>
@@ -391,14 +391,14 @@ export default function LandingPage() {
               <span className="text-[13px] font-medium text-[#0A0A0A]">BizPocket</span>
             </div>
             <div className="flex items-center gap-6">
-              <a href="#features" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Features</a>
-              <a href="#pricing" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Pricing</a>
-              <Link href="/login" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Log in</Link>
-              <a href="/privacy" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Privacy</a>
+              <a href="#features" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Features</a>
+              <a href="#pricing" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Pricing</a>
+              <Link href="/login" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Log in</Link>
+              <a href="/privacy" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Privacy</a>
               <span className="text-[#d1d5db]">&middot;</span>
-              <a href="/terms" className="text-[12px] text-[#999] hover:text-[#0A0A0A]">Terms</a>
+              <a href="/terms" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Terms</a>
             </div>
-            <p className="text-[11px] text-[#CCC]">&copy; 2026 TechDagger Inc.</p>
+            <p className="text-[11px] text-[#9ca3af]">&copy; 2026 TechDagger Inc.</p>
           </div>
         </div>
       </footer>

@@ -88,6 +88,7 @@ export default function HeroChatMockup() {
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
         @keyframes dotPulse { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
       `}} />
       <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden">
         {/* Header */}
