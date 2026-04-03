@@ -568,7 +568,7 @@ export default function PocketChatPage() {
         conversation_id: activeConvoId,
         organization_id: organization.id,
         sender_type: 'owner',
-        sender_name: profile?.name || 'You',
+        sender_name: profile?.full_name || profile?.name || 'You',
         message: text,
         message_type: 'text',
         original_text: text,
