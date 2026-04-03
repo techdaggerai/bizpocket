@@ -49,6 +49,7 @@
 body {
   color: var(--text-1);
   background: var(--bg);
+  font-family: 'DM Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans Arabic', 'Noto Sans Bengali', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
 }
 
 /* Safe area for bottom nav on iPhone */
