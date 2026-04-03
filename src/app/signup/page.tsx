@@ -50,8 +50,8 @@ function SignupInner() {
 
     if (authError) {
       const msg = authError.message.toLowerCase();
-      if (msg.includes('already') || msg.includes('exists') || msg.includes('invalid login')) {
-        setError('An account with this email already exists. Try logging in instead.');
+      if (msg.includes('already') || msg.includes('exists') || msg.includes('invalid login') || msg.includes('credentials') || msg.includes('registered')) {
+        setError('An account with this email already exists.');
       } else {
         setError(authError.message);
       }
@@ -78,6 +78,11 @@ function SignupInner() {
           {error && (
             <div className="rounded-input border border-[var(--red)]/20 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)]">
               {error}
+              {error.includes('already') && (
+                <Link href={isPocketChat ? '/login?mode=pocketchat' : '/login'} className="mt-1 block text-[var(--accent)] font-medium hover:underline">
+                  Log in here &rarr;
+                </Link>
+              )}
             </div>
           )}
           <div>

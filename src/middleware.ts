@@ -18,25 +18,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
 
-    // Signup → PocketChat mode (no auth needed)
-    if (path === '/signup') {
-      const url = new URL('/signup', request.url);
-      url.searchParams.set('mode', 'pocketchat');
-      return NextResponse.rewrite(url);
-    }
-
-    // Login → PocketChat mode
-    if (path === '/login') {
-      const url = new URL('/login', request.url);
-      url.searchParams.set('mode', 'pocketchat');
-      return NextResponse.rewrite(url);
-    }
-
     // Public pages on pocketchat.co — pass through without auth
     if (['/privacy', '/terms'].includes(path) || path.startsWith('/auth')) {
       return NextResponse.next();
     }
 
+    // Login/Signup on pocketchat.co — fall through to session check below
+    // (logged-in users get redirected to /chat at line 78 via isPocketChat check)
     // All other pocketchat.co paths (/chat, etc.) — fall through to normal auth flow below
   }
 
@@ -85,6 +73,12 @@ export async function middleware(request: NextRequest) {
       const mode = request.nextUrl.searchParams.get('mode');
       url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
       return NextResponse.redirect(url);
+    }
+    // Not logged in on pocketchat.co login/signup — rewrite to inject mode param
+    if (isPocketChat && (pathname === '/login' || pathname === '/signup')) {
+      const url = request.nextUrl.clone();
+      url.searchParams.set('mode', 'pocketchat');
+      return NextResponse.rewrite(url);
     }
     return supabaseResponse;
   }
