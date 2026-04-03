@@ -180,7 +180,8 @@ export async function POST(request: Request) {
     .eq('id', organizationId)
     .single()
 
-  const isPocketChatOrg = org?.signup_source === 'pocketchat'
+  const host = request.headers.get('host') || ''
+  const isPocketChatOrg = org?.signup_source === 'pocketchat' || host.includes('pocketchat')
 
   // Build context — PocketChat orgs only get contacts, BizPocket orgs get full business context
   let contextBlock: string

@@ -63,7 +63,8 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { organization } = useAuth();
   const plan = organization?.plan || 'free';
-  const isPocketChatOnly = organization?.signup_source === 'pocketchat';
+  const isPocketChatOnly = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
   const NAV_SECTIONS = isPocketChatOnly ? POCKETCHAT_NAV : FULL_NAV;
 
   return (
