@@ -1,6 +1,6 @@
 // Landing page — server component
 import Link from 'next/link';
-import { PocketMark, PocketChatMark } from '@/components/Logo';
+import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
 import InvoiceShowcase from '@/components/InvoiceShowcase';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -114,7 +114,7 @@ export default function LandingPage() {
           <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,60px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <AnimatedPocketChatLogo size={80} isTranslating />
+                <AnimatedPocketChatLogo size={80} isTranslating={true} />
                 <span className="text-sm font-bold text-[#F59E0B] tracking-wide">POCKETCHAT</span>
               </div>
               <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-[1.2] text-white mb-4">
@@ -159,7 +159,7 @@ export default function LandingPage() {
           <div className="bg-[#f9fafb] rounded-2xl px-8 py-6 flex items-center justify-between flex-wrap gap-4 border border-[#e5e7eb]">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <PocketChatMark size={40} />
+                <AnimatedPocketChatLogo size={40} isTranslating={true} />
                 <span className="text-[15px] font-bold text-[#111827]">PocketChat</span>
               </div>
               <p className="text-sm text-[#374151]">Just need translation chat? No business setup required. Free forever.</p>
@@ -337,7 +337,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-5 mb-6">
               <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
               <span className="text-[13px] text-[#d1d5db]">+</span>
-              <div className="flex items-center gap-1.5"><PocketChatMark size={28} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
+              <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
             <p className="text-base text-[#374151] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
@@ -384,7 +384,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl px-6 py-10">
           <div className="flex items-center justify-center gap-6 pb-6">
             <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
-            <div className="flex items-center gap-1.5"><PocketChatMark size={28} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
+            <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">

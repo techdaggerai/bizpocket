@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { PocketChatMark, PocketMark } from '@/components/Logo';
+import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
@@ -69,7 +69,7 @@ export default function PocketChatLanding() {
       {/* 1. Navbar */}
       <nav className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-3 px-6 py-5">
         <div className="flex items-center gap-2">
-          <PocketChatMark size={28} />
+          <AnimatedPocketChatLogo size={32} isTranslating={true} />
           <span className="text-[17px] font-bold text-[#111827]">Pocket<span className="text-[#F59E0B]">Chat</span></span>
         </div>
         <div className="flex items-center gap-3">
@@ -82,8 +82,8 @@ export default function PocketChatLanding() {
       <section className="px-6 py-16 text-center">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-4 flex justify-center">
-            <div className="hidden lg:block"><AnimatedPocketChatLogo size={120} isTranslating /></div>
-            <div className="lg:hidden"><AnimatedPocketChatLogo size={80} isTranslating /></div>
+            <div className="hidden lg:block"><AnimatedPocketChatLogo size={120} isTranslating={true} /></div>
+            <div className="lg:hidden"><AnimatedPocketChatLogo size={80} isTranslating={true} /></div>
           </div>
           <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pocket<span className="text-[#F59E0B]">Chat</span></h2>
           <p className="mt-3 text-lg text-[#6b7280]">Break every language barrier</p>
@@ -225,7 +225,7 @@ export default function PocketChatLanding() {
       <footer className="bg-[#f9fafb]">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="flex items-center gap-2">
-            <PocketChatMark size={28} />
+            <AnimatedPocketChatLogo size={32} isTranslating={true} />
             <span className="text-xs text-[#6b7280]">&copy; 2026 TechDagger Studio</span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
