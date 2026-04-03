@@ -13,27 +13,24 @@ export async function middleware(request: NextRequest) {
   if (isPocketChat) {
     const path = request.nextUrl.pathname;
 
-    // Root → PocketChat landing
+    // Root → PocketChat landing (no auth needed)
     if (path === '/') {
       return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
 
-    // Signup → PocketChat mode
+    // Signup → PocketChat mode (no auth needed)
     if (path === '/signup') {
       const url = new URL('/signup', request.url);
       url.searchParams.set('mode', 'pocketchat');
       return NextResponse.rewrite(url);
     }
 
-    // Login → pass through
-    if (path === '/login') {
+    // Public pages on pocketchat.co — pass through without auth
+    if (['/login', '/privacy', '/terms'].includes(path) || path.startsWith('/auth')) {
       return NextResponse.next();
     }
 
-    // /chat, /privacy, /terms, /auth → pass through normally
-    if (['/chat', '/privacy', '/terms', '/auth'].some(p => path.startsWith(p))) {
-      return NextResponse.next();
-    }
+    // All other pocketchat.co paths (/chat, etc.) — fall through to normal auth flow below
   }
 
   let supabaseResponse = NextResponse.next({ request });
@@ -75,10 +72,11 @@ export async function middleware(request: NextRequest) {
 
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {
-    // If logged in and on landing/login/signup, redirect to dashboard
+    // If logged in and on landing/login/signup, redirect appropriately
     if (user && (pathname === '/login' || pathname === '/signup')) {
       const url = request.nextUrl.clone();
-      url.pathname = '/dashboard';
+      const mode = request.nextUrl.searchParams.get('mode');
+      url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
       return NextResponse.redirect(url);
     }
     return supabaseResponse;

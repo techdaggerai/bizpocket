@@ -45,7 +45,12 @@ function SignupInner() {
     });
 
     if (authError) {
-      setError(authError.message);
+      const msg = authError.message.toLowerCase();
+      if (msg.includes('already') || msg.includes('exists') || msg.includes('invalid login')) {
+        setError('An account with this email already exists. Try logging in instead.');
+      } else {
+        setError(authError.message);
+      }
       setLoading(false);
       return;
     }
