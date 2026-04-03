@@ -228,6 +228,20 @@ export default function PocketChatPage() {
     fetchBotConfig();
   }, [fetchConversations, fetchBotConfig]);
 
+  // Refetch bot config when user returns from bot-setup
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') fetchBotConfig();
+    };
+    const handleFocus = () => { fetchBotConfig(); };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchBotConfig]);
+
   useEffect(() => {
     if (activeConvoId) {
       fetchMessages(activeConvoId);
