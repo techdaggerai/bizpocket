@@ -30,8 +30,8 @@ export default function AnimatedPocketChatLogo({ size = 36, isTranslating = fals
     if (!isTranslating) { setIndex(0); setFade(true); return; }
     const interval = setInterval(() => {
       setFade(false);
-      setTimeout(() => { setIndex(i => (i + 1) % greetings.length); setFade(true); }, 150);
-    }, 400);
+      setTimeout(() => { setIndex(i => (i + 1) % greetings.length); setFade(true); }, 300);
+    }, 1200);
     return () => clearInterval(interval);
   }, [isTranslating]);
 
@@ -48,12 +48,12 @@ export default function AnimatedPocketChatLogo({ size = 36, isTranslating = fals
       <path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
       <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/>
       <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B">
-        {isTranslating && <animate attributeName="opacity" values="1;0.7;1" dur="0.8s" repeatCount="indefinite"/>}
+        {isTranslating && <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>}
       </path>
       <text x="32" y="68" fontSize={leftSize} fontWeight="800" fill="#4338ca" textAnchor="middle" fontFamily="system-ui, -apple-system, sans-serif"
-        style={{ opacity: fade ? 1 : 0, transition: 'opacity 0.15s ease' }}>{g.left}</text>
+        style={{ opacity: fade ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>{g.left}</text>
       <text x="55.5" y="72" fontSize={rightSize} fontWeight="700" fill="white" textAnchor="middle" fontFamily="sans-serif"
-        style={{ opacity: fade ? 1 : 0, transition: 'opacity 0.15s ease' }}>{g.right}</text>
+        style={{ opacity: fade ? 1 : 0, transition: 'opacity 0.3s ease-in-out' }}>{g.right}</text>
     </svg>
   );
 }
