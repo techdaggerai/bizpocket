@@ -4,9 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import OutlinePillButton from '@/components/OutlinePillButton';
 
-type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner';
+type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner' | 'friend' | 'family' | 'work';
 
 type Contact = {
   id: string;
@@ -18,6 +19,7 @@ type Contact = {
   country: string | null;
   avatar_url: string | null;
   contact_type: ContactType;
+  language?: string | null;
   notes: string | null;
   created_at: string;
 };
@@ -32,31 +34,32 @@ type ContactForm = {
   notes: string;
 };
 
-const emptyForm: ContactForm = {
-  name: '',
-  company: '',
-  phone: '',
-  email: '',
-  country: '',
-  contact_type: 'customer',
-  notes: '',
+const BADGE_COLORS: Record<string, string> = {
+  friend: 'bg-[#FEF3C7] text-[#854D0E]',
+  family: 'bg-[#FCE7F3] text-[#9D174D]',
+  work: 'bg-[#F0FDF4] text-[#166534]',
+  customer: 'bg-[#DBEAFE] text-[#1D4ED8]',
+  supplier: 'bg-[#E1F5EE] text-[#085041]',
+  accountant: 'bg-[#EEEDFE] text-[#3C3489]',
+  partner: 'bg-[#FAECE7] text-[#712B13]',
 };
 
-const TYPE_COLORS: Record<ContactType, string> = {
-  customer: 'bg-[#4F46E5]',
-  supplier: 'bg-[#16A34A]',
-  accountant: 'bg-[#0EA5E9]',
-  partner: 'bg-[#7C3AED]',
-};
+const AVATAR_COLORS = ['#4F46E5', '#16A34A', '#F59E0B', '#DC2626', '#7C3AED', '#0EA5E9', '#EC4899', '#14B8A6'];
 
-const TYPE_BADGE_COLORS: Record<ContactType, string> = {
-  customer: 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]',
-  supplier: 'bg-[rgba(22,163,74,0.08)] text-[#16A34A]',
-  accountant: 'bg-[rgba(14,165,233,0.08)] text-[#0EA5E9]',
-  partner: 'bg-[rgba(124,58,237,0.08)] text-[#7C3AED]',
-};
+function avatarColor(name: string) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
 
-const FILTER_TABS: { label: string; value: ContactType | 'all' }[] = [
+const POCKETCHAT_TABS: { label: string; value: ContactType | 'all' }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Friends', value: 'friend' },
+  { label: 'Family', value: 'family' },
+  { label: 'Work', value: 'work' },
+];
+
+const BIZPOCKET_TABS: { label: string; value: ContactType | 'all' }[] = [
   { label: 'All', value: 'all' },
   { label: 'Customers', value: 'customer' },
   { label: 'Suppliers', value: 'supplier' },
@@ -64,10 +67,36 @@ const FILTER_TABS: { label: string; value: ContactType | 'all' }[] = [
   { label: 'Partners', value: 'partner' },
 ];
 
+const POCKETCHAT_TYPES: { value: ContactType; label: string }[] = [
+  { value: 'friend', label: 'Friend' },
+  { value: 'family', label: 'Family' },
+  { value: 'work', label: 'Work' },
+];
+
+const BIZPOCKET_TYPES: { value: ContactType; label: string }[] = [
+  { value: 'customer', label: 'Customer' },
+  { value: 'supplier', label: 'Supplier' },
+  { value: 'accountant', label: 'Accountant' },
+  { value: 'partner', label: 'Partner' },
+];
+
 export default function ContactsPage() {
   const { organization } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const supabase = createClient();
+
+  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+
+  const defaultType: ContactType = isPocketChatMode ? 'friend' : 'customer';
+  const tabs = isPocketChatMode ? POCKETCHAT_TABS : BIZPOCKET_TABS;
+  const typeOptions = isPocketChatMode ? POCKETCHAT_TYPES : BIZPOCKET_TYPES;
+
+  const emptyForm: ContactForm = {
+    name: '', company: '', phone: '', email: '', country: '',
+    contact_type: defaultType, notes: '',
+  };
 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,20 +126,16 @@ export default function ContactsPage() {
     setLoading(false);
   }, [organization?.id]);
 
-  useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
+  useEffect(() => { fetchContacts(); }, [fetchContacts]);
 
   const filtered = contacts.filter((c) => {
     if (activeTab !== 'all' && c.contact_type !== activeTab) return false;
     if (!search) return true;
     const q = search.toLowerCase();
-    return (
-      c.name.toLowerCase().includes(q) ||
+    return c.name.toLowerCase().includes(q) ||
       (c.company ?? '').toLowerCase().includes(q) ||
       (c.email ?? '').toLowerCase().includes(q) ||
-      (c.phone ?? '').toLowerCase().includes(q)
-    );
+      (c.phone ?? '').toLowerCase().includes(q);
   });
 
   function openAdd() {
@@ -121,13 +146,9 @@ export default function ContactsPage() {
 
   function openEdit(c: Contact) {
     setForm({
-      name: c.name,
-      company: c.company ?? '',
-      phone: c.phone ?? '',
-      email: c.email ?? '',
-      country: c.country ?? '',
-      contact_type: c.contact_type,
-      notes: c.notes ?? '',
+      name: c.name, company: c.company ?? '', phone: c.phone ?? '',
+      email: c.email ?? '', country: c.country ?? '',
+      contact_type: c.contact_type, notes: c.notes ?? '',
     });
     setEditingId(c.id);
     setShowForm(true);
@@ -141,10 +162,7 @@ export default function ContactsPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim()) {
-      toast('Name is required', 'error');
-      return;
-    }
+    if (!form.name.trim()) { toast('Name is required', 'error'); return; }
     setSaving(true);
 
     const payload = {
@@ -159,72 +177,35 @@ export default function ContactsPage() {
     };
 
     if (editingId) {
-      const { error } = await supabase
-        .from('contacts')
-        .update(payload)
-        .eq('id', editingId);
-      if (error) {
-        toast(error.message, 'error');
-      } else {
-        toast('Contact updated', 'success');
-        cancelForm();
-        fetchContacts();
-      }
+      const { error } = await supabase.from('contacts').update(payload).eq('id', editingId);
+      if (error) { toast(error.message, 'error'); }
+      else { toast('Contact updated', 'success'); cancelForm(); fetchContacts(); }
     } else {
       const { error } = await supabase.from('contacts').insert(payload);
-      if (error) {
-        toast(error.message, 'error');
-      } else {
-        toast('Contact added', 'success');
-        cancelForm();
-        fetchContacts();
-      }
+      if (error) { toast(error.message, 'error'); }
+      else { toast('Contact added', 'success'); cancelForm(); fetchContacts(); }
     }
     setSaving(false);
   }
 
   async function handleDelete(id: string) {
-    const { error } = await supabase
-      .from('contacts')
-      .delete()
-      .eq('id', id)
-      .eq('organization_id', organization!.id);
-    if (error) {
-      toast(`Delete failed: ${error.message}`, 'error');
-    } else {
-      toast('Contact deleted', 'success');
-      setContacts((prev) => prev.filter((c) => c.id !== id));
-    }
+    const { error } = await supabase.from('contacts').delete().eq('id', id).eq('organization_id', organization!.id);
+    if (error) { toast(`Delete failed: ${error.message}`, 'error'); }
+    else { toast('Contact deleted', 'success'); setContacts((prev) => prev.filter((c) => c.id !== id)); }
     setDeleteConfirmId(null);
   }
 
   async function importFromCustomers() {
     if (!organization?.id) return;
     setImporting(true);
-
     const { data: customers, error: fetchErr } = await supabase
-      .from('customers')
-      .select('*')
-      .eq('organization_id', organization.id);
+      .from('customers').select('*').eq('organization_id', organization.id);
 
-    if (fetchErr) {
-      toast(fetchErr.message, 'error');
-      setImporting(false);
-      return;
-    }
+    if (fetchErr) { toast(fetchErr.message, 'error'); setImporting(false); return; }
+    if (!customers || customers.length === 0) { toast('No customers to import', 'error'); setImporting(false); return; }
 
-    if (!customers || customers.length === 0) {
-      toast('No customers to import', 'error');
-      setImporting(false);
-      return;
-    }
-
-    // Build a lookup of existing contacts for dedup
     const existing = new Set(
-      contacts.map((c) => {
-        const key = c.email ? c.email.toLowerCase() : `${c.name.toLowerCase()}|${(c.phone ?? '').toLowerCase()}`;
-        return key;
-      })
+      contacts.map((c) => c.email ? c.email.toLowerCase() : `${c.name.toLowerCase()}|${(c.phone ?? '').toLowerCase()}`)
     );
 
     const toInsert = customers
@@ -236,29 +217,16 @@ export default function ContactsPage() {
         return true;
       })
       .map((cust: { name: string; company?: string | null; phone?: string | null; email?: string | null; notes?: string | null }) => ({
-        name: cust.name,
-        company: cust.company ?? null,
-        phone: cust.phone ?? null,
-        email: cust.email ?? null,
-        country: null,
-        contact_type: 'customer' as ContactType,
-        notes: cust.notes ?? null,
-        organization_id: organization.id,
+        name: cust.name, company: cust.company ?? null, phone: cust.phone ?? null,
+        email: cust.email ?? null, country: null, contact_type: 'customer' as ContactType,
+        notes: cust.notes ?? null, organization_id: organization.id,
       }));
 
-    if (toInsert.length === 0) {
-      toast('All customers already imported', 'success');
-      setImporting(false);
-      return;
-    }
+    if (toInsert.length === 0) { toast('All customers already imported', 'success'); setImporting(false); return; }
 
     const { error: insertErr } = await supabase.from('contacts').insert(toInsert);
-    if (insertErr) {
-      toast(insertErr.message, 'error');
-    } else {
-      toast(`Imported ${toInsert.length} contact${toInsert.length !== 1 ? 's' : ''}`, 'success');
-      fetchContacts();
-    }
+    if (insertErr) { toast(insertErr.message, 'error'); }
+    else { toast(`Imported ${toInsert.length} contact${toInsert.length !== 1 ? 's' : ''}`, 'success'); fetchContacts(); }
     setImporting(false);
   }
 
@@ -285,29 +253,39 @@ export default function ContactsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={importFromCustomers}
-            disabled={importing}
-            className="rounded-btn border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-2)] hover:bg-[rgba(79,70,229,0.04)] disabled:opacity-50"
-          >
-            {importing ? 'Importing...' : 'Import from Customers'}
-          </button>
-          <button
+          <OutlinePillButton
+            label="QR Code"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /><rect x="18" y="14" width="3" height="3" /><rect x="14" y="18" width="3" height="3" /><rect x="18" y="18" width="3" height="3" /></svg>}
+            color="#F59E0B"
+            onClick={() => toast('QR Code sharing coming soon!', 'info')}
+          />
+          {!isPocketChatMode && (
+            <button
+              onClick={importFromCustomers}
+              disabled={importing}
+              className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--text-2)] hover:text-white disabled:opacity-50"
+              style={{ border: '1px solid #D1D5DB' }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+              {importing ? 'Importing...' : 'Import'}
+            </button>
+          )}
+          <OutlinePillButton
+            label="Add Contact"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>}
+            color="#4F46E5"
             onClick={openAdd}
-            className="rounded-btn bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA]"
-          >
-            Add Contact
-          </button>
+          />
         </div>
       </div>
 
       {/* Filter Tabs */}
       <div className="flex gap-1.5 overflow-x-auto">
-        {FILTER_TABS.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`rounded-btn px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
+            className={`rounded-[20px] px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.value
                 ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
@@ -329,119 +307,73 @@ export default function ContactsPage() {
 
       {/* Inline Form */}
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3"
-        >
+        <form onSubmit={handleSubmit} className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3">
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
             {editingId ? 'Edit Contact' : 'New Contact'}
           </h2>
 
           <div>
-            <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">
-              Name <span className="text-[#DC2626]">*</span>
-            </label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => updateField('name', e.target.value)}
-              placeholder="Contact name"
-              required
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-            />
+            <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
+            <input type="text" value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Contact name" required
+              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Company</label>
-            <input
-              type="text"
-              value={form.company}
-              onChange={(e) => updateField('company', e.target.value)}
-              placeholder="Company name"
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-            />
-          </div>
+          {!isPocketChatMode && (
+            <div>
+              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Company</label>
+              <input type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} placeholder="Company name"
+                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Phone</label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => updateField('phone', e.target.value)}
-                placeholder="Phone number"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-              />
+              <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="Phone number"
+                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Email</label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                placeholder="Email address"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-              />
+              <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="Email address"
+                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Country</label>
-              <input
-                type="text"
-                value={form.country}
-                onChange={(e) => updateField('country', e.target.value)}
-                placeholder="Country"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-              />
+              <input type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} placeholder="Country"
+                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Type</label>
-              <select
-                value={form.contact_type}
-                onChange={(e) => updateField('contact_type', e.target.value)}
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-              >
-                <option value="customer">Customer</option>
-                <option value="supplier">Supplier</option>
-                <option value="accountant">Accountant</option>
-                <option value="partner">Partner</option>
+              <select value={form.contact_type} onChange={(e) => updateField('contact_type', e.target.value)}
+                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                {typeOptions.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
           </div>
 
           <div>
             <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => updateField('notes', e.target.value)}
-              placeholder="Additional notes"
-              rows={2}
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none"
-            />
+            <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes" rows={2}
+              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-btn bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA] disabled:opacity-50"
-            >
+            <button type="submit" disabled={saving}
+              className="rounded-btn bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA] disabled:opacity-50">
               {saving ? 'Saving...' : editingId ? 'Update' : 'Save'}
             </button>
-            <button
-              type="button"
-              onClick={cancelForm}
-              className="rounded-btn border border-[#E5E5E5] px-4 py-2 text-sm text-[var(--text-2)]"
-            >
+            <button type="button" onClick={cancelForm}
+              className="rounded-btn border border-[#E5E5E5] px-4 py-2 text-sm text-[var(--text-2)]">
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      {/* Contact Grid */}
+      {/* Contact List */}
       {filtered.length === 0 ? (
         <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
           <p className="text-sm text-[var(--text-3)]">
@@ -451,74 +383,82 @@ export default function ContactsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
           {filtered.map((c) => (
             <div
               key={c.id}
-              className="rounded-card border border-[#E5E5E5] bg-white p-4"
+              className="flex items-center gap-3 rounded-xl border border-[#F0F0F0] bg-white px-4 py-3 hover:bg-[#FAFAFA] transition-colors"
             >
-              {/* Avatar + Name */}
-              <div className="flex items-start gap-3">
-                <Link
-                  href={`/chat?contact=${c.id}`}
-                  className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-white text-sm font-semibold ${TYPE_COLORS[c.contact_type]}`}
-                >
-                  {c.name.charAt(0).toUpperCase()}
-                </Link>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-1)] truncate">
-                    {c.name}
-                  </p>
-                  {c.company && (
-                    <p className="text-[11px] text-[var(--text-3)] truncate">{c.company}</p>
-                  )}
-                  <span
-                    className={`inline-block mt-1 text-[10px] font-medium uppercase rounded-btn px-1.5 py-0.5 ${TYPE_BADGE_COLORS[c.contact_type]}`}
-                  >
+              {/* Avatar */}
+              <div
+                className="h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-white text-sm font-medium"
+                style={{ backgroundColor: avatarColor(c.name) }}
+              >
+                {c.name.charAt(0).toUpperCase()}
+              </div>
+
+              {/* Name + badge + language */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-[14px] font-medium text-[var(--text-1)] truncate">{c.name}</p>
+                  <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.contact_type] || BADGE_COLORS.friend}`}>
                     {c.contact_type}
                   </span>
                 </div>
+                {(c.company || c.phone || c.email) && (
+                  <p className="text-[12px] text-[var(--text-3)] truncate mt-0.5">
+                    {c.company || c.phone || c.email}
+                  </p>
+                )}
               </div>
 
-              {/* Phone + Email */}
-              <div className="mt-2.5 space-y-0.5">
+              {/* Action icons */}
+              <div className="flex items-center gap-1.5 shrink-0">
                 {c.phone && (
-                  <p className="text-[11px] text-[var(--text-3)] truncate">{c.phone}</p>
+                  <a href={`tel:${c.phone}`}
+                    className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors"
+                    title="Call">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                  </a>
                 )}
-                {c.email && (
-                  <p className="text-[11px] text-[var(--text-3)] truncate">{c.email}</p>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="mt-3 flex items-center gap-2 border-t border-[#F0F0F0] pt-2.5">
+                <button
+                  onClick={() => router.push(`/chat?contact=${c.id}`)}
+                  className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors"
+                  title="Chat">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </button>
                 <button
                   onClick={() => openEdit(c)}
-                  className="text-xs text-[#4F46E5] hover:opacity-80"
-                >
-                  Edit
+                  className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#9CA3AF] hover:bg-[#F3F4F6] transition-colors"
+                  title="Edit">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
                 </button>
                 {deleteConfirmId === c.id ? (
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleDelete(c.id)}
-                      className="rounded-btn bg-[#DC2626] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#B91C1C]"
-                    >
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => handleDelete(c.id)}
+                      className="rounded-full bg-[#DC2626] px-2 py-1 text-[10px] font-medium text-white">
                       Delete?
                     </button>
-                    <button
-                      onClick={() => setDeleteConfirmId(null)}
-                      className="text-xs text-[var(--text-3)] hover:text-[var(--text-1)]"
-                    >
-                      Cancel
+                    <button onClick={() => setDeleteConfirmId(null)}
+                      className="text-[10px] text-[var(--text-3)]">
+                      No
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setDeleteConfirmId(c.id)}
-                    className="text-xs text-[#DC2626] hover:opacity-80"
-                  >
-                    Delete
+                  <button onClick={() => setDeleteConfirmId(c.id)}
+                    className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#DC2626]/50 hover:text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                    title="Delete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
                   </button>
                 )}
               </div>
