@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { PocketChatMark } from '@/components/Logo';
 
 const greetings = [
   { to: 'やあ', lang: 'Japanese' }, { to: 'Hola', lang: 'Spanish' },
@@ -29,7 +30,7 @@ export default function PocketChatLanding() {
       {/* Nav */}
       <nav style={{ maxWidth: 1100, margin: '0 auto', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <svg width="32" height="32" viewBox="0 0 88 88" fill="none"><rect width="88" height="88" rx="20" fill="#4F46E5"/><rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15"/><path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/><path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/><path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/><text x="32" y="68" fontSize="10" fontWeight="800" fill="#4338ca" textAnchor="middle" fontFamily="system-ui">Hi</text><text x="55.5" y="72" fontSize="9.5" fontWeight="700" fill="white" textAnchor="middle" fontFamily="sans-serif">やあ</text></svg>
+          <PocketChatMark size={40} />
           <span style={{ fontSize: 18, fontWeight: 700 }}>Pocket<span style={{ color: '#F59E0B' }}>Chat</span></span>
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
@@ -40,6 +41,7 @@ export default function PocketChatLanding() {
 
       {/* Hero */}
       <section style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 24px 60px', textAlign: 'center' }}>
+        <div style={{ marginBottom: 24 }}><PocketChatMark size={72} /></div>
         <div style={{ display: 'inline-flex', padding: '4px 16px', borderRadius: 100, border: '1px solid #333', marginBottom: 24 }}>
           <span style={{ fontSize: 13, color: '#9ca3af' }}>Voice calls · Voice messages · Text · All translated</span>
         </div>

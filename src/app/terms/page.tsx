@@ -1,3 +1,5 @@
+import { PocketMark } from '@/components/Logo';
+
 export default function TermsPage() {
   const section = { marginBottom: 32 } as const;
   const h2 = { fontSize: 20, fontWeight: 700, margin: '0 0 12px', color: '#111827' } as const;
@@ -5,6 +7,7 @@ export default function TermsPage() {
 
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '60px 24px', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <div style={{ marginBottom: 20 }}><PocketMark variant="lg" /></div>
       <h1 style={{ fontSize: 28, fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>Terms of Service</h1>
       <p style={{ fontSize: 14, color: '#9ca3af', margin: '0 0 40px' }}>Last updated: April 3, 2026</p>
 

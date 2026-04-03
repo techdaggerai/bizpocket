@@ -1000,7 +1000,7 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 shrink-0"><PocketMark variant="sm" /></div>
+                  <div className="h-8 w-8 shrink-0"><PocketMark variant="xl" /></div>
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (

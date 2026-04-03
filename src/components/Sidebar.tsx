@@ -86,7 +86,7 @@ export default function Sidebar() {
                     }`}
                   >
                     {item.icon === '__pocketchat__' ? (
-                      <PocketChatMark size={18} />
+                      <PocketChatMark size={24} />
                     ) : (
                       <svg
                         className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}

@@ -58,7 +58,7 @@ function SignupInner() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
-            {isPocketChat ? <PocketChatMark size={48} /> : <PocketMark variant="lg" />}
+            {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
             {!isPocketChat && <LogoWordmark />}
           </div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">{isPocketChat ? 'Sign up for PocketChat' : 'Create your account'}</h1>

@@ -54,7 +54,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.06]">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2">
-            <PocketMark className="h-7 w-7" />
+            <PocketMark variant="lg" />
             <span className="text-[15px] font-semibold tracking-tight text-[#0A0A0A]">BizPocket</span>
           </Link>
           <div className="hidden sm:flex items-center gap-8">
@@ -113,7 +113,7 @@ export default function LandingPage() {
           <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,60px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
               <div className="flex items-center gap-2.5 mb-4">
-                <PocketChatMark size={36} />
+                <PocketChatMark size={48} />
                 <span className="text-sm font-bold text-[#F59E0B] tracking-wide">POCKETCHAT</span>
               </div>
               <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-[1.2] text-white mb-4">
@@ -158,7 +158,7 @@ export default function LandingPage() {
           <div className="bg-[#f9fafb] rounded-2xl px-8 py-6 flex items-center justify-between flex-wrap gap-4 border border-[#e5e7eb]">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <PocketChatMark size={24} />
+                <PocketChatMark size={40} />
                 <span className="text-[15px] font-bold text-[#111827]">PocketChat</span>
               </div>
               <p className="text-sm text-[#6b7280]">Just need translation chat? No business setup required. Free forever.</p>
@@ -302,16 +302,25 @@ export default function LandingPage() {
               <span className="text-xs font-semibold text-[#a5b4fc] tracking-widest">BIZPOCKET</span>
             </div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">SOCIAL MEDIA → ORDERS → MONEY</span>
-            <h2 className="text-[28px] font-bold leading-[1.3] mb-4">One link. Every platform.<br />Instant orders.</h2>
+            <h2 className="text-[28px] font-bold leading-[1.3] mb-4" style={{ background: 'linear-gradient(to right, #a5b4fc, #f0abfc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>One link. Every platform.<br />Instant orders.</h2>
             <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link on Instagram, TikTok, Facebook, LINE, WhatsApp, your business card — anywhere. Customers tap it, see your catalog, and chat with you in their language.</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 32, flexWrap: 'wrap' }}>
-              {['Instagram', 'TikTok', 'Facebook', 'LINE', 'WhatsApp', 'X / Twitter', 'QR Code', 'Email'].map((p, i) => (
-                <span key={i} style={{ fontSize: 12, fontWeight: 500, color: '#94a3b8', padding: '4px 14px', borderRadius: 100, border: '1px solid #334155' }}>{p}</span>
+              {[
+                { name: 'Instagram', color: '#E1306C' },
+                { name: 'TikTok', color: '#00f2ea' },
+                { name: 'Facebook', color: '#1877F2' },
+                { name: 'LINE', color: '#06C755' },
+                { name: 'WhatsApp', color: '#25D366' },
+                { name: 'X', color: '#9ca3af' },
+                { name: 'QR Code', color: '#F59E0B' },
+                { name: 'Email', color: '#a5b4fc' },
+              ].map((p, i) => (
+                <span key={i} style={{ fontSize: 12, fontWeight: 600, color: p.color, padding: '5px 16px', borderRadius: 100, border: `1px solid ${p.color}40`, background: `${p.color}10` }}>{p.name}</span>
               ))}
             </div>
             <div className="flex justify-center items-center gap-3 flex-wrap mb-8">
               {[{ l: 'Social post', c: '#e879f9' }, { l: 'Customer taps link', c: '#60a5fa' }, { l: 'Sees your catalog', c: '#34d399' }, { l: 'Chats in Japanese', c: '#a5b4fc' }, { l: 'Order in pipeline', c: '#fbbf24' }].map((s, i) => (
-                <span key={i} className="flex items-center gap-2"><span className="bg-[#1e293b] border border-[#334155] rounded-[14px] px-4 py-3 text-[11px] font-medium text-[#e2e8f0]">{s.l}</span>{i < 4 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
+                <span key={i} className="flex items-center gap-2"><span className="bg-[#1e293b] border border-[#334155] rounded-[14px] px-4 py-3 text-[11px] font-medium text-[#e2e8f0]" style={{ borderTop: `2px solid ${s.c}` }}>{s.l}</span>{i < 4 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
               ))}
             </div>
             <p className="text-sm text-[#64748b]">Works for any business — cake shop, car dealer, import-export, freelancer, restaurant.</p>
@@ -326,7 +335,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-5 mb-6">
               <div className="flex items-center gap-1.5"><PocketMark variant="sm" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
               <span className="text-[13px] text-[#d1d5db]">+</span>
-              <div className="flex items-center gap-1.5"><PocketChatMark size={20} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
+              <div className="flex items-center gap-1.5"><PocketChatMark size={24} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
             <p className="text-base text-[#6b7280] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
@@ -373,7 +382,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl px-6 py-10">
           <div className="flex items-center justify-center gap-6 pb-6">
             <div className="flex items-center gap-1.5"><PocketMark variant="sm" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
-            <div className="flex items-center gap-1.5"><PocketChatMark size={20} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
+            <div className="flex items-center gap-1.5"><PocketChatMark size={24} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
