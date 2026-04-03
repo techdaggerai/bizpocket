@@ -1,14 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { PocketMark, LogoWordmark } from '@/components/Logo';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginInner />
+    </Suspense>
+  );
+}
+
+function LoginInner() {
   const supabase = createClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get('mode');
+  const isPocketChat = mode === 'pocketchat';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,7 +41,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push('/dashboard');
+    router.push(isPocketChat ? '/chat' : '/dashboard');
   }
 
   return (
@@ -38,11 +49,11 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
-            <PocketMark variant="lg" />
-            <LogoWordmark />
+            {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
+            {!isPocketChat && <LogoWordmark />}
           </div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-[var(--text-3)]">Log in to BizPocket</p>
+          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Log in to PocketChat' : 'Log in to BizPocket'}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -84,7 +95,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-[var(--text-3)]">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
+          <Link href={isPocketChat ? '/signup?mode=pocketchat' : '/signup'} className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
             Sign Up
           </Link>
         </p>

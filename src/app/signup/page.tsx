@@ -154,7 +154,7 @@ function SignupInner() {
 
         <p className="mt-6 text-center text-sm text-[var(--text-3)]">
           Already have an account?{' '}
-          <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
+          <Link href={isPocketChat ? '/login?mode=pocketchat' : '/login'} className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
             Log In
           </Link>
         </p>
