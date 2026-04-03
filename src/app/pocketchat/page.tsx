@@ -83,9 +83,7 @@ export default function PocketChatLanding() {
       <section className="px-6 py-16 text-center">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-6 flex justify-center">
-            <div style={{ transform: 'scale(1.8)', transformOrigin: 'center center', margin: '3rem 0' }}>
-              <PocketChatTypingIndicator contactName="PocketChat" compact={false} />
-            </div>
+            <PocketChatTypingIndicator contactName="PocketChat" size="lg" />
           </div>
           <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pocket<span className="text-[#F59E0B]">Chat</span></h2>
           <p className="mt-3 text-lg text-[#6b7280]">Break every language barrier</p>
