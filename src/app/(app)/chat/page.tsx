@@ -772,19 +772,21 @@ export default function PocketChatPage() {
               </div>
             )}
           </div>
-          {/* Live Guide button */}
+          {/* Voice call button */}
           {!activeConvo.is_bot_chat && (
-            <button onClick={() => router.push('/chat/live-guide')} className="w-9 h-9 rounded-full bg-[#F59E0B] flex items-center justify-center shrink-0 hover:bg-[#d97706] transition-colors" title="Live Guide — point camera at any Japanese screen">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-                <circle cx="12" cy="13" r="4"/>
+            <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors" title="Voice call">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
             </button>
           )}
-          {/* Call button */}
+          {/* Live Video Guide button */}
           {!activeConvo.is_bot_chat && (
-            <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center shrink-0 hover:bg-[#16a34a] transition-colors" title="Voice call">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/></svg>
+            <button onClick={() => router.push('/chat/live-guide')} className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors" title="Live Video Guide">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 7l-7 5 7 5V7z" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+              </svg>
             </button>
           )}
           {/* Label button */}
