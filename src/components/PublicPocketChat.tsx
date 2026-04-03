@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { LANGUAGES, getDisplayText } from '@/lib/translate';
+import PocketSendIcon from '@/components/PocketSendIcon';
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -192,7 +193,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
           className="flex-1 px-3 py-2.5 rounded-[10px] border border-[#e5e7eb] text-[13px] outline-none" />
         <button onClick={handleSend} disabled={sending || !input.trim()}
           className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${sending || !input.trim() ? 'bg-[#d1d5db]' : 'bg-[#4F46E5]'}`}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" opacity="0.2"/><path d="M10 8l4 4-4 4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <PocketSendIcon size={18} />
         </button>
       </div>
 

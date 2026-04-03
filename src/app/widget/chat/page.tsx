@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
+import PocketSendIcon from '@/components/PocketSendIcon';
 import { LANGUAGES, getDisplayText } from '@/lib/translate';
 
 const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
@@ -115,7 +116,7 @@ function WidgetChatInner() {
           style={{ flex: 1, padding: '9px 11px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 13, outline: 'none' }} />
         <button onClick={handleSend} disabled={sending || !input.trim()}
           style={{ width: 34, height: 34, borderRadius: 10, background: sending || !input.trim() ? '#d1d5db' : '#4F46E5', border: 'none', cursor: sending || !input.trim() ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" opacity="0.2"/><path d="M10 8l4 4-4 4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <PocketSendIcon size={16} />
         </button>
       </div>
       <div style={{ borderTop: '1px solid #f3f4f6', padding: '7px 14px', textAlign: 'center', flexShrink: 0 }}>

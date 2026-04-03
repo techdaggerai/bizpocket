@@ -15,6 +15,7 @@ import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
+import PocketSendIcon from '@/components/PocketSendIcon';
 
 /* ---------- Types ---------- */
 
@@ -1221,9 +1222,7 @@ export default function PocketChatPage() {
                   className="h-[42px] w-[42px] flex items-center justify-center bg-[#DC2626] text-white rounded-[10px] hover:bg-[#B91C1C] transition-colors"
                   title="Send voice note"
                 >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
-                  </svg>
+                  <PocketSendIcon size={22} />
                 </button>
               </>
             ) : (
@@ -1248,9 +1247,7 @@ export default function PocketChatPage() {
                   className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:opacity-40"
                   aria-label="Send"
                 >
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m0 0l-7 7m7-7l7 7" />
-                  </svg>
+                  <PocketSendIcon size={22} />
                 </button>
               </>
             )}
