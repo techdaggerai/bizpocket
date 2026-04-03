@@ -18,7 +18,7 @@ const languages = [
 ];
 
 const SIZES = {
-  sm: { logo: 24, dot: 5, dotGap: 3, composing: 'text-xs', greeting: 'text-[11px]', greetMin: 'min-w-[70px]', bar: 'h-[2px]', barTrack: 'w-[80px]', barFill: 'w-[24px]', gap: 2, colGap: 3, pad: 'gap-2 py-1.5 px-1', showDetail: false },
+  sm: { logo: 40, dot: 5, dotGap: 3, composing: 'text-xs', greeting: 'text-[11px]', greetMin: 'min-w-[70px]', bar: 'h-[2px]', barTrack: 'w-[80px]', barFill: 'w-[24px]', gap: 2, colGap: 3, pad: 'gap-2 py-1.5 px-1', showDetail: false },
   md: { logo: 34, dot: 6, dotGap: 3, composing: 'text-[13px]', greeting: 'text-[11px]', greetMin: 'min-w-[70px]', bar: 'h-[2px]', barTrack: 'w-[100px]', barFill: 'w-[30px]', gap: 3, colGap: 5, pad: 'gap-3 py-2', showDetail: true },
   lg: { logo: 56, dot: 10, dotGap: 6, composing: 'text-xl', greeting: 'text-lg', greetMin: 'min-w-[90px]', bar: 'h-[4px]', barTrack: 'w-[140px]', barFill: 'w-[42px]', gap: 4, colGap: 8, pad: 'gap-4 py-3', showDetail: true },
 };
