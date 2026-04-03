@@ -735,7 +735,9 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
+            botConfig?.bot_icon ? (
+              <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-xl shrink-0">{botEmoji}</div>
+            ) : isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
           ) : (
             <div
               className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
@@ -1009,7 +1011,11 @@ export default function PocketChatPage() {
             return (
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
-                  <div className="h-8 w-8 shrink-0">{isPocketChatMode ? <AnimatedPocketChatLogo size={32} /> : <PocketMark variant="xl" />}</div>
+                  <div className="h-8 w-8 shrink-0 flex items-center justify-center">
+                    {botConfig?.bot_icon ? (
+                      <span className="text-lg">{botEmoji}</span>
+                    ) : isPocketChatMode ? <AnimatedPocketChatLogo size={32} /> : <PocketMark variant="xl" />}
+                  </div>
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
@@ -1374,7 +1380,9 @@ export default function PocketChatPage() {
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
+                  botConfig?.bot_icon ? (
+                    <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-xl shrink-0">{botEmoji}</div>
+                  ) : isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
                 ) : (
                   <div
                     className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"

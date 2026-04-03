@@ -12,13 +12,18 @@ interface BotConfig {
 }
 
 const BOT_ICON_MAP: Record<string, string> = {
-  rocket: '🚀',
-  brain: '🧠',
+  professional: '👔',
+  friendly: '😊',
+  robot: '🤖',
   star: '⭐',
+  rocket: '🚀',
+  crown: '👑',
+  fire: '🔥',
+  globe: '🌍',
+  brain: '🧠',
   bolt: '⚡',
   shield: '🛡️',
   gem: '💎',
-  fire: '🔥',
   crystal: '🔮',
 };
 

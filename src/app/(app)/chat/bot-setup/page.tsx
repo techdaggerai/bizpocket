@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
@@ -48,6 +48,32 @@ export default function BotSetupPage() {
   const [awayMessage, setAwayMessage] = useState('');
   const [rules, setRules] = useState<string[]>(['']);
   const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load existing config for editing
+  useEffect(() => {
+    if (!organization?.id || loaded) return;
+    (async () => {
+      const { data } = await supabase
+        .from('pocket_bot_config')
+        .select('*')
+        .eq('organization_id', organization.id)
+        .single();
+      if (data) {
+        setBotName(data.bot_name || '');
+        setBotIcon(data.bot_icon || 'professional');
+        setBotLang(data.language || 'en');
+        setPersonality(data.bot_personality || 'professional');
+        setGreeting(data.greeting_message || '');
+        setAwayMessage(data.away_message || '');
+        const existingRules = (data.bot_rules || [])
+          .filter((r: { active: boolean }) => r.active)
+          .map((r: { trigger: string }) => r.trigger);
+        if (existingRules.length > 0) setRules(existingRules);
+      }
+      setLoaded(true);
+    })();
+  }, [organization?.id, loaded, supabase]);
 
   const handleSave = async () => {
     if (!botName.trim()) return;
@@ -60,6 +86,33 @@ export default function BotSetupPage() {
       away_message: awayMessage || `Thanks for your message. I'll get back to you soon.`,
       auto_reply_enabled: true, bot_rules: botRules, is_setup_complete: true, response_style: personality,
     });
+
+    // Send re-introduction message in the bot conversation
+    if (organization?.id) {
+      const { data: botConvo } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('organization_id', organization.id)
+        .eq('is_bot_chat', true)
+        .single();
+
+      if (botConvo) {
+        const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
+        await supabase.from('messages').insert({
+          conversation_id: botConvo.id,
+          organization_id: organization.id,
+          sender_type: 'bot',
+          sender_name: botName,
+          message: introMsg,
+          message_type: 'text',
+        });
+        await supabase.from('conversations').update({
+          last_message: introMsg,
+          last_message_at: new Date().toISOString(),
+        }).eq('id', botConvo.id);
+      }
+    }
+
     setSaving(false);
     router.push('/chat');
   };
