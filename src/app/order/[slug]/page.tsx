@@ -37,6 +37,9 @@ export default function PublicOrderPage() {
     async function loadStore() {
       if (!slug) return;
 
+      // Try published_websites first, then fall back to organizations.slug
+      let organizationId: string | null = null;
+
       const { data: site } = await supabase
         .from('published_websites')
         .select('organization_id, business_name')
@@ -44,18 +47,33 @@ export default function PublicOrderPage() {
         .eq('is_published', true)
         .maybeSingle();
 
-      if (!site) {
+      if (site) {
+        organizationId = organizationId;
+      } else {
+        // Fallback: query organizations table directly by slug
+        const { data: orgBySlug } = await supabase
+          .from('organizations')
+          .select('id')
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (orgBySlug) {
+          organizationId = orgBySlug.id;
+        }
+      }
+
+      if (!organizationId) {
         setNotFound(true);
         setLoading(false);
         return;
       }
 
-      setOrgId(site.organization_id);
+      setOrgId(organizationId);
 
       const { data: org } = await supabase
         .from('organizations')
         .select('name, business_type, currency, phone, social_links')
-        .eq('id', site.organization_id)
+        .eq('id', organizationId)
         .maybeSingle();
 
       if (org) setBusiness(org as typeof business);
@@ -63,7 +81,7 @@ export default function PublicOrderPage() {
       const { data: cycleItems } = await supabase
         .from('cycle_items')
         .select('id, name, category, sale_price')
-        .eq('organization_id', site.organization_id)
+        .eq('organization_id', organizationId)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(50);
