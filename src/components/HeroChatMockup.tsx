@@ -167,7 +167,7 @@ export default function HeroChatMockup() {
           <span className="text-[#9ca3af]">Type a message...</span>
         </div>
         <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#4F46E5]">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" opacity="0.2"/><path d="M10 8l4 4-4 4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </div>
       </div>
     </div>
