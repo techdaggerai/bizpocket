@@ -42,6 +42,7 @@ const NAV_SECTIONS = [
       { href: '/items', label: 'Pipeline', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
       { href: '/accountant', label: 'Accountant', icon: 'M2 4h20v16H2zM17 4v16M5 8h5M5 11h4M5 14h6' },
       { href: '/form-fill', label: 'Form Fill', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M9 13h6M9 17h4' },
+      { href: '/chat/live-guide', label: 'Live Guide', icon: 'M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2zM12 13a4 4 0 100-8 4 4 0 000 8z' },
     ],
   },
 ];

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
@@ -106,6 +107,7 @@ function avatarColor(name: string): string {
 export default function PocketChatPage() {
   const { user, organization, profile } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const supabase = createClient();
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -764,6 +766,15 @@ export default function PocketChatPage() {
               </div>
             )}
           </div>
+          {/* Live Guide button */}
+          {!activeConvo.is_bot_chat && (
+            <button onClick={() => router.push('/chat/live-guide')} className="w-9 h-9 rounded-full bg-[#F59E0B] flex items-center justify-center shrink-0 hover:bg-[#d97706] transition-colors" title="Live Guide — point camera at any Japanese screen">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
+          )}
           {/* Call button */}
           {!activeConvo.is_bot_chat && (
             <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center shrink-0 hover:bg-[#16a34a] transition-colors" title="Voice call">
