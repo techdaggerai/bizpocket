@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 
@@ -29,14 +29,14 @@ const BOT_ICON_MAP: Record<string, string> = {
 
 export function usePocketBot() {
   const { organization, profile } = useAuth();
-  const supabase = createClient();
+  const supabaseRef = useRef(createClient());
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
   const [botLoading, setBotLoading] = useState(false);
   const [botConfigLoaded, setBotConfigLoaded] = useState(false);
 
   const fetchBotConfig = useCallback(async () => {
     if (!organization?.id) return null;
-    const { data } = await supabase
+    const { data } = await supabaseRef.current
       .from('pocket_bot_config')
       .select('*')
       .eq('organization_id', organization.id)
@@ -45,7 +45,7 @@ export function usePocketBot() {
     setBotConfig(data as BotConfig | null);
     setBotConfigLoaded(true);
     return data;
-  }, [organization?.id, supabase]);
+  }, [organization?.id]);
 
   const sendBotMessage = useCallback(
     async (
@@ -57,7 +57,7 @@ export function usePocketBot() {
       setBotLoading(true);
 
       // Save user message
-      await supabase.from('messages').insert({
+      await supabaseRef.current.from('messages').insert({
         conversation_id: conversationId,
         organization_id: organization.id,
         sender_type: 'owner',
@@ -68,7 +68,7 @@ export function usePocketBot() {
       });
 
       // Update conversation
-      await supabase
+      await supabaseRef.current
         .from('conversations')
         .update({
           last_message: message,
@@ -93,7 +93,7 @@ export function usePocketBot() {
         const botReply = data.message || 'I could not process that. Try again?';
 
         // Save bot reply
-        await supabase.from('messages').insert({
+        await supabaseRef.current.from('messages').insert({
           conversation_id: conversationId,
           organization_id: organization.id,
           sender_type: 'bot',
@@ -103,7 +103,7 @@ export function usePocketBot() {
         });
 
         // Update conversation
-        await supabase
+        await supabaseRef.current
           .from('conversations')
           .update({
             last_message: botReply,
@@ -114,7 +114,7 @@ export function usePocketBot() {
         onBotReply(botReply);
       } catch {
         const errorMsg = 'Sorry, I had trouble responding. Please try again.';
-        await supabase.from('messages').insert({
+        await supabaseRef.current.from('messages').insert({
           conversation_id: conversationId,
           organization_id: organization.id,
           sender_type: 'bot',
@@ -127,7 +127,7 @@ export function usePocketBot() {
 
       setBotLoading(false);
     },
-    [organization?.id, profile, botConfig, supabase]
+    [organization?.id, profile, botConfig]
   );
 
   const botEmoji = botConfig ? BOT_ICON_MAP[botConfig.bot_icon] || '🚀' : '🚀';

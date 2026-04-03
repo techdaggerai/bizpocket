@@ -23,6 +23,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // PocketChat users should never see BizPocket dashboard
+    if (path === '/dashboard') {
+      return NextResponse.redirect(new URL('/chat', request.url));
+    }
+
     // Login/Signup on pocketchat.co — fall through to session check below
     // (logged-in users get redirected to /chat at line 78 via isPocketChat check)
     // All other pocketchat.co paths (/chat, etc.) — fall through to normal auth flow below
