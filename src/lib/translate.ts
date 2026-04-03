@@ -78,7 +78,13 @@ export async function translateMessage(
 }
 
 export function getDisplayText(
-  message: { content: string; original_text?: string; original_language?: string; translations?: Record<string, string> },
+  message: {
+    content?: string;
+    message?: string;
+    original_text?: string;
+    original_language?: string;
+    translations?: Record<string, string>;
+  },
   viewerLanguage: string
 ): { text: string; isTranslated: boolean; originalLanguage: string | null } {
   const translations = message.translations || {};
@@ -89,7 +95,11 @@ export function getDisplayText(
       originalLanguage: message.original_language || null,
     };
   }
-  return { text: message.original_text || message.content, isTranslated: false, originalLanguage: message.original_language || null };
+  return {
+    text: message.original_text || message.message || message.content || '',
+    isTranslated: false,
+    originalLanguage: message.original_language || null,
+  };
 }
 
 export async function translateAndSend({

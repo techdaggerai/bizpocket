@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
+import { getDisplayText } from '@/lib/translate';
 import BotOnboarding from '@/components/BotOnboarding';
 import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
@@ -960,12 +961,18 @@ export default function PocketChatPage() {
 
             // Regular text message with translation
             const userLang = profile?.language || 'en';
-            const origLang = msg.original_language;
+            const display = getDisplayText({
+              message: msg.message,
+              original_text: msg.original_text,
+              original_language: msg.original_language,
+              translations: msg.translations,
+            }, userLang);
+            const origLang = display.originalLanguage;
             const hasTranslation = msg.translations && msg.translations[userLang];
-            const showTranslated = hasTranslation && origLang !== userLang;
+            const showTranslated = display.isTranslated;
             const displayText = showTranslated && !showOriginal[msg.id]
-              ? msg.translations![userLang]
-              : msg.message;
+              ? display.text
+              : showOriginal[msg.id] ? (msg.original_text || msg.message) : display.text;
             const langFlag = origLang ? LANG_FLAGS[origLang] || '' : '';
 
             return (
