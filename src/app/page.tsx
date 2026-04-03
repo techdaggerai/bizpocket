@@ -4,6 +4,7 @@ import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
 import InvoiceShowcase from '@/components/InvoiceShowcase';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
+import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 
 const PLANS = [
   {
@@ -113,9 +114,8 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1100px]">
           <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,60px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <AnimatedPocketChatLogo size={80} isTranslating={true} />
-                <span className="text-sm font-bold text-[#F59E0B] tracking-wide">POCKETCHAT</span>
+              <div className="mb-5 inline-block rounded-2xl bg-white px-5 py-3">
+                <PocketChatTypingIndicator contactName="PocketChat" compact={false} />
               </div>
               <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold leading-[1.2] text-white mb-4">
                 They speak Japanese.<br />You speak English.<br /><span className="text-[#a78bfa]">Nobody notices.</span>
