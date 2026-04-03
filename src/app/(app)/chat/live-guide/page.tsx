@@ -36,7 +36,7 @@ export default function LiveGuidePage() {
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: 1280, height: 720 },
+        video: { facingMode: 'environment', width: 640, height: 480 },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -67,7 +67,7 @@ export default function LiveGuidePage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
     ctx.drawImage(video, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.8);
+    return canvas.toDataURL('image/jpeg', 0.6);
   }, []);
 
   const analyzeFrame = useCallback(async () => {
@@ -126,7 +126,7 @@ export default function LiveGuidePage() {
       if (autoCaptureRef.current) clearInterval(autoCaptureRef.current);
       setAutoCapture(false);
     } else {
-      autoCaptureRef.current = setInterval(analyzeFrame, 3000);
+      autoCaptureRef.current = setInterval(analyzeFrame, 5000);
       setAutoCapture(true);
       analyzeFrame();
     }
