@@ -35,6 +35,7 @@ function getScoreLabel(score: number): string {
 export default function HealthScore() {
   const { organization } = useAuth();
   const supabase = createClient();
+  const orgId = organization?.id;
   const [score, setScore] = useState<number | null>(null);
   const [breakdown, setBreakdown] = useState<ScoreBreakdown | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -48,17 +49,17 @@ export default function HealthScore() {
       supabase
         .from('cash_flows')
         .select('amount, flow_type, classify_as')
-        .eq('organization_id', organization.id)
+        .eq('organization_id', orgId)
         .gte('date', month + '-01')
         .lt('date', (() => { const [y,m] = month.split('-'); return new Date(Number(y), Number(m), 1).toISOString().slice(0, 10); })()),
       supabase
         .from('invoices')
         .select('status, total')
-        .eq('organization_id', organization.id),
+        .eq('organization_id', orgId),
       supabase
         .from('documents')
         .select('id')
-        .eq('organization_id', organization.id),
+        .eq('organization_id', orgId),
     ]);
 
     const flows = flowRes.data || [];

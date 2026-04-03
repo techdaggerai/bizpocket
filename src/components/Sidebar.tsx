@@ -49,7 +49,7 @@ const NAV_SECTIONS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { organization } = useAuth();
-  const plan = organization.plan || 'free';
+  const plan = organization?.plan || 'free';
 
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">

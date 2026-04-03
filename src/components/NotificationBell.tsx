@@ -29,6 +29,7 @@ function timeAgo(dateStr: string): string {
 export default function NotificationBell() {
   const { organization } = useAuth();
   const supabase = createClient();
+  const orgId = organization?.id;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -38,14 +39,14 @@ export default function NotificationBell() {
     const { data } = await supabase
       .from('notifications')
       .select('*')
-      .eq('organization_id', organization.id)
+      .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .limit(10);
     if (data) {
       setNotifications(data);
       setUnreadCount(data.filter((n: Notification) => !n.read_at).length);
     }
-  }, [organization.id, supabase]);
+  }, [orgId, supabase]);
 
   useEffect(() => {
     fetchNotifications();

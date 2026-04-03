@@ -14,7 +14,7 @@ export default function TopNav() {
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
 
-  const currentPlan = organization.plan || 'free';
+  const currentPlan = organization?.plan || 'free';
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -45,8 +45,8 @@ export default function TopNav() {
               <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
               <div className="absolute right-0 top-10 z-50 w-56 rounded-xl border border-[#E5E5E5] bg-white p-2 shadow-lg">
                 <div className="px-3 py-2 border-b border-[#F0F0F0] mb-1">
-                  <p className="text-sm font-semibold text-[var(--text-1)] truncate">{profile.full_name || profile.name}</p>
-                  <p className="text-[10px] text-[var(--text-4)] truncate">{organization.name}</p>
+                  <p className="text-sm font-semibold text-[var(--text-1)] truncate">{profile?.full_name || profile?.name || ''}</p>
+                  <p className="text-[10px] text-[var(--text-4)] truncate">{organization?.name || ''}</p>
                   <span className="mt-1 inline-block rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[10px] font-semibold text-[#4F46E5] capitalize">{currentPlan} plan</span>
                 </div>
                 <Link href="/dashboard" onClick={() => setShowMenu(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
