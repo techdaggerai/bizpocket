@@ -3,20 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CONVERSATION = [
-  { sender: 'user', text: 'Hi Tanaka-san, I sent invoice #042 for the Alphard repair', note: 'You typed in English' },
-  { sender: 'tanaka', text: '受け取りました。金曜日までにお支払い処理します', note: '🇯🇵 Tanaka typed in Japanese · translated for you' },
-  { sender: 'user', text: 'Perfect. Are March receipts ready for tax filing?', note: 'You typed in English' },
-  { sender: 'tanaka', text: 'はい、Vaultにアップロード済みです。合計47枚の領収書', note: '🇯🇵 Tanaka typed in Japanese · translated for you' },
-  { sender: 'user', text: 'Amazing, thank you!', note: 'You typed in English' },
+  { sender: 'user', text: 'Hi Tanaka-san, I sent invoice #042 for the Alphard repair', note: 'You typed in English', dots: 1500 },
+  { sender: 'tanaka', text: '受け取りました。金曜日までにお支払い処理します', note: '🇯🇵 Tanaka typed in Japanese · translated for you', dots: 1500 },
+  { sender: 'user', text: 'Perfect, thanks!', note: 'You typed in English', dots: 1000 },
 ];
-
-function charDelay(char: string): number {
-  const base = 35 + Math.random() * 15;
-  if (char === ',') return base + 80;
-  if (char === '?') return base + 60;
-  if (char === ' ') return base + 20;
-  return base;
-}
 
 interface VisibleMsg {
   sender: string;
@@ -25,134 +15,148 @@ interface VisibleMsg {
 }
 
 export default function HeroChatMockup() {
-  const [visibleMessages, setVisibleMessages] = useState<VisibleMsg[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [messages, setMessages] = useState<VisibleMsg[]>([]);
   const [showDots, setShowDots] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const running = useRef(true);
+  const [fading, setFading] = useState(false);
+  const runId = useRef(0);
+  const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
-  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
-  const typeIntoInput = useCallback(async (text: string) => {
-    setIsTyping(true);
-    for (let i = 0; i < text.length; i++) {
-      if (!running.current) return;
-      setInputText(text.slice(0, i + 1));
-      await sleep(charDelay(text[i]));
-    }
-    await sleep(300);
-    setInputText('');
-    setIsTyping(false);
+  const sleep = useCallback((ms: number, id: number) => {
+    return new Promise<void>((resolve, reject) => {
+      const t = setTimeout(() => { timers.current.delete(t); resolve(); }, ms);
+      timers.current.add(t);
+      // Attach id so we can check staleness after await
+      void id;
+    });
   }, []);
-
-  const showTypingDots = useCallback(async () => {
-    setShowDots(true);
-    await sleep(1200 + Math.random() * 600);
-    setShowDots(false);
-  }, []);
-
-  const runConversation = useCallback(async () => {
-    while (running.current) {
-      setVisibleMessages([]);
-      setInputText('');
-      setShowDots(false);
-
-      for (const msg of CONVERSATION) {
-        if (!running.current) return;
-
-        if (msg.sender === 'user') {
-          await typeIntoInput(msg.text);
-          setVisibleMessages(prev => [...prev, { sender: msg.sender, text: msg.text, note: msg.note }]);
-        } else {
-          await showTypingDots();
-          setVisibleMessages(prev => [...prev, { sender: msg.sender, text: msg.text, note: msg.note }]);
-        }
-
-        await sleep(800 + Math.random() * 100);
-      }
-
-      await sleep(3000);
-    }
-  }, [typeIntoInput, showTypingDots]);
 
   useEffect(() => {
-    running.current = true;
-    runConversation();
-    return () => { running.current = false; };
-  }, [runConversation]);
+    const id = ++runId.current;
+    const alive = () => id === runId.current;
 
-  // No scroll — fixed height, overflow hidden
+    (async () => {
+      while (alive()) {
+        setMessages([]);
+        setFading(false);
+
+        for (const msg of CONVERSATION) {
+          if (!alive()) return;
+
+          setShowDots(true);
+          await sleep(msg.dots, id);
+          if (!alive()) return;
+          setShowDots(false);
+
+          setMessages(prev => [...prev, { sender: msg.sender, text: msg.text, note: msg.note }]);
+          await sleep(1000, id);
+        }
+
+        await sleep(2000, id);
+        if (!alive()) return;
+
+        setFading(true);
+        await sleep(600, id);
+        if (!alive()) return;
+
+        setMessages([]);
+        setFading(false);
+        await sleep(400, id);
+      }
+    })();
+
+    return () => {
+      runId.current++;
+      timers.current.forEach(t => clearTimeout(t));
+      timers.current.clear();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="bg-[#f9fafb] rounded-[20px] p-5">
+    <div className="hero-mockup-anim rounded-2xl bg-white shadow-lg border border-[#e5e7eb] overflow-hidden" role="img" aria-label="Live chat demo showing English to Japanese translation" style={{ maxWidth: 400 }}>
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes dotPulse { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
-        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes heroMsgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes heroDotBounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+        @keyframes heroBreathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        @keyframes heroFadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-mockup-anim, .hero-mockup-anim * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
       `}} />
-      <div className="bg-white rounded-2xl border border-[#E5E5E5] overflow-hidden">
-        {/* Header */}
-        <div className="px-4 py-3 border-b border-[#f3f4f6] flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7c3aed] flex items-center justify-center text-white text-sm font-semibold">TK</div>
-            <div><p className="text-sm font-semibold text-[#111827]">Tanaka CPA</p><p className="text-[11px] text-[#22c55e]">● Online</p></div>
+
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-[#f3f4f6] px-4 py-3">
+        <div className="flex items-center gap-2.5">
+          <div className="relative">
+            <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7c3aed] text-sm font-semibold text-white">TK</div>
+            {/* PocketChat breathing logo */}
+            <svg className="absolute -bottom-1 -right-1" width="16" height="16" viewBox="0 0 88 88" fill="none" style={{ animation: 'heroBreathe 2s ease-in-out infinite' }}>
+              <rect width="88" height="88" rx="20" fill="#4F46E5" />
+              <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95" />
+              <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B" />
+            </svg>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5] font-semibold">EN</span>
-            <span className="text-[11px] text-[#d1d5db]">⇄</span>
-            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] font-semibold">JP</span>
+          <div>
+            <p className="text-sm font-semibold text-[#111827]">Tanaka CPA</p>
+            <p className="text-[11px] text-[#22c55e]">● Online</p>
           </div>
         </div>
+        <div className="flex items-center gap-1.5">
+          <span className="rounded-full bg-[#eef2ff] px-2.5 py-0.5 text-[11px] font-semibold text-[#4F46E5]">EN</span>
+          <span className="text-[11px] text-[#d1d5db]">⇄</span>
+          <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[11px] font-semibold text-[#92400e]">JP</span>
+        </div>
+      </div>
 
-        {/* Messages */}
-        <div className="relative" style={{ height: '320px', minHeight: '320px', maxHeight: '320px', overflow: 'hidden', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {visibleMessages.map((msg, i) => (
-            msg.sender === 'user' ? (
-              <div key={i} className="flex justify-end animate-[fadeSlideUp_0.3s_ease-out]">
-                <div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_4px_14px] bg-[#4F46E5]">
-                  <p className="text-sm text-white leading-relaxed">{msg.text}</p>
-                  <p className="text-[10px] text-white/50 mt-1">{msg.note}</p>
-                </div>
-              </div>
-            ) : (
-              <div key={i} className="flex justify-start animate-[fadeSlideUp_0.3s_ease-out]">
-                <div className="max-w-[80%] px-3.5 py-2.5 rounded-[14px_14px_14px_4px] bg-[#f3f4f6]">
-                  <p className="text-sm text-[#111827] leading-relaxed">{msg.text}</p>
-                  <p className="text-[10px] text-[#9ca3af] mt-1">{msg.note}</p>
-                </div>
-              </div>
-            )
-          ))}
-          {showDots && (
-            <div className="flex justify-start">
-              <div className="px-4 py-3 rounded-[14px_14px_14px_4px] bg-[#f3f4f6] flex gap-1.5">
-                {[0, 1, 2].map(d => (
-                  <div key={d} className="w-2 h-2 rounded-full bg-[#9ca3af]" style={{ animation: `dotPulse 1.2s infinite`, animationDelay: `${d * 0.2}s` }} />
-                ))}
+      {/* Messages area — fixed 340px */}
+      <div
+        className="flex flex-col gap-2.5 px-3.5"
+        style={{ height: 340, minHeight: 340, maxHeight: 340, overflow: 'hidden', paddingTop: 14, paddingBottom: 14, animation: fading ? 'heroFadeOut 0.5s ease-out forwards' : undefined }}
+      >
+        {messages.map((msg, i) => (
+          msg.sender === 'user' ? (
+            <div key={`${i}-${msg.text}`} className="flex justify-end" style={{ animation: 'heroMsgIn 0.35s ease-out both' }}>
+              <div className="max-w-[80%] rounded-[14px_14px_4px_14px] bg-[#4F46E5] px-3.5 py-2.5">
+                <p className="text-sm leading-relaxed text-white">{msg.text}</p>
+                <p className="mt-1 text-[10px] text-white/50">{msg.note}</p>
               </div>
             </div>
-          )}
-        </div>
+          ) : (
+            <div key={`${i}-${msg.text}`} className="flex justify-start" style={{ animation: 'heroMsgIn 0.35s ease-out both' }}>
+              <div className="max-w-[80%] rounded-[14px_14px_14px_4px] bg-[#f3f4f6] px-3.5 py-2.5">
+                <p className="text-sm leading-relaxed text-[#111827]">{msg.text}</p>
+                <p className="mt-1 text-[10px] text-[#9ca3af]">{msg.note}</p>
+              </div>
+            </div>
+          )
+        ))}
 
-        {/* Input bar */}
-        <div className="px-4 py-2.5 border-t border-[#f3f4f6] flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-lg border border-[#E5E5E5] text-xs text-[#6b7280]">🇬🇧 EN ▼</span>
-          <div className="flex-1 px-3.5 py-2 rounded-[10px] border border-[#E5E5E5] text-[13px] min-h-[36px] flex items-center">
-            {inputText ? (
-              <span className="text-[#111827]">
-                {inputText}
-                <span className="inline-block w-[1.5px] h-4 bg-[#4F46E5] ml-[1px] align-middle" style={{ animation: 'blink 0.8s step-end infinite' }} />
-              </span>
-            ) : (
-              <span className="text-[#9ca3af]">
-                {isTyping ? '' : 'Type a message...'}
-                {!isTyping && !inputText && null}
-              </span>
-            )}
+        {/* Typing indicator */}
+        {showDots && (
+          <div className="flex justify-start" style={{ animation: 'heroMsgIn 0.2s ease-out both' }}>
+            <div>
+              <div className="flex gap-1 rounded-[14px_14px_14px_4px] bg-[#f3f4f6] px-4 py-3">
+                {[0, 1, 2].map(d => (
+                  <div
+                    key={d}
+                    className="h-2 w-2 rounded-full bg-[#9ca3af]"
+                    style={{ animation: 'heroDotBounce 1.2s ease-in-out infinite', animationDelay: `${d * 0.15}s` }}
+                  />
+                ))}
+              </div>
+              <p className="mt-0.5 pl-1 text-[10px] text-[#9ca3af]">typing...</p>
+            </div>
           </div>
-          <div className="w-[34px] h-[34px] rounded-[10px] bg-[#4F46E5] flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
-          </div>
+        )}
+      </div>
+
+      {/* Input bar */}
+      <div className="flex items-center gap-2 border-t border-[#f3f4f6] px-4 py-2.5">
+        <span className="rounded-lg border border-[#e5e7eb] px-2.5 py-1 text-xs text-[#6b7280]">🇬🇧 EN ▼</span>
+        <div className="flex min-h-[36px] flex-1 items-center rounded-[10px] border border-[#e5e7eb] px-3.5 py-2 text-[13px]">
+          <span className="text-[#9ca3af]">Type a message...</span>
+        </div>
+        <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#4F46E5]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M22 2L11 13" /><path d="M22 2L15 22L11 13L2 9L22 2Z" /></svg>
         </div>
       </div>
     </div>
