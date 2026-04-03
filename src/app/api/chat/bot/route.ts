@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const BOT_SYSTEM_PROMPT = `You are a BizPocket AI Business Assistant — a smart, friendly AI that helps business owners manage their operations through chat.
+const BIZPOCKET_SYSTEM_PROMPT = `You are a BizPocket AI Business Assistant — a smart, friendly AI that helps business owners manage their operations through chat.
 
 YOUR IDENTITY:
 - You are the user's personal business AI assistant
@@ -56,6 +56,50 @@ RESPONSE STYLE:
 - Plain text only — this renders inside a chat bubble
 - Use emoji sparingly — 1 per message max
 - Do NOT use line breaks between sentences unless listing 3+ items
+
+LANGUAGE:
+- If the user writes in Japanese, respond in Japanese
+- If the user writes in Urdu, respond in Urdu
+- If the user writes in any language, respond in THAT language
+- Default to English if unclear`
+
+const POCKETCHAT_SYSTEM_PROMPT = `You are a PocketChat AI assistant. PocketChat is a translation-powered chat app that lets people communicate across 13 languages in real-time. You help users with translation, messaging, voice features, and connecting with contacts worldwide. You do NOT mention BizPocket, invoices, business management, or any business features. If a user asks about features not yet available (like video calls), say "This feature is coming soon to PocketChat!" — NEVER redirect them to other apps like WhatsApp or LINE.
+
+YOUR IDENTITY:
+- You are the PocketChat AI assistant
+- You help people communicate across language barriers
+- You are friendly, helpful, and focused on messaging and translation
+
+POCKETCHAT FEATURES:
+1. Real-time chat with contacts in 13 languages
+2. AI auto-translation — messages are translated instantly
+3. Voice messages — record and send voice notes
+4. Photo and file sharing
+5. Quick replies — slash commands for fast responses
+6. Chat labels — organize your conversations
+7. Bot Setup — configure your own auto-reply bot with custom rules and personality
+8. Contact management — add and organize your contacts
+
+WHAT YOU CAN DO:
+- Help translate messages or phrases between any of the 13 supported languages
+- Explain PocketChat features and how to use them
+- Help users set up their bot and auto-replies
+- Suggest how to communicate better across languages
+- Help manage contacts and conversations
+
+COMING SOON (say "This feature is coming soon to PocketChat!"):
+- Video calls
+- Group chats with more than 2 people
+- Screen sharing
+
+RESPONSE STYLE:
+- Keep messages short — this is chat, not email
+- Use 1-2 sentences per response maximum
+- Be friendly and encouraging
+- Use the user's language (detect from their message or use provided preference)
+- NEVER use markdown: no **, no *, no #, no backticks, no - bullets, no numbered lists
+- Plain text only — this renders inside a chat bubble
+- Use emoji sparingly — 1 per message max
 
 LANGUAGE:
 - If the user writes in Japanese, respond in Japanese
@@ -129,27 +173,47 @@ export async function POST(request: Request) {
     }
   }
 
-  // Gather business context
-  const [orgRes, flowsRes, invoicesRes, contactsRes, cycleRes] = await Promise.all([
-    supabase.from('organizations').select('name, business_type, currency, plan').eq('id', organizationId).single(),
-    supabase.from('cash_flows').select('flow_type, amount, category, date').eq('organization_id', organizationId).order('date', { ascending: false }).limit(10),
-    supabase.from('invoices').select('invoice_number, status, grand_total, customer_name').eq('organization_id', organizationId).order('created_at', { ascending: false }).limit(5),
-    supabase.from('contacts').select('name, contact_type, company').eq('organization_id', organizationId).limit(10),
-    supabase.from('business_cycles').select('name, business_type').eq('organization_id', organizationId).eq('is_active', true).limit(1),
-  ])
+  // Gather org info first to determine signup_source
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('name, business_type, currency, plan, signup_source')
+    .eq('id', organizationId)
+    .single()
 
-  const org = orgRes.data
-  const recentFlows = flowsRes.data || []
-  const recentInvoices = invoicesRes.data || []
-  const contacts = contactsRes.data || []
-  const cycle = cycleRes.data?.[0]
+  const isPocketChatOrg = org?.signup_source === 'pocketchat'
 
-  // Build context
-  const totalIn = recentFlows.filter(f => f.flow_type === 'IN').reduce((s, f) => s + (f.amount || 0), 0)
-  const totalOut = recentFlows.filter(f => f.flow_type === 'OUT').reduce((s, f) => s + (f.amount || 0), 0)
-  const unpaidInvoices = recentInvoices.filter(i => i.status !== 'PAID')
+  // Build context — PocketChat orgs only get contacts, BizPocket orgs get full business context
+  let contextBlock: string
 
-  const contextBlock = `
+  if (isPocketChatOrg) {
+    const { data: contacts } = await supabase
+      .from('contacts')
+      .select('name, contact_type, company')
+      .eq('organization_id', organizationId)
+      .limit(10)
+
+    contextBlock = `
+CONTEXT:
+- User language preference: ${language || 'en'}
+- Contacts: ${(contacts || []).length} total (${(contacts || []).map(c => `${c.name}`).slice(0, 5).join(', ')})
+`
+  } else {
+    const [flowsRes, invoicesRes, contactsRes, cycleRes] = await Promise.all([
+      supabase.from('cash_flows').select('flow_type, amount, category, date').eq('organization_id', organizationId).order('date', { ascending: false }).limit(10),
+      supabase.from('invoices').select('invoice_number, status, grand_total, customer_name').eq('organization_id', organizationId).order('created_at', { ascending: false }).limit(5),
+      supabase.from('contacts').select('name, contact_type, company').eq('organization_id', organizationId).limit(10),
+      supabase.from('business_cycles').select('name, business_type').eq('organization_id', organizationId).eq('is_active', true).limit(1),
+    ])
+
+    const recentFlows = flowsRes.data || []
+    const recentInvoices = invoicesRes.data || []
+    const contacts = contactsRes.data || []
+    const cycle = cycleRes.data?.[0]
+    const totalIn = recentFlows.filter(f => f.flow_type === 'IN').reduce((s, f) => s + (f.amount || 0), 0)
+    const totalOut = recentFlows.filter(f => f.flow_type === 'OUT').reduce((s, f) => s + (f.amount || 0), 0)
+    const unpaidInvoices = recentInvoices.filter(i => i.status !== 'PAID')
+
+    contextBlock = `
 BUSINESS CONTEXT:
 - Business: ${org?.name || 'Unknown'} (${org?.business_type || 'general'})
 - Currency: ${org?.currency || 'JPY'}
@@ -160,6 +224,7 @@ BUSINESS CONTEXT:
 - Contacts: ${contacts.length} total (${contacts.map(c => `${c.name} [${c.contact_type}]`).slice(0, 5).join(', ')})
 ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No business cycle set up yet'}
 `
+  }
 
   try {
     const anthropic = new Anthropic({ apiKey })
@@ -167,7 +232,7 @@ ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No bus
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
-      system: BOT_SYSTEM_PROMPT + '\n\n' + contextBlock,
+      system: (isPocketChatOrg ? POCKETCHAT_SYSTEM_PROMPT : BIZPOCKET_SYSTEM_PROMPT) + '\n\n' + contextBlock,
       messages: [{ role: 'user', content: message }],
     })
 

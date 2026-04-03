@@ -1176,7 +1176,7 @@ export default function PocketChatPage() {
               }}
               placeholder="Type a message..."
               rows={1}
-              className="flex-1 border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
             />
 
             {/* Attachment button */}
@@ -1246,7 +1246,7 @@ export default function PocketChatPage() {
                 <button
                   onClick={sendMessage}
                   disabled={!newMessage.trim() || sending}
-                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:opacity-40"
+                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:bg-[#4F46E5]/60 disabled:text-white/80"
                   aria-label="Send"
                 >
                   <PocketSendIcon size={22} />
