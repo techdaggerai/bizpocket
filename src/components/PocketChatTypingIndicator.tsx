@@ -36,7 +36,7 @@ export default function PocketChatTypingIndicator({ contactName, compact = false
 
   return (
     <div className={`flex items-center ${compact ? 'gap-2 py-1.5 px-1' : 'gap-3 py-2'}`}>
-      <svg width={s} height={s} viewBox="0 0 88 88" fill="none" style={{ animation: 'pcBreathe 2.5s ease-in-out infinite' }}>
+      <svg width={s} height={s} viewBox="0 0 88 88" fill="none" style={{ animation: 'pcBreathe 2.5s ease-in-out infinite', transformOrigin: 'center center' }}>
         <rect width="88" height="88" rx="20" fill="#4F46E5" />
         {!compact && <><rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15" /><path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95" /></>}
         <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95" />
