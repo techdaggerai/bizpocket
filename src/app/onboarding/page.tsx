@@ -128,7 +128,7 @@ function OnboardingInner() {
         language: form.language,
         currency: form.currency,
         created_by: user.id,
-        plan: 'free',
+        plan: 'starter',
         trial_ends_at: trialEnd,
       })
       .select()

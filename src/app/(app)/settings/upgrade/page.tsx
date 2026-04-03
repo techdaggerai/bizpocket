@@ -58,7 +58,8 @@ export default function UpgradePage() {
   const cancelled = searchParams.get('cancelled');
   const autoCheckout = searchParams.get('auto');
   const targetPlan = searchParams.get('plan');
-  const currentPlan = organization.plan || 'free';
+  const rawPlan = organization.plan || 'free';
+  const currentPlan = rawPlan === 'starter' ? 'free' : rawPlan;
 
   async function handleCheckout(priceId: string, planKey: string) {
     setLoading(planKey);

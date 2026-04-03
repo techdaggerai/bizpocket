@@ -125,7 +125,7 @@ export default function Sidebar() {
           </svg>
           Settings
         </Link>
-        {plan === 'free' && (
+        {(plan === 'free' || plan === 'starter') && (
           <Link
             href="/settings/upgrade"
             className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-gradient-to-r from-[#F59E0B] to-[#EA580C] text-white text-[12px] font-semibold hover:opacity-90 transition-colors"

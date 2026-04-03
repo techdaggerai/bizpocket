@@ -46,13 +46,14 @@ export async function GET(request: NextRequest) {
           return NextResponse.redirect(`${origin}/dashboard`);
         }
 
-        // New user — auto-create org + profile, then dashboard
+        // New user — auto-create org + profile, then onboarding
+        const userLang = (searchParams.get('lang') || 'en').substring(0, 5);
         const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
         const { data: org } = await supabase.from('organizations').insert({
           name: 'My Business',
           created_by: user.id,
-          plan: 'free',
-          language: 'en',
+          plan: 'starter',
+          language: userLang,
           currency: 'JPY',
           trial_ends_at: trialEnd,
         }).select().single();
@@ -64,11 +65,11 @@ export async function GET(request: NextRequest) {
             role: 'owner',
             name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
             email: user.email!,
-            language: 'en',
+            language: userLang,
           });
         }
 
-        return NextResponse.redirect(`${origin}/dashboard`);
+        return NextResponse.redirect(`${origin}/onboarding`);
       }
     }
   }
