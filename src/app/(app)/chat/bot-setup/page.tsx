@@ -81,41 +81,46 @@ export default function BotSetupPage() {
 
   const handleSave = async () => {
     if (!botName.trim()) return;
+    if (!organization?.id) return;
     setSaving(true);
     const botRules = rules.filter(r => r.trim()).map(r => ({ trigger: r, action: r, active: true }));
-    await supabase.from('pocket_bot_config').upsert({
-      organization_id: organization?.id,
+    const { error: upsertError } = await supabase.from('pocket_bot_config').upsert({
+      organization_id: organization.id,
       bot_name: botName, bot_icon: botIcon, language: botLang, bot_personality: personality,
       greeting_message: greeting || `Hi! I'm ${botName}. How can I help you today?`,
       away_message: awayMessage || `Thanks for your message. I'll get back to you soon.`,
       auto_reply_enabled: true, bot_rules: botRules, is_setup_complete: true, response_style: personality,
-    });
+    }, { onConflict: 'organization_id' });
+
+    if (upsertError) {
+      console.error('[BOT SETUP] Upsert failed:', upsertError);
+      setSaving(false);
+      return;
+    }
 
     // Send re-introduction message in the bot conversation
-    if (organization?.id) {
-      const { data: botConvo } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('organization_id', organization.id)
-        .eq('is_bot_chat', true)
-        .single();
+    const { data: botConvo } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('organization_id', organization.id)
+      .eq('is_bot_chat', true)
+      .single();
 
-      if (botConvo) {
-        const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
-        await supabase.from('messages').insert({
-          conversation_id: botConvo.id,
-          organization_id: organization.id,
-          sender_type: 'bot',
-          sender_name: botName,
-          message: introMsg,
-          message_type: 'text',
-        });
-        await supabase.from('conversations').update({
-          title: botName,
-          last_message: introMsg,
-          last_message_at: new Date().toISOString(),
-        }).eq('id', botConvo.id);
-      }
+    if (botConvo) {
+      const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
+      await supabase.from('messages').insert({
+        conversation_id: botConvo.id,
+        organization_id: organization.id,
+        sender_type: 'bot',
+        sender_name: botName,
+        message: introMsg,
+        message_type: 'text',
+      });
+      await supabase.from('conversations').update({
+        title: botName,
+        last_message: introMsg,
+        last_message_at: new Date().toISOString(),
+      }).eq('id', botConvo.id);
     }
 
     setSaving(false);
