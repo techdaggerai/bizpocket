@@ -313,7 +313,7 @@ export default function PocketChatPage() {
   }, [activeConvoId, user?.id]); // eslint-disable-line
 
   const broadcastTyping = useCallback(() => {
-    typingChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: user?.id, name: profile?.name || 'Someone' } });
+    typingChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: user?.id, name: profile?.full_name || profile?.name || 'Someone' } });
   }, [user?.id, profile?.name]);
 
   /* ---------- Voice recording ---------- */
