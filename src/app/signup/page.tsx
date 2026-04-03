@@ -24,6 +24,7 @@ function SignupInner() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [language, setLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -38,8 +39,8 @@ function SignupInner() {
       email,
       password,
       options: {
-        data: { full_name: name },
-        emailRedirectTo: `${siteUrl}/auth/callback`,
+        data: { full_name: name, preferred_language: isPocketChat ? language : 'en' },
+        emailRedirectTo: `${siteUrl}/auth/callback${isPocketChat ? `?lang=${language}` : ''}`,
       },
     });
 
@@ -104,6 +105,30 @@ function SignupInner() {
               required
             />
           </div>
+          {isPocketChat && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Your Language</label>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              >
+                <option value="en">English</option>
+                <option value="ja">Japanese</option>
+                <option value="ur">Urdu</option>
+                <option value="ar">Arabic</option>
+                <option value="bn">Bengali</option>
+                <option value="pt">Portuguese</option>
+                <option value="fil">Filipino</option>
+                <option value="vi">Vietnamese</option>
+                <option value="tr">Turkish</option>
+                <option value="zh">Chinese</option>
+                <option value="fr">French</option>
+                <option value="nl">Dutch</option>
+                <option value="es">Spanish</option>
+              </select>
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
