@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import AnimatedPocketChatLogo from './AnimatedPocketChatLogo';
+import PocketChatTypingIndicator from './PocketChatTypingIndicator';
 
-const GREETINGS = ['Hello...', 'こんにちは...', 'مرحبا...', 'Bonjour...', 'Hola...', 'سلام...'];
-
-// Each step in the conversation: original message, then translation bubble
+// Each step: typing indicator or message bubble (with translation pair)
 const SCRIPT: Array<{
   type: 'dots';
   duration: number;
@@ -16,28 +16,20 @@ const SCRIPT: Array<{
   variant: 'user' | 'tanaka' | 'user-tl' | 'tanaka-tl';
 }> = [
   { type: 'dots', duration: 2000 },
-  // User message
   { type: 'msg', side: 'right', variant: 'user', text: 'Hi Tanaka-san, I sent invoice #042 for the Alphard repair', label: 'You · English' },
-  // User translation
   { type: 'msg', side: 'right', variant: 'user-tl', text: '田中さん、アルファードの修理の請求書#042を送りました', label: '✨ Auto-translated to Japanese' },
   { type: 'dots', duration: 1500 },
-  // Tanaka message
   { type: 'msg', side: 'left', variant: 'tanaka', text: '受け取りました。金曜日までにお支払い処理します', label: 'Tanaka · Japanese' },
-  // Tanaka translation
   { type: 'msg', side: 'left', variant: 'tanaka-tl', text: 'Received. I\'ll process the payment by Friday.', label: '✨ Translated for you' },
   { type: 'dots', duration: 1000 },
-  // User message 2
   { type: 'msg', side: 'right', variant: 'user', text: 'Perfect, thank you!', label: 'You · English' },
-  // User translation 2
   { type: 'msg', side: 'right', variant: 'user-tl', text: '完璧です、ありがとうございます！', label: '✨ Auto-translated to Japanese' },
 ];
 
-// Delays after each step
 const DELAYS: Record<string, number> = {
-  'dots': 0, // dots have their own duration
-  'user': 500, // pause before translation appears
+  'user': 500,
   'tanaka': 500,
-  'user-tl': 1500, // pause after translation pair
+  'user-tl': 1500,
   'tanaka-tl': 1500,
 };
 
@@ -52,7 +44,6 @@ export default function HeroChatMockup() {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [showDots, setShowDots] = useState(false);
   const [fading, setFading] = useState(false);
-  const [greetIdx, setGreetIdx] = useState(0);
   const runId = useRef(0);
   const timers = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
@@ -62,17 +53,6 @@ export default function HeroChatMockup() {
       timers.current.add(t);
     });
   }, []);
-
-  // Rotate greetings while dots are showing — JS-only, no CSS fade to avoid drift
-  const [greetFade, setGreetFade] = useState(true);
-  useEffect(() => {
-    if (!showDots) { setGreetFade(true); return; }
-    const iv = setInterval(() => {
-      setGreetFade(false);
-      setTimeout(() => { setGreetIdx(i => (i + 1) % GREETINGS.length); setGreetFade(true); }, 150);
-    }, 1200);
-    return () => clearInterval(iv);
-  }, [showDots]);
 
   useEffect(() => {
     const id = ++runId.current;
@@ -98,11 +78,9 @@ export default function HeroChatMockup() {
           }
         }
 
-        // Hold final state
         await sleep(3000);
         if (!alive()) return;
 
-        // Fade out
         setFading(true);
         await sleep(600);
         if (!alive()) return;
@@ -131,8 +109,6 @@ export default function HeroChatMockup() {
     <div className="hero-mockup-anim overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-lg" role="img" aria-label="Live chat demo showing real-time English to Japanese translation" style={{ maxWidth: 420 }}>
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes hMsgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes hDotBounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-        @keyframes hBreathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes hFadeOut { from { opacity: 1; } to { opacity: 0; } }
         @media (prefers-reduced-motion: reduce) {
           .hero-mockup-anim, .hero-mockup-anim * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -150,7 +126,7 @@ export default function HeroChatMockup() {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="rounded-full bg-[#eef2ff] px-2.5 py-0.5 text-[11px] font-semibold text-[#4F46E5]">EN</span>
-          <span className="text-[11px] text-[#d1d5db]">⇄</span>
+          <AnimatedPocketChatLogo size={20} isTranslating={showDots} />
           <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[11px] font-semibold text-[#92400e]">JP</span>
         </div>
       </div>
@@ -174,26 +150,11 @@ export default function HeroChatMockup() {
           );
         })}
 
-        {/* Typing indicator with breathing logo + rotating greetings */}
+        {/* REAL PocketChatTypingIndicator component */}
         {showDots && (
           <div className="flex justify-start" style={{ animation: 'hMsgIn 0.2s ease-out both' }}>
-            <div className="rounded-xl bg-[#f3f4f6] px-3.5 py-2.5">
-              <div className="flex items-center gap-2">
-                {/* Breathing PocketChat logo */}
-                <svg width="20" height="20" viewBox="0 0 88 88" fill="none" style={{ animation: 'hBreathe 2s ease-in-out infinite', flexShrink: 0 }}>
-                  <rect width="88" height="88" rx="20" fill="#4F46E5" />
-                  <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95" />
-                  <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B" />
-                </svg>
-                {/* Bouncing dots */}
-                <div className="flex gap-1">
-                  {[0, 1, 2].map(d => (
-                    <div key={d} className="h-[7px] w-[7px] rounded-full bg-[#9ca3af]" style={{ animation: 'hDotBounce 1.2s ease-in-out infinite', animationDelay: `${d * 0.15}s` }} />
-                  ))}
-                </div>
-              </div>
-              {/* Rotating greeting */}
-              <p className="mt-1 text-[11px] text-[#9ca3af] transition-opacity duration-150" style={{ opacity: greetFade ? 1 : 0 }}>{GREETINGS[greetIdx]}</p>
+            <div className="min-h-[60px] rounded-xl bg-[#f3f4f6] px-3 py-2.5">
+              <PocketChatTypingIndicator contactName="Tanaka" compact />
             </div>
           </div>
         )}

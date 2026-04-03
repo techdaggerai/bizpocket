@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PocketChatMark, PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
+import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 const greetings = [
   { to: 'やあ', lang: 'Japanese' }, { to: 'Hola', lang: 'Spanish' },
@@ -77,8 +78,20 @@ export default function PocketChatLanding() {
         </div>
       </nav>
 
+      {/* Brand Showcase */}
+      <section className="px-6 py-16 text-center">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="mb-4 flex justify-center">
+            <div className="hidden lg:block"><AnimatedPocketChatLogo size={120} isTranslating /></div>
+            <div className="lg:hidden"><AnimatedPocketChatLogo size={80} isTranslating /></div>
+          </div>
+          <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pocket<span className="text-[#F59E0B]">Chat</span></h2>
+          <p className="mt-3 text-lg text-[#6b7280]">Break every language barrier</p>
+        </div>
+      </section>
+
       {/* 2. Hero Section */}
-      <section className="mx-auto max-w-[1100px] px-6 pb-20 pt-12">
+      <section className="mx-auto max-w-[1100px] px-6 pb-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="mx-auto w-full max-w-[420px] lg:mx-0" aria-hidden="true">
             <HeroChatMockup />
