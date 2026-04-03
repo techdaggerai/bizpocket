@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         }
 
         // New user — auto-create org + profile, then onboarding
-        const userLang = (searchParams.get('lang') || 'en').substring(0, 5);
+        const userLang = (user.user_metadata?.preferred_language || searchParams.get('lang') || 'en').substring(0, 5);
         const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
         const { data: org } = await supabase.from('organizations').insert({
           name: 'My Business',
