@@ -249,12 +249,23 @@ export default function PocketChatPage() {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'messages',
           filter: `organization_id=eq.${organization.id}`,
         },
         (payload) => {
+          if (payload.eventType === 'UPDATE') {
+            // Background translation completed — merge updated fields
+            const updated = payload.new as Message;
+            if (updated.conversation_id === activeConvoId) {
+              setMessages((prev) =>
+                prev.map((m) => m.id === updated.id ? { ...m, translations: updated.translations } : m)
+              );
+            }
+            return;
+          }
+
           const newMsg = payload.new as Message;
 
           // If message is for active conversation, append it
