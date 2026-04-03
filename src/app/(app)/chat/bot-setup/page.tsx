@@ -107,6 +107,7 @@ export default function BotSetupPage() {
           message_type: 'text',
         });
         await supabase.from('conversations').update({
+          title: botName,
           last_message: introMsg,
           last_message_at: new Date().toISOString(),
         }).eq('id', botConvo.id);

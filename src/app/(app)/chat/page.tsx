@@ -732,7 +732,7 @@ export default function PocketChatPage() {
   /* ---------- Render: Active Conversation ---------- */
 
   if (activeConvoId && activeConvo) {
-    const contactName = activeConvo.contact?.name ?? activeConvo.title ?? 'Chat';
+    const contactName = activeConvo.is_bot_chat ? botName : (activeConvo.contact?.name ?? activeConvo.title ?? 'Chat');
     const contactType = activeConvo.contact?.contact_type;
 
     return (
@@ -1385,7 +1385,7 @@ export default function PocketChatPage() {
           </div>
         ) : (
           sortedConversations.map((convo) => {
-            const name = convo.contact?.name ?? convo.title ?? 'Unknown';
+            const name = convo.is_bot_chat ? botName : (convo.contact?.name ?? convo.title ?? 'Unknown');
             return (
               <button
                 key={convo.id}
