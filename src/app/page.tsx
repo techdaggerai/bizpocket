@@ -301,9 +301,9 @@ export default function LandingPage() {
               <PocketMark variant="sm" />
               <span className="text-xs font-semibold text-[#a5b4fc] tracking-widest">BIZPOCKET</span>
             </div>
-            <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">INSTAGRAM → ORDERS → MONEY</span>
-            <h2 className="text-[28px] font-bold leading-[1.3] mb-4">Your Instagram bio becomes<br />a full order system.</h2>
-            <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link in your bio. Customers tap it, see your catalog, place orders, and chat with you — all in their language.</p>
+            <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">SOCIAL MEDIA → ORDERS → MONEY</span>
+            <h2 className="text-[28px] font-bold leading-[1.3] mb-4">One link. Every platform.<br />Instant orders.</h2>
+            <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link on Instagram, TikTok, Facebook, LINE, WhatsApp, your business card — anywhere. Customers tap it, see your catalog, and chat with you in their language.</p>
             <div className="flex justify-center items-center gap-3 flex-wrap mb-8">
               {[{ l: 'Instagram post', c: '#e879f9' }, { l: 'Customer taps link', c: '#60a5fa' }, { l: 'Sees your catalog', c: '#34d399' }, { l: 'Chats in Japanese', c: '#a5b4fc' }, { l: 'Order in pipeline', c: '#fbbf24' }].map((s, i) => (
                 <span key={i} className="flex items-center gap-2"><span className="bg-[#1e293b] border border-[#334155] rounded-[14px] px-4 py-3 text-[11px] font-medium text-[#e2e8f0]">{s.l}</span>{i < 4 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
