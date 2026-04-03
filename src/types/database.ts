@@ -25,6 +25,7 @@ export interface Organization {
   bank_account_number: string | null;
   bank_account_type: string | null;
   logo_url: string | null;
+  signup_source: 'bizpocket' | 'pocketchat' | null;
   created_at: string;
 }
 

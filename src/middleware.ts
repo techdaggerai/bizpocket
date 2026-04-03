@@ -8,7 +8,7 @@ const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 export async function middleware(request: NextRequest) {
   // PocketChat domain routing — pocketchat.co serves PocketChat experience
   const hostname = request.headers.get('host') || '';
-  const isPocketChat = hostname.includes('pocketchat.co');
+  const isPocketChat = hostname === 'pocketchat.co' || hostname === 'www.pocketchat.co' || hostname.endsWith('.pocketchat.co');
 
   if (isPocketChat) {
     const path = request.nextUrl.pathname;
@@ -25,8 +25,15 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(url);
     }
 
+    // Login → PocketChat mode
+    if (path === '/login') {
+      const url = new URL('/login', request.url);
+      url.searchParams.set('mode', 'pocketchat');
+      return NextResponse.rewrite(url);
+    }
+
     // Public pages on pocketchat.co — pass through without auth
-    if (['/login', '/privacy', '/terms'].includes(path) || path.startsWith('/auth')) {
+    if (['/privacy', '/terms'].includes(path) || path.startsWith('/auth')) {
       return NextResponse.next();
     }
 

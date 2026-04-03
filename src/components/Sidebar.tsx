@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 
-const NAV_SECTIONS = [
+const FULL_NAV = [
   {
     label: '',
     items: [
@@ -47,18 +47,41 @@ const NAV_SECTIONS = [
   },
 ];
 
+const POCKETCHAT_NAV = [
+  {
+    label: '',
+    items: [
+      { href: '/chat', label: 'PocketChat', icon: '__pocketchat__' },
+      { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
+      { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
+      { href: '/settings', label: 'Settings', icon: 'M12 8a4 4 0 100-8M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82' },
+    ],
+  },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { organization } = useAuth();
   const plan = organization?.plan || 'free';
+  const isPocketChatOnly = organization?.signup_source === 'pocketchat';
+  const NAV_SECTIONS = isPocketChatOnly ? POCKETCHAT_NAV : FULL_NAV;
 
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">
       {/* Logo */}
       <div className="px-4 py-4 border-b border-[#F0F0F0]">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <PocketMark variant="xl" />
-          <LogoWordmark />
+        <Link href={isPocketChatOnly ? '/chat' : '/dashboard'} className="flex items-center gap-2">
+          {isPocketChatOnly ? (
+            <>
+              <PocketChatMark size={32} />
+              <span className="text-[14px] font-bold text-[#111827]">Pocket<span className="text-[#F59E0B]">Chat</span></span>
+            </>
+          ) : (
+            <>
+              <PocketMark variant="xl" />
+              <LogoWordmark />
+            </>
+          )}
         </Link>
       </div>
 
@@ -111,21 +134,31 @@ export default function Sidebar() {
 
       {/* Bottom — Upgrade + Settings */}
       <div className="px-2 py-3 border-t border-[#F0F0F0] space-y-1">
-        <Link
-          href="/settings"
-          className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
-            pathname === '/settings' || pathname?.startsWith('/settings/')
-              ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
-              : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
-          }`}
-        >
-          <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
-            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-          </svg>
-          Settings
-        </Link>
-        {(plan === 'free' || plan === 'starter') && (
+        {!isPocketChatOnly && (
+          <Link
+            href="/settings"
+            className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
+              pathname === '/settings' || pathname?.startsWith('/settings/')
+                ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
+                : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
+            }`}
+          >
+            <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+            </svg>
+            Settings
+          </Link>
+        )}
+        {isPocketChatOnly ? (
+          <Link
+            href="/settings/upgrade"
+            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg bg-[#4F46E5] text-white text-[12px] font-semibold hover:bg-[#4338ca] transition-colors"
+          >
+            <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="currentColor"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+            Unlock BizPocket →
+          </Link>
+        ) : (plan === 'free' || plan === 'starter') && (
           <Link
             href="/settings/upgrade"
             className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-gradient-to-r from-[#F59E0B] to-[#EA580C] text-white text-[12px] font-semibold hover:opacity-90 transition-colors"

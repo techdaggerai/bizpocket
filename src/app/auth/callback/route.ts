@@ -5,7 +5,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/onboarding';
 
   if (code) {
     const cookieStore = await cookies();
@@ -35,6 +34,10 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Read source from URL params (supports both 'source' and legacy 'mode')
+        const source = searchParams.get('source') || (searchParams.get('mode') === 'pocketchat' ? 'pocketchat' : 'bizpocket');
+        const isPocketChat = source === 'pocketchat';
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('id, organization_id')
@@ -42,20 +45,20 @@ export async function GET(request: NextRequest) {
           .single();
 
         if (profile) {
-          // Existing user — PocketChat mode goes to /chat, otherwise dashboard
-          const dest = searchParams.get('mode') === 'pocketchat' ? '/chat' : '/dashboard';
-          return NextResponse.redirect(`${origin}${dest}`);
+          // Existing user — route based on source
+          return NextResponse.redirect(`${origin}${isPocketChat ? '/chat' : '/dashboard'}`);
         }
 
-        // New user — auto-create org + profile, then onboarding
+        // New user — auto-create org + profile
         const userLang = (user.user_metadata?.preferred_language || searchParams.get('lang') || 'en').substring(0, 5);
-        const trialEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+        const trialEnd = isPocketChat ? null : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
         const { data: org } = await supabase.from('organizations').insert({
           name: 'My Business',
           created_by: user.id,
           plan: 'starter',
           language: userLang,
           currency: 'JPY',
+          signup_source: source,
           trial_ends_at: trialEnd,
         }).select().single();
 
@@ -70,7 +73,6 @@ export async function GET(request: NextRequest) {
           });
         }
 
-        const isPocketChat = searchParams.get('mode') === 'pocketchat';
         return NextResponse.redirect(`${origin}${isPocketChat ? '/chat' : '/onboarding'}`);
       }
     }
