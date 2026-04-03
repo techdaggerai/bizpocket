@@ -133,9 +133,9 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col gap-3">
               {[
-                { from: 'GB', to: 'JP', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', transColor: '#a5b4fc' },
-                { from: 'PK', to: 'AE', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', transColor: '#fbbf24' },
-                { from: 'BR', to: 'CN', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', transColor: '#4ade80' },
+                { from: 'GB', to: 'JP', orig: '"Payment confirmed for the Alphard"', trans: '「アルファードの支払いを確認しました」', transColor: '#a5b4fc', origFont: undefined, transFont: undefined, origDir: undefined, transDir: undefined },
+                { from: 'PK', to: 'AE', orig: '"آرڈر کی تصدیق ہو گئی"', trans: '「تم تأكيد الطلب」', transColor: '#fbbf24', origFont: "'Noto Sans Arabic', sans-serif", transFont: "'Noto Sans Arabic', sans-serif", origDir: 'rtl' as const, transDir: 'rtl' as const },
+                { from: 'BR', to: 'CN', orig: '"Obrigado pelo pagamento rápido"', trans: '「感谢您的快速付款」', transColor: '#4ade80', origFont: undefined, transFont: "'Noto Sans SC', sans-serif", origDir: undefined, transDir: undefined },
               ].map((item, i) => (
                 <div key={i} className="bg-[#1e293b] rounded-2xl p-4 border border-[#475569]">
                   <div className="flex items-center gap-2 mb-2.5">
@@ -143,8 +143,8 @@ export default function LandingPage() {
                     <span style={{ color: '#94a3b8', fontSize: 11 }}>→</span>
                     <span style={{ color: '#f1f5f9', fontSize: 14, fontWeight: 600 }}>{item.to}</span>
                   </div>
-                  <p style={{ color: '#ffffff', fontSize: 13, fontWeight: 500, margin: 0 }}>{item.orig}</p>
-                  <p style={{ color: item.transColor, fontSize: 13, marginTop: 6 }}>{item.trans}</p>
+                  <p style={{ color: '#ffffff', fontSize: item.origDir === 'rtl' ? 15 : 13, fontWeight: 500, margin: 0, fontFamily: item.origFont, direction: item.origDir, unicodeBidi: item.origDir === 'rtl' ? 'isolate' : undefined }}>{item.orig}</p>
+                  <p style={{ color: item.transColor, fontSize: item.transDir === 'rtl' ? 15 : 13, marginTop: 6, fontFamily: item.transFont, direction: item.transDir, unicodeBidi: item.transDir === 'rtl' ? 'isolate' : undefined }}>{item.trans}</p>
                 </div>
               ))}
             </div>
