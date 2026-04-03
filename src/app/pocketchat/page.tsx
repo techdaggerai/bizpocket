@@ -43,11 +43,7 @@ const LANGUAGES = [
   { name: 'Spanish', native: 'Español', flag: '🇪🇸' },
 ];
 
-const STEPS = [
-  { num: '1', title: 'Sign up free', desc: '30 seconds. No credit card.', color: '#4F46E5', bg: '#eef2ff', icon: 'M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M12 7a4 4 0 100-8 4 4 0 000 8z' },
-  { num: '2', title: 'Add your contacts', desc: 'Share QR code or invite link.', color: '#F59E0B', bg: '#fef3c7', icon: 'M17 21v-2a4 4 0 00-3-3.87M9 7a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75' },
-  { num: '3', title: 'Start talking', desc: 'Type, speak, or call in any language.', color: '#16a34a', bg: '#f0fdf4', icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z' },
-];
+
 
 export default function PocketChatLanding() {
   const [idx, setIdx] = useState(0);
@@ -149,17 +145,56 @@ export default function PocketChatLanding() {
             <h2 className="text-[32px] font-bold text-[#111827]">Three steps. That&apos;s it.</h2>
             <p className="mt-3 text-base text-[#374151]">From zero to translated conversations in under a minute.</p>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ background: s.bg }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={s.icon} /></svg>
-                </div>
-                <div className="mb-2 text-xs font-bold uppercase tracking-widest" style={{ color: s.color }}>Step {s.num}</div>
-                <h3 className="mb-1 text-lg font-bold text-[#111827]">{s.title}</h3>
-                <p className="text-sm text-[#374151]">{s.desc}</p>
+          <div className="relative grid grid-cols-1 gap-8 sm:grid-cols-3">
+            {/* Dotted connector lines — desktop only */}
+            <div className="absolute top-[52px] left-[calc(33.33%+20px)] right-[calc(33.33%+20px)] hidden border-t-2 border-dashed border-[#d1d5db] sm:block" style={{ width: 'calc(33.33% - 40px)' }} />
+            <div className="absolute top-[52px] left-[calc(66.66%+20px)] hidden border-t-2 border-dashed border-[#d1d5db] sm:block" style={{ width: 'calc(33.33% - 40px)' }} />
+
+            {/* Step 1 */}
+            <div className="rounded-2xl border border-[#f3f4f6] bg-white p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
+              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef2ff]">
+                <AnimatedPocketChatLogo size={48} isTranslating={true} />
               </div>
-            ))}
+              <div className="mb-2 text-sm font-semibold text-[#4F46E5]">STEP 1</div>
+              <h3 className="mb-1 text-xl font-bold text-[#111827]">Sign up free</h3>
+              <p className="text-sm text-[#6b7280]">30 seconds. No credit card.</p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="rounded-2xl border border-[#f3f4f6] bg-white p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
+              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#fef3c7]">
+                <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
+                  <rect x="4" y="4" width="16" height="16" rx="3" stroke="#4F46E5" strokeWidth="2"/>
+                  <rect x="8" y="8" width="8" height="8" rx="1" fill="#4F46E5"/>
+                  <rect x="28" y="4" width="16" height="16" rx="3" stroke="#4F46E5" strokeWidth="2"/>
+                  <rect x="32" y="8" width="8" height="8" rx="1" fill="#4F46E5"/>
+                  <rect x="4" y="28" width="16" height="16" rx="3" stroke="#4F46E5" strokeWidth="2"/>
+                  <rect x="8" y="32" width="8" height="8" rx="1" fill="#4F46E5"/>
+                  <rect x="28" y="28" width="4" height="4" fill="#F59E0B"/>
+                  <rect x="36" y="28" width="8" height="4" fill="#F59E0B"/>
+                  <rect x="28" y="36" width="4" height="8" fill="#F59E0B"/>
+                  <rect x="36" y="40" width="8" height="4" fill="#F59E0B"/>
+                </svg>
+              </div>
+              <div className="mb-2 text-sm font-semibold text-[#d97706]">STEP 2</div>
+              <h3 className="mb-1 text-xl font-bold text-[#111827]">Add your contacts</h3>
+              <p className="text-sm text-[#6b7280]">Share QR code or invite link.</p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="rounded-2xl border border-[#f3f4f6] bg-white p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
+              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef2ff]">
+                <svg viewBox="0 0 48 48" width="48" height="48" fill="none">
+                  <rect x="2" y="6" width="28" height="20" rx="6" fill="#4F46E5"/>
+                  <text x="16" y="20" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">Hi!</text>
+                  <rect x="18" y="22" width="28" height="20" rx="6" fill="#F59E0B"/>
+                  <text x="32" y="36" textAnchor="middle" fontSize="9" fontWeight="700" fill="white">やあ!</text>
+                </svg>
+              </div>
+              <div className="mb-2 text-sm font-semibold text-[#4F46E5]">STEP 3</div>
+              <h3 className="mb-1 text-xl font-bold text-[#111827]">Start talking</h3>
+              <p className="text-sm text-[#6b7280]">Type, speak, or call in any language.</p>
+            </div>
           </div>
         </div>
       </section>
