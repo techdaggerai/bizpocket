@@ -131,6 +131,14 @@ function SignupInner() {
                 <option value="fr">Français</option>
                 <option value="nl">Nederlands</option>
                 <option value="es">Español</option>
+                <option value="ps">پښتو</option>
+                <option value="fa">فارسی</option>
+                <option value="hi">हिन्दी</option>
+                <option value="ko">한국어</option>
+                <option value="th">ไทย</option>
+                <option value="id">Bahasa Indonesia</option>
+                <option value="ne">नेपाली</option>
+                <option value="si">සිංහල</option>
               </select>
             </div>
           )}

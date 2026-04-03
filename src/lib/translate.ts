@@ -1,6 +1,6 @@
 /**
  * PocketChat Translation Bridge
- * Real-time AI translation between any two of 13 supported languages.
+ * Real-time AI translation between any two of 21 supported languages.
  */
 
 import { createBrowserClient } from '@supabase/ssr';
@@ -24,6 +24,14 @@ export const LANGUAGES: Record<string, { name: string; native: string; flag: str
   fr: { name: 'French', native: 'Français', flag: '🇫🇷' },
   nl: { name: 'Dutch', native: 'Nederlands', flag: '🇳🇱' },
   es: { name: 'Spanish', native: 'Español', flag: '🇪🇸' },
+  ps: { name: 'Pashto', native: 'پښتو', flag: '🇦🇫' },
+  fa: { name: 'Persian', native: 'فارسی', flag: '🇮🇷' },
+  hi: { name: 'Hindi', native: 'हिन्दी', flag: '🇮🇳' },
+  ko: { name: 'Korean', native: '한국어', flag: '🇰🇷' },
+  th: { name: 'Thai', native: 'ไทย', flag: '🇹🇭' },
+  id: { name: 'Indonesian', native: 'Bahasa Indonesia', flag: '🇮🇩' },
+  ne: { name: 'Nepali', native: 'नेपाली', flag: '🇳🇵' },
+  si: { name: 'Sinhala', native: 'සිංහල', flag: '🇱🇰' },
 };
 
 export interface TranslationResult {

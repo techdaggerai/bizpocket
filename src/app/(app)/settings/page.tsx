@@ -22,6 +22,14 @@ const LANGUAGES = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'ps', name: 'پښتو', flag: '🇦🇫' },
+  { code: 'fa', name: 'فارسی', flag: '🇮🇷' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'th', name: 'ไทย', flag: '🇹🇭' },
+  { code: 'id', name: 'Bahasa Indonesia', flag: '🇮🇩' },
+  { code: 'ne', name: 'नेपाली', flag: '🇳🇵' },
+  { code: 'si', name: 'සිංහල', flag: '🇱🇰' },
 ];
 
 function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {

@@ -15,6 +15,14 @@ const languages = [
   { text: 'Hallo', label: 'Dutch' },
   { text: 'Kumusta', label: 'Filipino' },
   { text: 'নমস্কার', label: 'Bengali' },
+  { text: 'سلام', label: 'Pashto' },
+  { text: 'سلام', label: 'Persian' },
+  { text: 'नमस्ते', label: 'Hindi' },
+  { text: '안녕', label: 'Korean' },
+  { text: 'สวัสดี', label: 'Thai' },
+  { text: 'Halo', label: 'Indonesian' },
+  { text: 'नमस्कार', label: 'Nepali' },
+  { text: 'ආයුබෝවන්', label: 'Sinhala' },
 ];
 
 const SIZES = {

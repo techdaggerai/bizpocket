@@ -32,7 +32,7 @@ const PLANS = [
     priceAlt: '~$33 · ~€30',
     period: '/mo',
     desc: 'Your entire office — automated',
-    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Voice translation', '13 languages', 'Japanese compliance toolkit', 'Custom branding'],
+    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Custom branding'],
     cta: 'Go Business',
     highlight: false,
   },
@@ -98,7 +98,7 @@ export default function LandingPage() {
               </a>
             </div>
             <div className="flex justify-center lg:justify-start gap-5 mt-6 flex-wrap">
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">13 languages</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">21 languages</span></div>
               <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-[#6b7280] font-medium">Real-time AI</span></div>
               <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">No app for clients</span></div>
             </div>
@@ -120,7 +120,7 @@ export default function LandingPage() {
             <div className="mb-8 text-center">
               <span className="inline-block rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] mb-4">BUILT INTO EVERY PLAN</span>
               <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">Meet PocketChat</h2>
-              <p className="mt-3 max-w-[560px] mx-auto text-[15px] text-[#374151] leading-relaxed">Real-time translation chat. Text, voice, video calls — all in 13 languages. Your business speaks every language.</p>
+              <p className="mt-3 max-w-[560px] mx-auto text-[15px] text-[#374151] leading-relaxed">Real-time translation chat. Text, voice, video calls — all in 21 languages. Your business speaks every language.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               {/* LEFT — Live Typing Indicator */}
@@ -132,7 +132,7 @@ export default function LandingPage() {
               {/* RIGHT — Feature list */}
               <div className="space-y-4">
                 {[
-                  { icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z', color: '#4F46E5', text: 'Translated text chat in 13 languages' },
+                  { icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z', color: '#4F46E5', text: 'Translated text chat in 21 languages' },
                   { icon: 'M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2', color: '#F59E0B', text: 'Voice messages — record, translate, speak' },
                   { icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72', color: '#16a34a', text: 'Live translated voice calls' },
                   { icon: 'M9 18V5l12-2v13M6 18a3 3 0 100-6M18 16a3 3 0 100-6', color: '#dc2626', text: 'Voice cloning — your voice, their language' },
@@ -349,7 +349,7 @@ export default function LandingPage() {
             {[
               { name: 'Starter', price: '¥0', sub: 'Free forever + 14-day Pro trial', color: '#22c55e', border: '1px solid #e5e7eb', features: ['Unlimited invoices', 'Unlimited PocketChat contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website', '"Powered by BizPocket" branding'], cta: 'Start free trial', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #e5e7eb', href: '/signup' },
               { name: 'Pro', price: '¥1,980', sub: '~$13 · ~€12 /mo', color: '#4F46E5', border: '2px solid #4F46E5', popular: true, features: ['Everything in Starter', 'Unlimited AI translations', 'AI Morning Briefing', 'AI Form Fill (unlimited)', 'Social Media Assistant', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', 'Remove BizPocket branding', '5 languages'], cta: 'Go Pro', ctaBg: '#4F46E5', ctaColor: 'white', ctaBorder: 'none', href: '/signup?plan=pro' },
-              { name: 'Business', price: '¥4,980', sub: '~$33 · ~€30 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 10 staff accounts', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '13 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
+              { name: 'Business', price: '¥4,980', sub: '~$33 · ~€30 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 10 staff accounts', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
               { name: 'Enterprise', price: 'Custom', sub: 'For firms managing multiple clients', color: '#374151', border: '1px solid #e5e7eb', bg: '#f9fafb', features: ['Everything in Business', 'Multi-org dashboard', 'Unlimited staff', 'API access', 'White-label everything', 'Dedicated account manager', 'Custom onboarding'], cta: 'Contact us', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #d1d5db', href: 'mailto:hello@bizpocket.io' },
             ].map((p, i) => (
               <div key={i} className="rounded-[20px] p-7 flex flex-col relative" style={{ border: p.border, background: p.bg || 'white' }}>

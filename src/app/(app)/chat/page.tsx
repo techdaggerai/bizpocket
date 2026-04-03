@@ -1210,6 +1210,14 @@ export default function PocketChatPage() {
                   <option value="fr">🇫🇷</option>
                   <option value="nl">🇳🇱</option>
                   <option value="es">🇪🇸</option>
+                  <option value="ps">🇦🇫</option>
+                  <option value="fa">🇮🇷</option>
+                  <option value="hi">🇮🇳</option>
+                  <option value="ko">🇰🇷</option>
+                  <option value="th">🇹🇭</option>
+                  <option value="id">🇮🇩</option>
+                  <option value="ne">🇳🇵</option>
+                  <option value="si">🇱🇰</option>
                 </select>
               </div>
             )}
@@ -1340,7 +1348,7 @@ export default function PocketChatPage() {
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
           <h1 className="text-xl font-bold text-[#0A0A0A]">PocketChat</h1>
-          <p className="text-xs text-[#999]">Chat in 13 languages — AI translates in real-time</p>
+          <p className="text-xs text-[#999]">Chat in 21 languages — AI translates in real-time</p>
         </div>
         <div className="flex items-center gap-2">
           <OutlinePillButton
@@ -1402,7 +1410,7 @@ export default function PocketChatPage() {
                 <h3 className="mt-4 text-lg font-bold text-[#111827]">Start a conversation in any language</h3>
                 <p className="text-sm text-[#6b7280] mt-2 text-center max-w-xs leading-relaxed">You type English. They read Japanese. Voice notes, photos, documents — all translated instantly.</p>
                 <div className="flex justify-center gap-2 mt-4 flex-wrap">
-                  <span className="text-xs px-3 py-1 rounded-full bg-[#eef2ff] text-[#4F46E5] font-medium">13 languages</span>
+                  <span className="text-xs px-3 py-1 rounded-full bg-[#eef2ff] text-[#4F46E5] font-medium">21 languages</span>
                   <span className="text-xs px-3 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-medium">Real-time AI</span>
                   <span className="text-xs px-3 py-1 rounded-full bg-[#f0fdf4] text-[#166534] font-medium">No app for clients</span>
                 </div>

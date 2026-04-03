@@ -330,7 +330,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-[#0A0A0A]">Unlock the full autopilot</p>
-              <p className="text-xs text-[#999]">Unlimited invoices, AI Briefing, 13 languages</p>
+              <p className="text-xs text-[#999]">Unlimited invoices, AI Briefing, 21 languages</p>
             </div>
             <span className="rounded-full border border-[#F59E0B] px-3 py-1.5 text-xs font-bold text-[#F59E0B]">Go Pro &rarr;</span>
           </div>

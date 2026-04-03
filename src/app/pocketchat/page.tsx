@@ -15,7 +15,7 @@ const greetings = [
 ];
 
 const FEATURES = [
-  { title: 'Translated Text Chat', desc: 'Type in your language. Your contact reads theirs. 13 languages, zero delay.', color: '#4F46E5', bg: '#eef2ff', icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z' },
+  { title: 'Translated Text Chat', desc: 'Type in your language. Your contact reads theirs. 21 languages, zero delay.', color: '#4F46E5', bg: '#eef2ff', icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z' },
   { title: 'Voice Messages', desc: 'Record a voice message. PocketChat transcribes, translates, and speaks it in their language.', color: '#F59E0B', bg: '#fef3c7', icon: 'M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2' },
   { title: 'Live Voice Calls', desc: 'Real-time translated phone calls. You speak English, they hear Japanese. Like magic.', color: '#16a34a', bg: '#f0fdf4', icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72', badge: 'NEW' },
   { title: 'Voice Cloning', desc: 'Your voice, their language. AI clones your voice and speaks the translation as YOU.', color: '#dc2626', bg: '#fef2f2', icon: 'M9 18V5l12-2v13M6 18a3 3 0 100-6M18 16a3 3 0 100-6' },
@@ -121,7 +121,7 @@ export default function PocketChatLanding() {
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-12 text-center">
             <h2 className="text-[32px] font-bold text-[#111827]">Everything translates.</h2>
-            <p className="mt-3 text-base text-[#374151]">Text, voice, photos, video, calls — all in 13 languages.</p>
+            <p className="mt-3 text-base text-[#374151]">Text, voice, photos, video, calls — all in 21 languages.</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {FEATURES.map((f, i) => (
@@ -203,7 +203,7 @@ export default function PocketChatLanding() {
       <section className="bg-[#f9fafb] px-6 py-20">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-12 text-center">
-            <h2 className="text-[32px] font-bold text-[#111827]">13 languages. One chat.</h2>
+            <h2 className="text-[32px] font-bold text-[#111827]">21 languages. One chat.</h2>
             <p className="mt-3 text-base text-[#374151]">Every language pair works in both directions, in real-time.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">

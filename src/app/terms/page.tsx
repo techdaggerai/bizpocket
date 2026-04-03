@@ -18,7 +18,7 @@ export default function TermsPage() {
 
       <div style={section}>
         <h2 style={h2}>Description of Service</h2>
-        <p style={p}>BizPocket is a mobile-first business management platform designed for foreigners running businesses in Japan. PocketChat is our built-in multilingual messenger with real-time AI translation. Together, they provide invoicing, cash flow tracking, expense management, document storage, AI-powered business insights, and translated communication across 13 languages.</p>
+        <p style={p}>BizPocket is a mobile-first business management platform designed for foreigners running businesses in Japan. PocketChat is our built-in multilingual messenger with real-time AI translation. Together, they provide invoicing, cash flow tracking, expense management, document storage, AI-powered business insights, and translated communication across 21 languages.</p>
       </div>
 
       <div style={section}>

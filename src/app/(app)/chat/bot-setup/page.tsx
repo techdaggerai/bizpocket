@@ -31,6 +31,10 @@ const LANGUAGES = [
   { code: 'tr', name: 'Turkish', flag: '🇹🇷' }, { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
   { code: 'fr', name: 'French', flag: '🇫🇷' }, { code: 'nl', name: 'Dutch', flag: '🇳🇱' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
+  { code: 'ps', name: 'Pashto', flag: '🇦🇫' }, { code: 'fa', name: 'Persian', flag: '🇮🇷' },
+  { code: 'hi', name: 'Hindi', flag: '🇮🇳' }, { code: 'ko', name: 'Korean', flag: '🇰🇷' },
+  { code: 'th', name: 'Thai', flag: '🇹🇭' }, { code: 'id', name: 'Indonesian', flag: '🇮🇩' },
+  { code: 'ne', name: 'Nepali', flag: '🇳🇵' }, { code: 'si', name: 'Sinhala', flag: '🇱🇰' },
 ];
 
 const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 14, boxSizing: 'border-box' as const, fontFamily: 'inherit' };

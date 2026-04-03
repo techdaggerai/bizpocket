@@ -41,7 +41,7 @@ const PLANS = [
     features: [
       'Everything in Pro',
       'Voice translation',
-      '13 languages',
+      '21 languages',
       'Document scan AI',
       'Priority support',
     ],
