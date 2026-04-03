@@ -6,6 +6,36 @@ const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/']; // Public invoice + publis
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
+  // PocketChat domain routing — pocketchat.co serves PocketChat experience
+  const hostname = request.headers.get('host') || '';
+  const isPocketChat = hostname.includes('pocketchat.co');
+
+  if (isPocketChat) {
+    const path = request.nextUrl.pathname;
+
+    // Root → PocketChat landing
+    if (path === '/') {
+      return NextResponse.rewrite(new URL('/pocketchat', request.url));
+    }
+
+    // Signup → PocketChat mode
+    if (path === '/signup') {
+      const url = new URL('/signup', request.url);
+      url.searchParams.set('mode', 'pocketchat');
+      return NextResponse.rewrite(url);
+    }
+
+    // Login → pass through
+    if (path === '/login') {
+      return NextResponse.next();
+    }
+
+    // /chat, /privacy, /terms, /auth → pass through normally
+    if (['/chat', '/privacy', '/terms', '/auth'].some(p => path.startsWith(p))) {
+      return NextResponse.next();
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
