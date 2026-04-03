@@ -40,7 +40,7 @@ function SignupInner() {
       password,
       options: {
         data: { full_name: name, preferred_language: isPocketChat ? language : 'en' },
-        emailRedirectTo: `${siteUrl}/auth/callback${isPocketChat ? `?lang=${language}` : ''}`,
+        emailRedirectTo: `${siteUrl}/auth/callback${isPocketChat ? `?lang=${language}&mode=pocketchat` : ''}`,
       },
     });
 

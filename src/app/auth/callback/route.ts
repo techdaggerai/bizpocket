@@ -42,8 +42,9 @@ export async function GET(request: NextRequest) {
           .single();
 
         if (profile) {
-          // Existing user — go to dashboard
-          return NextResponse.redirect(`${origin}/dashboard`);
+          // Existing user — PocketChat mode goes to /chat, otherwise dashboard
+          const dest = searchParams.get('mode') === 'pocketchat' ? '/chat' : '/dashboard';
+          return NextResponse.redirect(`${origin}${dest}`);
         }
 
         // New user — auto-create org + profile, then onboarding
@@ -69,7 +70,8 @@ export async function GET(request: NextRequest) {
           });
         }
 
-        return NextResponse.redirect(`${origin}/onboarding`);
+        const isPocketChat = searchParams.get('mode') === 'pocketchat';
+        return NextResponse.redirect(`${origin}${isPocketChat ? '/chat' : '/onboarding'}`);
       }
     }
   }
