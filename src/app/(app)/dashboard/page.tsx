@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
+import { useSearchParams } from 'next/navigation';
 import { formatCurrency, getGreeting, getCurrentMonth, formatDateShort } from '@/lib/utils';
 import GlobalSearch from '@/components/GlobalSearch';
 import HealthScore from '@/components/HealthScore';
@@ -56,7 +57,15 @@ export default function DashboardPage() {
   const { user, profile, organization } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [supabase] = useState(() => createClient());
+
+  // Show upgrade success toast
+  useEffect(() => {
+    if (searchParams.get('upgraded') === 'true') {
+      toast('Plan upgraded successfully!', 'success');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rawName = (profile as any).full_name || user.user_metadata?.full_name || profile.name || '';
   const firstName = rawName.split(' ')[0] || user.email?.split('@')[0] || '';

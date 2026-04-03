@@ -72,8 +72,8 @@ export async function POST(request: Request) {
     customer: customerId,
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${origin}/settings/upgrade?success=true`,
-    cancel_url: `${origin}/settings/upgrade?cancelled=true`,
+    success_url: `${origin}/dashboard?upgraded=true`,
+    cancel_url: `${origin}/settings/upgrade`,
     metadata: {
       organization_id: organizationId,
     },
