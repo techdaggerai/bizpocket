@@ -126,7 +126,7 @@ export default function HeroChatMockup() {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="rounded-full bg-[#eef2ff] px-2.5 py-0.5 text-[11px] font-semibold text-[#4F46E5]">EN</span>
-          <AnimatedPocketChatLogo size={20} isTranslating={showDots} />
+          <AnimatedPocketChatLogo size={28} isTranslating={showDots} />
           <span className="rounded-full bg-[#fef3c7] px-2.5 py-0.5 text-[11px] font-semibold text-[#92400e]">JP</span>
         </div>
       </div>

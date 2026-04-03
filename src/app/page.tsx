@@ -299,7 +299,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1100px]">
           <div className="bg-[#111827] rounded-3xl p-[clamp(32px,5vw,56px)] text-center text-white">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <PocketMark variant="sm" />
+              <PocketMark variant="xl" />
               <span className="text-xs font-semibold text-[#a5b4fc] tracking-widest">BIZPOCKET</span>
             </div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">SOCIAL MEDIA → ORDERS → MONEY</span>
@@ -335,9 +335,9 @@ export default function LandingPage() {
         <div className="mx-auto max-w-[1100px]">
           <div className="text-center mb-10">
             <div className="flex items-center justify-center gap-5 mb-6">
-              <div className="flex items-center gap-1.5"><PocketMark variant="sm" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
+              <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
               <span className="text-[13px] text-[#d1d5db]">+</span>
-              <div className="flex items-center gap-1.5"><PocketChatMark size={24} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
+              <div className="flex items-center gap-1.5"><PocketChatMark size={28} /><span className="text-[13px] font-semibold text-[#111827]">PocketChat</span></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
             <p className="text-base text-[#374151] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
@@ -383,12 +383,12 @@ export default function LandingPage() {
       <footer className="border-t border-[#F0F0F0] bg-white">
         <div className="mx-auto max-w-5xl px-6 py-10">
           <div className="flex items-center justify-center gap-6 pb-6">
-            <div className="flex items-center gap-1.5"><PocketMark variant="sm" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
-            <div className="flex items-center gap-1.5"><PocketChatMark size={24} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
+            <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
+            <div className="flex items-center gap-1.5"><PocketChatMark size={28} /><span className="text-xs font-semibold text-[#6b7280]">PocketChat</span></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <PocketMark variant="sm" />
+              <PocketMark variant="xl" />
               <span className="text-[13px] font-medium text-[#0A0A0A]">BizPocket</span>
             </div>
             <div className="flex items-center gap-6">

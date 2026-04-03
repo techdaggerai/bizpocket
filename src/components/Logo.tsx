@@ -19,7 +19,7 @@ export function PocketMark({ variant = 'xl', className = '' }: { variant?: LogoS
       <rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15" />
       <path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95" />
       <rect x="24" y="66" width="40" height="4" rx="2" fill="white" opacity="0.9" />
-      <rect x="24" y="76" width="28" height="4" rx="2" fill="white" opacity="0.5" />
+      <rect x="24" y="76" width="28" height="4" rx="2" fill="white" opacity="0.9" />
     </svg>
   );
 }

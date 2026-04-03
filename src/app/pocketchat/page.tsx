@@ -225,7 +225,7 @@ export default function PocketChatLanding() {
       <footer className="bg-[#f9fafb]">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="flex items-center gap-2">
-            <PocketChatMark size={24} />
+            <PocketChatMark size={28} />
             <span className="text-xs text-[#6b7280]">&copy; 2026 TechDagger Studio</span>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -236,7 +236,7 @@ export default function PocketChatLanding() {
             <a href="mailto:hello@bizpocket.io" className="text-xs text-[#6b7280] hover:text-[#111827] transition-colors">Contact</a>
           </div>
           <a href="https://bizpocket.io" target="_blank" rel="noreferrer" className="flex items-center gap-2 no-underline">
-            <PocketMark variant="sm" />
+            <PocketMark variant="xl" />
             <span className="text-xs text-[#6b7280]">Powered by <span className="font-semibold text-[#4F46E5]">BizPocket</span></span>
           </a>
         </div>
