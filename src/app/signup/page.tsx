@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -27,6 +27,10 @@ function SignupInner() {
   const [language, setLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    document.title = isPocketChat ? 'Sign up — PocketChat' : 'Sign up — BizPocket';
+  }, [isPocketChat]);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();

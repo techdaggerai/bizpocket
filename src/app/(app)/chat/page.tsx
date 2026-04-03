@@ -111,6 +111,8 @@ export default function PocketChatPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  useEffect(() => { document.title = 'PocketChat'; }, []);
+
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
