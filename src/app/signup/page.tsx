@@ -59,7 +59,42 @@ function SignupInner() {
       return;
     }
 
-    router.push(isPocketChat ? '/chat/bot-setup' : `/onboarding?plan=${plan}`);
+    // PocketChat: create org + profile immediately (they skip onboarding)
+    if (isPocketChat) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Check if profile already exists (e.g. from auth callback)
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!existingProfile) {
+          const { data: org } = await supabase.from('organizations').insert({
+            name: name || 'My PocketChat',
+            created_by: user.id,
+            plan: 'starter',
+            language: language,
+            currency: 'JPY',
+            signup_source: 'pocketchat',
+          }).select().single();
+
+          if (org) {
+            await supabase.from('profiles').insert({
+              user_id: user.id,
+              organization_id: org.id,
+              role: 'owner',
+              name: name || user.email?.split('@')[0] || 'Owner',
+              email: user.email!,
+              language: language,
+            });
+          }
+        }
+      }
+    }
+
+    router.push(isPocketChat ? '/chat' : `/onboarding?plan=${plan}`);
   }
 
   return (

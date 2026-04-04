@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           .from('profiles')
           .select('id, organization_id')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profile) {
           // Existing user — route based on source
