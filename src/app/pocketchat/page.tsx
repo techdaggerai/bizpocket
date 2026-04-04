@@ -58,7 +58,7 @@ const LANGUAGES = [
 const FAQ_ITEMS = [
   {
     q: 'Is it really free?',
-    a: 'Yes — unlimited chat with your contacts is free forever. You get 3 AI-powered translations per day on the free plan. Need more? Pro plans start at ¥1,980/month.',
+    a: 'Yes — unlimited chat with your contacts is free forever. You get 10 AI translations per day on the free plan. Need more? Pro starts at just ¥980/month.',
   },
   {
     q: 'How accurate are the translations?',

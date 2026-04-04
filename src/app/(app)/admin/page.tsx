@@ -99,7 +99,7 @@ export default function AdminPage() {
     );
   }
 
-  const estimatedRevenue = paidSubs * 1980;
+  const estimatedRevenue = paidSubs * 980;
 
   return (
     <div className="space-y-6 py-4">

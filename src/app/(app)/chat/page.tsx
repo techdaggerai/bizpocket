@@ -1965,11 +1965,11 @@ export default function PocketChatPage() {
           <div className="px-3 py-1.5 border-t border-[#F0F0F0] bg-[#FAFAFA] flex items-center justify-between">
             <span className="text-[11px] text-[#9CA3AF]">
               {activeConvo.is_bot_chat
-                ? `${Math.max(0, 10 - botMessagesUsed)}/10 AI messages left today`
-                : `${Math.max(0, 3 - translationsUsed)}/3 translations left today`
+                ? null
+                : `${Math.max(0, 10 - translationsUsed)}/10 translations left today`
               }
             </span>
-            {((activeConvo.is_bot_chat && botMessagesUsed >= 10) || (!activeConvo.is_bot_chat && translationsUsed >= 3)) && (
+            {(!activeConvo.is_bot_chat && translationsUsed >= 10) && (
               <Link href="/settings/upgrade" className="text-[11px] font-medium text-[#4F46E5]">Upgrade</Link>
             )}
           </div>

@@ -1,14 +1,15 @@
 /**
  * Evrywher AI Usage Tracking
- * Free tier: 3 translations/day, 10 bot messages/day
- * Pro/Business/Team: unlimited
+ * Free tier: 10 translations/day, unlimited bot, 3 smart replies/day, 3 groups max
+ * Pro/Business/Team: unlimited everything
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
 
 const FREE_LIMITS: Record<string, number> = {
-  translation: 3,
-  bot_chat: 10,
+  translation: 10,
+  smart_reply: 3,
+  group_create: 3,
 };
 
 export async function checkUsageLimit(
@@ -22,8 +23,26 @@ export async function checkUsageLimit(
     return { allowed: true, used: 0, limit: Infinity };
   }
 
+  // Bot chat: unlimited on free tier
+  if (usageType === 'bot_chat') {
+    return { allowed: true, used: 0, limit: Infinity };
+  }
+
   const limit = FREE_LIMITS[usageType] || 0;
+  if (limit === 0) return { allowed: true, used: 0, limit: Infinity };
+
   const today = new Date().toISOString().slice(0, 10);
+
+  // For group_create, count total groups (not daily)
+  if (usageType === 'group_create') {
+    const { count } = await supabase
+      .from('conversations')
+      .select('id', { count: 'exact', head: true })
+      .eq('organization_id', orgId)
+      .eq('is_group', true);
+    const used = count || 0;
+    return { allowed: used < limit, used, limit };
+  }
 
   const { data } = await supabase
     .from('usage_tracking')
@@ -42,9 +61,11 @@ export async function incrementUsage(
   orgId: string,
   usageType: string
 ): Promise<void> {
+  // Skip tracking for unlimited types
+  if (usageType === 'bot_chat' || usageType === 'group_create') return;
+
   const today = new Date().toISOString().slice(0, 10);
 
-  // Upsert: insert or increment
   const { data: existing } = await supabase
     .from('usage_tracking')
     .select('id, count')

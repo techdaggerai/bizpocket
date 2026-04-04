@@ -19,7 +19,7 @@ const PLANS = [
   },
   {
     name: 'Pro',
-    price: '¥1,980',
+    price: '¥980',
     priceAlt: '~$13 · ~€12',
     period: '/mo',
     desc: 'Your AI business autopilot',
@@ -29,11 +29,11 @@ const PLANS = [
   },
   {
     name: 'Business',
-    price: '¥4,980',
+    price: '¥2,980',
     priceAlt: '~$33 · ~€30',
     period: '/mo',
     desc: 'Your entire office — automated',
-    features: ['Everything in Pro', 'Up to 10 staff accounts', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Custom branding'],
+    features: ['Everything in Pro', 'Up to 5 team members', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Custom branding', 'Includes Evrywher Business'],
     cta: 'Go Business',
     highlight: false,
   },
@@ -227,8 +227,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { title: 'The newcomer', desc: 'Just arrived in Japan. Starting a side business. Need to send your first invoice and read Japanese documents.', badge: 'Starter — Free', badgeBg: '#eef2ff', badgeColor: '#4F46E5', iconBg: '#eef2ff', iconColor: '#4F46E5', icon: 'M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2', icon2: 'M12 7 a4 4 0 100 0.01', border: '1px solid #e5e7eb' },
-              { title: 'The solo operator', desc: 'Running a real business. 10-50 transactions a month. Drowning in manual work. Need an autopilot.', badge: 'Pro — ¥1,980/mo', badgeBg: '#4F46E5', badgeColor: 'white', iconBg: '#eef2ff', iconColor: '#4F46E5', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', border: '2px solid #4F46E5', popular: true },
-              { title: 'The growing team', desc: '2-10 staff. Has an accountant. Needs team access, role-based permissions, and compliance tools.', badge: 'Business — ¥4,980/mo', badgeBg: '#fef3c7', badgeColor: '#92400e', iconBg: '#fef3c7', iconColor: '#F59E0B', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', icon2: 'M9 7 a4 4 0 100 0.01', border: '1px solid #e5e7eb' },
+              { title: 'The solo operator', desc: 'Running a real business. 10-50 transactions a month. Drowning in manual work. Need an autopilot.', badge: 'Pro — ¥980/mo', badgeBg: '#4F46E5', badgeColor: 'white', iconBg: '#eef2ff', iconColor: '#4F46E5', icon: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z', border: '2px solid #4F46E5', popular: true },
+              { title: 'The growing team', desc: '2-5 team members. Has an accountant. Needs team access, role-based permissions, and compliance tools.', badge: 'Business — ¥2,980/mo', badgeBg: '#fef3c7', badgeColor: '#92400e', iconBg: '#fef3c7', iconColor: '#F59E0B', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2', icon2: 'M9 7 a4 4 0 100 0.01', border: '1px solid #e5e7eb' },
               { title: 'The accounting firm', desc: 'Managing 10-50 foreign business clients. Need one dashboard for all of them. White-label everything.', badge: 'Enterprise — Custom', badgeBg: '#f3f4f6', badgeColor: '#374151', iconBg: '#f3f4f6', iconColor: '#374151', icon: 'M2 7h20v14H2z M16 7V5a4 4 0 00-8 0v2 M12 12v4', border: '1px solid #e5e7eb' },
             ].map((p, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 relative" style={{ border: p.border }}>
@@ -349,8 +349,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { name: 'Starter', price: '¥0', sub: 'Free forever + 14-day Pro trial', color: '#22c55e', border: '1px solid #e5e7eb', features: ['Unlimited invoices', 'Unlimited Evrywher contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website', '"Powered by BizPocket" branding'], cta: 'Start free trial', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #e5e7eb', href: '/signup' },
-              { name: 'Pro', price: '¥1,980', sub: '~$13 · ~€12 /mo', color: '#4F46E5', border: '2px solid #4F46E5', popular: true, features: ['Everything in Starter', 'Unlimited AI translations', 'AI Morning Briefing', 'AI Form Fill (unlimited)', 'Social Media Assistant', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', 'Remove BizPocket branding', '5 languages'], cta: 'Go Pro', ctaBg: '#4F46E5', ctaColor: 'white', ctaBorder: 'none', href: '/signup?plan=pro' },
-              { name: 'Business', price: '¥4,980', sub: '~$33 · ~€30 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 10 staff accounts', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
+              { name: 'Pro', price: '¥980', sub: '~$7 · ~€6 /mo', color: '#4F46E5', border: '2px solid #4F46E5', popular: true, features: ['Everything in Starter', 'Unlimited AI translations', 'AI Morning Briefing', 'AI Form Fill (unlimited)', 'Social Media Assistant', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', 'Remove BizPocket branding', '5 languages'], cta: 'Go Pro', ctaBg: '#4F46E5', ctaColor: 'white', ctaBorder: 'none', href: '/signup?plan=pro' },
+              { name: 'Business', price: '¥2,980', sub: '~$20 · ~€18 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 5 team members', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support', 'Includes Evrywher Business'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
               { name: 'Enterprise', price: 'Custom', sub: 'For firms managing multiple clients', color: '#374151', border: '1px solid #e5e7eb', bg: '#f9fafb', features: ['Everything in Business', 'Multi-org dashboard', 'Unlimited staff', 'API access', 'White-label everything', 'Dedicated account manager', 'Custom onboarding'], cta: 'Contact us', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #d1d5db', href: 'mailto:hello@bizpocket.io' },
             ].map((p, i) => (
               <div key={i} className="rounded-[20px] p-7 flex flex-col relative" style={{ border: p.border, background: p.bg || 'white' }}>

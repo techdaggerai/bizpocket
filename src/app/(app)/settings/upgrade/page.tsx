@@ -21,7 +21,7 @@ const PLANS = [
   {
     key: 'pro' as const,
     name: 'Pro',
-    price: '¥1,980',
+    price: '¥980',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_1TGXQoKiugpuK1mjtDYwA15I',
     features: [
@@ -35,7 +35,7 @@ const PLANS = [
   {
     key: 'business' as const,
     name: 'Business',
-    price: '¥4,980',
+    price: '¥2,980',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || 'price_1TGXRfKiugpuK1mjK5oI8CsA',
     features: [

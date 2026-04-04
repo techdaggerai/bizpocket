@@ -302,7 +302,7 @@ export function trialExpiringEmail({
   daysLeft,
   trialEndsDate,
   upgradeUrl = 'https://evrywher.io/settings/upgrade',
-  priceMonthly = '¥1,980/mo',
+  priceMonthly = '¥980/mo',
 }: TrialExpiringEmailOptions): {
   subject: string;
   html: string;
