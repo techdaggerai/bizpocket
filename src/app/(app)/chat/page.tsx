@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
@@ -147,6 +148,9 @@ export default function PocketChatPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
+  const [translationsUsed, setTranslationsUsed] = useState(0);
+  const [botMessagesUsed, setBotMessagesUsed] = useState(0);
+  const isFreePlan = (organization?.plan || 'free') === 'free';
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -844,6 +848,20 @@ export default function PocketChatPage() {
     })();
   }, [organization?.id, botName]);
 
+  // Fetch AI usage for free tier indicator
+  useEffect(() => {
+    if (!isFreePlan || !organization?.id) return;
+    const today = new Date().toISOString().slice(0, 10);
+    supabase.from('usage_tracking').select('usage_type, count').eq('org_id', organization.id).eq('usage_date', today).then(({ data }) => {
+      if (data) {
+        for (const row of data) {
+          if (row.usage_type === 'translation') setTranslationsUsed(row.count);
+          if (row.usage_type === 'bot_chat') setBotMessagesUsed(row.count);
+        }
+      }
+    });
+  }, [isFreePlan, organization?.id, sending]);
+
   // Evrywher users: NEVER block with setup screen — go straight to chat UI.
   // Bot auto-creates in background via useEffect above.
 
@@ -1291,6 +1309,21 @@ export default function PocketChatPage() {
           <div className="flex-1" />
           <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
         </div>
+
+        {/* Free tier usage indicator */}
+        {isFreePlan && activeConvo && (
+          <div className="px-3 py-1.5 border-t border-[#F0F0F0] bg-[#FAFAFA] flex items-center justify-between">
+            <span className="text-[11px] text-[#9CA3AF]">
+              {activeConvo.is_bot_chat
+                ? `${Math.max(0, 10 - botMessagesUsed)}/10 AI messages left today`
+                : `${Math.max(0, 3 - translationsUsed)}/3 translations left today`
+              }
+            </span>
+            {((activeConvo.is_bot_chat && botMessagesUsed >= 10) || (!activeConvo.is_bot_chat && translationsUsed >= 3)) && (
+              <Link href="/settings/upgrade" className="text-[11px] font-medium text-[#4F46E5]">Upgrade</Link>
+            )}
+          </div>
+        )}
 
         {/* Input area */}
         <div className="p-3 border-t border-[#E5E5E5] bg-white">

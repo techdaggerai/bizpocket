@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { checkUsageLimit, incrementUsage } from '@/lib/usage'
 
 const BIZPOCKET_SYSTEM_PROMPT = `You are a BizPocket AI Business Assistant — a smart, friendly AI that helps business owners manage their operations through chat.
 
@@ -245,6 +246,18 @@ ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No bus
 `
   }
 
+  // Rate limit check for free tier
+  const orgPlan = org?.plan || 'free'
+  const usage = await checkUsageLimit(supabase, organizationId, 'bot_chat', orgPlan)
+  if (!usage.allowed) {
+    return NextResponse.json({
+      message: `You've used all ${usage.limit} AI messages for today on the free plan. Upgrade to Pro for unlimited AI chat!`,
+      limited: true,
+      used: usage.used,
+      limit: usage.limit,
+    })
+  }
+
   try {
     const anthropic = new Anthropic({ apiKey })
 
@@ -266,6 +279,9 @@ ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No bus
     })
 
     const botMessage = response.content[0].type === 'text' ? response.content[0].text : 'I could not process that. Try again?'
+
+    // Increment usage after successful response
+    incrementUsage(supabase, organizationId, 'bot_chat')
 
     return NextResponse.json({ message: botMessage })
   } catch (err) {

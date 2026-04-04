@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { EVRYWHER_CULTURAL_PROMPT } from '@/lib/prompts'
+import { checkUsageLimit, incrementUsage } from '@/lib/usage'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -44,6 +45,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ translatedText: text, fromLanguage, toLanguage })
     }
 
+    // Rate limit check for free tier (skip for public token / unauthenticated)
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('organization_id').eq('user_id', user.id).single()
+      if (profile) {
+        const { data: org } = await supabase.from('organizations').select('plan').eq('id', profile.organization_id).single()
+        const plan = org?.plan || 'free'
+        const usage = await checkUsageLimit(supabase, profile.organization_id, 'translation', plan)
+        if (!usage.allowed) {
+          return NextResponse.json({
+            error: 'limit_reached',
+            message: `Free plan limit: ${usage.limit} translations/day. Upgrade for unlimited.`,
+            used: usage.used,
+            limit: usage.limit,
+          }, { status: 429 })
+        }
+      }
+    }
+
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
@@ -58,6 +77,13 @@ export async function POST(req: NextRequest) {
     })
 
     const translatedText = message.content[0].type === 'text' ? message.content[0].text.trim() : text
+
+    // Increment usage after successful translation
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('organization_id').eq('user_id', user.id).single()
+      if (profile) incrementUsage(supabase, profile.organization_id, 'translation')
+    }
+
     return NextResponse.json({ translatedText, fromLanguage, toLanguage })
   } catch (error) {
     console.error('Translation API error:', error)
