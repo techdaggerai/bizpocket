@@ -815,7 +815,13 @@ export default function PocketChatPage() {
     return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // PocketChat users: show loading while auto-creating bot
+  // PocketChat users: show loading while auto-creating bot + timeout fallback
+  useEffect(() => {
+    if (!isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
+    const timer = setTimeout(() => { window.location.reload(); }, 3000);
+    return () => clearTimeout(timer);
+  }, [isPocketChatMode, botConfigLoaded, isSetupComplete]);
+
   if (isPocketChatMode && botConfigLoaded && !isSetupComplete) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] bg-white gap-3">
@@ -1434,12 +1440,14 @@ export default function PocketChatPage() {
 
   /* ---------- Render: Conversation List ---------- */
 
-  const filters: { key: FilterType; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'customer', label: 'Customers' },
-    { key: 'supplier', label: 'Suppliers' },
-    { key: 'invoice', label: 'Invoices' },
-  ];
+  const filters: { key: FilterType; label: string }[] = isPocketChatMode
+    ? [{ key: 'all', label: 'All' }]
+    : [
+        { key: 'all', label: 'All' },
+        { key: 'customer', label: 'Customers' },
+        { key: 'supplier', label: 'Suppliers' },
+        { key: 'invoice', label: 'Invoices' },
+      ];
 
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col bg-white">

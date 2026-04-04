@@ -54,6 +54,8 @@ export default function BotSetupPage() {
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [orgReady, setOrgReady] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [originalBotName, setOriginalBotName] = useState('');
 
   useEffect(() => {
     if (organization?.id) setOrgReady(true);
@@ -70,6 +72,7 @@ export default function BotSetupPage() {
         .single();
       if (data) {
         setBotName(data.bot_name || '');
+        setOriginalBotName(data.bot_name || '');
         setBotIcon(data.bot_icon || 'professional');
         setBotLang(data.language || 'en');
         setPersonality(data.bot_personality || 'professional');
@@ -79,6 +82,7 @@ export default function BotSetupPage() {
           .filter((r: { active: boolean }) => r.active)
           .map((r: { trigger: string }) => r.trigger);
         if (existingRules.length > 0) setRules(existingRules);
+        setIsEditMode(true);
       }
       setLoaded(true);
     })();
@@ -99,7 +103,9 @@ export default function BotSetupPage() {
 
       if (upsertError) throw upsertError;
 
-      // Send re-introduction message in the bot conversation
+      // Send re-introduction message ONLY if bot name changed
+      const nameChanged = botName.trim() !== originalBotName.trim();
+
       const { data: botConvo } = await supabase
         .from('conversations')
         .select('id')
@@ -107,7 +113,7 @@ export default function BotSetupPage() {
         .eq('is_bot_chat', true)
         .single();
 
-      if (botConvo) {
+      if (botConvo && nameChanged) {
         const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
         await supabase.from('messages').insert({
           conversation_id: botConvo.id,
@@ -121,6 +127,11 @@ export default function BotSetupPage() {
           title: botName,
           last_message: introMsg,
           last_message_at: new Date().toISOString(),
+        }).eq('id', botConvo.id);
+      } else if (botConvo) {
+        // Name didn't change, just update conversation title silently
+        await supabase.from('conversations').update({
+          title: botName,
         }).eq('id', botConvo.id);
       }
 
@@ -138,6 +149,60 @@ export default function BotSetupPage() {
       setSaving(false);
     }
   };
+
+  // EDIT MODE: single page with all fields
+  if (isEditMode && loaded) {
+    return (
+      <div className="max-w-[560px] mx-auto py-10 px-6">
+        <div className="flex justify-center mb-6"><PocketChatMark size={48} /></div>
+        <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">Edit {botName || 'your assistant'}</h2>
+        <p className="text-sm text-[#6b7280] text-center mb-8">Update your bot&apos;s settings.</p>
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Bot name</label>
+        <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant" style={{ ...inputStyle, marginBottom: 20 }} />
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Icon</label>
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          {BOT_ICONS.map(icon => (
+            <button key={icon.id} onClick={() => setBotIcon(icon.id)}
+              className={`py-3 px-2 rounded-[10px] text-center cursor-pointer ${botIcon === icon.id ? 'border-2 border-[#4F46E5] bg-[#eef2ff]' : 'border border-[#e5e7eb] bg-white'}`}>
+              <span className="text-2xl block">{icon.emoji}</span>
+              <span className="text-[11px] text-[#6b7280] mt-1 block">{icon.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Language</label>
+        <select value={botLang} onChange={e => setBotLang(e.target.value)} style={{ ...inputStyle, marginBottom: 20, background: 'white' }}>
+          {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
+        </select>
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Personality</label>
+        <div className="flex flex-col gap-2 mb-6">
+          {PERSONALITIES.map(p => (
+            <button key={p.id} onClick={() => setPersonality(p.id)}
+              className={`p-3.5 rounded-xl text-left cursor-pointer ${personality === p.id ? 'border-2 border-[#4F46E5] bg-[#eef2ff]' : 'border border-[#e5e7eb] bg-white'}`}>
+              <p className="text-sm font-semibold text-[#111827]">{p.name}</p>
+              <p className="text-xs text-[#6b7280] mt-0.5">{p.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Greeting message</label>
+        <textarea value={greeting} onChange={e => setGreeting(e.target.value)} placeholder={`Hi! I'm ${botName}. How can I help you today?`} rows={3} style={{ ...inputStyle, marginBottom: 20, resize: 'vertical' }} />
+
+        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Away message</label>
+        <textarea value={awayMessage} onChange={e => setAwayMessage(e.target.value)} placeholder="Thanks for your message! I'm currently away but will respond soon." rows={3} style={{ ...inputStyle, marginBottom: 24, resize: 'vertical' }} />
+
+        <div className="flex gap-2.5">
+          <button onClick={() => router.push('/chat')} className="flex-1 py-3 rounded-[10px] text-sm font-semibold text-[#374151] border border-[#e5e7eb] bg-white">Cancel</button>
+          <button onClick={handleSave} disabled={!orgReady || saving || !botName.trim()} className={`flex-[2] py-3 rounded-[10px] text-sm font-semibold text-white ${!orgReady || saving || !botName.trim() ? 'bg-[#9ca3af]' : 'bg-[#4F46E5]'}`}>
+            {!orgReady ? 'Loading...' : saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[560px] mx-auto py-10 px-6">
