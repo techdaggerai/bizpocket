@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
-import { BOT_GRADIENTS, getBotGradient } from '@/lib/use-pocket-bot';
+
 
 interface BotOnboardingProps {
   onComplete: (botName: string, botIcon: string) => void;
@@ -14,9 +14,9 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const { organization, user } = useAuth();
   const supabase = createClient();
 
-  const [step, setStep] = useState<'welcome' | 'name' | 'icon'>('welcome');
+  const [step, setStep] = useState<'welcome' | 'name'>('welcome');
   const [botName, setBotName] = useState('Evrywher AI');
-  const [botIcon, setBotIcon] = useState('1');
+  const [botIcon] = useState('1');
   const [saving, setSaving] = useState(false);
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
@@ -96,8 +96,6 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
     onComplete(botName, botIcon);
   }
 
-  const selectedGradient = getBotGradient(botIcon);
-
   if (step === 'welcome') {
     return (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center">
@@ -134,8 +132,8 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   if (step === 'name') {
     return (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full text-white text-3xl font-bold" style={{ background: `linear-gradient(135deg, ${selectedGradient.from}, ${selectedGradient.to})` }}>
-          {(botName || 'P').charAt(0).toUpperCase()}
+        <div className="mb-6">
+          <AnimatedPocketChatLogo size={80} isTranslating={true} />
         </div>
         <h2 className="text-xl font-bold text-[var(--text-1)] mb-2">Name your assistant</h2>
         <p className="text-sm text-[var(--text-3)] max-w-sm mb-6">
@@ -151,48 +149,13 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
         />
         <p className="text-[10px] text-[var(--text-4)] mt-2 mb-6">You can change this anytime in settings</p>
         <button
-          onClick={() => setStep('icon')}
-          disabled={!botName.trim()}
+          onClick={handleFinish}
+          disabled={saving || !botName.trim()}
           className="rounded-xl bg-[#4F46E5] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#4338CA] disabled:opacity-50"
         >
-          Next — Choose a Color
+          {saving ? 'Creating...' : `Activate ${botName}`}
         </button>
       </div>
     );
   }
-
-  return (
-    <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-      <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full text-white text-3xl font-bold" style={{ background: `linear-gradient(135deg, ${selectedGradient.from}, ${selectedGradient.to})` }}>
-        {botName.charAt(0).toUpperCase()}
-      </div>
-      <h2 className="text-xl font-bold text-[var(--text-1)] mb-1">{botName}</h2>
-      <p className="text-sm text-[var(--text-3)] max-w-sm mb-6">Choose a color for your assistant</p>
-
-      <div className="flex gap-3 mb-8">
-        {BOT_GRADIENTS.map((g) => (
-          <button
-            key={g.id}
-            onClick={() => setBotIcon(g.id)}
-            className={`h-14 w-14 rounded-full flex items-center justify-center text-white text-xl font-bold cursor-pointer transition-all ${
-              botIcon === g.id
-                ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-110'
-                : 'hover:scale-105'
-            }`}
-            style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}
-          >
-            {botName.charAt(0).toUpperCase()}
-          </button>
-        ))}
-      </div>
-
-      <button
-        onClick={handleFinish}
-        disabled={saving}
-        className="rounded-xl bg-[#4F46E5] px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#4338CA] disabled:opacity-50"
-      >
-        {saving ? 'Creating...' : `Activate ${botName}`}
-      </button>
-    </div>
-  );
 }
