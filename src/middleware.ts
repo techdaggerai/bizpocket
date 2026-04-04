@@ -95,6 +95,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Inject pathname for server layouts that need it
+  supabaseResponse.headers.set('x-pathname', pathname);
+
+  // Evrywher onboarding gate — new users see welcome once
+  if (isPocketChat && pathname !== '/welcome' && !pathname.startsWith('/auth') && !pathname.startsWith('/api')) {
+    const { data: pcProfile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('user_id', user.id)
+      .single();
+    if (pcProfile && !pcProfile.onboarding_completed) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/welcome';
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Check role for accountant restriction
   if (pathname !== '/onboarding') {
     const { data: profile } = await supabase

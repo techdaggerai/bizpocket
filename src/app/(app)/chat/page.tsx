@@ -45,6 +45,8 @@ interface Conversation {
   unread_count: number;
   created_at: string;
   is_bot_chat?: boolean;
+  is_group?: boolean;
+  group_name?: string | null;
   label?: string | null;
   label_color?: string | null;
   contact?: Contact | null;
@@ -163,6 +165,9 @@ export default function PocketChatPage() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const [showGroupCreate, setShowGroupCreate] = useState(false);
+  const [groupName, setGroupName] = useState('');
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [translationsUsed, setTranslationsUsed] = useState(0);
   const [botMessagesUsed, setBotMessagesUsed] = useState(0);
   const isFreePlan = (organization?.plan || 'free') === 'free';
@@ -767,6 +772,42 @@ export default function PocketChatPage() {
     },
     [organization?.id]
   );
+
+  const createGroupConversation = useCallback(async () => {
+    if (!organization?.id || !groupName.trim() || selectedContacts.length < 2) return;
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert({
+        organization_id: organization.id,
+        title: groupName.trim(),
+        group_name: groupName.trim(),
+        is_group: true,
+        unread_count: 0,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      toast('Failed to create group', 'error');
+    } else {
+      // Add selected contacts as a note in the first message
+      const memberNames = contacts.filter(c => selectedContacts.includes(c.id)).map(c => c.name).join(', ');
+      await supabase.from('messages').insert({
+        conversation_id: data.id,
+        organization_id: organization.id,
+        sender_type: 'owner',
+        sender_name: profile?.full_name || profile?.name || 'You',
+        message: `Group "${groupName.trim()}" created with ${memberNames}`,
+        message_type: 'text',
+      });
+      setConversations(prev => [data as Conversation, ...prev]);
+      setActiveConvoId(data.id);
+      setShowGroupCreate(false);
+      setShowNewChat(false);
+      setGroupName('');
+      setSelectedContacts([]);
+    }
+  }, [organization?.id, groupName, selectedContacts, contacts, profile]);
 
   /* ---------- Filter & search ---------- */
 
@@ -1736,7 +1777,7 @@ export default function PocketChatPage() {
           </div>
         ) : (
           sortedConversations.map((convo) => {
-            const name = convo.is_bot_chat ? botName : (convo.contact?.name ?? convo.title ?? 'Unknown');
+            const name = convo.is_bot_chat ? botName : convo.is_group ? (convo.group_name || convo.title) : (convo.contact?.name ?? convo.title ?? 'Unknown');
             return (
               <button
                 key={convo.id}
@@ -1748,6 +1789,10 @@ export default function PocketChatPage() {
                   botConfig?.avatar_url ? (
                     <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
                   ) : <AnimatedPocketChatLogo size={40} />
+                ) : convo.is_group ? (
+                  <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
                 ) : (
                   <PocketAvatar name={name} size={40} />
                 )}
@@ -1758,6 +1803,7 @@ export default function PocketChatPage() {
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className={`text-[15px] text-[#0A0A0A] truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
+                      {convo.is_group && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Group</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
                     {convo.last_message_at && (
@@ -1782,6 +1828,47 @@ export default function PocketChatPage() {
           })
         )}
       </div>
+
+      {/* Group Create Modal */}
+      {showGroupCreate && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setShowGroupCreate(false); setSelectedContacts([]); setGroupName(''); }} />
+          <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#0A0A0A]">New Group</h2>
+              <button onClick={() => { setShowGroupCreate(false); setSelectedContacts([]); setGroupName(''); }} className="text-[#A3A3A3] hover:text-[#0A0A0A]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium text-[#374151] block mb-1.5">Group name</label>
+                <input type="text" value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="e.g. Team Japan, Family" className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#374151] block mb-1.5">Select members ({selectedContacts.length} selected)</label>
+                <div className="max-h-[240px] overflow-y-auto space-y-1">
+                  {contacts.filter(c => !c.contact_type || c.contact_type !== 'accountant').map(c => {
+                    const selected = selectedContacts.includes(c.id);
+                    return (
+                      <button key={c.id} onClick={() => setSelectedContacts(prev => selected ? prev.filter(id => id !== c.id) : [...prev, c.id])}
+                        className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${selected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-[#F9FAFB] border border-transparent'}`}>
+                        <PocketAvatar name={c.name} size={36} />
+                        <span className="text-sm font-medium text-[#0A0A0A] flex-1 truncate">{c.name}</span>
+                        {selected && <svg width="18" height="18" viewBox="0 0 24 24" fill="#4F46E5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <button onClick={createGroupConversation} disabled={!groupName.trim() || selectedContacts.length < 2}
+                className="w-full rounded-lg bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#4338CA] transition-colors">
+                Create Group ({selectedContacts.length} members)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Invite Modal */}
       <InviteModal isOpen={showInvite} onClose={() => setShowInvite(false)} />
@@ -1815,8 +1902,24 @@ export default function PocketChatPage() {
               </button>
             </div>
 
+            {/* New Group button */}
+            <div className="px-4 pt-3">
+              <button
+                onClick={() => { setShowGroupCreate(true); setShowNewChat(false); fetchContacts(); }}
+                className="w-full flex items-center gap-3 rounded-xl border border-[#E5E5E5] px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors mb-3"
+              >
+                <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-[#4F46E5]">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0A0A0A]">New Group</p>
+                  <p className="text-xs text-[#9CA3AF]">Chat with multiple contacts</p>
+                </div>
+              </button>
+            </div>
+
             {/* Contact search */}
-            <div className="p-4">
+            <div className="px-4 pb-2">
               <input
                 type="text"
                 value={contactSearch}
