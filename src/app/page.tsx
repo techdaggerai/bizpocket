@@ -178,7 +178,7 @@ export default function LandingPage() {
       <section className="px-6 pb-16">
         <div className="mx-auto max-w-[1100px]">
           <div className="grid grid-cols-4 gap-[1px] bg-[#e5e7eb] rounded-2xl overflow-hidden">
-            {[{ n: '30+', l: 'Pages deployed', c: '#4F46E5' }, { n: '9', l: 'AI features', c: '#F59E0B' }, { n: '13', l: 'Languages', c: '#111827' }, { n: '16', l: 'Currencies', c: '#111827' }].map((s, i) => (
+            {[{ n: '30+', l: 'Pages deployed', c: '#4F46E5' }, { n: '9', l: 'AI features', c: '#F59E0B' }, { n: '21', l: 'Languages', c: '#111827' }, { n: '16', l: 'Currencies', c: '#111827' }].map((s, i) => (
               <div key={i} className="bg-white py-7 px-5 text-center">
                 <p className="text-[32px] font-bold mb-1" style={{ color: s.c }}>{s.n}</p>
                 <p className="text-[13px] text-[#6b7280]">{s.l}</p>

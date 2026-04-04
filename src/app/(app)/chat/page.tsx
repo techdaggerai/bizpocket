@@ -743,10 +743,9 @@ export default function PocketChatPage() {
         .from('pocket_bot_config')
         .select('id')
         .eq('organization_id', organization.id)
-        .single();
+        .maybeSingle();
 
       if (existing) {
-        // Config exists but isSetupComplete was false — refetch to sync
         if (!cancelled) { fetchBotConfig(); setAutoCreating(false); }
         return;
       }
@@ -771,13 +770,12 @@ export default function PocketChatPage() {
         return;
       }
 
-      // Create bot conversation (check first to avoid duplicates)
       const { data: existingConvo } = await supabase
         .from('conversations')
         .select('id')
         .eq('organization_id', organization.id)
         .eq('is_bot_chat', true)
-        .single();
+        .maybeSingle();
 
       if (!existingConvo) {
         const { data: newConvo } = await supabase
@@ -815,20 +813,32 @@ export default function PocketChatPage() {
     return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // PocketChat users: show loading while auto-creating bot + timeout fallback
+  // PocketChat users: timeout fallback with retry guard to prevent infinite reload
   useEffect(() => {
     if (!isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
-    const timer = setTimeout(() => { window.location.reload(); }, 3000);
+    const retries = parseInt(sessionStorage.getItem('bot_retries') || '0');
+    if (retries >= 2) {
+      sessionStorage.removeItem('bot_retries');
+      return; // Stop looping — fall through to chat UI
+    }
+    const timer = setTimeout(() => {
+      sessionStorage.setItem('bot_retries', String(retries + 1));
+      window.location.reload();
+    }, 3000);
     return () => clearTimeout(timer);
   }, [isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
   if (isPocketChatMode && botConfigLoaded && !isSetupComplete) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] bg-white gap-3">
-        <div className="h-10 w-10 rounded-full border-3 border-[#4F46E5] border-t-transparent animate-spin" />
-        <p className="text-sm text-[#6b7280]">Setting up your assistant...</p>
-      </div>
-    );
+    // Check if we've exhausted retries — show chat UI instead of spinner
+    const retries = typeof window !== 'undefined' ? parseInt(sessionStorage.getItem('bot_retries') || '0') : 0;
+    if (retries < 2) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] bg-white gap-3">
+          <div className="h-10 w-10 rounded-full border-3 border-[#4F46E5] border-t-transparent animate-spin" />
+          <p className="text-sm text-[#6b7280]">Setting up your assistant...</p>
+        </div>
+      );
+    }
   }
 
   // Show bot onboarding if not set up (BizPocket users only)

@@ -30,17 +30,25 @@ const FEATURES = [
 const LANGUAGES = [
   { name: 'English', native: 'English', flag: '🇬🇧' },
   { name: 'Japanese', native: '日本語', flag: '🇯🇵' },
-  { name: 'Urdu', native: 'اردو', flag: '🇵🇰' },
+  { name: 'Hindi', native: 'हिन्दी', flag: '🇮🇳' },
+  { name: 'Chinese', native: '中文', flag: '🇨🇳' },
   { name: 'Arabic', native: 'العربية', flag: '🇸🇦' },
-  { name: 'Bengali', native: 'বাংলা', flag: '🇧🇩' },
+  { name: 'Spanish', native: 'Español', flag: '🇪🇸' },
+  { name: 'Korean', native: '한국어', flag: '🇰🇷' },
   { name: 'Portuguese', native: 'Português', flag: '🇧🇷' },
+  { name: 'French', native: 'Français', flag: '🇫🇷' },
+  { name: 'Bengali', native: 'বাংলা', flag: '🇧🇩' },
+  { name: 'Urdu', native: 'اردو', flag: '🇵🇰' },
+  { name: 'Turkish', native: 'Türkçe', flag: '🇹🇷' },
   { name: 'Filipino', native: 'Filipino', flag: '🇵🇭' },
   { name: 'Vietnamese', native: 'Tiếng Việt', flag: '🇻🇳' },
-  { name: 'Turkish', native: 'Türkçe', flag: '🇹🇷' },
-  { name: 'Chinese', native: '中文', flag: '🇨🇳' },
-  { name: 'French', native: 'Français', flag: '🇫🇷' },
+  { name: 'Persian', native: 'فارسی', flag: '🇮🇷' },
+  { name: 'Pashto', native: 'پښتو', flag: '🇦🇫' },
+  { name: 'Thai', native: 'ไทย', flag: '🇹🇭' },
+  { name: 'Indonesian', native: 'Bahasa', flag: '🇮🇩' },
+  { name: 'Nepali', native: 'नेपाली', flag: '🇳🇵' },
+  { name: 'Sinhala', native: 'සිංහල', flag: '🇱🇰' },
   { name: 'Dutch', native: 'Nederlands', flag: '🇳🇱' },
-  { name: 'Spanish', native: 'Español', flag: '🇪🇸' },
 ];
 
 
@@ -93,7 +101,7 @@ export default function PocketChatLanding() {
             <HeroChatMockup />
           </div>
           <div className="text-center lg:text-left">
-            <span className="mb-5 inline-block rounded-full bg-[#eef2ff] px-4 py-1.5 text-xs font-semibold tracking-wide text-[#4F46E5]">13 LANGUAGES · REAL-TIME AI</span>
+            <span className="mb-5 inline-block rounded-full bg-[#eef2ff] px-4 py-1.5 text-xs font-semibold tracking-wide text-[#4F46E5]">21 LANGUAGES · REAL-TIME AI</span>
             <h1 className="mb-3 text-[clamp(36px,5vw,56px)] font-bold leading-[1.08] tracking-tight text-[#111827]">
               You say <span className="text-[#4F46E5]">Hi</span>.<br />
               They hear{' '}
@@ -108,7 +116,7 @@ export default function PocketChatLanding() {
               <a href="#features" className="rounded-[10px] border border-[#e5e7eb] px-8 py-3.5 text-[15px] font-semibold text-[#374151] hover:border-[#d1d5db] transition-colors">See it in action</a>
             </div>
             <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
-              {['English', 'Japanese', 'Urdu', 'Arabic', 'Bengali', 'Portuguese', 'Filipino', 'Vietnamese', 'Turkish', 'Chinese', 'French', 'Dutch', 'Spanish'].map((l, i) => (
+              {['English', 'Japanese', 'Hindi', 'Chinese', 'Arabic', 'Spanish', 'Korean', 'Portuguese', 'French', 'Bengali', 'Urdu', 'Turkish', 'Filipino', 'Vietnamese', 'Persian', 'Pashto', 'Thai', 'Indonesian', 'Nepali', 'Sinhala', 'Dutch'].map((l, i) => (
                 <span key={i} className="rounded-full border border-[#e5e7eb] px-3 py-1 text-xs text-[#6b7280]">{l}</span>
               ))}
             </div>
