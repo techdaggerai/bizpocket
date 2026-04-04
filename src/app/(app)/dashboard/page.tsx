@@ -322,7 +322,7 @@ export default function DashboardPage() {
       )}
 
       {/* Upgrade Banner */}
-      {(organization.plan === 'free' || organization.plan === 'starter' || !organization.plan) && (
+      {(organization.plan === 'free' || !organization.plan) && (
         <Link href="/settings/upgrade" className="block rounded-xl border border-[#E5E5E5] bg-white p-4 transition-all hover:shadow-md hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F59E0B]/10">

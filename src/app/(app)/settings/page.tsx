@@ -280,8 +280,8 @@ export default function SettingsPage() {
           <SectionLabel>Account</SectionLabel>
           <SettingsRow first>
             <span className="text-[14px] text-[var(--text-2)]">Plan</span>
-            <span className={`text-[12px] font-medium px-2.5 py-0.5 rounded-full ${plan === 'free' || plan === 'starter' ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-[#EDE9FE] text-[#4F46E5]'}`}>
-              {plan === 'starter' ? 'Free' : plan.charAt(0).toUpperCase() + plan.slice(1)}
+            <span className={`text-[12px] font-medium px-2.5 py-0.5 rounded-full ${plan === 'free' ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-[#EDE9FE] text-[#4F46E5]'}`}>
+              {plan.charAt(0).toUpperCase() + plan.slice(1)}
             </span>
           </SettingsRow>
           <SettingsRow>
