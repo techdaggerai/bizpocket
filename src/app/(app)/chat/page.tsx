@@ -824,7 +824,27 @@ export default function PocketChatPage() {
     return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // PocketChat users: NEVER block with setup screen — go straight to chat UI.
+  // One-time cleanup: fix old bot messages that still say "PocketChat" or "Speko"
+  useEffect(() => {
+    if (!organization?.id) return;
+    const key = `brand_cleanup_${organization.id}`;
+    if (typeof window !== 'undefined' && sessionStorage.getItem(key)) return;
+    (async () => {
+      await supabase.from('messages')
+        .update({ message: "Hi! I'm your Evrywher assistant. I can help you communicate in 21 languages!" })
+        .eq('organization_id', organization.id)
+        .eq('sender_type', 'bot')
+        .or('message.ilike.%PocketChat%,message.ilike.%Speko%');
+      await supabase.from('conversations')
+        .update({ title: botName || 'Evrywher AI' })
+        .eq('organization_id', organization.id)
+        .eq('is_bot_chat', true)
+        .or('title.ilike.%Speko%,title.ilike.%PocketChat%');
+      if (typeof window !== 'undefined') sessionStorage.setItem(key, '1');
+    })();
+  }, [organization?.id, botName]);
+
+  // Evrywher users: NEVER block with setup screen — go straight to chat UI.
   // Bot auto-creates in background via useEffect above.
 
   // Show bot onboarding if not set up (BizPocket users only — never PocketChat)
