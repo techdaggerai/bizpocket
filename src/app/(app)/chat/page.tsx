@@ -11,6 +11,7 @@ import { getDisplayText } from '@/lib/translate';
 import BotOnboarding from '@/components/BotOnboarding';
 import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
+import VoiceMessagePlayer from '@/components/VoiceMessagePlayer';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
@@ -1085,33 +1086,15 @@ export default function PocketChatPage() {
                   <div className="max-w-[80%]">
                     {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
                     <div
-                      className={`rounded-[12px] px-3.5 py-2.5 ${
+                      className={`rounded-[12px] px-3.5 py-2.5 min-w-[200px] ${
                         isOwner ? 'bg-[#4F46E5]' : 'bg-[#F3F3F1]'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          onClick={() => {
-                            const audio = new Audio(msg.attachment_url!);
-                            audio.play();
-                          }}
-                          className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                            isOwner ? 'bg-white/20 text-white' : 'bg-[#4F46E5]/10 text-[#4F46E5]'
-                          }`}
-                        >
-                          <svg className="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </button>
-                        <div className="flex-1">
-                          <div className={`h-1 rounded-full ${isOwner ? 'bg-white/30' : 'bg-[#0A0A0A]/10'}`}>
-                            <div className={`h-full w-1/3 rounded-full ${isOwner ? 'bg-white' : 'bg-[#4F46E5]'}`} />
-                          </div>
-                        </div>
-                        <span className={`text-[10px] font-mono ${isOwner ? 'text-white/70' : 'text-[#A3A3A3]'}`}>
-                          {msg.message.match(/\d+:\d+/)?.[0] || '0:00'}
-                        </span>
-                      </div>
+                      <VoiceMessagePlayer
+                        url={msg.attachment_url!}
+                        duration={msg.message.match(/\d+:\d+/)?.[0] || '0:00'}
+                        isOwner={isOwner}
+                      />
                     </div>
                     <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
                       {langFlag && <span className="text-[10px]">{langFlag}</span>}
