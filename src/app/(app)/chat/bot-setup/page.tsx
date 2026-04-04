@@ -53,6 +53,11 @@ export default function BotSetupPage() {
   const [rules, setRules] = useState<string[]>(['']);
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [orgReady, setOrgReady] = useState(false);
+
+  useEffect(() => {
+    if (organization?.id) setOrgReady(true);
+  }, [organization?.id]);
 
   // Load existing config for editing
   useEffect(() => {
@@ -80,57 +85,58 @@ export default function BotSetupPage() {
   }, [organization?.id, loaded, supabase]);
 
   const handleSave = async () => {
-    if (!botName.trim()) return;
-    if (!organization?.id) return;
+    if (!botName.trim() || !organization?.id) return;
     setSaving(true);
-    const botRules = rules.filter(r => r.trim()).map(r => ({ trigger: r, action: r, active: true }));
-    const { error: upsertError } = await supabase.from('pocket_bot_config').upsert({
-      organization_id: organization.id,
-      bot_name: botName, bot_icon: botIcon, language: botLang, bot_personality: personality,
-      greeting_message: greeting || `Hi! I'm ${botName}. How can I help you today?`,
-      away_message: awayMessage || `Thanks for your message. I'll get back to you soon.`,
-      auto_reply_enabled: true, bot_rules: botRules, is_setup_complete: true, response_style: personality,
-    }, { onConflict: 'organization_id' });
-
-    if (upsertError) {
-      console.error('[BOT SETUP] Upsert failed:', upsertError);
-      setSaving(false);
-      return;
-    }
-
-    // Send re-introduction message in the bot conversation
-    const { data: botConvo } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('organization_id', organization.id)
-      .eq('is_bot_chat', true)
-      .single();
-
-    if (botConvo) {
-      const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
-      await supabase.from('messages').insert({
-        conversation_id: botConvo.id,
+    try {
+      const botRules = rules.filter(r => r.trim()).map(r => ({ trigger: r, action: r, active: true }));
+      const { error: upsertError } = await supabase.from('pocket_bot_config').upsert({
         organization_id: organization.id,
-        sender_type: 'bot',
-        sender_name: botName,
-        message: introMsg,
-        message_type: 'text',
-      });
-      await supabase.from('conversations').update({
-        title: botName,
-        last_message: introMsg,
-        last_message_at: new Date().toISOString(),
-      }).eq('id', botConvo.id);
-    }
+        bot_name: botName, bot_icon: botIcon, language: botLang, bot_personality: personality,
+        greeting_message: greeting || `Hi! I'm ${botName}. How can I help you today?`,
+        away_message: awayMessage || `Thanks for your message. I'll get back to you soon.`,
+        auto_reply_enabled: true, bot_rules: botRules, is_setup_complete: true, response_style: personality,
+      }, { onConflict: 'organization_id' });
 
-    setSaving(false);
-    // Pass new config directly to chat page via sessionStorage
-    sessionStorage.setItem('bot_config_updated', JSON.stringify({
-      bot_name: botName,
-      bot_icon: botIcon,
-      ts: Date.now(),
-    }));
-    router.push('/chat');
+      if (upsertError) throw upsertError;
+
+      // Send re-introduction message in the bot conversation
+      const { data: botConvo } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('organization_id', organization.id)
+        .eq('is_bot_chat', true)
+        .single();
+
+      if (botConvo) {
+        const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
+        await supabase.from('messages').insert({
+          conversation_id: botConvo.id,
+          organization_id: organization.id,
+          sender_type: 'bot',
+          sender_name: botName,
+          message: introMsg,
+          message_type: 'text',
+        });
+        await supabase.from('conversations').update({
+          title: botName,
+          last_message: introMsg,
+          last_message_at: new Date().toISOString(),
+        }).eq('id', botConvo.id);
+      }
+
+      // Pass new config directly to chat page via sessionStorage
+      sessionStorage.setItem('bot_config_updated', JSON.stringify({
+        bot_name: botName,
+        bot_icon: botIcon,
+        ts: Date.now(),
+      }));
+      router.push('/chat');
+    } catch (err) {
+      console.error('[BOT SETUP] Save failed:', err);
+      alert('Failed to save. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -230,8 +236,8 @@ export default function BotSetupPage() {
           <button onClick={() => setRules([...rules, ''])} className="w-full py-2.5 rounded-lg bg-[#f9fafb] border border-dashed border-[#d1d5db] text-[13px] text-[#6b7280] mb-6">+ Add another rule</button>
           <div className="flex gap-2.5">
             <button onClick={() => setStep(3)} className="flex-1 py-3 rounded-[10px] text-sm font-semibold text-[#374151] border border-[#e5e7eb] bg-white">Back</button>
-            <button onClick={handleSave} disabled={saving} className={`flex-[2] py-3 rounded-[10px] text-sm font-semibold text-white ${saving ? 'bg-[#9ca3af]' : 'bg-[#4F46E5]'}`}>
-              {saving ? 'Creating...' : `Launch ${botName}`}
+            <button onClick={handleSave} disabled={!orgReady || saving} className={`flex-[2] py-3 rounded-[10px] text-sm font-semibold text-white ${!orgReady || saving ? 'bg-[#9ca3af]' : 'bg-[#4F46E5]'}`}>
+              {!orgReady ? 'Loading...' : saving ? 'Creating...' : `Activate ${botName}`}
             </button>
           </div>
         </div>
