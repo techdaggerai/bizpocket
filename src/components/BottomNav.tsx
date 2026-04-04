@@ -45,6 +45,18 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    href: '/status',
+    label: 'Status',
+    bizpocketOnly: false,
+    icon: (
+      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+      </svg>
+    ),
+  },
+  {
     href: '/chat',
     label: 'Chat',
     icon: (
