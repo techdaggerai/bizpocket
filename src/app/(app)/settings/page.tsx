@@ -492,6 +492,35 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* CHAT WALLPAPER */}
+        <div>
+          <SectionLabel>Chat Wallpaper</SectionLabel>
+          <div className="bg-[#F9FAFB] rounded-lg p-4">
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { label: 'Default', value: '' },
+                { label: 'White', value: '#FFFFFF' },
+                { label: 'Cream', value: '#FFFBEB' },
+                { label: 'Sky', value: '#F0F9FF' },
+                { label: 'Mint', value: '#F0FDF4' },
+                { label: 'Lavender', value: '#F5F3FF' },
+                { label: 'Dots', value: 'radial-gradient(circle, #E5E7EB 1px, transparent 1px)' },
+              ].map(wp => (
+                <button
+                  key={wp.value}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') localStorage.setItem('chat_wallpaper', wp.value);
+                  }}
+                  className="h-12 w-12 rounded-xl border-2 border-[#E5E5E5] hover:border-[#4F46E5] transition-colors"
+                  style={{ backgroundColor: wp.value.startsWith('#') ? wp.value : '#FAFAFA', backgroundImage: wp.value && !wp.value.startsWith('#') ? wp.value : undefined, backgroundSize: '20px 20px' }}
+                  title={wp.label}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-[#9CA3AF] mt-2">Tap to preview. Reopen chat to see the change.</p>
+          </div>
+        </div>
+
         {/* BOT & AI */}
         <div>
           <SectionLabel>Bot & AI</SectionLabel>

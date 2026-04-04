@@ -13,6 +13,7 @@ import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
 import VoiceMessagePlayer from '@/components/VoiceMessagePlayer';
 import EmojiPicker from '@/components/EmojiPicker';
+import LinkPreview from '@/components/LinkPreview';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
@@ -67,6 +68,8 @@ interface Message {
   original_language: string | null;
   translations: Record<string, string> | null;
   deleted_at?: string | null;
+  reactions?: Record<string, string[]> | null;
+  is_starred?: boolean;
   created_at: string;
 }
 
@@ -166,6 +169,8 @@ export default function PocketChatPage() {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [showGroupCreate, setShowGroupCreate] = useState(false);
+  const [reactionMsgId, setReactionMsgId] = useState<string | null>(null);
+  const [chatWallpaper, setChatWallpaper] = useState<string>(() => typeof window !== 'undefined' ? localStorage.getItem('chat_wallpaper') || '' : '');
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
@@ -179,6 +184,22 @@ export default function PocketChatPage() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // ── Smart reply suggestions ──────────────────────────────────────────────
+  const [smartReplies, setSmartReplies] = useState<string[]>([]);
+  const [smartRepliesLoading, setSmartRepliesLoading] = useState(false);
+  const smartRepliesConvoRef = useRef<string | null>(null);
+
+  // ── On-demand message translation ────────────────────────────────────────
+  const [msgTranslations, setMsgTranslations] = useState<Record<string, { text: string; toLang: string }>>({});
+  const [translatePickerMsgId, setTranslatePickerMsgId] = useState<string | null>(null);
+  const [translatingMsgId, setTranslatingMsgId] = useState<string | null>(null);
+
+  // ── Conversation summary ──────────────────────────────────────────────────
+  const [showChatMenu, setShowChatMenu] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [summaryText, setSummaryText] = useState('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const {
     botConfig, botName, botLoading,
@@ -431,6 +452,32 @@ export default function PocketChatPage() {
     if (!actionMenu) return;
     await navigator.clipboard.writeText(actionMenu.text);
     toast('Copied', 'success');
+    setActionMenu(null);
+  }
+
+  async function handleReaction(emoji: string) {
+    if (!reactionMsgId) return;
+    const msg = messages.find(m => m.id === reactionMsgId);
+    const userId = user?.id || 'me';
+    const current = (msg?.reactions || {}) as Record<string, string[]>;
+    const users = current[emoji] || [];
+    const updated = users.includes(userId)
+      ? { ...current, [emoji]: users.filter(u => u !== userId) }
+      : { ...current, [emoji]: [...users, userId] };
+    // Remove empty arrays
+    Object.keys(updated).forEach(k => { if (updated[k].length === 0) delete updated[k]; });
+    await supabase.from('messages').update({ reactions: updated }).eq('id', reactionMsgId);
+    setMessages(prev => prev.map(m => m.id === reactionMsgId ? { ...m, reactions: updated } : m));
+    setReactionMsgId(null);
+  }
+
+  async function handleStarMessage() {
+    if (!actionMenu) return;
+    const msg = messages.find(m => m.id === actionMenu.msgId);
+    const newVal = !msg?.is_starred;
+    await supabase.from('messages').update({ is_starred: newVal }).eq('id', actionMenu.msgId);
+    setMessages(prev => prev.map(m => m.id === actionMenu.msgId ? { ...m, is_starred: newVal } : m));
+    toast(newVal ? 'Message starred' : 'Star removed', 'success');
     setActionMenu(null);
   }
 
@@ -1128,7 +1175,8 @@ export default function PocketChatPage() {
         {/* Messages */}
         <div
           ref={chatScrollRef}
-          className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAFAFA] relative"
+          className="flex-1 overflow-y-auto p-4 space-y-3 relative"
+          style={{ backgroundColor: chatWallpaper?.startsWith('#') ? chatWallpaper : '#FAFAFA', backgroundImage: chatWallpaper && !chatWallpaper.startsWith('#') ? chatWallpaper : undefined }}
           onScroll={() => {
             const el = chatScrollRef.current;
             if (el) setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);
@@ -1367,6 +1415,7 @@ export default function PocketChatPage() {
                     }`}
                   >
                     <p className="text-[15px] whitespace-pre-wrap break-words" style={/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : undefined}>{displayText}</p>
+                    {(() => { const urlMatch = displayText.match(/https?:\/\/[^\s]+/); return urlMatch ? <LinkPreview url={urlMatch[0]} /> : null; })()}
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
                     {showTranslated && (
@@ -1404,6 +1453,22 @@ export default function PocketChatPage() {
                       </span>
                     )}
                   </div>
+                  {/* Reactions */}
+                  {msg.reactions && Object.keys(msg.reactions).length > 0 && (
+                    <div className={`flex flex-wrap gap-1 mt-1 ${isOwner ? 'justify-end' : ''}`}>
+                      {Object.entries(msg.reactions as Record<string, string[]>).map(([emoji, users]) => (
+                        <button key={emoji} onClick={() => { setReactionMsgId(msg.id); handleReaction(emoji); }} className="flex items-center gap-0.5 rounded-full bg-[#F3F4F6] px-1.5 py-0.5 text-xs hover:bg-[#E5E7EB] transition-colors">
+                          <span>{emoji}</span>
+                          {users.length > 1 && <span className="text-[10px] text-[#6B7280]">{users.length}</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {msg.is_starred && (
+                    <div className={`mt-0.5 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                      <span className="text-[10px] text-[#F59E0B]">★ Starred</span>
+                    </div>
+                  )}
                 </div>
               </div>
               </div>
@@ -1484,12 +1549,32 @@ export default function PocketChatPage() {
                 <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                 Copy text
               </button>
+              <button onClick={handleStarMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
+                {(() => { const m = messages.find(m => m.id === actionMenu.msgId); return m?.is_starred ? 'Unstar' : 'Star'; })()}
+              </button>
+              <button onClick={() => { setReactionMsgId(actionMenu.msgId); setActionMenu(null); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                <span className="text-base">😊</span>
+                React
+              </button>
               {actionMenu.isOwner && (
                 <button onClick={handleDeleteMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#DC2626] hover:bg-[#FEF2F2]">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                   Delete
                 </button>
               )}
+            </div>
+          </>
+        )}
+
+        {/* Reaction picker */}
+        {reactionMsgId && (
+          <>
+            <div className="fixed inset-0 z-50" onClick={() => setReactionMsgId(null)} />
+            <div className="fixed z-50 left-1/2 -translate-x-1/2 bottom-24 flex gap-2 bg-white rounded-full px-3 py-2 shadow-lg border border-[#E5E5E5]">
+              {['❤️', '👍', '😂', '😮', '🙏'].map(emoji => (
+                <button key={emoji} onClick={() => handleReaction(emoji)} className="text-2xl hover:scale-125 transition-transform px-1">{emoji}</button>
+              ))}
             </div>
           </>
         )}
