@@ -20,7 +20,8 @@ function SignupInner() {
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan') || 'free';
   const mode = searchParams.get('mode');
-  const isPocketChat = mode === 'pocketchat';
+  const isPocketChat = mode === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');

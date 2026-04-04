@@ -19,7 +19,8 @@ function LoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode');
-  const isPocketChat = mode === 'pocketchat';
+  const isPocketChat = mode === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
