@@ -102,7 +102,7 @@ export default function BottomNav() {
               }`}
             >
               {item.icon}
-              <span className="mt-0.5 text-[10px] font-medium">{t(item.labelKey)}</span>
+              <span className="mt-0.5 text-[11px] font-medium">{t(item.labelKey)}</span>
             </Link>
           );
         })}

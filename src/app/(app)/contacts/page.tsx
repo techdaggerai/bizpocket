@@ -286,7 +286,7 @@ export default function ContactsPage() {
           <button
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
-            className={`rounded-[20px] px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`rounded-[20px] px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.value
                 ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
