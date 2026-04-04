@@ -27,7 +27,7 @@ const LANGUAGES = [
   { code: 'ne', name: 'Nepali', flag: '🇳🇵' }, { code: 'si', name: 'Sinhala', flag: '🇱🇰' },
 ];
 
-const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 14, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+const inputStyle = { width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 16, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
 
 export default function BotSetupPage() {
   const router = useRouter();
@@ -46,6 +46,9 @@ export default function BotSetupPage() {
   const [orgReady, setOrgReady] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [originalBotName, setOriginalBotName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (organization?.id) setOrgReady(true);
@@ -72,6 +75,7 @@ export default function BotSetupPage() {
           .filter((r: { active: boolean }) => r.active)
           .map((r: { trigger: string }) => r.trigger);
         if (existingRules.length > 0) setRules(existingRules);
+        if (data.avatar_url) setAvatarUrl(data.avatar_url);
         setIsEditMode(true);
       }
       setLoaded(true);
@@ -89,6 +93,7 @@ export default function BotSetupPage() {
         greeting_message: greeting || `Hi! I'm ${botName}. How can I help you today?`,
         away_message: awayMessage || `Thanks for your message. I'll get back to you soon.`,
         auto_reply_enabled: true, bot_rules: botRules, is_setup_complete: true, response_style: personality,
+        ...(avatarUrl !== null && { avatar_url: avatarUrl }),
       }, { onConflict: 'organization_id' });
 
       if (upsertError) throw upsertError;
@@ -140,6 +145,34 @@ export default function BotSetupPage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !organization?.id) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5MB'); return; }
+
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+
+    setUploading(true);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${organization.id}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('bot-avatars').upload(path, file, { upsert: true });
+    if (error) {
+      console.error('[AVATAR] Upload failed:', error);
+      alert('Upload failed. Try again.');
+      setAvatarPreview(null);
+    } else {
+      const { data: urlData } = supabase.storage.from('bot-avatars').getPublicUrl(path);
+      setAvatarUrl(urlData.publicUrl);
+    }
+    setUploading(false);
+  };
+
+  const displayAvatar = avatarPreview || avatarUrl;
+  const gradient = BOT_GRADIENTS.find(g => g.id === botIcon) || BOT_GRADIENTS[0];
+
   // EDIT MODE: single page with all fields
   if (isEditMode && loaded) {
     return (
@@ -148,26 +181,41 @@ export default function BotSetupPage() {
         <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">Edit {botName || 'your assistant'}</h2>
         <p className="text-sm text-[#6b7280] text-center mb-8">Update your bot&apos;s settings.</p>
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Bot name</label>
+        <label className="text-sm font-medium text-[#374151] block mb-1.5">Bot name</label>
         <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant" style={{ ...inputStyle, marginBottom: 20 }} />
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Color</label>
-        <div className="flex gap-3 mb-6">
-          {BOT_GRADIENTS.map(g => (
-            <button key={g.id} onClick={() => setBotIcon(g.id)}
-              className={`h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold cursor-pointer transition-all ${botIcon === g.id ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-110' : 'hover:scale-105'}`}
-              style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}>
-              {(botName || 'P').charAt(0).toUpperCase()}
-            </button>
-          ))}
+        <label className="text-sm font-medium text-[#374151] block mb-2.5">Avatar</label>
+        <div className="flex flex-col items-center gap-3 mb-6">
+          <label className="relative cursor-pointer group">
+            {displayAvatar ? (
+              <img src={displayAvatar} alt="Bot avatar" className="h-20 w-20 rounded-full object-cover" />
+            ) : (
+              <div className="h-20 w-20 rounded-full flex items-center justify-center text-white text-2xl font-bold" style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}>
+                {(botName || 'P').charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
+            </div>
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+          </label>
+          {uploading && <p className="text-xs text-[#6b7280]">Uploading...</p>}
+          <p className="text-xs text-[#9ca3af]">Tap to upload photo</p>
+          <div className="flex gap-2">
+            {BOT_GRADIENTS.map(g => (
+              <button key={g.id} onClick={() => { setBotIcon(g.id); setAvatarPreview(null); setAvatarUrl(null); }}
+                className={`h-8 w-8 rounded-full cursor-pointer transition-all ${botIcon === g.id && !displayAvatar ? 'ring-2 ring-[#4F46E5] ring-offset-1 scale-110' : 'hover:scale-105'}`}
+                style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
+            ))}
+          </div>
         </div>
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Language</label>
+        <label className="text-sm font-medium text-[#374151] block mb-1.5">Language</label>
         <select value={botLang} onChange={e => setBotLang(e.target.value)} style={{ ...inputStyle, marginBottom: 20, background: 'white' }}>
           {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
         </select>
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Personality</label>
+        <label className="text-sm font-medium text-[#374151] block mb-2.5">Personality</label>
         <div className="flex flex-col gap-2 mb-6">
           {PERSONALITIES.map(p => (
             <button key={p.id} onClick={() => setPersonality(p.id)}
@@ -178,10 +226,10 @@ export default function BotSetupPage() {
           ))}
         </div>
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Greeting message</label>
+        <label className="text-sm font-medium text-[#374151] block mb-1.5">Greeting message</label>
         <textarea value={greeting} onChange={e => setGreeting(e.target.value)} placeholder={`Hi! I'm ${botName}. How can I help you today?`} rows={3} style={{ ...inputStyle, marginBottom: 20, resize: 'vertical' }} />
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Away message</label>
+        <label className="text-sm font-medium text-[#374151] block mb-1.5">Away message</label>
         <textarea value={awayMessage} onChange={e => setAwayMessage(e.target.value)} placeholder="Thanks for your message! I'm currently away but will respond soon." rows={3} style={{ ...inputStyle, marginBottom: 24, resize: 'vertical' }} />
 
         <div className="flex gap-2.5">
@@ -211,17 +259,31 @@ export default function BotSetupPage() {
         <div>
           <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">Create your AI assistant</h2>
           <p className="text-sm text-[#6b7280] text-center mb-8">Your bot responds when you can&apos;t. In any language.</p>
-          <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Give your bot a name</label>
+          <label className="text-sm font-medium text-[#374151] block mb-1.5">Give your bot a name</label>
           <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant, Sweet Cakes Bot" style={{ ...inputStyle, marginBottom: 20 }} />
-          <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Choose a color</label>
-          <div className="flex gap-3 mb-6">
-            {BOT_GRADIENTS.map(g => (
-              <button key={g.id} onClick={() => setBotIcon(g.id)}
-                className={`h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold cursor-pointer transition-all ${botIcon === g.id ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-110' : 'hover:scale-105'}`}
-                style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}>
-                {(botName || 'P').charAt(0).toUpperCase()}
-              </button>
-            ))}
+          <label className="text-sm font-medium text-[#374151] block mb-2.5">Avatar</label>
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <label className="relative cursor-pointer group">
+              {displayAvatar ? (
+                <img src={displayAvatar} alt="Bot avatar" className="h-16 w-16 rounded-full object-cover" />
+              ) : (
+                <div className="h-16 w-16 rounded-full flex items-center justify-center text-white text-xl font-bold" style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}>
+                  {(botName || 'P').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
+              </div>
+              <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            </label>
+            {uploading && <p className="text-xs text-[#6b7280]">Uploading...</p>}
+            <div className="flex gap-2">
+              {BOT_GRADIENTS.map(g => (
+                <button key={g.id} onClick={() => { setBotIcon(g.id); setAvatarPreview(null); setAvatarUrl(null); }}
+                  className={`h-7 w-7 rounded-full cursor-pointer transition-all ${botIcon === g.id && !displayAvatar ? 'ring-2 ring-[#4F46E5] ring-offset-1 scale-110' : 'hover:scale-105'}`}
+                  style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
+              ))}
+            </div>
           </div>
           <button onClick={() => botName.trim() && setStep(2)} disabled={!botName.trim()}
             className={`w-full py-3 rounded-[10px] text-sm font-semibold text-white ${botName.trim() ? 'bg-[#4F46E5] cursor-pointer' : 'bg-[#d1d5db]'}`}>Next</button>
@@ -233,11 +295,11 @@ export default function BotSetupPage() {
         <div>
           <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">How should {botName} speak?</h2>
           <p className="text-sm text-[#6b7280] text-center mb-8">Choose the default language and tone.</p>
-          <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Bot&apos;s default language</label>
+          <label className="text-sm font-medium text-[#374151] block mb-1.5">Bot&apos;s default language</label>
           <select value={botLang} onChange={e => setBotLang(e.target.value)} style={{ ...inputStyle, marginBottom: 20, background: 'white' }}>
             {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
           </select>
-          <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Personality</label>
+          <label className="text-sm font-medium text-[#374151] block mb-2.5">Personality</label>
           <div className="flex flex-col gap-2 mb-6">
             {PERSONALITIES.map(p => (
               <button key={p.id} onClick={() => setPersonality(p.id)}
@@ -260,9 +322,9 @@ export default function BotSetupPage() {
         <div>
           <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">What does {botName} say?</h2>
           <p className="text-sm text-[#6b7280] text-center mb-8">Set a greeting for new visitors and an away message.</p>
-          <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Greeting message</label>
+          <label className="text-sm font-medium text-[#374151] block mb-1.5">Greeting message</label>
           <textarea value={greeting} onChange={e => setGreeting(e.target.value)} placeholder={`Hi! I'm ${botName}. How can I help you today?`} rows={3} style={{ ...inputStyle, marginBottom: 20, resize: 'vertical' }} />
-          <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Away message</label>
+          <label className="text-sm font-medium text-[#374151] block mb-1.5">Away message</label>
           <textarea value={awayMessage} onChange={e => setAwayMessage(e.target.value)} placeholder="Thanks for your message! I'm currently away but will respond soon." rows={3} style={{ ...inputStyle, marginBottom: 24, resize: 'vertical' }} />
           <div className="flex gap-2.5">
             <button onClick={() => setStep(2)} className="flex-1 py-3 rounded-[10px] text-sm font-semibold text-[#374151] border border-[#e5e7eb] bg-white">Back</button>

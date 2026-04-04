@@ -9,6 +9,7 @@ interface BotConfig {
   bot_icon: string;
   bot_personality: string;
   is_setup_complete: boolean;
+  avatar_url?: string | null;
 }
 
 export const BOT_GRADIENTS = [
@@ -37,7 +38,7 @@ export function usePocketBot() {
     fetchCountRef.current += 1;
     const { data } = await supabaseRef.current
       .from('pocket_bot_config')
-      .select('bot_name, bot_icon, bot_personality, is_setup_complete, updated_at')
+      .select('bot_name, bot_icon, bot_personality, is_setup_complete, avatar_url, updated_at')
       .eq('organization_id', organization.id)
       .limit(1)
       .single();

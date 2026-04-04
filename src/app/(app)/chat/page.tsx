@@ -853,7 +853,9 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            botConfig?.bot_name ? (
+            botConfig?.avatar_url ? (
+              <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
+            ) : botConfig?.bot_name ? (
               <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
             ) : <AnimatedPocketChatLogo size={40} />
           ) : (
@@ -1154,7 +1156,9 @@ export default function PocketChatPage() {
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
-                    {botConfig?.bot_name ? (
+                    {botConfig?.avatar_url ? (
+                      <img src={botConfig.avatar_url} alt={botName} className="h-8 w-8 rounded-full object-cover" />
+                    ) : botConfig?.bot_name ? (
                       <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
                     ) : <AnimatedPocketChatLogo size={32} />}
                   </div>
@@ -1343,7 +1347,7 @@ export default function PocketChatPage() {
               }}
               placeholder="Type a message..."
               rows={1}
-              className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
+              className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
             />
 
             {/* Attachment button */}
@@ -1443,7 +1447,7 @@ export default function PocketChatPage() {
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
           <h1 className="text-xl font-bold text-[#0A0A0A]">PocketChat</h1>
-          <p className="text-xs text-[#999]">Chat in 21 languages — AI translates in real-time</p>
+          <p className="text-[13px] text-[#999]">Chat in 21 languages — AI translates in real-time</p>
         </div>
         <div className="flex items-center gap-2">
           <OutlinePillButton
@@ -1485,7 +1489,7 @@ export default function PocketChatPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search conversations..."
-          className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+          className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
         />
       </div>
 
@@ -1532,7 +1536,9 @@ export default function PocketChatPage() {
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  botConfig?.bot_name ? (
+                  botConfig?.avatar_url ? (
+                    <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
+                  ) : botConfig?.bot_name ? (
                     <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
                   ) : <AnimatedPocketChatLogo size={40} />
                 ) : (
@@ -1548,7 +1554,7 @@ export default function PocketChatPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <p className="text-sm font-semibold text-[#0A0A0A] truncate">{name}</p>
+                      <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">{name}</p>
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F59E0B] font-medium">AI Assistant</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
@@ -1559,7 +1565,7 @@ export default function PocketChatPage() {
                     )}
                   </div>
                   <div className="flex items-center justify-between gap-2 mt-0.5">
-                    <p className="text-xs text-[#6B7280] truncate">
+                    <p className="text-[13px] text-[#6B7280] truncate">
                       {convo.last_message ?? 'No messages yet'}
                     </p>
                     {convo.unread_count > 0 && (
@@ -1615,7 +1621,7 @@ export default function PocketChatPage() {
                 onChange={(e) => setContactSearch(e.target.value)}
                 placeholder="Search contacts..."
                 autoFocus
-                className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+                className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
               />
             </div>
 
