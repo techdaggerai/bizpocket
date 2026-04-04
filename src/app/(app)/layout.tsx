@@ -93,6 +93,34 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!organization) redirect('/onboarding');
 
+  // Trial auto-downgrade: if trial expired and still on free, ensure downgraded
+  if (organization.trial_ends_at && organization.plan !== 'free') {
+    const trialEnd = new Date(organization.trial_ends_at);
+    if (trialEnd < new Date()) {
+      await supabase.from('organizations').update({ plan: 'free' }).eq('id', organization.id);
+      organization.plan = 'free';
+    }
+  }
+
+  // Trial 3-day warning notification (fire once)
+  if (organization.trial_ends_at && organization.plan !== 'free') {
+    const trialEnd = new Date(organization.trial_ends_at);
+    const daysLeft = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 3 && daysLeft > 0) {
+      const { data: existing } = await supabase.from('notifications')
+        .select('id').eq('organization_id', organization.id).eq('type', 'trial_expiring').limit(1);
+      if (!existing?.length) {
+        await supabase.from('notifications').insert({
+          organization_id: organization.id,
+          type: 'trial_expiring',
+          title: `Pro trial expires in ${daysLeft} day${daysLeft > 1 ? 's' : ''}`,
+          body: 'Upgrade now to keep unlimited translations and AI features.',
+          action_url: '/settings/upgrade',
+        });
+      }
+    }
+  }
+
   return (
     <AuthProvider user={user} profile={profile} organization={organization}>
       <I18nProvider initialLang={(profile.language || 'en') as Language}>

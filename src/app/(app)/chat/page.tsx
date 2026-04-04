@@ -697,6 +697,12 @@ export default function PocketChatPage() {
       toast('File too large (max 10MB)', 'error');
       return;
     }
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const allowedDocTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedImageTypes.includes(file.type) && !allowedDocTypes.includes(file.type) && !file.type.startsWith('image/') && !file.type.startsWith('audio/')) {
+      toast('Unsupported file type', 'error');
+      return;
+    }
 
     setUploading(true);
     const ext = file.name.split('.').pop() || 'bin';
@@ -820,6 +826,7 @@ export default function PocketChatPage() {
     }
 
     if (!newMessage.trim() || !activeConvoId || !organization?.id || sending) return;
+    if (newMessage.trim().length > 5000) { toast('Message too long (max 5000 characters)', 'error'); return; }
     setSending(true);
     const text = newMessage.trim();
     setNewMessage('');
@@ -1876,6 +1883,8 @@ export default function PocketChatPage() {
               }}
               placeholder="Type a message..."
               rows={1}
+              maxLength={5000}
+              aria-label="Message input"
               className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
             />
 
