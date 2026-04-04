@@ -67,6 +67,13 @@ interface Message {
 const LANG_FLAGS: Record<string, string> = {
   en: '🇺🇸', ja: '🇯🇵', ur: '🇵🇰', ar: '🇦🇪', tl: '🇵🇭', pt: '🇧🇷', bn: '🇧🇩',
   vi: '🇻🇳', tr: '🇹🇷', zh: '🇨🇳', fr: '🇫🇷', nl: '🇳🇱', es: '🇪🇸',
+  fil: '🇵🇭', ps: '🇦🇫', fa: '🇮🇷', hi: '🇮🇳', ko: '🇰🇷', th: '🇹🇭', id: '🇮🇩', ne: '🇳🇵', si: '🇱🇰',
+};
+
+const LANG_NAMES: Record<string, string> = {
+  en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic', tl: 'Tagalog', pt: 'Portuguese', bn: 'Bengali',
+  vi: 'Vietnamese', tr: 'Turkish', zh: 'Chinese', fr: 'French', nl: 'Dutch', es: 'Spanish',
+  fil: 'Filipino', ps: 'Pashto', fa: 'Persian', hi: 'Hindi', ko: 'Korean', th: 'Thai', id: 'Indonesian', ne: 'Nepali', si: 'Sinhala',
 };
 
 type FilterType = 'all' | 'customer' | 'supplier' | 'invoice';
@@ -1177,18 +1184,18 @@ export default function PocketChatPage() {
                     {showTranslated && (
                       <button
                         onClick={() => setShowOriginal(p => ({ ...p, [msg.id]: !p[msg.id] }))}
-                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-white/50' : 'text-[#F59E0B]'} hover:opacity-70`}
+                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-white/50' : 'text-[#9CA3AF]'} hover:opacity-70`}
                       >
-                        {langFlag && <span>{langFlag}</span>}
-                        {showOriginal[msg.id] ? 'See translation' : 'Translated · tap for original'}
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+                        {showOriginal[msg.id] ? 'See translation' : `Translated from ${LANG_NAMES[origLang || ''] || origLang || 'unknown'}`}
                       </button>
                     )}
-                    {!showTranslated && langFlag && <span className="text-[11px]">{langFlag}</span>}
-                    {!hasTranslation && origLang && origLang !== userLang && (
+                    {!showTranslated && !hasTranslation && origLang && origLang !== userLang && (
                       <button
                         onClick={() => translateMessage(msg.id, userLang)}
-                        className={`text-[11px] ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
                       >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
                         Translate
                       </button>
                     )}
