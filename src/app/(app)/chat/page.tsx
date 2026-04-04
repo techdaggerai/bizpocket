@@ -192,6 +192,10 @@ export default function PocketChatPage() {
   const [editingMsg, setEditingMsg] = useState<{ id: string; text: string } | null>(null);
   const [pickerTab, setPickerTab] = useState<'emoji' | 'stickers' | 'gifs'>('emoji');
   const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
   const [broadcastContacts, setBroadcastContacts] = useState<string[]>([]);
   const [broadcastMsg, setBroadcastMsg] = useState('');
   const [actionMenu, setActionMenu] = useState<{ msgId: string; x: number; y: number; isOwner: boolean; text: string } | null>(null);
@@ -618,6 +622,25 @@ export default function PocketChatPage() {
     setMessages(prev => prev.map(m => m.id === editingMsg.id ? { ...m, message: newMessage.trim(), edited_at: new Date().toISOString() } : m));
     setEditingMsg(null);
     setNewMessage('');
+  }
+
+  async function shareLocation() {
+    if (!activeConvoId || !organization?.id) return;
+    if (!navigator.geolocation) { toast('Location not supported', 'error'); return; }
+    toast('Getting location...', 'info');
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      const mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      await supabase.from('messages').insert({
+        conversation_id: activeConvoId, organization_id: organization.id,
+        sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+        message: `📍 Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+        message_type: 'text', original_text: mapUrl,
+      });
+      await supabase.from('conversations').update({ last_message: '📍 Shared location', last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
+      toast('Location shared', 'success');
+    }, () => { toast('Location access denied', 'error'); });
+    setShowAttachMenu(false);
   }
 
   async function sendBroadcast() {
@@ -1451,6 +1474,13 @@ export default function PocketChatPage() {
                     Invite contact
                   </button>
                   <button
+                    onClick={() => { setShowChatMenu(false); setShowMediaGallery(true); }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                  >
+                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5" /></svg>
+                    Media & Docs
+                  </button>
+                  <button
                     onClick={() => { setShowChatMenu(false); exportChat(); }}
                     className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
                   >
@@ -1796,14 +1826,10 @@ export default function PocketChatPage() {
           )}
         </div>
 
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
+        {/* Hidden file inputs */}
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+        <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} className="hidden" />
+        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} className="hidden" />
 
         {/* Upload progress */}
         {uploading && (
@@ -2100,17 +2126,42 @@ export default function PocketChatPage() {
               className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
             />
 
-            {/* Attachment button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
-              title="Attach file"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-              </svg>
-            </button>
+            {/* Attachment menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowAttachMenu(!showAttachMenu)}
+                disabled={uploading}
+                className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
+                title="Attach"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+                </svg>
+              </button>
+              {showAttachMenu && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowAttachMenu(false)} />
+                  <div className="absolute bottom-full mb-2 right-0 z-50 w-48 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1">
+                    <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
+                      Photo
+                    </button>
+                    <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                      <svg className="h-4 w-4 text-[#F43F5E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                      Video
+                    </button>
+                    <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                      <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                      Document
+                    </button>
+                    <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                      <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+                      Location
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
 
             {/* Voice / Send toggle */}
             {recording ? (
@@ -2370,6 +2421,77 @@ export default function PocketChatPage() {
             </button>
           </div>
         </>
+      )}
+
+      {/* Media Gallery Modal */}
+      {showMediaGallery && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowMediaGallery(false)} />
+          <div className="relative bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#0A0A0A]">Media, Links & Docs</h2>
+              <button onClick={() => setShowMediaGallery(false)} className="text-[#A3A3A3] hover:text-[#0A0A0A]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">
+              {/* Images */}
+              {(() => {
+                const images = messages.filter(m => m.message_type === 'image' && m.attachment_url);
+                const docs = messages.filter(m => m.message_type === 'document' && m.attachment_url);
+                const links = messages.filter(m => m.message_type === 'text' && /https?:\/\//.test(m.message));
+                return (
+                  <div className="space-y-4">
+                    {images.length > 0 && (
+                      <div>
+                        <p className="text-sm font-semibold text-[#374151] mb-2">Media ({images.length})</p>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {images.map(m => (
+                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-[#F3F4F6]">
+                              <img src={m.attachment_url!} alt="" className="w-full h-full object-cover" loading="lazy" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {docs.length > 0 && (
+                      <div>
+                        <p className="text-sm font-semibold text-[#374151] mb-2">Documents ({docs.length})</p>
+                        <div className="space-y-1">
+                          {docs.map(m => (
+                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-[#E5E5E5] px-3 py-2 hover:bg-[#F9FAFB]">
+                              <svg className="h-5 w-5 text-[#F59E0B] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                              <span className="text-sm text-[#374151] truncate">{m.message}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {links.length > 0 && (
+                      <div>
+                        <p className="text-sm font-semibold text-[#374151] mb-2">Links ({links.length})</p>
+                        <div className="space-y-1">
+                          {links.slice(0, 20).map(m => {
+                            const url = m.message.match(/https?:\/\/[^\s]+/)?.[0];
+                            return url ? (
+                              <a key={m.id} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-[#E5E5E5] px-3 py-2 hover:bg-[#F9FAFB]">
+                                <svg className="h-4 w-4 text-[#4F46E5] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
+                                <span className="text-sm text-[#4F46E5] truncate">{url}</span>
+                              </a>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    {images.length === 0 && docs.length === 0 && links.length === 0 && (
+                      <p className="text-center text-sm text-[#9CA3AF] py-8">No media, documents, or links shared yet</p>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Broadcast Modal */}

@@ -617,10 +617,25 @@ export default function ContactsPage() {
                 <button
                   onClick={() => { handleDelete(detailContact.id); setDetailContact(null); }}
                   className="flex items-center justify-center gap-2 rounded-lg border border-[#DC2626]/20 px-4 py-2.5 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                  title="Delete"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                 </button>
               </div>
+              {/* Block */}
+              <button
+                onClick={async () => {
+                  if (!confirm(`Block ${detailContact.name}? They won't be able to send you messages.`)) return;
+                  await supabase.from('contacts').update({ is_blocked: true }).eq('id', detailContact.id);
+                  setContacts(prev => prev.map(c => c.id === detailContact.id ? { ...c, is_blocked: true } : c));
+                  toast(`${detailContact.name} blocked`, 'success');
+                  setDetailContact(null);
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="m4.93 4.93 14.14 14.14" /></svg>
+                Block contact
+              </button>
             </div>
           </div>
         </div>
