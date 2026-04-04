@@ -84,11 +84,12 @@ export default function AnimatedTagline() {
   const current = TRANSLATIONS[transIdx];
   const showCursor = typing === 'eng' || typing === 'trans';
 
-  // Render English text with amber "E" at index 25
-  const eIndex = 25; // "You bring the missing " = 25 chars, then "E"
-  const engRendered = engText.length <= eIndex
+  // Render English text with rose-red "E" — "You bring the missing E. We..."
+  // "You bring the missing " = 22 chars, "E" at index 22
+  const eIdx = 22;
+  const engRendered = engText.length <= eIdx
     ? <>{engText}</>
-    : <>{engText.slice(0, eIndex)}<span className="text-[#F59E0B]">{engText[eIndex]}</span>{engText.slice(eIndex + 1)}</>;
+    : <>{engText.slice(0, eIdx)}<span className="text-[#F43F5E] text-[24px]"> {engText[eIdx]} </span>{engText.slice(eIdx + 1)}</>;
 
   return (
     <div className="mt-2 space-y-1">
