@@ -145,7 +145,7 @@ export default function PocketChatPage() {
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
-    botConfig, botName, botEmoji, botLoading,
+    botConfig, botName, botGradient, botLoading,
     botConfigLoaded, isSetupComplete,
     fetchBotConfig, sendBotMessage, updateBotLocally
   } = usePocketBot();
@@ -757,7 +757,7 @@ export default function PocketChatPage() {
           .upsert({
             organization_id: organization.id,
             bot_name: 'Speko AI',
-            bot_icon: 'gem',
+            bot_icon: '1',
             greeting_message: botGreeting,
             bot_personality: 'friendly',
             language: 'en',
@@ -853,9 +853,9 @@ export default function PocketChatPage() {
             </svg>
           </button>
           {activeConvo.is_bot_chat ? (
-            botConfig?.bot_icon ? (
-              <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-xl shrink-0">{botEmoji}</div>
-            ) : isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
+            botConfig?.bot_name ? (
+              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
+            ) : <AnimatedPocketChatLogo size={40} />
           ) : (
             <div
               className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
@@ -1154,9 +1154,9 @@ export default function PocketChatPage() {
               <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
-                    {botConfig?.bot_icon ? (
-                      <span className="text-lg">{botEmoji}</span>
-                    ) : isPocketChatMode ? <AnimatedPocketChatLogo size={32} /> : <PocketMark variant="xl" />}
+                    {botConfig?.bot_name ? (
+                      <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
+                    ) : <AnimatedPocketChatLogo size={32} />}
                   </div>
                 )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
@@ -1532,9 +1532,9 @@ export default function PocketChatPage() {
               >
                 {/* Avatar */}
                 {convo.is_bot_chat ? (
-                  botConfig?.bot_icon ? (
-                    <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-xl shrink-0">{botEmoji}</div>
-                  ) : isPocketChatMode ? <AnimatedPocketChatLogo size={40} /> : <PocketMark variant="xl" />
+                  botConfig?.bot_name ? (
+                    <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
+                  ) : <AnimatedPocketChatLogo size={40} />
                 ) : (
                   <div
                     className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"

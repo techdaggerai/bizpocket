@@ -5,17 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { PocketChatMark } from '@/components/Logo';
-
-const BOT_ICONS = [
-  { id: 'professional', emoji: '👔', label: 'Professional' },
-  { id: 'friendly', emoji: '😊', label: 'Friendly' },
-  { id: 'robot', emoji: '🤖', label: 'Robot' },
-  { id: 'star', emoji: '⭐', label: 'Star' },
-  { id: 'rocket', emoji: '🚀', label: 'Rocket' },
-  { id: 'crown', emoji: '👑', label: 'Royal' },
-  { id: 'fire', emoji: '🔥', label: 'Fire' },
-  { id: 'globe', emoji: '🌍', label: 'Global' },
-];
+import { BOT_GRADIENTS } from '@/lib/use-pocket-bot';
 
 const PERSONALITIES = [
   { id: 'professional', name: 'Professional', desc: 'Formal, business-appropriate responses', example: 'Thank you for reaching out. I will inform them of your message.' },
@@ -45,7 +35,7 @@ export default function BotSetupPage() {
   const supabase = createClient();
   const [step, setStep] = useState(1);
   const [botName, setBotName] = useState('');
-  const [botIcon, setBotIcon] = useState('professional');
+  const [botIcon, setBotIcon] = useState('1');
   const [botLang, setBotLang] = useState('en');
   const [personality, setPersonality] = useState('professional');
   const [greeting, setGreeting] = useState('');
@@ -73,7 +63,7 @@ export default function BotSetupPage() {
       if (data) {
         setBotName(data.bot_name || '');
         setOriginalBotName(data.bot_name || '');
-        setBotIcon(data.bot_icon || 'professional');
+        setBotIcon(data.bot_icon || '1');
         setBotLang(data.language || 'en');
         setPersonality(data.bot_personality || 'professional');
         setGreeting(data.greeting_message || '');
@@ -161,13 +151,13 @@ export default function BotSetupPage() {
         <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Bot name</label>
         <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant" style={{ ...inputStyle, marginBottom: 20 }} />
 
-        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Icon</label>
-        <div className="grid grid-cols-4 gap-2 mb-6">
-          {BOT_ICONS.map(icon => (
-            <button key={icon.id} onClick={() => setBotIcon(icon.id)}
-              className={`py-3 px-2 rounded-[10px] text-center cursor-pointer ${botIcon === icon.id ? 'border-2 border-[#4F46E5] bg-[#eef2ff]' : 'border border-[#e5e7eb] bg-white'}`}>
-              <span className="text-2xl block">{icon.emoji}</span>
-              <span className="text-[11px] text-[#6b7280] mt-1 block">{icon.label}</span>
+        <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Color</label>
+        <div className="flex gap-3 mb-6">
+          {BOT_GRADIENTS.map(g => (
+            <button key={g.id} onClick={() => setBotIcon(g.id)}
+              className={`h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold cursor-pointer transition-all ${botIcon === g.id ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-110' : 'hover:scale-105'}`}
+              style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}>
+              {(botName || 'P').charAt(0).toUpperCase()}
             </button>
           ))}
         </div>
@@ -223,13 +213,13 @@ export default function BotSetupPage() {
           <p className="text-sm text-[#6b7280] text-center mb-8">Your bot responds when you can&apos;t. In any language.</p>
           <label className="text-[13px] font-semibold text-[#374151] block mb-1.5">Give your bot a name</label>
           <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant, Sweet Cakes Bot" style={{ ...inputStyle, marginBottom: 20 }} />
-          <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Choose an icon</label>
-          <div className="grid grid-cols-4 gap-2 mb-6">
-            {BOT_ICONS.map(icon => (
-              <button key={icon.id} onClick={() => setBotIcon(icon.id)}
-                className={`py-3 px-2 rounded-[10px] text-center cursor-pointer ${botIcon === icon.id ? 'border-2 border-[#4F46E5] bg-[#eef2ff]' : 'border border-[#e5e7eb] bg-white'}`}>
-                <span className="text-2xl block">{icon.emoji}</span>
-                <span className="text-[11px] text-[#6b7280] mt-1 block">{icon.label}</span>
+          <label className="text-[13px] font-semibold text-[#374151] block mb-2.5">Choose a color</label>
+          <div className="flex gap-3 mb-6">
+            {BOT_GRADIENTS.map(g => (
+              <button key={g.id} onClick={() => setBotIcon(g.id)}
+                className={`h-12 w-12 rounded-full flex items-center justify-center text-white text-lg font-bold cursor-pointer transition-all ${botIcon === g.id ? 'ring-2 ring-[#4F46E5] ring-offset-2 scale-110' : 'hover:scale-105'}`}
+                style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }}>
+                {(botName || 'P').charAt(0).toUpperCase()}
               </button>
             ))}
           </div>

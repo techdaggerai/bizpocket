@@ -11,21 +11,18 @@ interface BotConfig {
   is_setup_complete: boolean;
 }
 
-const BOT_ICON_MAP: Record<string, string> = {
-  professional: '👔',
-  friendly: '😊',
-  robot: '🤖',
-  star: '⭐',
-  rocket: '🚀',
-  crown: '👑',
-  fire: '🔥',
-  globe: '🌍',
-  brain: '🧠',
-  bolt: '⚡',
-  shield: '🛡️',
-  gem: '💎',
-  crystal: '🔮',
-};
+export const BOT_GRADIENTS = [
+  { id: '1', from: '#4F46E5', to: '#7C3AED', label: 'Indigo' },
+  { id: '2', from: '#F59E0B', to: '#EA580C', label: 'Amber' },
+  { id: '3', from: '#10B981', to: '#14B8A6', label: 'Emerald' },
+  { id: '4', from: '#F43F5E', to: '#EC4899', label: 'Rose' },
+  { id: '5', from: '#3B82F6', to: '#06B6D4', label: 'Blue' },
+  { id: '6', from: '#475569', to: '#64748B', label: 'Slate' },
+];
+
+export function getBotGradient(iconId: string) {
+  return BOT_GRADIENTS.find(g => g.id === iconId) || BOT_GRADIENTS[0];
+}
 
 export function usePocketBot() {
   const { organization, profile } = useAuth();
@@ -139,7 +136,7 @@ export function usePocketBot() {
     [organization?.id, profile, botConfig]
   );
 
-  const botEmoji = botConfig ? BOT_ICON_MAP[botConfig.bot_icon] || '🚀' : '🚀';
+  const botGradient = getBotGradient(botConfig?.bot_icon || '1');
   const botName = botConfig?.bot_name || 'Pocket';
 
   // PocketChat users: if botConfig exists, treat as setup complete regardless of DB value
@@ -150,13 +147,13 @@ export function usePocketBot() {
   return {
     botConfig,
     botName,
-    botEmoji,
+    botGradient,
     botLoading,
     botConfigLoaded,
     isSetupComplete,
     fetchBotConfig,
     sendBotMessage,
     updateBotLocally,
-    BOT_ICON_MAP,
+    BOT_GRADIENTS,
   };
 }
