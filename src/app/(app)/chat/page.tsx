@@ -885,7 +885,7 @@ export default function PocketChatPage() {
             </div>
             {!activeConvo.is_bot_chat && (
               <div className="flex items-center gap-2 mt-1">
-                <AnimatedPocketChatLogo size={24} isTranslating={sending} />
+                <AnimatedPocketChatLogo size={32} isTranslating={sending} />
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5]">{(profile?.language || 'en').toUpperCase()}</span>
                 <span className="text-[11px] text-[#d1d5db]">⇄</span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>

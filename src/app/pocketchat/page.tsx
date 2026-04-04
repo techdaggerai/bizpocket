@@ -153,10 +153,7 @@ export default function PocketChatLanding() {
             <h2 className="text-[32px] font-bold text-[#111827]">Three steps. That&apos;s it.</h2>
             <p className="mt-3 text-base text-[#374151]">From zero to translated conversations in under a minute.</p>
           </div>
-          <div className="relative grid grid-cols-1 gap-8 sm:grid-cols-3">
-            {/* Dotted connector lines — desktop only */}
-            <div className="absolute top-[52px] left-[calc(33.33%+20px)] right-[calc(33.33%+20px)] hidden border-t-2 border-dashed border-[#d1d5db] sm:block" style={{ width: 'calc(33.33% - 40px)' }} />
-            <div className="absolute top-[52px] left-[calc(66.66%+20px)] hidden border-t-2 border-dashed border-[#d1d5db] sm:block" style={{ width: 'calc(33.33% - 40px)' }} />
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
 
             {/* Step 1 */}
             <div className="rounded-2xl border border-[#f3f4f6] bg-white p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">

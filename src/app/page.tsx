@@ -103,7 +103,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">No app for clients</span></div>
             </div>
             <a href="#pocketchat" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] hover:bg-[#fde68a] transition-colors">
-              <AnimatedPocketChatLogo size={28} isTranslating={true} />
+              <AnimatedPocketChatLogo size={32} isTranslating={true} />
               Now with PocketChat — real-time translation
             </a>
           </div>
