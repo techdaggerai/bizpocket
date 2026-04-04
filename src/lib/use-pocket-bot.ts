@@ -141,7 +141,11 @@ export function usePocketBot() {
 
   const botEmoji = botConfig ? BOT_ICON_MAP[botConfig.bot_icon] || '🚀' : '🚀';
   const botName = botConfig?.bot_name || 'Pocket';
-  const isSetupComplete = botConfig?.is_setup_complete ?? false;
+
+  // PocketChat users: if botConfig exists, treat as setup complete regardless of DB value
+  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+  const isSetupComplete = (isPocketChatMode && botConfig) ? true : (botConfig?.is_setup_complete ?? false);
 
   return {
     botConfig,
