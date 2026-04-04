@@ -6,14 +6,14 @@ const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/']; // Public invoice + publis
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
-  // PocketChat domain routing — pocketchat.co serves PocketChat experience
+  // Evrywyre domain routing — evrywyre.com / pocketchat.co serves Evrywyre experience
   const hostname = request.headers.get('host') || '';
-  const isPocketChat = hostname === 'pocketchat.co' || hostname === 'www.pocketchat.co' || hostname.endsWith('.pocketchat.co');
+  const isPocketChat = hostname === 'evrywyre.com' || hostname === 'www.evrywyre.com' || hostname.endsWith('.evrywyre.com') || hostname === 'pocketchat.co' || hostname === 'www.pocketchat.co' || hostname.endsWith('.pocketchat.co');
 
   if (isPocketChat) {
     const path = request.nextUrl.pathname;
 
-    // Root → PocketChat landing (no auth needed)
+    // Root → Evrywyre landing (no auth needed)
     if (path === '/') {
       return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // PocketChat users should never see BizPocket dashboard
+    // Evrywyre users should never see BizPocket dashboard
     if (path === '/dashboard') {
       return NextResponse.redirect(new URL('/chat', request.url));
     }

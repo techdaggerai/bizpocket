@@ -13,7 +13,7 @@ const PLANS = [
     period: '',
     features: [
       '5 invoices/month',
-      'PocketChat (2 contacts)',
+      'Evrywyre (2 contacts)',
       '1 language',
       'Basic cash flow',
     ],
@@ -26,7 +26,7 @@ const PLANS = [
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_1TGXQoKiugpuK1mjtDYwA15I',
     features: [
       'Unlimited invoices',
-      'PocketChat unlimited',
+      'Evrywyre unlimited',
       '5 languages',
       'AI Morning Briefing',
       'Accountant Portal',

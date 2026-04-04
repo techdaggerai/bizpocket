@@ -17,6 +17,7 @@ import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 import PocketSendIcon from '@/components/PocketSendIcon';
 import OutlinePillButton from '@/components/OutlinePillButton';
+import PocketAvatar from '@/components/PocketAvatar';
 
 /* ---------- Types ---------- */
 
@@ -113,9 +114,9 @@ export default function PocketChatPage() {
   const supabase = createClient();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
 
-  useEffect(() => { document.title = 'PocketChat'; }, []);
+  useEffect(() => { document.title = 'Evrywyre'; }, []);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
@@ -145,7 +146,7 @@ export default function PocketChatPage() {
   const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const {
-    botConfig, botName, botGradient, botLoading,
+    botConfig, botName, botLoading,
     botConfigLoaded, isSetupComplete,
     fetchBotConfig, sendBotMessage, updateBotLocally
   } = usePocketBot();
@@ -855,22 +856,15 @@ export default function PocketChatPage() {
           {activeConvo.is_bot_chat ? (
             botConfig?.avatar_url ? (
               <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
-            ) : botConfig?.bot_name ? (
-              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
             ) : <AnimatedPocketChatLogo size={40} />
           ) : (
-            <div
-              className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
-              style={{ backgroundColor: avatarColor(contactName) }}
-            >
-              {contactName.charAt(0).toUpperCase()}
-            </div>
+            <PocketAvatar name={contactName} size={40} />
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
-                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${isPocketChatMode ? 'bg-[#F59E0B]/10 text-[#F59E0B]' : 'bg-[#4F46E5]/10 text-[#4F46E5]'}`}>
+                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${isPocketChatMode ? 'bg-[#F43F5E]/10 text-[#F43F5E]' : 'bg-[#4F46E5]/10 text-[#4F46E5]'}`}>
                   AI Assistant
                 </span>
               ) : contactType ? (
@@ -1158,8 +1152,6 @@ export default function PocketChatPage() {
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
                     {botConfig?.avatar_url ? (
                       <img src={botConfig.avatar_url} alt={botName} className="h-8 w-8 rounded-full object-cover" />
-                    ) : botConfig?.bot_name ? (
-                      <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
                     ) : <AnimatedPocketChatLogo size={32} />}
                   </div>
                 )}
@@ -1446,7 +1438,7 @@ export default function PocketChatPage() {
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
-          <h1 className="text-xl font-bold text-[#0A0A0A]">PocketChat</h1>
+          <h1 className="text-xl font-bold text-[#0A0A0A]">Evrywyre</h1>
           <p className="text-[13px] text-[#999]">Chat in 21 languages — AI translates in real-time</p>
         </div>
         <div className="flex items-center gap-2">
@@ -1538,16 +1530,9 @@ export default function PocketChatPage() {
                 {convo.is_bot_chat ? (
                   botConfig?.avatar_url ? (
                     <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
-                  ) : botConfig?.bot_name ? (
-                    <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-base font-bold shrink-0" style={{ background: `linear-gradient(135deg, ${botGradient.from}, ${botGradient.to})` }}>{botName.charAt(0).toUpperCase()}</div>
                   ) : <AnimatedPocketChatLogo size={40} />
                 ) : (
-                  <div
-                    className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
-                    style={{ backgroundColor: avatarColor(name) }}
-                  >
-                    {name.charAt(0).toUpperCase()}
-                  </div>
+                  <PocketAvatar name={name} size={40} />
                 )}
 
                 {/* Content */}
@@ -1555,7 +1540,7 @@ export default function PocketChatPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">{name}</p>
-                      {convo.is_bot_chat && <span className="text-[12px] text-[#F59E0B] font-medium">AI Assistant</span>}
+                      {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
                     {convo.last_message_at && (
@@ -1636,12 +1621,7 @@ export default function PocketChatPage() {
                     onClick={() => createConversation(contact)}
                     className="w-full flex items-center gap-3 px-3 py-3 hover:bg-[#F9FAFB] rounded-lg transition-colors text-left"
                   >
-                    <div
-                      className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
-                      style={{ backgroundColor: avatarColor(contact.name) }}
-                    >
-                      {contact.name.charAt(0).toUpperCase()}
-                    </div>
+                    <PocketAvatar name={contact.name} size={40} />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contact.name}</p>
                       <div className="flex items-center gap-2">

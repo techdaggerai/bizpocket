@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import OutlinePillButton from '@/components/OutlinePillButton';
+import PocketAvatar from '@/components/PocketAvatar';
 
 type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner' | 'friend' | 'family' | 'work';
 
@@ -87,7 +88,7 @@ export default function ContactsPage() {
   const supabase = createClient();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
 
   const defaultType: ContactType = isPocketChatMode ? 'friend' : 'customer';
   const tabs = isPocketChatMode ? POCKETCHAT_TABS : BIZPOCKET_TABS;
@@ -390,12 +391,7 @@ export default function ContactsPage() {
               className="flex items-center gap-3 rounded-xl border border-[#F0F0F0] bg-white px-4 py-3 hover:bg-[#FAFAFA] transition-colors"
             >
               {/* Avatar */}
-              <div
-                className="h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-white text-sm font-medium"
-                style={{ backgroundColor: avatarColor(c.name) }}
-              >
-                {c.name.charAt(0).toUpperCase()}
-              </div>
+              <PocketAvatar name={c.name} size={40} />
 
               {/* Name + badge + language */}
               <div className="flex-1 min-w-0">

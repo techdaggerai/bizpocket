@@ -21,7 +21,7 @@ function SignupInner() {
   const plan = searchParams.get('plan') || 'free';
   const mode = searchParams.get('mode');
   const isPocketChat = mode === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -30,7 +30,7 @@ function SignupInner() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = isPocketChat ? 'Sign up — PocketChat' : 'Sign up — BizPocket';
+    document.title = isPocketChat ? 'Sign up — Evrywyre' : 'Sign up — BizPocket';
   }, [isPocketChat]);
 
   async function handleSignup(e: React.FormEvent) {
@@ -73,7 +73,7 @@ function SignupInner() {
 
         if (!existingProfile) {
           const { data: org } = await supabase.from('organizations').insert({
-            name: name || 'My PocketChat',
+            name: name || 'My Evrywyre',
             created_by: user.id,
             plan: 'free',
             language: language,
@@ -106,7 +106,7 @@ function SignupInner() {
             {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
             {!isPocketChat && <LogoWordmark />}
           </div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">{isPocketChat ? 'Sign up for PocketChat' : 'Create your account'}</h1>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">{isPocketChat ? 'Sign up for Evrywyre' : 'Create your account'}</h1>
           <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Chat in any language. Free.' : 'Start managing your business'}</p>
         </div>
 
@@ -195,7 +195,7 @@ function SignupInner() {
             disabled={loading}
             className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px disabled:opacity-50 disabled:hover:translate-y-0"
           >
-            {loading ? 'Creating account...' : isPocketChat ? 'Get PocketChat free' : 'Open Your Pocket'}
+            {loading ? 'Creating account...' : isPocketChat ? 'Get Evrywyre free' : 'Open Your Pocket'}
           </button>
         </form>
 

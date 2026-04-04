@@ -140,9 +140,9 @@ export function usePocketBot() {
   const botGradient = getBotGradient(botConfig?.bot_icon || '1');
   const botName = botConfig?.bot_name || 'Pocket';
 
-  // PocketChat users: if botConfig exists, treat as setup complete regardless of DB value
+  // Evrywyre users: if botConfig exists, treat as setup complete regardless of DB value
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
   const isSetupComplete = (isPocketChatMode && botConfig) ? true : (botConfig?.is_setup_complete ?? false);
 
   return {

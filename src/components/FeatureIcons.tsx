@@ -263,7 +263,7 @@ export function IconVoiceTranslation() {
 export const FEATURES = [
   // Row 1: orange, cyan/purple, gold, green
   { key: 'fire-invoice', name: 'Fire Invoice', desc: 'Professional invoices in 60 seconds. Fire from anywhere. Share via chat, LINE, or WhatsApp.', Icon: IconFireInvoice },
-  { key: 'pocketchat', name: 'PocketChat', desc: 'Real-time AI translation across 21 languages. Text, voice notes, photos, and documents.', Icon: IconPocketChat },
+  { key: 'pocketchat', name: 'Evrywyre', desc: 'Real-time AI translation across 21 languages. Text, voice notes, photos, and documents.', Icon: IconPocketChat },
   { key: 'ai-briefing', name: 'AI Briefing', desc: 'Wake up to an AI-generated intelligence report on your business. Every single morning.', Icon: IconAIBriefing },
   { key: 'health-score', name: 'Business Health', desc: 'One number that tells you everything. Cash flow, receivables, risk — monitored 24/7 by AI.', Icon: IconHealthScore },
   // Row 2: indigo, green, red/rose, blue

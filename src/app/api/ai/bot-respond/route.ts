@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const { data: recentMessages } = await supabase.from('messages').select('message, sender_type, sender_name').eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(5);
     const chatHistory = (recentMessages || []).reverse().map((m) => `${m.sender_name}: ${m.message}`).join('\n');
 
-    const systemPrompt = `You are "${botConfig.bot_name}", an AI assistant for a business on PocketChat.
+    const systemPrompt = `You are "${botConfig.bot_name}", an AI assistant for a business on Evrywyre.
 
 PERSONALITY: ${botConfig.bot_personality || 'professional'}
 ${botConfig.bot_personality === 'professional' ? 'Be formal, business-appropriate, respectful.' : ''}

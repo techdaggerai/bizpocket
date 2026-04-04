@@ -16,7 +16,7 @@ export default function TopNav() {
 
   const currentPlan = organization?.plan || 'free';
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -29,7 +29,7 @@ export default function TopNav() {
         {isPocketChatMode ? (
           <>
             <PocketChatMark size={28} />
-            <span className="text-base font-bold text-[#111827]">Pocket<span className="text-[#F59E0B]">Chat</span></span>
+            <span className="text-base font-bold text-[#111827]">Evry<span className="text-[#F59E0B]">wyre</span></span>
           </>
         ) : (
           <>

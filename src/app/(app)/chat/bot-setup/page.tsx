@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { PocketChatMark } from '@/components/Logo';
-import { BOT_GRADIENTS } from '@/lib/use-pocket-bot';
+import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 const PERSONALITIES = [
   { id: 'professional', name: 'Professional', desc: 'Formal, business-appropriate responses', example: 'Thank you for reaching out. I will inform them of your message.' },
@@ -109,7 +109,7 @@ export default function BotSetupPage() {
         .single();
 
       if (botConvo && nameChanged) {
-        const introMsg = `Hi! I'm ${botName} — your PocketChat assistant. I've been updated and I'm ready to help!`;
+        const introMsg = `Hi! I'm ${botName} — your Evrywyre assistant. I've been updated and I'm ready to help!`;
         await supabase.from('messages').insert({
           conversation_id: botConvo.id,
           organization_id: organization.id,
@@ -171,8 +171,6 @@ export default function BotSetupPage() {
   };
 
   const displayAvatar = avatarPreview || avatarUrl;
-  const gradient = BOT_GRADIENTS.find(g => g.id === botIcon) || BOT_GRADIENTS[0];
-
   // EDIT MODE: single page with all fields
   if (isEditMode && loaded) {
     return (
@@ -190,9 +188,7 @@ export default function BotSetupPage() {
             {displayAvatar ? (
               <img src={displayAvatar} alt="Bot avatar" className="h-20 w-20 rounded-full object-cover" />
             ) : (
-              <div className="h-20 w-20 rounded-full flex items-center justify-center text-white text-2xl font-bold" style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}>
-                {(botName || 'P').charAt(0).toUpperCase()}
-              </div>
+              <AnimatedPocketChatLogo size={80} isTranslating={true} />
             )}
             <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
@@ -200,14 +196,7 @@ export default function BotSetupPage() {
             <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
           </label>
           {uploading && <p className="text-xs text-[#6b7280]">Uploading...</p>}
-          <p className="text-xs text-[#9ca3af]">Tap to upload photo</p>
-          <div className="flex gap-2">
-            {BOT_GRADIENTS.map(g => (
-              <button key={g.id} onClick={() => { setBotIcon(g.id); setAvatarPreview(null); setAvatarUrl(null); }}
-                className={`h-8 w-8 rounded-full cursor-pointer transition-all ${botIcon === g.id && !displayAvatar ? 'ring-2 ring-[#4F46E5] ring-offset-1 scale-110' : 'hover:scale-105'}`}
-                style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
-            ))}
-          </div>
+          <p className="text-xs text-[#9ca3af]">Tap to upload custom photo</p>
         </div>
 
         <label className="text-sm font-medium text-[#374151] block mb-1.5">Language</label>
@@ -267,9 +256,7 @@ export default function BotSetupPage() {
               {displayAvatar ? (
                 <img src={displayAvatar} alt="Bot avatar" className="h-16 w-16 rounded-full object-cover" />
               ) : (
-                <div className="h-16 w-16 rounded-full flex items-center justify-center text-white text-xl font-bold" style={{ background: `linear-gradient(135deg, ${gradient.from}, ${gradient.to})` }}>
-                  {(botName || 'P').charAt(0).toUpperCase()}
-                </div>
+                <AnimatedPocketChatLogo size={64} isTranslating={true} />
               )}
               <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" /></svg>
@@ -277,13 +264,7 @@ export default function BotSetupPage() {
               <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
             </label>
             {uploading && <p className="text-xs text-[#6b7280]">Uploading...</p>}
-            <div className="flex gap-2">
-              {BOT_GRADIENTS.map(g => (
-                <button key={g.id} onClick={() => { setBotIcon(g.id); setAvatarPreview(null); setAvatarUrl(null); }}
-                  className={`h-7 w-7 rounded-full cursor-pointer transition-all ${botIcon === g.id && !displayAvatar ? 'ring-2 ring-[#4F46E5] ring-offset-1 scale-110' : 'hover:scale-105'}`}
-                  style={{ background: `linear-gradient(135deg, ${g.from}, ${g.to})` }} />
-              ))}
-            </div>
+            <p className="text-xs text-[#9ca3af]">Upload custom photo</p>
           </div>
           <button onClick={() => botName.trim() && setStep(2)} disabled={!botName.trim()}
             className={`w-full py-3 rounded-[10px] text-sm font-semibold text-white ${botName.trim() ? 'bg-[#4F46E5] cursor-pointer' : 'bg-[#d1d5db]'}`}>Next</button>

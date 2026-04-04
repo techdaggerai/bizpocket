@@ -77,7 +77,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
       <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
         <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#0A0A0A]">Invite to PocketChat</h2>
+          <h2 className="text-base font-bold text-[#0A0A0A]">Invite to Evrywyre</h2>
           <button onClick={onClose} className="text-[#A3A3A3] hover:text-[#0A0A0A] transition-colors">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -16,12 +16,12 @@ const greetings = [
 
 const FEATURES = [
   { title: 'Translated Text Chat', desc: 'Type in your language. Your contact reads theirs. 21 languages, zero delay.', color: '#4F46E5', bg: '#eef2ff', icon: 'M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z' },
-  { title: 'Voice Messages', desc: 'Record a voice message. PocketChat transcribes, translates, and speaks it in their language.', color: '#F59E0B', bg: '#fef3c7', icon: 'M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2' },
+  { title: 'Voice Messages', desc: 'Record a voice message. Evrywyre transcribes, translates, and speaks it in their language.', color: '#F59E0B', bg: '#fef3c7', icon: 'M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2' },
   { title: 'Live Voice Calls', desc: 'Real-time translated phone calls. You speak English, they hear Japanese. Like magic.', color: '#16a34a', bg: '#f0fdf4', icon: 'M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72', badge: 'NEW' },
   { title: 'Voice Cloning', desc: 'Your voice, their language. AI clones your voice and speaks the translation as YOU.', color: '#dc2626', bg: '#fef2f2', icon: 'M9 18V5l12-2v13M6 18a3 3 0 100-6M18 16a3 3 0 100-6' },
   { title: 'AI Bot / Auto-Reply', desc: 'Set up a personal AI agent. Custom rules, personality, auto-replies when you\'re busy.', color: '#7c3aed', bg: '#f5f3ff', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
-  { title: 'QR Code Sharing', desc: 'Share your PocketChat contact instantly. One scan, they\'re connected.', color: '#ec4899', bg: '#fdf2f8', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM17 14h1v1h-1zM14 17h1v1h-1zM20 17h1v1h-1zM17 20h1v1h-1z' },
-  { title: 'Website Widget', desc: 'Embed PocketChat on any website. Customers chat from your Instagram, website, anywhere.', color: '#0891b2', bg: '#ecfeff', icon: 'M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z' },
+  { title: 'QR Code Sharing', desc: 'Share your Evrywyre contact instantly. One scan, they\'re connected.', color: '#ec4899', bg: '#fdf2f8', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM17 14h1v1h-1zM14 17h1v1h-1zM20 17h1v1h-1zM17 20h1v1h-1z' },
+  { title: 'Website Widget', desc: 'Embed Evrywyre on any website. Customers chat from your Instagram, website, anywhere.', color: '#0891b2', bg: '#ecfeff', icon: 'M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z' },
   { title: 'Photo Translation', desc: 'Snap a photo of Japanese text — menus, signs, documents. Instant translation.', color: '#ea580c', bg: '#fff7ed', icon: 'M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2zM12 13a4 4 0 100-8 4 4 0 000 8z' },
   { title: 'Live Video Guide', desc: 'Point your camera at any screen or sign. AI gives you step-by-step guidance in your language.', color: '#4F46E5', bg: '#eef2ff', icon: 'M23 7l-7 5 7 5V7zM14 5H3a2 2 0 00-2 2v10a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2z', badge: 'COMING' },
   { title: 'Smart Typing Indicator', desc: 'Know when your contact is composing. Animated indicator with multilingual greetings.', color: '#F59E0B', bg: '#fef3c7', icon: 'M5 12h2m4 0h2m4 0h2' },
@@ -75,7 +75,7 @@ export default function PocketChatLanding() {
       <nav className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-3 px-6 py-5">
         <div className="flex items-center gap-2">
           <AnimatedPocketChatLogo size={32} isTranslating={true} />
-          <span className="text-[17px] font-bold text-[#111827]">Pocket<span className="text-[#F59E0B]">Chat</span></span>
+          <span className="text-[17px] font-bold text-[#111827]">Evry<span className="text-[#F59E0B]">wyre</span></span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm text-[#6b7280] hover:text-[#111827] transition-colors">Log in</Link>
@@ -87,9 +87,9 @@ export default function PocketChatLanding() {
       <section className="px-6 py-16 text-center">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-6 flex justify-center">
-            <PocketChatTypingIndicator contactName="PocketChat" size="lg" />
+            <PocketChatTypingIndicator contactName="Evrywyre" size="lg" />
           </div>
-          <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Pocket<span className="text-[#F59E0B]">Chat</span></h2>
+          <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Evry<span className="text-[#F59E0B]">wyre</span></h2>
           <p className="mt-3 text-lg text-[#6b7280]">Break every language barrier</p>
         </div>
       </section>
@@ -232,7 +232,7 @@ export default function PocketChatLanding() {
             <div className="mb-5 flex items-center justify-center">
               <PocketMark variant="lg" />
             </div>
-            <h2 className="mb-3 text-[28px] font-bold text-[#111827]">PocketChat is built into BizPocket</h2>
+            <h2 className="mb-3 text-[28px] font-bold text-[#111827]">Evrywyre is built into BizPocket</h2>
             <p className="mx-auto mb-8 max-w-[560px] text-[15px] leading-relaxed text-[#374151]">
               The AI business autopilot — invoices, orders, website builder, operations radar, and more. Everything your business needs.
             </p>

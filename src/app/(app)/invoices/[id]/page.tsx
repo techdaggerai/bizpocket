@@ -426,12 +426,12 @@ export default function InvoiceDetailPage() {
         )}
       </div>
 
-      {/* PocketChat Section */}
+      {/* Evrywyre Section */}
       <div className="rounded-card border border-[#E5E5E5] bg-white overflow-hidden">
         {/* Chat Header */}
         <div className="p-4 border-b border-[#E5E5E5]">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#0A0A0A]">PocketChat</h2>
+            <h2 className="text-base font-semibold text-[#0A0A0A]">Evrywyre</h2>
             <span className="text-xs text-[#A3A3A3]">
               {messages.length} message{messages.length !== 1 ? 's' : ''}
             </span>

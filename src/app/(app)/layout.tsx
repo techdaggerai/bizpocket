@@ -20,17 +20,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .eq('user_id', user.id)
     .single();
 
-  // If no profile exists, auto-create org+profile for PocketChat users
+  // If no profile exists, auto-create org+profile for Evrywyre users
   if (!profile) {
     const headersList = await headers();
     const host = headersList.get('host') || '';
-    const isPocketChat = host.includes('pocketchat');
+    const isPocketChat = host.includes('evrywyre') || host.includes('pocketchat');
 
     if (isPocketChat) {
-      // Auto-create org + profile so PocketChat users never hit /onboarding
+      // Auto-create org + profile so Evrywyre users never hit /onboarding
       const userLang = user.user_metadata?.preferred_language || 'en';
       const { data: newOrg } = await supabase.from('organizations').insert({
-        name: 'My PocketChat',
+        name: 'My Evrywyre',
         created_by: user.id,
         plan: 'free',
         language: userLang,

@@ -20,14 +20,14 @@ function LoginInner() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode');
   const isPocketChat = mode === 'pocketchat' ||
-    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = isPocketChat ? 'Log in — PocketChat' : 'Log in — BizPocket';
+    document.title = isPocketChat ? 'Log in — Evrywyre' : 'Log in — BizPocket';
   }, [isPocketChat]);
 
   async function handleLogin(e: React.FormEvent) {
@@ -58,7 +58,7 @@ function LoginInner() {
             {!isPocketChat && <LogoWordmark />}
           </div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Log in to PocketChat' : 'Log in to BizPocket'}</p>
+          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Log in to Evrywyre' : 'Log in to BizPocket'}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
