@@ -361,7 +361,12 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
-        <p className="text-center text-xs text-[var(--text-4)] pt-2">Evrywher by TechDagger</p>
+        <div className="flex items-center justify-center gap-3 pt-3">
+          <Link href="/privacy" className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]">Privacy</Link>
+          <span className="text-[var(--text-4)]">&middot;</span>
+          <Link href="/terms" className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]">Terms</Link>
+        </div>
+        <p className="text-center text-xs text-[var(--text-4)] pt-1">Evrywher by TechDagger</p>
       </div>
     );
   }
