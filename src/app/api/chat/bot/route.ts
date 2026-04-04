@@ -58,10 +58,10 @@ RESPONSE STYLE:
 - Do NOT use line breaks between sentences unless listing 3+ items
 
 LANGUAGE:
-- If the user writes in Japanese, respond in Japanese
-- If the user writes in Urdu, respond in Urdu
-- If the user writes in any language, respond in THAT language
-- Default to English if unclear`
+- ALWAYS respond in the user's preferred language (specified in context)
+- Even if the user writes in a different language, ALWAYS reply in their preferred language
+- If the user sends a message in another language, understand it, then respond in their preferred language
+- Default to English if no preference is set`
 
 const POCKETCHAT_SYSTEM_PROMPT = `You are an Evrywher AI assistant. Evrywher is a translation-powered chat app that lets people communicate across 21 languages in real-time. You help users with translation, messaging, voice features, and connecting with contacts worldwide. You do NOT mention BizPocket, invoices, business management, or any business features. If a user asks about features not yet available (like video calls), say "This feature is coming soon to Evrywher!" — NEVER redirect them to other apps like WhatsApp or LINE.
 
@@ -102,10 +102,18 @@ RESPONSE STYLE:
 - Use emoji sparingly — 1 per message max
 
 LANGUAGE:
-- If the user writes in Japanese, respond in Japanese
-- If the user writes in Urdu, respond in Urdu
-- If the user writes in any language, respond in THAT language
-- Default to English if unclear`
+- ALWAYS respond in the user's preferred language (specified in context)
+- Even if the user writes in a different language, ALWAYS reply in their preferred language
+- If the user sends a message in another language, understand it, then respond in their preferred language
+- Default to English if no preference is set`
+
+const LANG_NAMES_BOT: Record<string, string> = {
+  en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic', bn: 'Bengali',
+  pt: 'Portuguese', fil: 'Filipino', vi: 'Vietnamese', tr: 'Turkish',
+  zh: 'Chinese', fr: 'French', nl: 'Dutch', es: 'Spanish',
+  ps: 'Pashto', fa: 'Persian', hi: 'Hindi', ko: 'Korean',
+  th: 'Thai', id: 'Indonesian', ne: 'Nepali', si: 'Sinhala',
+}
 
 export async function POST(request: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY
@@ -183,6 +191,16 @@ export async function POST(request: Request) {
   const host = request.headers.get('host') || ''
   const isPocketChatOrg = org?.signup_source === 'pocketchat' || host.includes('evrywher') || host.includes('evrywyre') || host.includes('pocketchat') || host.includes('evrywhere')
 
+  // Fetch bot config for language preference
+  const { data: botConfig } = await supabase
+    .from('pocket_bot_config')
+    .select('language')
+    .eq('organization_id', organizationId)
+    .single()
+
+  const userLangCode = botConfig?.language || language || 'en'
+  const userLangName = LANG_NAMES_BOT[userLangCode] || 'English'
+
   // Build context — Evrywher orgs only get contacts, BizPocket orgs get full business context
   let contextBlock: string
 
@@ -195,7 +213,7 @@ export async function POST(request: Request) {
 
     contextBlock = `
 CONTEXT:
-- User language preference: ${language || 'en'}
+- RESPOND IN: ${userLangName} (language code: ${userLangCode}). This is mandatory — every response must be in ${userLangName}, regardless of what language the user writes in.
 - Contacts: ${(contacts || []).length} total (${(contacts || []).map(c => `${c.name}`).slice(0, 5).join(', ')})
 `
   } else {
@@ -216,10 +234,10 @@ CONTEXT:
 
     contextBlock = `
 BUSINESS CONTEXT:
+- RESPOND IN: ${userLangName} (language code: ${userLangCode}). This is mandatory — every response must be in ${userLangName}, regardless of what language the user writes in.
 - Business: ${org?.name || 'Unknown'} (${org?.business_type || 'general'})
 - Currency: ${org?.currency || 'JPY'}
 - Plan: ${org?.plan || 'free'}
-- User language preference: ${language || 'en'}
 - Recent cash flow: ${recentFlows.length} entries, ${org?.currency || '¥'}${totalIn} in, ${org?.currency || '¥'}${totalOut} out
 - Invoices: ${recentInvoices.length} recent, ${unpaidInvoices.length} unpaid${unpaidInvoices.length > 0 ? ` (${unpaidInvoices.map(i => `${i.customer_name}: ¥${i.grand_total}`).join(', ')})` : ''}
 - Contacts: ${contacts.length} total (${contacts.map(c => `${c.name} [${c.contact_type}]`).slice(0, 5).join(', ')})
