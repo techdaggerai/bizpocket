@@ -21,7 +21,7 @@ const PLANS = [
   {
     key: 'pro' as const,
     name: 'Pro',
-    price: '¥2,980',
+    price: '¥1,980',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_1TGXQoKiugpuK1mjtDYwA15I',
     features: [
@@ -35,7 +35,7 @@ const PLANS = [
   {
     key: 'business' as const,
     name: 'Business',
-    price: '¥5,980',
+    price: '¥4,980',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || 'price_1TGXRfKiugpuK1mjK5oI8CsA',
     features: [
@@ -60,6 +60,9 @@ export default function UpgradePage() {
   const targetPlan = searchParams.get('plan');
   const rawPlan = organization.plan || 'free';
   const currentPlan = rawPlan;
+  const trialEndsAt = organization.trial_ends_at ? new Date(organization.trial_ends_at) : null;
+  const isOnTrial = trialEndsAt && trialEndsAt > new Date() && currentPlan === 'free';
+  const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
   async function handleCheckout(priceId: string, planKey: string) {
     setLoading(planKey);
@@ -121,6 +124,19 @@ export default function UpgradePage() {
         </Link>
         <h1 className="text-xl font-bold text-[var(--text-1)]">Upgrade Plan</h1>
       </div>
+
+      {/* Trial Badge */}
+      {isOnTrial && (
+        <div className="rounded-card border border-[#4F46E5]/20 bg-[#4F46E5]/5 p-4 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F46E5]/10">
+            <svg className="h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-[#4F46E5]">Pro Trial — {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left</p>
+            <p className="text-xs text-[#6B7280]">You have full Pro access. Upgrade before your trial ends.</p>
+          </div>
+        </div>
+      )}
 
       {/* Success/Cancel Banners */}
       {success && (
