@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
+import EvryWherMark from '@/components/EvryWherMark';
 
 const FULL_NAV = [
   {
@@ -78,7 +79,7 @@ export default function Sidebar() {
           {isPocketChatOnly ? (
             <>
               <PocketChatMark size={32} />
-              <span className="text-[14px] font-bold text-[#111827]"><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></span>
+              <EvryWherMark size="md" />
             </>
           ) : (
             <>

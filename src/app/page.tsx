@@ -4,6 +4,7 @@ import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
 import InvoiceShowcase from '@/components/InvoiceShowcase';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
+import EvryWherMark from '@/components/EvryWherMark';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 
 const PLANS = [
@@ -340,7 +341,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-5 mb-6">
               <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
               <span className="text-[13px] text-[#d1d5db]">+</span>
-              <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-[13px] font-semibold text-[#111827]">Evrywher</span></div>
+              <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><EvryWherMark size="sm" /></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
             <p className="text-base text-[#374151] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
@@ -387,7 +388,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl px-6 py-10">
           <div className="flex items-center justify-center gap-6 pb-6">
             <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
-            <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-xs font-semibold text-[#6b7280]">Evrywher</span></div>
+            <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><EvryWherMark size="xs" /></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">

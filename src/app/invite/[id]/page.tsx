@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase-server';
 import Link from 'next/link';
 import { PocketChatMark } from '@/components/Logo';
+import EvryWherMark from '@/components/EvryWherMark';
 
 export default async function InvitePage({ params }: { params: Promise<{ id: string }> }) {
   const { id: orgId } = await params;
@@ -38,7 +39,7 @@ export default async function InvitePage({ params }: { params: Promise<{ id: str
 
         {/* Brand */}
         <h1 className="text-2xl font-bold text-[#0A0A0A] mb-2">
-          <span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span>
+          <EvryWherMark size="lg" />
         </h1>
 
         {/* Invite message */}

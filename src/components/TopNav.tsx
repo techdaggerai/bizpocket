@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
+import EvryWherMark from '@/components/EvryWherMark';
 import NotificationBell from './NotificationBell';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -31,7 +32,7 @@ export default function TopNav() {
           {isPocketChatMode ? (
             <>
               <PocketChatMark size={28} />
-              <span className="text-base font-bold text-[#111827]"><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></span>
+              <EvryWherMark size="sm" />
             </>
           ) : (
             <>

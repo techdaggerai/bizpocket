@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PocketChatMark } from '@/components/Logo';
+import EvryWherMark from '@/components/EvryWherMark';
 
 export default function SplashScreen({ children }: { children: React.ReactNode }) {
   const [show, setShow] = useState(true);
@@ -28,9 +29,9 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
         <div className="animate-pulse">
           <PocketChatMark size={80} />
         </div>
-        <h1 className="mt-4 text-2xl font-bold text-[#0A0A0A]">
-          <span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span>
-        </h1>
+        <div className="mt-4">
+          <EvryWherMark size="lg" />
+        </div>
         <p className="mt-2 text-sm text-[#9CA3AF]">You bring the missing E. We bring the world.</p>
       </div>
       <div className="invisible">{children}</div>

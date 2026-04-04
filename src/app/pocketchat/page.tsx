@@ -7,6 +7,7 @@ import HeroChatMockup from '@/components/HeroChatMockup';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 import AnimatedTagline from '@/components/AnimatedTagline';
+import EvryWherMark from '@/components/EvryWherMark';
 
 const greetings = [
   { to: 'やあ', lang: 'Japanese' }, { to: 'Hola', lang: 'Spanish' },
@@ -148,7 +149,7 @@ export default function PocketChatLanding() {
       <nav className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-3 px-6 py-5">
         <div className="flex items-center gap-2">
           <AnimatedPocketChatLogo size={32} isTranslating={true} />
-          <span className="text-[17px] font-bold text-[#111827]"><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></span>
+          <EvryWherMark size="md" />
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login" className="text-sm text-[#6b7280] hover:text-[#111827] transition-colors">Log in</Link>
@@ -162,7 +163,7 @@ export default function PocketChatLanding() {
           <div className="mb-6 flex justify-center">
             <PocketChatTypingIndicator contactName="Evrywher" size="lg" />
           </div>
-          <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></h2>
+          <h2><EvryWherMark size="hero" /></h2>
           <p className="mt-3 text-lg text-[#6b7280]">Chat in 21 languages — AI translates in real-time</p>
           <AnimatedTagline />
         </div>

@@ -16,6 +16,7 @@ import EmojiPicker from '@/components/EmojiPicker';
 import StickerPicker from '@/components/StickerPicker';
 import GifPicker from '@/components/GifPicker';
 import LinkPreview from '@/components/LinkPreview';
+import EvryWherMark from '@/components/EvryWherMark';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
@@ -2247,7 +2248,7 @@ export default function PocketChatPage() {
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
-          <h1 className="text-xl font-bold text-[#0A0A0A]">Evrywher</h1>
+          <EvryWherMark size="md" />
           <p className="text-[13px] text-[#999]">Chat in 21 languages — AI translates in real-time</p>
         </div>
         {/* Desktop: inline buttons */}
