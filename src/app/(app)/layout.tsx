@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase-server';
 import { AuthProvider } from '@/lib/auth-context';
 import { I18nProvider } from '@/lib/i18n';
@@ -19,7 +20,70 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .eq('user_id', user.id)
     .single();
 
-  if (!profile) redirect('/onboarding');
+  // If no profile exists, auto-create org+profile for PocketChat users
+  if (!profile) {
+    const headersList = await headers();
+    const host = headersList.get('host') || '';
+    const isPocketChat = host.includes('pocketchat');
+
+    if (isPocketChat) {
+      // Auto-create org + profile so PocketChat users never hit /onboarding
+      const userLang = user.user_metadata?.preferred_language || 'en';
+      const { data: newOrg } = await supabase.from('organizations').insert({
+        name: 'My PocketChat',
+        created_by: user.id,
+        plan: 'free',
+        language: userLang,
+        currency: 'JPY',
+        signup_source: 'pocketchat',
+      }).select().single();
+
+      if (newOrg) {
+        await supabase.from('profiles').insert({
+          user_id: user.id,
+          organization_id: newOrg.id,
+          role: 'owner',
+          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+          email: user.email!,
+          language: userLang,
+        });
+        // Re-fetch the profile we just created
+        const { data: freshProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        if (freshProfile) {
+          const { data: freshOrg } = await supabase
+            .from('organizations')
+            .select('*')
+            .eq('id', freshProfile.organization_id)
+            .single();
+          if (freshOrg) {
+            return (
+              <AuthProvider user={user} profile={freshProfile} organization={freshOrg}>
+                <I18nProvider initialLang={(freshProfile.language || 'en') as Language}>
+                  <div className="min-h-screen bg-[var(--bg)]">
+                    <div className="lg:hidden"><TopNav /></div>
+                    <div className="flex">
+                      <Sidebar />
+                      <main className="flex-1 min-h-screen pb-20 lg:pb-0">
+                        <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white"><TopNav /></div>
+                        <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4">{children}</div>
+                      </main>
+                    </div>
+                    <div className="lg:hidden"><BottomNav /></div>
+                  </div>
+                </I18nProvider>
+              </AuthProvider>
+            );
+          }
+        }
+      }
+    }
+
+    redirect('/onboarding');
+  }
 
   const { data: organization } = await supabase
     .from('organizations')
