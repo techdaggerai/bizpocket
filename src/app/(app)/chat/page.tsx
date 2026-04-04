@@ -1705,13 +1705,17 @@ export default function PocketChatPage() {
       </div>
       {/* Mobile: action buttons row */}
       <div className="flex sm:hidden gap-2 px-4 py-2 border-b border-[#F0F0F0]">
-        <button onClick={() => setShowInvite(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F59E0B] py-2 text-[13px] font-medium text-[#F59E0B]">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        <button onClick={() => setShowInvite(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F59E0B] py-2 text-[12px] font-medium text-[#F59E0B]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
           Invite
         </button>
-        <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#4F46E5] py-2 text-[13px] font-medium text-[#4F46E5]">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          New chat
+        <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#4F46E5] py-2 text-[12px] font-medium text-[#4F46E5]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </button>
+        <button onClick={() => { fetchContacts(); setShowGroupCreate(true); }} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#10B981] py-2 text-[12px] font-medium text-[#10B981]">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Group
         </button>
       </div>
 

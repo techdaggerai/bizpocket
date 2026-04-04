@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1290">
+<title>Evrywher — Chat in 21 languages</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1290px; height: 2796px;
+    background: linear-gradient(160deg, #EEF2FF 0%, #F5F3FF 40%, #FFF7ED 100%);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* ── Headline ── */
+  .headline-area {
+    padding-top: 120px;
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #4F46E5; color: white;
+    font-size: 28px; font-weight: 700; letter-spacing: -0.5px;
+    padding: 14px 32px; border-radius: 999px;
+    margin-bottom: 36px;
+    box-shadow: 0 8px 32px rgba(79,70,229,0.35);
+  }
+  .badge-dot { width: 10px; height: 10px; border-radius: 50%; background: #FCD34D; }
+  h1 {
+    font-size: 112px; font-weight: 900; color: #0A0A0A;
+    line-height: 1.05; letter-spacing: -4px;
+    margin-bottom: 24px;
+  }
+  h1 span { color: #4F46E5; }
+  .subtitle {
+    font-size: 44px; font-weight: 500; color: #6B7280;
+    letter-spacing: -1px;
+  }
+
+  /* ── iPhone frame ── */
+  .phone-wrap {
+    position: relative;
+    width: 630px; height: 1340px;
+    flex-shrink: 0;
+  }
+  .phone-frame {
+    position: absolute; inset: 0;
+    background: #1A1A1A;
+    border-radius: 70px;
+    box-shadow:
+      0 0 0 2px #3A3A3A,
+      0 0 0 10px #2A2A2A,
+      0 60px 120px rgba(0,0,0,0.45);
+  }
+  .phone-screen {
+    position: absolute;
+    top: 18px; left: 18px; right: 18px; bottom: 18px;
+    background: #FFFFFF;
+    border-radius: 54px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  /* Dynamic island */
+  .dynamic-island {
+    position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    width: 130px; height: 36px; background: #1A1A1A; border-radius: 20px;
+    z-index: 10;
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 68px; background: white;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 32px 10px;
+    font-size: 18px; font-weight: 600; color: #0A0A0A;
+    flex-shrink: 0;
+  }
+  .status-time { font-size: 22px; font-weight: 700; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+
+  /* ── App top bar ── */
+  .app-topbar {
+    background: white;
+    padding: 16px 26px 14px;
+    border-bottom: 1px solid #F0F0F0;
+    flex-shrink: 0;
+  }
+  .app-topbar-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-title { font-size: 32px; font-weight: 800; color: #0A0A0A; letter-spacing: -0.5px; }
+  .topbar-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #EEF2FF; display: flex; align-items: center; justify-content: center;
+  }
+  .search-bar {
+    margin-top: 14px;
+    background: #F3F4F6; border-radius: 14px;
+    padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+    color: #9CA3AF; font-size: 18px;
+  }
+
+  /* ── Filter pills ── */
+  .filter-row {
+    display: flex; gap: 10px; padding: 14px 20px;
+    border-bottom: 1px solid #F0F0F0; flex-shrink: 0;
+    background: white;
+  }
+  .pill {
+    padding: 8px 20px; border-radius: 999px; font-size: 16px; font-weight: 600;
+    border: 1.5px solid #E5E7EB; color: #6B7280;
+  }
+  .pill.active {
+    background: #4F46E5; color: white; border-color: #4F46E5;
+  }
+
+  /* ── Conversation list ── */
+  .conv-list { flex: 1; overflow: hidden; background: #FFFFFF; }
+  .conv-item {
+    display: flex; align-items: center; gap: 18px;
+    padding: 16px 22px;
+    border-bottom: 1px solid #F9FAFB;
+  }
+  .conv-item:first-child { border-top: none; }
+  .conv-item.unread { background: #FAFAFF; }
+
+  /* Pocket Avatar */
+  .pocket-avatar {
+    width: 64px; height: 64px; border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative;
+    font-size: 22px; font-weight: 700; color: white;
+    background: #4F46E5;
+  }
+  .pocket-avatar.amber { background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .pocket-avatar.emerald { background: linear-gradient(135deg, #10B981, #059669); }
+  .pocket-avatar.rose { background: linear-gradient(135deg, #F43F5E, #E11D48); }
+  .pocket-avatar.blue { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+  .pocket-avatar.indigo { background: linear-gradient(135deg, #4F46E5, #4338CA); }
+  .pocket-pocket {
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    width: 44px; height: 22px;
+    border: 2.5px solid rgba(255,255,255,0.45);
+    border-radius: 12px 12px 0 0; border-bottom: none;
+  }
+  .online-dot {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #22C55E; border: 2.5px solid white;
+  }
+  .conv-body { flex: 1; min-width: 0; }
+  .conv-row1 { display: flex; justify-content: space-between; align-items: baseline; }
+  .conv-name { font-size: 18px; font-weight: 700; color: #0A0A0A; }
+  .conv-time { font-size: 14px; color: #9CA3AF; font-weight: 500; }
+  .conv-row2 { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .conv-preview { font-size: 16px; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
+  .conv-preview.bold { color: #0A0A0A; font-weight: 600; }
+  .unread-badge {
+    background: #4F46E5; color: white;
+    font-size: 13px; font-weight: 700;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .flag-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: #9CA3AF; margin-top: 3px;
+  }
+  .translate-tag {
+    font-size: 12px; padding: 2px 8px; border-radius: 6px;
+    background: #EEF2FF; color: #4F46E5; font-weight: 600;
+    margin-left: auto;
+  }
+
+  /* AI Bot row */
+  .ai-badge-wrap { display: flex; align-items: center; gap: 8px; }
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: linear-gradient(135deg, #7C3AED, #4F46E5);
+    color: white; font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 8px;
+  }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    height: 92px; background: white;
+    border-top: 1px solid #F0F0F0;
+    display: flex; align-items: flex-start; justify-content: space-around;
+    padding-top: 14px; flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    font-size: 12px; color: #9CA3AF; font-weight: 500;
+  }
+  .nav-item.active { color: #4F46E5; }
+  .nav-icon {
+    width: 28px; height: 28px;
+  }
+
+  /* ── Language flags strip ── */
+  .lang-strip {
+    display: flex; justify-content: center; gap: 14px;
+    padding: 0 40px; margin-top: 40px; flex-wrap: wrap;
+  }
+  .lang-chip {
+    font-size: 28px; padding: 8px 18px; border-radius: 999px;
+    background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    font-weight: 600; color: #374151;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 22px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADLINE -->
+<div class="headline-area">
+  <div class="badge"><span class="badge-dot"></span> Evrywher</div>
+  <h1>Chat in<br/><span>21 languages</span></h1>
+  <p class="subtitle">AI translates in real-time</p>
+</div>
+
+<!-- PHONE -->
+<div class="phone-wrap">
+  <div class="phone-frame"></div>
+  <div class="phone-screen">
+    <div class="dynamic-island"></div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="#0A0A0A"><rect x="0" y="4" width="3" height="12" rx="1"/><rect x="5" y="2" width="3" height="14" rx="1"/><rect x="10" y="0" width="3" height="16" rx="1"/><rect x="15" y="0" width="3" height="16" rx="1" opacity=".3"/><rect x="19" y="5" width="2" height="8" rx="1" opacity=".3"/></svg>
+        <svg width="20" height="14" viewBox="0 0 20 14" fill="#0A0A0A"><path d="M10 2.8C6.7 2.8 3.7 4.2 1.6 6.4L0 4.7C2.6 2 6.1.5 10 .5s7.4 1.5 10 4.2l-1.6 1.7C16.3 4.2 13.3 2.8 10 2.8zm0 4.4c-2.1 0-4 .9-5.3 2.3L3.1 7.8C4.9 5.9 7.3 4.7 10 4.7s5.1 1.2 6.9 3.1l-1.6 1.7C14 8.1 12.1 7.2 10 7.2zm0 4.3c-1 0-2 .4-2.7 1.1L10 14l2.7-1.4c-.7-.7-1.7-1.1-2.7-1.1z"/></svg>
+        <svg width="30" height="16" viewBox="0 0 30 16" fill="none"><rect x="0" y="1" width="25" height="14" rx="4" stroke="#0A0A0A" stroke-width="1.5"/><rect x="2" y="3" width="19" height="10" rx="2" fill="#0A0A0A"/><rect x="26" y="5" width="3" height="6" rx="1.5" fill="#0A0A0A" opacity=".4"/></svg>
+      </div>
+    </div>
+
+    <!-- App top bar -->
+    <div class="app-topbar">
+      <div class="app-topbar-row">
+        <span class="app-title">Messages</span>
+        <div style="display:flex;gap:12px">
+          <div class="topbar-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="topbar-icon" style="background:#4F46E5">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search conversations…
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="filter-row">
+      <div class="pill active">All</div>
+      <div class="pill">Customers</div>
+      <div class="pill">Groups</div>
+      <div class="pill">Unread</div>
+    </div>
+
+    <!-- Conversation list -->
+    <div class="conv-list">
+
+      <!-- AI Bot -->
+      <div class="conv-item">
+        <div class="pocket-avatar indigo" style="background:linear-gradient(135deg,#7C3AED,#4F46E5)">
+          🤖
+          <span class="online-dot"></span>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <div class="ai-badge-wrap">
+              <span class="conv-name">AI Assistant</span>
+              <span class="ai-badge">✨ AI</span>
+            </div>
+            <span class="conv-time">now</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview bold">Good morning! 3 messages need reply</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yuki -->
+      <div class="conv-item unread">
+        <div class="pocket-avatar rose">
+          Y
+          <div class="pocket-pocket"></div>
+          <span class="online-dot"></span>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Yuki Tanaka</span>
+            <span class="conv-time">2m</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview bold">「明日の打ち合わせ確認したい」</span>
+            <span class="unread-badge">3</span>
+          </div>
+          <div class="flag-tag">🇯🇵 <span class="translate-tag">✨ Translated</span></div>
+        </div>
+      </div>
+
+      <!-- Ahmed -->
+      <div class="conv-item">
+        <div class="pocket-avatar amber">
+          A
+          <div class="pocket-pocket"></div>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Ahmed Al-Rashid</span>
+            <span class="conv-time">14m</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview">شكراً جزيلاً على التعاون</span>
+          </div>
+          <div class="flag-tag">🇦🇪 <span class="translate-tag">✨ Translated</span></div>
+        </div>
+      </div>
+
+      <!-- Carlos -->
+      <div class="conv-item unread">
+        <div class="pocket-avatar emerald">
+          C
+          <div class="pocket-pocket"></div>
+          <span class="online-dot"></span>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Carlos Mendes</span>
+            <span class="conv-time">1h</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview bold">Podemos fechar o contrato hoje?</span>
+            <span class="unread-badge">1</span>
+          </div>
+          <div class="flag-tag">🇧🇷 <span class="translate-tag">✨ Translated</span></div>
+        </div>
+      </div>
+
+      <!-- Park Ji-ho -->
+      <div class="conv-item">
+        <div class="pocket-avatar blue">
+          P
+          <div class="pocket-pocket"></div>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Park Ji-ho</span>
+            <span class="conv-time">3h</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview">좋아요! 내일 봐요 👋</span>
+          </div>
+          <div class="flag-tag">🇰🇷 <span class="translate-tag">✨ Translated</span></div>
+        </div>
+      </div>
+
+      <!-- Priya -->
+      <div class="conv-item">
+        <div class="pocket-avatar" style="background:linear-gradient(135deg,#EC4899,#DB2777)">
+          P
+          <div class="pocket-pocket"></div>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Priya Sharma</span>
+            <span class="conv-time">Yesterday</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview">धन्यवाद! कल मिलते हैं</span>
+          </div>
+          <div class="flag-tag">🇮🇳 <span class="translate-tag">✨ Translated</span></div>
+        </div>
+      </div>
+
+      <!-- Group -->
+      <div class="conv-item">
+        <div style="width:64px;height:64px;border-radius:18px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:1px;flex-shrink:0">
+          <div style="background:linear-gradient(135deg,#4F46E5,#4338CA);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700">Y</div>
+          <div style="background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700">A</div>
+          <div style="background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700">C</div>
+          <div style="background:linear-gradient(135deg,#3B82F6,#2563EB);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700">P</div>
+        </div>
+        <div class="conv-body">
+          <div class="conv-row1">
+            <span class="conv-name">Tokyo Team 🌏</span>
+            <span class="conv-time">Yesterday</span>
+          </div>
+          <div class="conv-row2">
+            <span class="conv-preview">Carlos: Ready for tomorrow!</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom nav -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Chats
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Contacts
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        QR
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1"/></svg>
+        Profile
+      </div>
+    </div>
+
+  </div><!-- phone-screen -->
+</div><!-- phone-wrap -->
+
+<!-- Language strip -->
+<div class="lang-strip">
+  <div class="lang-chip">🇬🇧 English</div>
+  <div class="lang-chip">🇯🇵 日本語</div>
+  <div class="lang-chip">🇦🇪 العربية</div>
+  <div class="lang-chip">🇰🇷 한국어</div>
+  <div class="lang-chip">🇧🇷 Português</div>
+  <div class="lang-chip">🇨🇳 中文</div>
+  <div class="lang-chip">🇮🇳 हिन्दी</div>
+  <div class="lang-chip">+14 more</div>
+</div>
+
+</body>
+</html>

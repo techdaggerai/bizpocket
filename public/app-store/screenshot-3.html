@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1290">
+<title>Evrywher — Speak any language</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1290px; height: 2796px;
+    background: linear-gradient(155deg, #F0FDF4 0%, #ECFDF5 40%, #EEF2FF 100%);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .headline-area { padding-top: 110px; text-align: center; margin-bottom: 56px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #10B981, #059669); color: white;
+    font-size: 26px; font-weight: 700;
+    padding: 12px 30px; border-radius: 999px; margin-bottom: 32px;
+    box-shadow: 0 8px 28px rgba(16,185,129,0.4);
+  }
+  h1 { font-size: 108px; font-weight: 900; color: #0A0A0A; line-height: 1.04; letter-spacing: -3.5px; margin-bottom: 22px; }
+  h1 span { color: #4F46E5; }
+  .subtitle { font-size: 42px; font-weight: 500; color: #6B7280; letter-spacing: -0.8px; }
+
+  .phone-wrap { position: relative; width: 630px; height: 1400px; flex-shrink: 0; }
+  .phone-frame { position: absolute; inset: 0; background: #1A1A1A; border-radius: 70px; box-shadow: 0 0 0 2px #3A3A3A, 0 0 0 10px #2A2A2A, 0 60px 120px rgba(0,0,0,0.45); }
+  .phone-screen { position: absolute; top: 18px; left: 18px; right: 18px; bottom: 18px; background: #F9FAFB; border-radius: 54px; overflow: hidden; display: flex; flex-direction: column; }
+  .dynamic-island { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); width: 130px; height: 36px; background: #1A1A1A; border-radius: 20px; z-index: 10; }
+  .status-bar { height: 68px; background: #059669; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 10px; flex-shrink: 0; }
+  .status-time { font-size: 22px; font-weight: 700; color: white; }
+
+  .chat-bar { background: #059669; padding: 14px 22px 18px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .chat-avatar { width: 52px; height: 52px; border-radius: 14px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: white; position: relative; }
+  .online-dot { position: absolute; bottom: -1px; right: -1px; width: 14px; height: 14px; border-radius: 50%; background: #FCD34D; border: 2px solid #059669; }
+  .chat-name { font-size: 20px; font-weight: 700; color: white; }
+  .chat-status { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+  .messages { flex: 1; padding: 18px 16px; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+
+  .msg-row { display: flex; gap: 10px; align-items: flex-end; }
+  .msg-row.me { flex-direction: row-reverse; }
+  .msg-avatar { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: white; }
+  .bubble { max-width: 78%; padding: 12px 16px; border-radius: 20px; font-size: 17px; line-height: 1.45; position: relative; }
+  .bubble.them { background: white; color: #0A0A0A; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .bubble.me { background: #4F46E5; color: white; border-bottom-right-radius: 4px; }
+  .bubble-time { font-size: 12px; margin-top: 4px; display: block; opacity: 0.55; text-align: right; }
+  .translation-line { font-size: 13px; color: #6B7280; margin-top: 4px; display: flex; align-items: center; gap: 5px; padding: 0 4px; }
+
+  /* ── Voice message bubble ── */
+  .voice-bubble {
+    background: white; border-radius: 20px; border-bottom-left-radius: 4px;
+    padding: 14px 18px; max-width: 82%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .voice-top { display: flex; align-items: center; gap: 14px; }
+  .play-btn {
+    width: 48px; height: 48px; border-radius: 50%; background: #4F46E5;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .waveform {
+    flex: 1; display: flex; align-items: center; gap: 3px; height: 40px;
+  }
+  .wave-bar {
+    width: 4px; background: #4F46E5; border-radius: 2px; opacity: 0.7;
+  }
+  .wave-bar.played { opacity: 1; }
+  .voice-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; color: #9CA3AF; margin-top: 2px;
+  }
+  .voice-lang-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #EEF2FF; color: #4F46E5; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 8px;
+  }
+  .transcription-box {
+    background: #F9FAFB; border-radius: 12px; padding: 10px 14px;
+    border-left: 3px solid #4F46E5;
+    font-size: 14px; color: #374151; line-height: 1.5;
+  }
+  .transcription-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: #9CA3AF; font-weight: 700; margin-bottom: 4px;
+  }
+
+  /* My voice msg - amber */
+  .voice-bubble.me {
+    background: #4F46E5; border-radius: 20px; border-bottom-right-radius: 4px;
+    margin-left: auto; max-width: 82%;
+  }
+  .voice-bubble.me .play-btn { background: rgba(255,255,255,0.2); }
+  .voice-bubble.me .wave-bar { background: rgba(255,255,255,0.5); }
+  .voice-bubble.me .wave-bar.played { background: white; opacity: 1; }
+  .voice-bubble.me .voice-meta { color: rgba(255,255,255,0.6); }
+  .voice-bubble.me .voice-lang-tag { background: rgba(255,255,255,0.2); color: white; }
+  .voice-bubble.me .transcription-box { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.9); }
+  .voice-bubble.me .transcription-label { color: rgba(255,255,255,0.6); }
+
+  .input-bar { background: white; padding: 14px 16px; border-top: 1px solid #F0F0F0; flex-shrink: 0; display: flex; align-items: center; gap: 12px; }
+  .input-field { flex: 1; background: #F3F4F6; border-radius: 24px; padding: 12px 18px; font-size: 16px; color: #6B7280; display: flex; align-items: center; }
+  .send-btn { width: 46px; height: 46px; border-radius: 50%; background: #4F46E5; display: flex; align-items: center; justify-content: center; }
+
+  .feature-strip { display: flex; justify-content: center; gap: 28px; margin-top: 44px; flex-wrap: wrap; padding: 0 60px; }
+  .feature-pill { display: flex; align-items: center; gap: 10px; background: white; padding: 14px 24px; border-radius: 999px; box-shadow: 0 4px 16px rgba(0,0,0,0.07); font-size: 22px; font-weight: 600; color: #374151; }
+</style>
+</head>
+<body>
+
+<div class="headline-area">
+  <div class="badge">🎙️ Voice Messages</div>
+  <h1>Speak <span>any</span><br/>language</h1>
+  <p class="subtitle">Record once. Heard in 21 languages.</p>
+</div>
+
+<div class="phone-wrap">
+  <div class="phone-frame"></div>
+  <div class="phone-screen">
+    <div class="dynamic-island"></div>
+    <div class="status-bar"><span class="status-time">9:41</span></div>
+
+    <div class="chat-bar">
+      <div style="color:rgba(255,255,255,0.8)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+      </div>
+      <div class="chat-avatar">
+        A
+        <div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:30px;height:15px;border:2px solid rgba(255,255,255,0.4);border-radius:8px 8px 0 0;border-bottom:none"></div>
+        <span class="online-dot"></span>
+      </div>
+      <div>
+        <div class="chat-name">Ahmed Al-Rashid</div>
+        <div class="chat-status">🇦🇪 Arabic · Online</div>
+      </div>
+    </div>
+
+    <div class="messages">
+
+      <!-- Text from Ahmed -->
+      <div class="msg-row">
+        <div class="msg-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706)">A</div>
+        <div>
+          <div class="bubble them">مرحباً! كيف حالك اليوم؟</div>
+          <div class="translation-line">✨ "Hello! How are you today?"</div>
+        </div>
+      </div>
+
+      <!-- My voice message -->
+      <div class="msg-row me">
+        <div>
+          <div class="voice-bubble me">
+            <div class="voice-top">
+              <div class="play-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div class="waveform">
+                <div class="wave-bar played" style="height:14px"></div>
+                <div class="wave-bar played" style="height:24px"></div>
+                <div class="wave-bar played" style="height:32px"></div>
+                <div class="wave-bar played" style="height:22px"></div>
+                <div class="wave-bar played" style="height:36px"></div>
+                <div class="wave-bar played" style="height:28px"></div>
+                <div class="wave-bar played" style="height:18px"></div>
+                <div class="wave-bar" style="height:30px"></div>
+                <div class="wave-bar" style="height:20px"></div>
+                <div class="wave-bar" style="height:26px"></div>
+                <div class="wave-bar" style="height:16px"></div>
+                <div class="wave-bar" style="height:22px"></div>
+                <div class="wave-bar" style="height:34px"></div>
+                <div class="wave-bar" style="height:24px"></div>
+                <div class="wave-bar" style="height:14px"></div>
+              </div>
+            </div>
+            <div class="voice-meta">
+              <span>0:08 / 0:23</span>
+              <span class="voice-lang-tag">🇬🇧 EN → 🇦🇪 AR</span>
+            </div>
+            <div class="transcription-box">
+              <div class="transcription-label">Your message</div>
+              I'm doing great! I wanted to talk about the Tokyo project update.
+            </div>
+            <div class="transcription-box" style="background:rgba(255,255,255,0.15);border-color:rgba(245,158,11,0.6)">
+              <div class="transcription-label" style="color:rgba(255,255,255,0.5)">✨ Ahmed hears in Arabic</div>
+              أنا بخير جداً! أردت التحدث عن آخر مستجدات مشروع طوكيو.
+            </div>
+          </div>
+          <div style="text-align:right;font-size:12px;color:#9CA3AF;margin-top:4px">9:33 ✓✓</div>
+        </div>
+      </div>
+
+      <!-- Ahmed's voice reply -->
+      <div class="msg-row">
+        <div class="msg-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706)">A</div>
+        <div>
+          <div class="voice-bubble">
+            <div class="voice-top">
+              <div class="play-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#4F46E5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div class="waveform">
+                <div class="wave-bar" style="height:18px"></div>
+                <div class="wave-bar" style="height:28px"></div>
+                <div class="wave-bar" style="height:36px;opacity:1"></div>
+                <div class="wave-bar" style="height:20px"></div>
+                <div class="wave-bar" style="height:30px"></div>
+                <div class="wave-bar" style="height:16px"></div>
+                <div class="wave-bar" style="height:24px"></div>
+                <div class="wave-bar" style="height:32px"></div>
+                <div class="wave-bar" style="height:22px"></div>
+                <div class="wave-bar" style="height:18px"></div>
+                <div class="wave-bar" style="height:26px"></div>
+                <div class="wave-bar" style="height:14px"></div>
+                <div class="wave-bar" style="height:20px"></div>
+                <div class="wave-bar" style="height:28px"></div>
+              </div>
+            </div>
+            <div class="voice-meta">
+              <span>0:00 / 0:18</span>
+              <span class="voice-lang-tag">🇦🇪 AR → 🇬🇧 EN</span>
+            </div>
+            <div class="transcription-box">
+              <div class="transcription-label">✨ Translated to English for you</div>
+              Great news on Tokyo! I reviewed the docs — everything looks perfect. Can we meet Thursday?
+            </div>
+          </div>
+          <div style="font-size:12px;color:#9CA3AF;margin-top:4px">9:34</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="input-bar">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 1 1-14 0"/></svg>
+      <div class="input-field">Hold to record…</div>
+      <div class="send-btn" style="background:linear-gradient(135deg,#10B981,#059669)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="feature-strip">
+  <div class="feature-pill">🎙️ Record in any language</div>
+  <div class="feature-pill">✨ AI translates voice</div>
+  <div class="feature-pill">🔊 Plays in their language</div>
+</div>
+
+</body>
+</html>
