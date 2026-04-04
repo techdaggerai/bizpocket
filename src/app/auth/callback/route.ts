@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         const { data: org } = await supabase.from('organizations').insert({
           name: 'My Business',
           created_by: user.id,
-          plan: 'starter',
+          plan: 'free',
           language: userLang,
           currency: 'JPY',
           signup_source: source,

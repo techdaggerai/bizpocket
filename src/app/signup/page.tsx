@@ -74,7 +74,7 @@ function SignupInner() {
           const { data: org } = await supabase.from('organizations').insert({
             name: name || 'My PocketChat',
             created_by: user.id,
-            plan: 'starter',
+            plan: 'free',
             language: language,
             currency: 'JPY',
             signup_source: 'pocketchat',
