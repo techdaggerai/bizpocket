@@ -177,6 +177,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const supabase = createClient();
   const router = useRouter();
+  const [themeMode, setThemeMode] = useDarkMode();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
@@ -201,6 +202,40 @@ export default function SettingsPage() {
   const [messageNotifs, setMessageNotifs] = useState(true);
   const [translationSounds, setTranslationSounds] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
+
+  // Avatar upload state
+  const [avatarUrl, setAvatarUrl] = useState<string>(profile.avatar_url || '');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    if (!file.type.startsWith('image/')) { toast('Please select an image file', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast('Image must be under 5MB', 'error'); return; }
+
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from('profile-photos').getPublicUrl(path);
+      const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id);
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast('Avatar updated!', 'success');
+    } catch (err: unknown) {
+      console.error('[Avatar upload]', err);
+      toast('Upload failed. Please try again.', 'error');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -256,15 +291,39 @@ export default function SettingsPage() {
         {/* Profile header */}
         <div className="flex flex-col items-center gap-2 pb-2">
           <div className="relative">
-            <div className="h-20 w-20 rounded-full bg-[#EDE9FE] flex items-center justify-center text-2xl font-semibold text-[#4F46E5]">
-              {userName.charAt(0).toUpperCase()}
-            </div>
-            <div className="absolute -bottom-0.5 -right-0.5 h-6 w-6 rounded-full bg-[#4F46E5] flex items-center justify-center">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-            </div>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={userName}
+                className="h-20 w-20 rounded-full object-cover"
+              />
+            ) : (
+              <div className="h-20 w-20 rounded-full bg-[#EDE9FE] flex items-center justify-center text-2xl font-semibold text-[#4F46E5]">
+                {userName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <button
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              className="absolute -bottom-0.5 -right-0.5 h-6 w-6 rounded-full bg-[#4F46E5] flex items-center justify-center hover:bg-[#4338CA] transition-colors disabled:opacity-70"
+              title="Change photo"
+            >
+              {uploadingAvatar ? (
+                <span className="h-3 w-3 rounded-full border border-white border-t-transparent animate-spin block" />
+              ) : (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+              )}
+            </button>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
           </div>
           <p className="text-[16px] font-medium text-[var(--text-1)]">{userName}</p>
           <p className="text-[13px] text-[var(--text-3)]">{statusValue}</p>
@@ -379,6 +438,31 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
+        {/* APPEARANCE */}
+        <div>
+          <SectionLabel>Appearance</SectionLabel>
+          <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3" style={{ borderRadius: '8px 8px 0 0' }}>
+              <span className="text-[14px] text-[var(--text-2)]">Theme</span>
+              <div className="flex items-center gap-1 bg-white rounded-lg p-0.5 border border-[#E5E5E5]">
+                {(['light', 'system', 'dark'] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setThemeMode(m)}
+                    className={`px-2.5 py-1 rounded-md text-[12px] font-medium transition-all ${
+                      themeMode === m
+                        ? 'bg-[#4F46E5] text-white shadow-sm'
+                        : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
+                    }`}
+                  >
+                    {m === 'light' ? '☀️ Light' : m === 'dark' ? '🌙 Dark' : '⚙️ System'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* BOT & AI */}
         <div>
           <SectionLabel>Bot & AI</SectionLabel>
@@ -467,6 +551,29 @@ export default function SettingsPage() {
         >
           {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
         </select>
+      </section>
+
+      {/* Appearance / Dark Mode */}
+      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Appearance</h2>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[var(--text-1)]">Theme</span>
+          <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-lg p-0.5">
+            {(['light', 'system', 'dark'] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setThemeMode(m)}
+                className={`px-2.5 py-1 rounded-md text-[12px] font-medium transition-all ${
+                  themeMode === m
+                    ? 'bg-white text-[#4F46E5] shadow-sm font-semibold'
+                    : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
+                }`}
+              >
+                {m === 'light' ? '☀️ Light' : m === 'dark' ? '🌙 Dark' : '⚙️ System'}
+              </button>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Currency */}

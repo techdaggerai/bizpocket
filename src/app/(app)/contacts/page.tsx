@@ -113,6 +113,7 @@ export default function ContactsPage() {
   const [showQR, setShowQR] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [detailContact, setDetailContact] = useState<Contact | null>(null);
 
   const fetchContacts = useCallback(async () => {
     if (!organization?.id) return;
@@ -437,7 +438,7 @@ export default function ContactsPage() {
               <PocketAvatar name={c.name} size={40} />
 
               {/* Name + badge + language */}
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailContact(c)}>
                 <div className="flex items-center gap-2">
                   <p className="text-[14px] font-medium text-[var(--text-1)] truncate">{c.name}</p>
                   <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.contact_type] || BADGE_COLORS.friend}`}>
@@ -531,6 +532,93 @@ export default function ContactsPage() {
               <button onClick={shareQR} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors">
                 Share
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Details Modal */}
+      {detailContact && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setDetailContact(null)} />
+          <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
+            {/* Header */}
+            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#0A0A0A]">Contact Details</h2>
+              <button onClick={() => setDetailContact(null)} className="text-[#A3A3A3] hover:text-[#0A0A0A]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-5 space-y-5">
+              {/* Avatar + Name */}
+              <div className="flex flex-col items-center gap-3">
+                <PocketAvatar name={detailContact.name} size={80} />
+                <div className="text-center">
+                  <p className="text-xl font-bold text-[#0A0A0A]">{detailContact.name}</p>
+                  <span className={`inline-block mt-1 text-xs font-medium rounded-full px-3 py-0.5 capitalize ${BADGE_COLORS[detailContact.contact_type] || BADGE_COLORS.friend}`}>
+                    {detailContact.contact_type}
+                  </span>
+                </div>
+              </div>
+
+              {/* Info rows */}
+              <div className="space-y-0.5">
+                {detailContact.company && (
+                  <div className="flex items-center justify-between bg-[#F9FAFB] px-4 py-3 rounded-t-lg">
+                    <span className="text-sm text-[#6B7280]">Company</span>
+                    <span className="text-sm font-medium text-[#0A0A0A]">{detailContact.company}</span>
+                  </div>
+                )}
+                {detailContact.phone && (
+                  <div className="flex items-center justify-between bg-[#F9FAFB] px-4 py-3">
+                    <span className="text-sm text-[#6B7280]">Phone</span>
+                    <a href={`tel:${detailContact.phone}`} className="text-sm font-medium text-[#4F46E5]">{detailContact.phone}</a>
+                  </div>
+                )}
+                {detailContact.email && (
+                  <div className="flex items-center justify-between bg-[#F9FAFB] px-4 py-3">
+                    <span className="text-sm text-[#6B7280]">Email</span>
+                    <a href={`mailto:${detailContact.email}`} className="text-sm font-medium text-[#4F46E5] truncate max-w-[200px]">{detailContact.email}</a>
+                  </div>
+                )}
+                {detailContact.language && (
+                  <div className="flex items-center justify-between bg-[#F9FAFB] px-4 py-3">
+                    <span className="text-sm text-[#6B7280]">Language</span>
+                    <span className="text-sm font-medium text-[#0A0A0A]">{detailContact.language}</span>
+                  </div>
+                )}
+                {detailContact.notes && (
+                  <div className="bg-[#F9FAFB] px-4 py-3 rounded-b-lg">
+                    <span className="text-sm text-[#6B7280] block mb-1">Notes</span>
+                    <p className="text-sm text-[#0A0A0A]">{detailContact.notes}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { router.push(`/chat?contact=${detailContact.id}`); setDetailContact(null); }}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                  Chat
+                </button>
+                <button
+                  onClick={() => { openEdit(detailContact); setDetailContact(null); }}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                  Edit
+                </button>
+                <button
+                  onClick={() => { handleDelete(detailContact.id); setDetailContact(null); }}
+                  className="flex items-center justify-center gap-2 rounded-lg border border-[#DC2626]/20 px-4 py-2.5 text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
