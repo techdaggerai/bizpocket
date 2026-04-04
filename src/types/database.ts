@@ -40,6 +40,7 @@ export interface Profile {
   language: string;
   avatar_url?: string | null;
   onboarding_completed?: boolean | null;
+  status_message?: string | null;
   created_at: string;
 }
 
