@@ -233,7 +233,17 @@ ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No bus
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
-      system: (isPocketChatOrg ? POCKETCHAT_SYSTEM_PROMPT : BIZPOCKET_SYSTEM_PROMPT) + '\n\n' + contextBlock,
+      system: [
+        {
+          type: 'text',
+          text: isPocketChatOrg ? POCKETCHAT_SYSTEM_PROMPT : BIZPOCKET_SYSTEM_PROMPT,
+          cache_control: { type: 'ephemeral' },
+        },
+        {
+          type: 'text',
+          text: contextBlock,
+        },
+      ],
       messages: [{ role: 'user', content: message }],
     })
 
