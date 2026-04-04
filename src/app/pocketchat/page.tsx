@@ -54,6 +54,78 @@ const LANGUAGES = [
 
 
 
+const FAQ_ITEMS = [
+  {
+    q: 'Is it really free?',
+    a: 'Yes — unlimited chat with your contacts is free forever. You get 3 AI-powered translations per day on the free plan. Need more? Pro plans start at ¥1,980/month.',
+  },
+  {
+    q: 'How accurate are the translations?',
+    a: "Powered by Claude AI by Anthropic — one of the most advanced language models in the world. It understands context, tone, and cultural nuance, not just literal word-for-word translation.",
+  },
+  {
+    q: 'Is my data safe?',
+    a: 'All messages are encrypted in transit and at rest. Data is stored on servers in Japan (Supabase Tokyo). We never read your messages, never sell your data, and never share it with third parties.',
+  },
+  {
+    q: 'What languages are supported?',
+    a: 'Currently 21: English, Japanese, Arabic, Korean, Chinese, Hindi, Portuguese, Spanish, French, Urdu, Bengali, Turkish, Filipino, Vietnamese, Persian, Pashto, Thai, Indonesian, Nepali, Sinhala, and Dutch. More coming.',
+  },
+  {
+    q: 'Can I use Evrywher for my business?',
+    a: 'Absolutely. Pro and Business plans unlock unlimited AI translations, voice message translation, group chat, the AI auto-reply bot, and priority support. Perfect for international teams, customer service, and client communication.',
+  },
+];
+
+function FaqSection() {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section className="px-6 py-20 bg-white">
+      <div className="mx-auto max-w-[720px]">
+        <div className="mb-10 text-center">
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Got questions?</p>
+          <h2 className="text-[clamp(24px,4vw,34px)] font-bold text-[#111827]">Frequently asked</h2>
+        </div>
+        <div className="space-y-2">
+          {FAQ_ITEMS.map((item, i) => (
+            <div
+              key={i}
+              className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f9fafb]"
+            >
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left"
+                aria-expanded={open === i}
+              >
+                <span className="text-[15px] font-semibold text-[#111827]">{item.q}</span>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#4F46E5"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="shrink-0 transition-transform duration-200"
+                  style={{ transform: open === i ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {open === i && (
+                <div className="border-t border-[#e5e7eb] px-6 py-4">
+                  <p className="text-[14px] leading-relaxed text-[#374151]">{item.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function PocketChatLanding() {
   const [idx, setIdx] = useState(0);
   const [fade, setFade] = useState(true);
@@ -263,7 +335,152 @@ export default function PocketChatLanding() {
         </div>
       </section>
 
-      {/* 8. Footer */}
+      {/* 8. Testimonials */}
+      <section className="px-6 py-20 bg-white">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="mb-12 text-center">
+            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Real people. Real conversations.</p>
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827]">Trusted by expats worldwide</h2>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {[
+              {
+                quote: "Finally someone who understands that すみません doesn't just mean sorry",
+                name: 'Yuki',
+                location: 'Tokyo',
+                flag: '🇯🇵',
+                avatar: 'Y',
+                color: '#F43F5E',
+              },
+              {
+                quote: "My Pakistani family and Japanese in-laws can actually talk now",
+                name: 'Ahmed',
+                location: 'Osaka',
+                flag: '🇵🇰',
+                avatar: 'A',
+                color: '#F59E0B',
+              },
+              {
+                quote: "The cultural notes are a game changer for business meetings",
+                name: 'Sarah',
+                location: 'Nagoya',
+                flag: '🇬🇧',
+                avatar: 'S',
+                color: '#4F46E5',
+              },
+            ].map((t, i) => (
+              <div key={i} className="flex flex-col gap-4 rounded-2xl border border-[#e5e7eb] bg-[#f9fafb] p-6">
+                {/* Stars */}
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, s) => (
+                    <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill="#F59E0B" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  ))}
+                </div>
+                {/* Quote */}
+                <p className="flex-1 text-[15px] leading-relaxed text-[#374151]">&ldquo;{t.quote}&rdquo;</p>
+                {/* Author */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] text-[15px] font-bold text-white"
+                    style={{ background: t.color }}
+                  >
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-semibold text-[#111827]">{t.name} {t.flag}</p>
+                    <p className="text-[12px] text-[#6b7280]">{t.location}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Comparison */}
+      <section className="bg-[#f9fafb] px-6 py-20">
+        <div className="mx-auto max-w-[680px]">
+          <div className="mb-10 text-center">
+            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Why Evrywher</p>
+            <h2 className="text-[clamp(24px,4vw,34px)] font-bold text-[#111827]">Evrywher vs Google Translate</h2>
+            <p className="mt-3 text-[15px] text-[#6b7280]">Translate is a tool. Evrywher is a conversation.</p>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+            {/* Header row */}
+            <div className="grid grid-cols-3 border-b border-[#e5e7eb] bg-[#f9fafb] px-6 py-3">
+              <div />
+              <div className="text-center text-[13px] font-bold text-[#4F46E5]">Evrywher</div>
+              <div className="text-center text-[13px] font-semibold text-[#9ca3af]">Google Translate</div>
+            </div>
+            {/* Feature rows */}
+            {[
+              { label: 'Cultural context', us: true, them: false },
+              { label: 'Real-time chat', us: true, them: false },
+              { label: 'Voice messages', us: true, them: false },
+              { label: 'Group translation', us: true, them: false },
+              { label: 'Keigo detection', us: true, them: false },
+            ].map((row, i, arr) => (
+              <div
+                key={i}
+                className={`grid grid-cols-3 items-center px-6 py-4 ${i < arr.length - 1 ? 'border-b border-[#f3f4f6]' : ''}`}
+              >
+                <span className="text-[14px] font-medium text-[#374151]">{row.label}</span>
+                <div className="flex justify-center">
+                  {row.us ? (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#d1fae5]">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    </span>
+                  ) : (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fee2e2]">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </span>
+                  )}
+                </div>
+                <div className="flex justify-center">
+                  {row.them ? (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#d1fae5]">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    </span>
+                  ) : (
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f3f4f6]">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. FAQ */}
+      <FaqSection />
+
+      {/* 11. Final CTA */}
+      <section className="px-6 py-24 text-center">
+        <div className="mx-auto max-w-[560px]">
+          <p className="mb-4 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Get started today</p>
+          <h2 className="mb-4 text-[clamp(28px,5vw,44px)] font-black leading-tight text-[#111827]">
+            Start chatting in<br />
+            <span className="text-[#4F46E5]">21 languages</span>
+          </h2>
+          <p className="mb-2 text-[16px] text-[#6b7280]">Free forever. No credit card.</p>
+          <p className="mb-10 text-[14px] text-[#9ca3af]">No download. Works on any phone.</p>
+          <Link
+            href="/signup?mode=pocketchat"
+            className="inline-block rounded-xl bg-[#4F46E5] px-12 py-4 text-[17px] font-bold text-white shadow-lg shadow-[#4F46E5]/30 hover:bg-[#4338ca] transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            Start Free →
+          </Link>
+          <p className="mt-6 text-[13px] italic text-[#9ca3af]">
+            You bring the missing E. We bring the world.
+          </p>
+        </div>
+      </section>
+
+      {/* 12. Footer */}
       <footer className="bg-[#f9fafb]">
         <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4 px-6 py-8">
           <div className="flex items-center gap-2">
