@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { createClient } from '@/lib/supabase-client';
 
 interface NavItem {
   href: string;
@@ -75,6 +77,21 @@ const NAV_ITEMS: NavItem[] = [
 export default function BottomNav() {
   const pathname = usePathname();
   const { organization } = useAuth();
+  const [chatUnread, setChatUnread] = useState(0);
+
+  useEffect(() => {
+    if (!organization?.id) return;
+    const supabase = createClient();
+    supabase.from('conversations').select('unread_count').eq('organization_id', organization.id).gt('unread_count', 0).then(({ data }) => {
+      setChatUnread(data?.reduce((sum, c) => sum + (c.unread_count || 0), 0) || 0);
+    });
+    const ch = supabase.channel('unread-' + organization.id).on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `organization_id=eq.${organization.id}` }, () => {
+      supabase.from('conversations').select('unread_count').eq('organization_id', organization.id).gt('unread_count', 0).then(({ data }) => {
+        setChatUnread(data?.reduce((sum, c) => sum + (c.unread_count || 0), 0) || 0);
+      });
+    }).subscribe();
+    return () => { ch.unsubscribe(); };
+  }, [organization?.id]);
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
@@ -99,7 +116,14 @@ export default function BottomNav() {
                   : 'text-[#A3A3A3] hover:text-[var(--text-2)]'
               }`}
             >
-              {item.icon}
+              <div className="relative">
+                {item.icon}
+                {item.href === '/chat' && chatUnread > 0 && (
+                  <span className="absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#DC2626] px-1 text-[9px] font-bold text-white">
+                    {chatUnread > 99 ? '99+' : chatUnread}
+                  </span>
+                )}
+              </div>
               <span className="mt-0.5 text-[11px] font-medium">{item.label}</span>
             </Link>
           );

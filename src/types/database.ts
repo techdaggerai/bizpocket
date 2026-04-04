@@ -1,4 +1,4 @@
-export type NotificationType = 'invoice_overdue' | 'payment_due' | 'tax_deadline' | 'low_balance' | 'expense_reminder' | 'planner_reminder';
+export type NotificationType = 'invoice_overdue' | 'payment_due' | 'tax_deadline' | 'low_balance' | 'expense_reminder' | 'planner_reminder' | 'new_message' | 'new_contact' | 'trial_expiring' | 'limit_reached' | 'system';
 
 export type UserRole = 'owner' | 'staff' | 'accountant';
 export type FlowType = 'IN' | 'OUT';

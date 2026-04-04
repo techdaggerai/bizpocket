@@ -6,13 +6,18 @@ import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import type { Notification, NotificationType } from '@/types/database';
 
-const TYPE_ICONS: Record<NotificationType, { icon: string; color: string }> = {
+const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
   invoice_overdue: { icon: '!', color: 'bg-[#DC2626]/10 text-[#DC2626]' },
   payment_due: { icon: '$', color: 'bg-[#16A34A]/10 text-[#16A34A]' },
   tax_deadline: { icon: 'T', color: 'bg-[#F59E0B]/10 text-[#F59E0B]' },
   low_balance: { icon: '!', color: 'bg-[#DC2626]/10 text-[#DC2626]' },
   expense_reminder: { icon: 'E', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
   planner_reminder: { icon: 'P', color: 'bg-[#7C3AED]/10 text-[#7C3AED]' },
+  new_message: { icon: '💬', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
+  new_contact: { icon: '👤', color: 'bg-[#10B981]/10 text-[#10B981]' },
+  trial_expiring: { icon: '⏰', color: 'bg-[#F59E0B]/10 text-[#F59E0B]' },
+  limit_reached: { icon: '🔒', color: 'bg-[#9CA3AF]/10 text-[#6B7280]' },
+  system: { icon: '📢', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
 };
 
 function timeAgo(dateStr: string): string {
@@ -50,9 +55,24 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+    // Realtime subscription for instant updates
+    const channel = supabase
+      .channel('notifications-' + orgId)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `organization_id=eq.${orgId}`,
+      }, (payload) => {
+        const newNotif = payload.new as Notification;
+        setNotifications(prev => [newNotif, ...prev].slice(0, 20));
+        setUnreadCount(c => c + 1);
+      })
+      .subscribe();
+    // Fallback poll every 2 minutes
+    const interval = setInterval(fetchNotifications, 120000);
+    return () => { clearInterval(interval); channel.unsubscribe(); };
+  }, [fetchNotifications, orgId]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
