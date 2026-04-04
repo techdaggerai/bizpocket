@@ -51,6 +51,8 @@ interface Conversation {
   is_pinned?: boolean;
   pinned_at?: string | null;
   is_archived?: boolean;
+  muted_until?: string | null;
+  disappearing_timer?: string;
   label?: string | null;
   label_color?: string | null;
   contact?: Contact | null;
@@ -73,6 +75,8 @@ interface Message {
   deleted_at?: string | null;
   reactions?: Record<string, string[]> | null;
   is_starred?: boolean;
+  reply_to_id?: string | null;
+  edited_at?: string | null;
   created_at: string;
 }
 
@@ -182,6 +186,8 @@ export default function PocketChatPage() {
   const [botMessagesUsed, setBotMessagesUsed] = useState(0);
   const isFreePlan = (organization?.plan || 'free') === 'free';
   const [contactLastSeen, setContactLastSeen] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<{ id: string; sender: string; text: string } | null>(null);
+  const [editingMsg, setEditingMsg] = useState<{ id: string; text: string } | null>(null);
   const [actionMenu, setActionMenu] = useState<{ msgId: string; x: number; y: number; isOwner: boolean; text: string } | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -585,6 +591,42 @@ export default function PocketChatPage() {
     }
   }
 
+  function handleReplyTo() {
+    if (!actionMenu) return;
+    setReplyTo({ id: actionMenu.msgId, sender: messages.find(m => m.id === actionMenu.msgId)?.sender_name || '', text: actionMenu.text.slice(0, 100) });
+    setActionMenu(null);
+    inputRef.current?.focus();
+  }
+
+  function handleEditMsg() {
+    if (!actionMenu) return;
+    setEditingMsg({ id: actionMenu.msgId, text: actionMenu.text });
+    setNewMessage(actionMenu.text);
+    setActionMenu(null);
+    inputRef.current?.focus();
+  }
+
+  async function saveEditedMsg() {
+    if (!editingMsg || !newMessage.trim()) return;
+    await supabase.from('messages').update({ message: newMessage.trim(), edited_at: new Date().toISOString() }).eq('id', editingMsg.id);
+    setMessages(prev => prev.map(m => m.id === editingMsg.id ? { ...m, message: newMessage.trim(), edited_at: new Date().toISOString() } : m));
+    setEditingMsg(null);
+    setNewMessage('');
+  }
+
+  async function handleMuteConvo(duration: string) {
+    const convoId = convoActionId;
+    if (!convoId) return;
+    let mutedUntil: string | null = null;
+    if (duration === '8h') mutedUntil = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString();
+    else if (duration === '1w') mutedUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    else if (duration === 'always') mutedUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from('conversations').update({ muted_until: mutedUntil }).eq('id', convoId);
+    setConversations(prev => prev.map(c => c.id === convoId ? { ...c, muted_until: mutedUntil } : c));
+    toast(mutedUntil ? 'Muted' : 'Unmuted', 'success');
+    setConvoActionId(null);
+  }
+
   async function handlePinConvo(convoId: string) {
     const convo = conversations.find(c => c.id === convoId);
     const pinned = conversations.filter(c => c.is_pinned).length;
@@ -850,6 +892,8 @@ export default function PocketChatPage() {
 
     if (!newMessage.trim() || !activeConvoId || !organization?.id || sending) return;
     if (newMessage.trim().length > 5000) { toast('Message too long (max 5000 characters)', 'error'); return; }
+    // Handle edit mode
+    if (editingMsg) { await saveEditedMsg(); setSending(false); return; }
     setSending(true);
     const text = newMessage.trim();
     setNewMessage('');
@@ -869,7 +913,9 @@ export default function PocketChatPage() {
         original_text: text,
         original_language: senderLang,
         translations: { [senderLang]: text },
+        ...(replyTo && { reply_to_id: replyTo.id }),
       }).select().single();
+      setReplyTo(null);
 
       if (error) {
         toast('Failed to send message', 'error');
@@ -1595,7 +1641,14 @@ export default function PocketChatPage() {
                           : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
+                    {msg.reply_to_id && (() => { const orig = messages.find(m => m.id === msg.reply_to_id); return orig ? (
+                      <div className={`mb-1.5 border-l-2 pl-2 py-1 text-[12px] rounded ${isOwner ? 'border-white/50 bg-white/10' : 'border-[#4F46E5]/30 bg-[#4F46E5]/5'}`}>
+                        <p className={`font-medium ${isOwner ? 'text-white/70' : 'text-[#4F46E5]'}`}>{orig.sender_name}</p>
+                        <p className={`truncate ${isOwner ? 'text-white/60' : 'text-[#6B7280]'}`}>{orig.message?.slice(0, 60)}</p>
+                      </div>
+                    ) : null; })()}
                     <p className="text-[15px] whitespace-pre-wrap break-words" style={/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : undefined}>{displayText}</p>
+                    {msg.edited_at && <p className={`text-[10px] mt-0.5 ${isOwner ? 'text-white/40' : 'text-[#9CA3AF]'}`}>(edited)</p>}
                     {(() => { const urlMatch = displayText.match(/https?:\/\/[^\s]+/); return urlMatch ? <LinkPreview url={urlMatch[0]} /> : null; })()}
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
@@ -1726,10 +1779,20 @@ export default function PocketChatPage() {
               className="fixed z-50 w-44 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1 animate-in fade-in zoom-in-95 duration-150"
               style={{ top: actionMenu.y, left: actionMenu.x }}
             >
+              <button onClick={handleReplyTo} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
+                Reply
+              </button>
               <button onClick={handleCopyText} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
                 <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                 Copy text
               </button>
+              {actionMenu.isOwner && (
+                <button onClick={handleEditMsg} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                  <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg>
+                  Edit
+                </button>
+              )}
               <button onClick={handleStarMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
                 <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
                 {(() => { const m = messages.find(m => m.id === actionMenu.msgId); return m?.is_starred ? 'Unstar' : 'Star'; })()}
@@ -1818,6 +1881,19 @@ export default function PocketChatPage() {
             {((activeConvo.is_bot_chat && botMessagesUsed >= 10) || (!activeConvo.is_bot_chat && translationsUsed >= 3)) && (
               <Link href="/settings/upgrade" className="text-[11px] font-medium text-[#4F46E5]">Upgrade</Link>
             )}
+          </div>
+        )}
+
+        {/* Reply/Edit preview above input */}
+        {(replyTo || editingMsg) && (
+          <div className="px-3 py-2 border-t border-[#F0F0F0] bg-[#F9FAFB] flex items-center gap-2">
+            <div className="flex-1 min-w-0 border-l-2 border-[#4F46E5] pl-2">
+              <p className="text-[11px] font-medium text-[#4F46E5]">{editingMsg ? 'Editing message' : `Replying to ${replyTo?.sender}`}</p>
+              <p className="text-[12px] text-[#6B7280] truncate">{editingMsg ? editingMsg.text : replyTo?.text}</p>
+            </div>
+            <button onClick={() => { setReplyTo(null); setEditingMsg(null); setNewMessage(''); }} className="text-[#9CA3AF] hover:text-[#374151]">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
         )}
 
@@ -2137,6 +2213,7 @@ export default function PocketChatPage() {
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className={`text-[15px] text-[#0A0A0A] truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
                       {convo.is_pinned && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>}
+                      {convo.muted_until && new Date(convo.muted_until) > new Date() && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51" /></svg>}
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
                       {convo.is_group && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Group</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
@@ -2172,6 +2249,10 @@ export default function PocketChatPage() {
             <button onClick={() => handlePinConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#374151] hover:bg-[#F3F4F6]">
               <svg className="h-5 w-5 text-[#6B7280]" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
               {conversations.find(c => c.id === convoActionId)?.is_pinned ? 'Unpin' : 'Pin to top'}
+            </button>
+            <button onClick={() => handleMuteConvo(conversations.find(c => c.id === convoActionId)?.muted_until ? 'unmute' : '8h')} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#374151] hover:bg-[#F3F4F6]">
+              <svg className="h-5 w-5 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>
+              {conversations.find(c => c.id === convoActionId)?.muted_until ? 'Unmute' : 'Mute (8h)'}
             </button>
             <button onClick={() => handleArchiveConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#374151] hover:bg-[#F3F4F6]">
               <svg className="h-5 w-5 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
