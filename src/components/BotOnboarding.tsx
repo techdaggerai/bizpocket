@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
+import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 const BOT_ICONS: { key: string; emoji: string; label: string }[] = [
   { key: 'rocket', emoji: '🚀', label: 'Rocket' },
@@ -27,6 +28,9 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const [botName, setBotName] = useState('Pocket');
   const [botIcon, setBotIcon] = useState('rocket');
   const [saving, setSaving] = useState(false);
+
+  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && window.location.hostname.includes('pocketchat'));
 
   async function handleFinish() {
     setSaving(true);
@@ -84,15 +88,25 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   if (step === 'welcome') {
     return (
       <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] shadow-lg">
-          <span className="text-5xl">🚀</span>
-        </div>
+        {isPocketChatMode ? (
+          <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] shadow-lg">
+            <AnimatedPocketChatLogo size={64} isTranslating={true} />
+          </div>
+        ) : (
+          <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] shadow-lg">
+            <span className="text-5xl">🚀</span>
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-[var(--text-1)] mb-2">Meet your AI Assistant</h1>
         <p className="text-sm text-[var(--text-3)] max-w-sm mb-2">
-          Your personal business AI lives right here in PocketChat. It knows your business, speaks your language, and helps you manage everything through conversation.
+          {isPocketChatMode
+            ? 'Your personal AI lives right here in PocketChat. It speaks every language, translates your conversations, and helps you connect with anyone worldwide.'
+            : 'Your personal business AI lives right here in PocketChat. It knows your business, speaks your language, and helps you manage everything through conversation.'}
         </p>
         <p className="text-xs text-[var(--text-4)] max-w-xs mb-8">
-          Send invoices, translate documents, check finances — all by messaging your assistant.
+          {isPocketChatMode
+            ? 'Voice calls, live translation, AI video guide — all by chatting with your assistant.'
+            : 'Send invoices, translate documents, check finances — all by messaging your assistant.'}
         </p>
         <button
           onClick={() => setStep('name')}
