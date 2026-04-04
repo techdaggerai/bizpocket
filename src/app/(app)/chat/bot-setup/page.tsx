@@ -85,7 +85,6 @@ export default function BotSetupPage() {
   }, [organization?.id, loaded, supabase]);
 
   const handleSave = async () => {
-    alert('DEBUG: handleSave called. orgId=' + organization?.id + ' orgReady=' + orgReady + ' botName=' + botName); // TEMP DEBUG — remove after testing
     if (!botName.trim() || !organization?.id) return;
     setSaving(true);
     try {

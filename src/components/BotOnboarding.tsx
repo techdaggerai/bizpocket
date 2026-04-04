@@ -49,34 +49,57 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
       console.error('Bot config error:', configError);
     }
 
-    // Create bot conversation
+    // Create bot conversation (check for existing first to prevent duplicates)
     const welcomeMsg = `Hi! I'm ${botName}, your AI business assistant. How can I help?`;
-    const { data: convoData, error: convoError } = await supabase
+
+    const { data: existingConvo } = await supabase
       .from('conversations')
-      .insert({
-        organization_id: organization.id,
-        title: botName,
-        is_bot_chat: true,
-        last_message: welcomeMsg,
-        last_message_at: new Date().toISOString(),
-      })
       .select('id')
+      .eq('organization_id', organization.id)
+      .eq('is_bot_chat', true)
       .single();
 
-    if (convoError) {
-      console.error('Bot conversation error:', convoError);
+    const botConvoId = existingConvo?.id;
+    let newConvoId: string | null = null;
+
+    if (!botConvoId) {
+      const { data: convoData, error: convoError } = await supabase
+        .from('conversations')
+        .insert({
+          organization_id: organization.id,
+          title: botName,
+          is_bot_chat: true,
+          last_message: welcomeMsg,
+          last_message_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single();
+
+      if (convoError) {
+        console.error('Bot conversation error:', convoError);
+      }
+      newConvoId = convoData?.id ?? null;
     }
 
-    // Insert the first bot message into messages table
-    if (convoData) {
-      await supabase.from('messages').insert({
-        conversation_id: convoData.id,
-        organization_id: organization.id,
-        sender_type: 'bot',
-        sender_name: botName,
-        message: welcomeMsg,
-        message_type: 'text',
-      });
+    // Insert greeting only if conversation has no messages yet
+    const convoId = botConvoId || newConvoId;
+    if (convoId) {
+      const { data: existingMessages } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', convoId)
+        .limit(1);
+
+      if (!existingMessages?.length) {
+        await supabase.from('messages').insert({
+          conversation_id: convoId,
+          organization_id: organization.id,
+          sender_type: 'bot',
+          sender_name: botName,
+          message: welcomeMsg,
+          message_type: 'text',
+        });
+      }
     }
 
     setSaving(false);

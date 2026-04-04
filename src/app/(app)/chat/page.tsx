@@ -729,8 +729,80 @@ export default function PocketChatPage() {
     return c.name.toLowerCase().includes(q) || (c.company ?? '').toLowerCase().includes(q);
   });
 
-  // Show bot onboarding if not set up
-  if (botConfigLoaded && !isSetupComplete) {
+  // Auto-create bot for PocketChat/Speko users — skip onboarding entirely
+  useEffect(() => {
+    if (!organization?.id || !isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
+
+    const autoCreateBot = async () => {
+      const { data: existing } = await supabase
+        .from('pocket_bot_config')
+        .select('id')
+        .eq('organization_id', organization.id)
+        .single();
+
+      if (existing) return;
+
+      const botGreeting = "Hi! I'm your Speko assistant. I can help you communicate in 21 languages!";
+      const { error } = await supabase
+        .from('pocket_bot_config')
+        .upsert({
+          organization_id: organization.id,
+          bot_name: 'Speko AI',
+          bot_icon: 'gem',
+          greeting_message: botGreeting,
+          bot_personality: 'friendly',
+          language: 'en',
+          is_setup_complete: true,
+          auto_reply_enabled: true,
+        }, { onConflict: 'organization_id' });
+
+      if (error) {
+        console.error('[AUTO BOT] Failed to create config:', error);
+        return;
+      }
+
+      // Create bot conversation (check first to avoid duplicates)
+      const { data: existingConvo } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('organization_id', organization.id)
+        .eq('is_bot_chat', true)
+        .single();
+
+      if (!existingConvo) {
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert({
+            organization_id: organization.id,
+            is_bot_chat: true,
+            title: 'Speko AI',
+            last_message: botGreeting,
+            last_message_at: new Date().toISOString(),
+          })
+          .select('id')
+          .single();
+
+        if (newConvo) {
+          await supabase.from('messages').insert({
+            conversation_id: newConvo.id,
+            organization_id: organization.id,
+            sender_type: 'bot',
+            sender_name: 'Speko AI',
+            message: botGreeting,
+            message_type: 'text',
+          });
+        }
+      }
+
+      fetchBotConfig();
+      fetchConversations();
+    };
+
+    autoCreateBot();
+  }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
+
+  // Show bot onboarding if not set up (BizPocket users only — PocketChat auto-creates above)
+  if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
     return (
       <div className="h-[calc(100vh-80px)] bg-white">
         <BotOnboarding
