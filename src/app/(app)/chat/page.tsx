@@ -730,8 +730,13 @@ export default function PocketChatPage() {
   });
 
   // Auto-create bot for PocketChat/Speko users — skip onboarding entirely
+  const [autoCreating, setAutoCreating] = useState(false);
+
   useEffect(() => {
     if (!organization?.id || !isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
+
+    let cancelled = false;
+    setAutoCreating(true);
 
     const autoCreateBot = async () => {
       const { data: existing } = await supabase
@@ -740,7 +745,11 @@ export default function PocketChatPage() {
         .eq('organization_id', organization.id)
         .single();
 
-      if (existing) return;
+      if (existing) {
+        // Config exists but isSetupComplete was false — refetch to sync
+        if (!cancelled) { fetchBotConfig(); setAutoCreating(false); }
+        return;
+      }
 
       const botGreeting = "Hi! I'm your Speko assistant. I can help you communicate in 21 languages!";
       const { error } = await supabase
@@ -758,6 +767,7 @@ export default function PocketChatPage() {
 
       if (error) {
         console.error('[AUTO BOT] Failed to create config:', error);
+        if (!cancelled) setAutoCreating(false);
         return;
       }
 
@@ -794,14 +804,28 @@ export default function PocketChatPage() {
         }
       }
 
-      fetchBotConfig();
-      fetchConversations();
+      if (!cancelled) {
+        await fetchBotConfig();
+        await fetchConversations();
+        setAutoCreating(false);
+      }
     };
 
     autoCreateBot();
+    return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // Show bot onboarding if not set up (BizPocket users only — PocketChat auto-creates above)
+  // PocketChat users: show loading while auto-creating bot
+  if (isPocketChatMode && botConfigLoaded && !isSetupComplete) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] bg-white gap-3">
+        <div className="h-10 w-10 rounded-full border-3 border-[#4F46E5] border-t-transparent animate-spin" />
+        <p className="text-sm text-[#6b7280]">Setting up your assistant...</p>
+      </div>
+    );
+  }
+
+  // Show bot onboarding if not set up (BizPocket users only)
   if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
     return (
       <div className="h-[calc(100vh-80px)] bg-white">
