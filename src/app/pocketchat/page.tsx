@@ -158,7 +158,7 @@ export default function PocketChatLanding() {
 
             {/* Step 1 */}
             <div className="rounded-2xl border border-[#f3f4f6] bg-white p-8 text-center shadow-sm transition-shadow duration-300 hover:shadow-md">
-              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef2ff]">
+              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef2ff] overflow-visible">
                 <AnimatedPocketChatLogo size={48} isTranslating={true} />
               </div>
               <div className="mb-2 text-sm font-semibold text-[#4F46E5]">STEP 1</div>
