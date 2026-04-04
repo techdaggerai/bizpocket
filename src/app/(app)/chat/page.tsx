@@ -733,79 +733,98 @@ export default function PocketChatPage() {
   const [autoCreating, setAutoCreating] = useState(false);
 
   useEffect(() => {
+    console.log('[AUTO] Guard check —', 'orgId:', organization?.id, 'isPocketChat:', isPocketChatMode, 'botConfigLoaded:', botConfigLoaded, 'isSetupComplete:', isSetupComplete);
     if (!organization?.id || !isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
 
     let cancelled = false;
     setAutoCreating(true);
+    console.log('[AUTO] Starting auto-create bot...');
 
     const autoCreateBot = async () => {
-      const { data: existing } = await supabase
-        .from('pocket_bot_config')
-        .select('id')
-        .eq('organization_id', organization.id)
-        .maybeSingle();
-
-      if (existing) {
-        if (!cancelled) { fetchBotConfig(); setAutoCreating(false); }
-        return;
-      }
-
-      const botGreeting = "Hi! I'm your Speko assistant. I can help you communicate in 21 languages!";
-      const { error } = await supabase
-        .from('pocket_bot_config')
-        .upsert({
-          organization_id: organization.id,
-          bot_name: 'Speko AI',
-          bot_icon: 'gem',
-          greeting_message: botGreeting,
-          bot_personality: 'friendly',
-          language: 'en',
-          is_setup_complete: true,
-          auto_reply_enabled: true,
-        }, { onConflict: 'organization_id' });
-
-      if (error) {
-        console.error('[AUTO BOT] Failed to create config:', error);
-        if (!cancelled) setAutoCreating(false);
-        return;
-      }
-
-      const { data: existingConvo } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('organization_id', organization.id)
-        .eq('is_bot_chat', true)
-        .maybeSingle();
-
-      if (!existingConvo) {
-        const { data: newConvo } = await supabase
-          .from('conversations')
-          .insert({
-            organization_id: organization.id,
-            is_bot_chat: true,
-            title: 'Speko AI',
-            last_message: botGreeting,
-            last_message_at: new Date().toISOString(),
-          })
+      try {
+        const { data: existing, error: checkErr } = await supabase
+          .from('pocket_bot_config')
           .select('id')
-          .single();
+          .eq('organization_id', organization.id)
+          .maybeSingle();
 
-        if (newConvo) {
-          await supabase.from('messages').insert({
-            conversation_id: newConvo.id,
-            organization_id: organization.id,
-            sender_type: 'bot',
-            sender_name: 'Speko AI',
-            message: botGreeting,
-            message_type: 'text',
-          });
+        console.log('[AUTO] Existing config check — data:', existing, 'error:', checkErr);
+
+        if (existing) {
+          if (!cancelled) { fetchBotConfig(); setAutoCreating(false); }
+          return;
         }
-      }
 
-      if (!cancelled) {
-        await fetchBotConfig();
-        await fetchConversations();
-        setAutoCreating(false);
+        console.log('[AUTO] About to upsert bot config for org:', organization.id);
+        const botGreeting = "Hi! I'm your Speko assistant. I can help you communicate in 21 languages!";
+        const { error } = await supabase
+          .from('pocket_bot_config')
+          .upsert({
+            organization_id: organization.id,
+            bot_name: 'Speko AI',
+            bot_icon: 'gem',
+            greeting_message: botGreeting,
+            bot_personality: 'friendly',
+            language: 'en',
+            is_setup_complete: true,
+            auto_reply_enabled: true,
+          }, { onConflict: 'organization_id' });
+
+        console.log('[AUTO] Upsert result — error:', error);
+
+        if (error) {
+          console.error('[AUTO BOT] Failed to create config:', error);
+          if (!cancelled) setAutoCreating(false);
+          return;
+        }
+
+        const { data: existingConvo, error: convoCheckErr } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('organization_id', organization.id)
+          .eq('is_bot_chat', true)
+          .maybeSingle();
+
+        console.log('[AUTO] Existing convo check — data:', existingConvo, 'error:', convoCheckErr);
+
+        if (!existingConvo) {
+          const { data: newConvo, error: convoErr } = await supabase
+            .from('conversations')
+            .insert({
+              organization_id: organization.id,
+              is_bot_chat: true,
+              title: 'Speko AI',
+              last_message: botGreeting,
+              last_message_at: new Date().toISOString(),
+            })
+            .select('id')
+            .single();
+
+          console.log('[AUTO] Convo insert — data:', newConvo, 'error:', convoErr);
+
+          if (newConvo) {
+            const { error: msgErr } = await supabase.from('messages').insert({
+              conversation_id: newConvo.id,
+              organization_id: organization.id,
+              sender_type: 'bot',
+              sender_name: 'Speko AI',
+              message: botGreeting,
+              message_type: 'text',
+            });
+            console.log('[AUTO] Message insert — error:', msgErr);
+          }
+        }
+
+        if (!cancelled) {
+          console.log('[AUTO] All done, refetching...');
+          await fetchBotConfig();
+          await fetchConversations();
+          setAutoCreating(false);
+          console.log('[AUTO] Refetch complete, autoCreating set to false');
+        }
+      } catch (err) {
+        console.error('[AUTO] Uncaught error in autoCreateBot:', err);
+        if (!cancelled) setAutoCreating(false);
       }
     };
 
