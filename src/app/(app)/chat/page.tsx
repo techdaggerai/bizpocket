@@ -832,23 +832,23 @@ export default function PocketChatPage() {
     return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // PocketChat users: timeout fallback with retry guard to prevent infinite reload
+  // PocketChat users: timeout fallback — only if no botConfig exists at all
   useEffect(() => {
-    if (!isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
+    if (!isPocketChatMode || !botConfigLoaded || isSetupComplete || botConfig) return;
     const retries = parseInt(sessionStorage.getItem('bot_retries') || '0');
     if (retries >= 2) {
       sessionStorage.removeItem('bot_retries');
-      return; // Stop looping — fall through to chat UI
+      return;
     }
     const timer = setTimeout(() => {
       sessionStorage.setItem('bot_retries', String(retries + 1));
       window.location.reload();
     }, 3000);
     return () => clearTimeout(timer);
-  }, [isPocketChatMode, botConfigLoaded, isSetupComplete]);
+  }, [isPocketChatMode, botConfigLoaded, isSetupComplete, botConfig]);
 
-  if (isPocketChatMode && botConfigLoaded && !isSetupComplete) {
-    // Check if we've exhausted retries — show chat UI instead of spinner
+  // PocketChat: only show "Setting up..." if botConfig doesn't exist AND retries not exhausted
+  if (isPocketChatMode && botConfigLoaded && !isSetupComplete && !botConfig) {
     const retries = typeof window !== 'undefined' ? parseInt(sessionStorage.getItem('bot_retries') || '0') : 0;
     if (retries < 2) {
       return (
