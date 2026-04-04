@@ -136,7 +136,7 @@ export default function PocketChatPage() {
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
-  useEffect(() => { document.title = 'Evrywher'; }, []);
+  useEffect(() => { document.title = 'Evrywher — Chat'; }, []);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);

@@ -115,6 +115,8 @@ export default function ContactsPage() {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
 
+  useEffect(() => { document.title = 'Evrywher — Contacts'; }, []);
+
   const fetchContacts = useCallback(async () => {
     if (!organization?.id) return;
     setLoading(true);

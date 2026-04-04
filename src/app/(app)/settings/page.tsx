@@ -182,6 +182,8 @@ export default function SettingsPage() {
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
+  useEffect(() => { document.title = isPocketChatMode ? 'Evrywher — Settings' : 'BizPocket — Settings'; }, [isPocketChatMode]);
+
   // Shared state
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'staff' | 'accountant'>('accountant');
@@ -246,11 +248,14 @@ export default function SettingsPage() {
     if (deleteConfirmText.toLowerCase() !== 'delete') return;
     setDeleting(true);
     try {
-      // Delete profile data (cascade will clean up org data via RLS policies)
+      // Delete profile data (cascade will handle org data via RLS policies)
       await supabase.from('profiles').delete().eq('id', profile.id);
-      // Call the delete user endpoint
-      const { error } = await supabase.rpc('delete_user_account').throwOnError().then(() => ({ error: null })).catch((e: unknown) => ({ error: e }));
-      if (error) console.warn('[Delete account]', error);
+      // Best-effort: call delete_user_account RPC if it exists
+      try {
+        await supabase.rpc('delete_user_account');
+      } catch (_) {
+        // RPC may not exist yet — sign out anyway
+      }
       await supabase.auth.signOut();
       router.push('/');
     } catch (err) {

@@ -3,6 +3,8 @@ import { headers } from 'next/headers';
 import { DM_Sans, DM_Mono } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
+import SplashScreen from '@/components/SplashScreen';
+import OfflineBanner from '@/components/OfflineBanner';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -68,7 +70,10 @@ export default function RootLayout({
           })();
         `}} />
         <ToastProvider>
-          {children}
+          <OfflineBanner />
+          <SplashScreen>
+            {children}
+          </SplashScreen>
         </ToastProvider>
       </body>
     </html>

@@ -39,6 +39,7 @@ export interface Profile {
   email: string;
   language: string;
   avatar_url?: string | null;
+  onboarding_completed?: boolean | null;
   created_at: string;
 }
 

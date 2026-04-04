@@ -1,5 +1,7 @@
 'use client';
 
+import { PocketChatMark } from '@/components/Logo';
+
 export default function AppError({
   error,
   reset,
@@ -7,19 +9,25 @@ export default function AppError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const isAI = error.message?.toLowerCase().includes('translat') || error.message?.toLowerCase().includes('ai') || error.message?.toLowerCase().includes('anthropic');
+  const isConnection = error.message?.toLowerCase().includes('fetch') || error.message?.toLowerCase().includes('network') || error.message?.toLowerCase().includes('supabase');
+
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', padding: 40, maxWidth: 500, margin: '60px auto', textAlign: 'center' }}>
-      <div style={{ width: 48, height: 48, borderRadius: 12, background: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-        <span style={{ color: 'white', fontSize: 24, fontWeight: 700 }}>!</span>
-      </div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0A0A0A', marginBottom: 8 }}>Page Error</h2>
-      <p style={{ fontSize: 14, color: '#666', marginBottom: 8 }}>{error.message}</p>
-      <pre style={{ fontSize: 11, color: '#999', textAlign: 'left', background: '#f5f5f5', padding: 12, borderRadius: 8, overflow: 'auto', maxHeight: 160, marginBottom: 16 }}>
-        {error.stack}
-      </pre>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <PocketChatMark size={56} />
+      <h2 className="mt-4 text-lg font-bold text-[#0A0A0A]">
+        {isAI ? 'Translation temporarily unavailable' : isConnection ? 'Connection lost' : 'Something went wrong'}
+      </h2>
+      <p className="mt-2 text-sm text-[#6B7280] max-w-sm">
+        {isAI
+          ? "We're having trouble reaching the translation service. Your messages are safe — try again in a moment."
+          : isConnection
+            ? "Please check your internet connection. We'll reconnect automatically."
+            : 'An unexpected error occurred. Please try again.'}
+      </p>
       <button
         onClick={reset}
-        style={{ padding: '10px 24px', background: '#4F46E5', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+        className="mt-6 rounded-lg bg-[#4F46E5] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA] transition-colors"
       >
         Try again
       </button>

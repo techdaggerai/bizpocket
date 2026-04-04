@@ -44,6 +44,7 @@ export default function AdminPage() {
       router.replace('/dashboard');
       return;
     }
+    document.title = 'Evrywher — Admin';
     fetchAll();
   }, [isAdmin]);
 
