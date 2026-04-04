@@ -89,7 +89,7 @@ export default function AnimatedTagline() {
   const eIdx = 22;
   const engRendered = engText.length <= eIdx
     ? <>{engText}</>
-    : <>{engText.slice(0, eIdx)}<span className="text-[#F43F5E] text-[24px]"> {engText[eIdx]} </span>{engText.slice(eIdx + 1)}</>;
+    : <>{engText.slice(0, eIdx)}<span className="text-[#F43F5E] text-[26px] italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif", letterSpacing: '2px' }}> {engText[eIdx]} </span>{engText.slice(eIdx + 1)}</>;
 
   return (
     <div className="mt-2 space-y-1">
