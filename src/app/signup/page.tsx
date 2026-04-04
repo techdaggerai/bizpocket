@@ -20,6 +20,7 @@ function SignupInner() {
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan') || 'free';
   const mode = searchParams.get('mode');
+  const refOrgId = searchParams.get('ref');
   const isPocketChat = mode === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
   const [email, setEmail] = useState('');
@@ -45,7 +46,7 @@ function SignupInner() {
       password,
       options: {
         data: { full_name: name, preferred_language: isPocketChat ? language : 'en' },
-        emailRedirectTo: `${siteUrl}/auth/callback?source=${isPocketChat ? 'pocketchat' : 'bizpocket'}${isPocketChat ? `&lang=${language}` : ''}`,
+        emailRedirectTo: `${siteUrl}/auth/callback?source=${isPocketChat ? 'pocketchat' : 'bizpocket'}${isPocketChat ? `&lang=${language}` : ''}${refOrgId ? `&ref=${refOrgId}` : ''}`,
       },
     });
 
@@ -90,6 +91,37 @@ function SignupInner() {
               email: user.email!,
               language: language,
             });
+
+            // If referred by another org, create mutual contacts
+            if (refOrgId) {
+              // Get inviter's owner profile
+              const { data: inviterProfile } = await supabase
+                .from('profiles')
+                .select('name, full_name, email, language')
+                .eq('organization_id', refOrgId)
+                .eq('role', 'owner')
+                .single();
+
+              if (inviterProfile) {
+                // Add inviter as contact for the new user
+                await supabase.from('contacts').insert({
+                  organization_id: org.id,
+                  name: inviterProfile.full_name || inviterProfile.name || 'Contact',
+                  email: inviterProfile.email,
+                  contact_type: 'friend',
+                  language: inviterProfile.language || 'en',
+                });
+
+                // Add new user as contact for the inviter
+                await supabase.from('contacts').insert({
+                  organization_id: refOrgId,
+                  name: name || user.email?.split('@')[0] || 'Contact',
+                  email: user.email,
+                  contact_type: 'friend',
+                  language: language,
+                });
+              }
+            }
           }
         }
       }

@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/privacy', '/terms', '/pocketchat'];
-const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/']; // Public invoice + published websites + order pages
+const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/']; // Public invoice + published websites + order + invite pages
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {

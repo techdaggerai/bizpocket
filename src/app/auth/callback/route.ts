@@ -63,14 +63,45 @@ export async function GET(request: NextRequest) {
         }).select().single();
 
         if (org) {
+          const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner';
           await supabase.from('profiles').insert({
             user_id: user.id,
             organization_id: org.id,
             role: 'owner',
-            name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+            name: userName,
             email: user.email!,
             language: userLang,
           });
+
+          // Handle invite referral — create mutual contacts
+          const refOrgId = searchParams.get('ref');
+          if (refOrgId && isPocketChat) {
+            const { data: inviterProfile } = await supabase
+              .from('profiles')
+              .select('name, full_name, email, language')
+              .eq('organization_id', refOrgId)
+              .eq('role', 'owner')
+              .single();
+
+            if (inviterProfile) {
+              await supabase.from('contacts').insert([
+                {
+                  organization_id: org.id,
+                  name: inviterProfile.full_name || inviterProfile.name || 'Contact',
+                  email: inviterProfile.email,
+                  contact_type: 'friend',
+                  language: inviterProfile.language || 'en',
+                },
+                {
+                  organization_id: refOrgId,
+                  name: userName,
+                  email: user.email,
+                  contact_type: 'friend',
+                  language: userLang,
+                },
+              ]);
+            }
+          }
         }
 
         return NextResponse.redirect(`${origin}${isPocketChat ? '/chat' : '/onboarding'}`);
