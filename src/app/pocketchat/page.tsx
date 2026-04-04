@@ -6,6 +6,7 @@ import { PocketMark } from '@/components/Logo';
 import HeroChatMockup from '@/components/HeroChatMockup';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
+import AnimatedTagline from '@/components/AnimatedTagline';
 
 const greetings = [
   { to: 'やあ', lang: 'Japanese' }, { to: 'Hola', lang: 'Spanish' },
@@ -91,7 +92,7 @@ export default function PocketChatLanding() {
           </div>
           <h2 className="text-4xl font-bold text-[#0A0A0A]" style={{ fontFamily: "'DM Sans', sans-serif" }}><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></h2>
           <p className="mt-3 text-lg text-[#6b7280]">Chat in 21 languages — AI translates in real-time</p>
-          <p className="mt-1 text-sm text-[#9ca3af] italic">You bring the missing E. We bring the world.</p>
+          <AnimatedTagline />
         </div>
       </section>
 
