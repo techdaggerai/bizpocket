@@ -850,7 +850,7 @@ export default function PocketChatPage() {
   // Show bot onboarding if not set up (BizPocket users only — never PocketChat)
   if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
     return (
-      <div className="h-[calc(100vh-80px)] bg-white">
+      <div className="chat-fullbleed h-[calc(100vh-80px)] bg-white">
         <BotOnboarding
           onComplete={(name, icon) => {
             fetchBotConfig();
@@ -868,7 +868,7 @@ export default function PocketChatPage() {
     const contactType = activeConvo.contact?.contact_type;
 
     return (
-      <div className="h-[calc(100vh-80px)] flex flex-col bg-white">
+      <div className="chat-fullbleed h-[calc(100vh-80px)] flex flex-col bg-white">
         {/* Header */}
         <div className="p-3 border-b border-[#E5E5E5] flex items-center gap-3">
           <button
@@ -1461,7 +1461,7 @@ export default function PocketChatPage() {
       ];
 
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col bg-white">
+    <div className="chat-fullbleed h-[calc(100vh-80px)] flex flex-col bg-white">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>

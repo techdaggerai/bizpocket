@@ -69,7 +69,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                       <Sidebar />
                       <main className="flex-1 min-h-screen pb-20 lg:pb-0">
                         <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white"><TopNav /></div>
-                        <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4">{children}</div>
+                        <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">{children}</div>
                       </main>
                     </div>
                     <div className="lg:hidden"><BottomNav /></div>
@@ -110,7 +110,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
                 <TopNav />
               </div>
-              <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4">
+              <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">
                 {children}
               </div>
             </main>
