@@ -59,9 +59,12 @@ const POCKETCHAT_NAV = [
   },
 ];
 
+const ADMIN_EMAILS = ['bilal@techdagger.com', 'test123@techdagger.com'];
+
 export default function Sidebar() {
   const pathname = usePathname();
-  const { organization } = useAuth();
+  const { organization, user } = useAuth();
+  const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
   const plan = organization?.plan || 'free';
   const isPocketChatOnly = organization?.signup_source === 'pocketchat' ||
     (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
@@ -75,7 +78,7 @@ export default function Sidebar() {
           {isPocketChatOnly ? (
             <>
               <PocketChatMark size={32} />
-              <span className="text-[14px] font-bold text-[#111827]">Evry<span className="text-[#F59E0B]">wyre</span></span>
+              <span className="text-[14px] font-bold text-[#111827]"><span className="text-[#0A0A0A]">Evry</span><span className="text-[#F59E0B]">wher</span></span>
             </>
           ) : (
             <>
@@ -133,8 +136,24 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom — Upgrade + Settings */}
+      {/* Bottom — Admin + Settings + Upgrade */}
       <div className="px-2 py-3 border-t border-[#F0F0F0] space-y-1">
+        {isAdmin && !isPocketChatOnly && (
+          <Link
+            href="/admin"
+            className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
+              pathname === '/admin'
+                ? 'bg-[#F43F5E]/[0.06] text-[#F43F5E]'
+                : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
+            }`}
+          >
+            <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 4.5v15m7.5-7.5h-15" />
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            Admin
+          </Link>
+        )}
         {!isPocketChatOnly && (
           <Link
             href="/settings"

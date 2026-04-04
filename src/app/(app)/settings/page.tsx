@@ -67,6 +67,66 @@ function SettingsRow({ first, last, children }: { first?: boolean; last?: boolea
   );
 }
 
+function FeedbackSection() {
+  const { user, organization } = useAuth();
+  const { toast } = useToast();
+  const supabase = createClient();
+  const [fbMessage, setFbMessage] = useState('');
+  const [fbType, setFbType] = useState('general');
+  const [fbSending, setFbSending] = useState(false);
+
+  async function handleSendFeedback() {
+    if (!fbMessage.trim() || !user?.id) return;
+    setFbSending(true);
+    const { error } = await supabase.from('feedback').insert({
+      user_id: user.id,
+      org_id: organization?.id || null,
+      message: fbMessage.trim(),
+      type: fbType,
+    });
+    setFbSending(false);
+    if (error) {
+      console.error('[Feedback]', error);
+      toast('Failed to send feedback', 'error');
+    } else {
+      setFbMessage('');
+      setFbType('general');
+      toast("Thanks! We'll look into this.", 'success');
+    }
+  }
+
+  return (
+    <div>
+      <SectionLabel>Feedback</SectionLabel>
+      <div className="bg-[#F9FAFB] rounded-lg p-4 space-y-3">
+        <select
+          value={fbType}
+          onChange={(e) => setFbType(e.target.value)}
+          className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none"
+        >
+          <option value="general">General</option>
+          <option value="bug">Bug Report</option>
+          <option value="feature">Feature Request</option>
+        </select>
+        <textarea
+          value={fbMessage}
+          onChange={(e) => setFbMessage(e.target.value)}
+          placeholder="Tell us what you think..."
+          rows={3}
+          className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none resize-none"
+        />
+        <button
+          onClick={handleSendFeedback}
+          disabled={fbSending || !fbMessage.trim()}
+          className="w-full rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white disabled:opacity-50 hover:bg-[#4338CA] transition-colors"
+        >
+          {fbSending ? 'Sending...' : 'Send Feedback'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { profile, organization, user } = useAuth();
   const { t, lang, setLang } = useI18n();
@@ -274,6 +334,9 @@ export default function SettingsPage() {
             <Toggle on={translationSounds} onChange={setTranslationSounds} />
           </SettingsRow>
         </div>
+
+        {/* FEEDBACK */}
+        <FeedbackSection />
 
         {/* ACCOUNT */}
         <div>
