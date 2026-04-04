@@ -13,12 +13,12 @@ export default function PrivacyPage() {
 
       <div style={section}>
         <h2 style={h2}>Information We Collect</h2>
-        <p style={p}>When you create an account, we collect your email address, name, and business information you provide. When you use Evrywyre, we store messages, translations, and voice recordings you create. We also collect usage data such as pages visited and features used to improve our service.</p>
+        <p style={p}>When you create an account, we collect your email address, name, and business information you provide. When you use Evrywher, we store messages, translations, and voice recordings you create. We also collect usage data such as pages visited and features used to improve our service.</p>
       </div>
 
       <div style={section}>
         <h2 style={h2}>How We Use Your Information</h2>
-        <p style={p}>We use your information to provide and improve BizPocket and Evrywyre services, process invoices and payments, translate messages between languages, generate AI-powered business insights, and communicate service updates. We do not sell your personal data to third parties.</p>
+        <p style={p}>We use your information to provide and improve BizPocket and Evrywher services, process invoices and payments, translate messages between languages, generate AI-powered business insights, and communicate service updates. We do not sell your personal data to third parties.</p>
       </div>
 
       <div style={section}>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
 
       <div style={section}>
         <h2 style={h2}>Voice Data</h2>
-        <p style={p}>When you use voice features in Evrywyre, voice recordings are processed by ElevenLabs for voice cloning and translation. Voice samples you provide for cloning are stored securely and used only to generate translations in your voice. You can delete your voice clone at any time from your settings.</p>
+        <p style={p}>When you use voice features in Evrywher, voice recordings are processed by ElevenLabs for voice cloning and translation. Voice samples you provide for cloning are stored securely and used only to generate translations in your voice. You can delete your voice clone at any time from your settings.</p>
       </div>
 
       <div style={section}>
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
       </div>
 
       <footer style={{ borderTop: '1px solid #e5e7eb', paddingTop: 24, marginTop: 40 }}>
-        <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>BizPocket and Evrywyre are products of TechDagger Studio. Registered in Japan.</p>
+        <p style={{ fontSize: 13, color: '#9ca3af', margin: 0 }}>BizPocket and Evrywher are products of TechDagger Studio. Registered in Japan.</p>
       </footer>
     </div>
   );

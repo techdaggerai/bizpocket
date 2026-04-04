@@ -12,7 +12,7 @@ const PLANS = [
     price: '¥0',
     period: '',
     desc: 'Start with a 14-day Pro trial',
-    features: ['14-day free trial (full Pro)', 'Unlimited invoices', 'Unlimited Evrywyre contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website'],
+    features: ['14-day free trial (full Pro)', 'Unlimited invoices', 'Unlimited Evrywher contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website'],
     cta: 'Start free trial',
     highlight: false,
   },
@@ -104,7 +104,7 @@ export default function LandingPage() {
             </div>
             <a href="#pocketchat" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] hover:bg-[#fde68a] transition-colors">
               <AnimatedPocketChatLogo size={32} isTranslating={true} />
-              Now with Evrywyre — real-time translation
+              Now with Evrywher — real-time translation
             </a>
           </div>
 
@@ -119,7 +119,7 @@ export default function LandingPage() {
           <div className="rounded-3xl border-l-4 border-[#F59E0B] bg-[#fffbeb]/40 p-[clamp(32px,5vw,56px)]">
             <div className="mb-8 text-center">
               <span className="inline-block rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] mb-4">BUILT INTO EVERY PLAN</span>
-              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">Meet Evrywyre</h2>
+              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">Meet Evrywher</h2>
               <p className="mt-3 max-w-[560px] mx-auto text-[15px] text-[#374151] leading-relaxed">Real-time translation chat. Text, voice, video calls — all in 21 languages. Your business speaks every language.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
@@ -147,7 +147,7 @@ export default function LandingPage() {
                   </div>
                 ))}
                 <Link href="/chat" className="mt-4 inline-flex items-center gap-2 rounded-[10px] bg-[#4F46E5] px-6 py-3 text-sm font-semibold text-white hover:bg-[#4338ca] transition-colors">
-                  Try Evrywyre free
+                  Try Evrywher free
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </Link>
               </div>
@@ -163,12 +163,12 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <AnimatedPocketChatLogo size={40} isTranslating={true} />
-                <span className="text-[15px] font-bold text-[#111827]">Evrywyre</span>
+                <span className="text-[15px] font-bold text-[#111827]">Evrywher</span>
               </div>
               <p className="text-sm text-[#374151]">Just need translation chat? No business setup required. Free forever.</p>
             </div>
             <Link href="/signup?mode=pocketchat" className="bg-[#F59E0B] text-[#111827] px-6 py-2.5 rounded-[10px] text-sm font-semibold whitespace-nowrap hover:bg-[#d97706] transition-colors">
-              Get Evrywyre free
+              Get Evrywher free
             </Link>
           </div>
         </div>
@@ -340,14 +340,14 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-5 mb-6">
               <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-[13px] font-semibold text-[#111827]">BizPocket</span></div>
               <span className="text-[13px] text-[#d1d5db]">+</span>
-              <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-[13px] font-semibold text-[#111827]">Evrywyre</span></div>
+              <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-[13px] font-semibold text-[#111827]">Evrywher</span></div>
             </div>
             <h2 className="text-[32px] font-bold text-[#111827]">Start free. Scale when ready.</h2>
             <p className="text-base text-[#374151] mt-3">Every plan starts with a 14-day free trial of Pro. No credit card needed.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Starter', price: '¥0', sub: 'Free forever + 14-day Pro trial', color: '#22c55e', border: '1px solid #e5e7eb', features: ['Unlimited invoices', 'Unlimited Evrywyre contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website', '"Powered by BizPocket" branding'], cta: 'Start free trial', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #e5e7eb', href: '/signup' },
+              { name: 'Starter', price: '¥0', sub: 'Free forever + 14-day Pro trial', color: '#22c55e', border: '1px solid #e5e7eb', features: ['Unlimited invoices', 'Unlimited Evrywher contacts', '3 AI translations/day', 'AI Document Detector', 'Cash Flow tracker', 'Basic website', '"Powered by BizPocket" branding'], cta: 'Start free trial', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #e5e7eb', href: '/signup' },
               { name: 'Pro', price: '¥1,980', sub: '~$13 · ~€12 /mo', color: '#4F46E5', border: '2px solid #4F46E5', popular: true, features: ['Everything in Starter', 'Unlimited AI translations', 'AI Morning Briefing', 'AI Form Fill (unlimited)', 'Social Media Assistant', 'Ops Radar dashboard', 'Business Cycle Engine', 'Accountant Portal', 'Remove BizPocket branding', '5 languages'], cta: 'Go Pro', ctaBg: '#4F46E5', ctaColor: 'white', ctaBorder: 'none', href: '/signup?plan=pro' },
               { name: 'Business', price: '¥4,980', sub: '~$33 · ~€30 /mo', color: '#F59E0B', border: '1px solid #e5e7eb', features: ['Everything in Pro', 'Up to 10 staff accounts', 'Role-based access', 'Accountant Portal (full)', 'Voice translation', '21 languages', 'Japanese compliance toolkit', 'Team Hub', 'Custom branding', 'Priority support'], cta: 'Go Business', ctaBg: 'transparent', ctaColor: '#92400e', ctaBorder: '1px solid #F59E0B', href: '/signup?plan=business' },
               { name: 'Enterprise', price: 'Custom', sub: 'For firms managing multiple clients', color: '#374151', border: '1px solid #e5e7eb', bg: '#f9fafb', features: ['Everything in Business', 'Multi-org dashboard', 'Unlimited staff', 'API access', 'White-label everything', 'Dedicated account manager', 'Custom onboarding'], cta: 'Contact us', ctaBg: 'transparent', ctaColor: '#374151', ctaBorder: '1px solid #d1d5db', href: 'mailto:hello@bizpocket.io' },
@@ -387,7 +387,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl px-6 py-10">
           <div className="flex items-center justify-center gap-6 pb-6">
             <div className="flex items-center gap-1.5"><PocketMark variant="xl" /><span className="text-xs font-semibold text-[#6b7280]">BizPocket</span></div>
-            <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-xs font-semibold text-[#6b7280]">Evrywyre</span></div>
+            <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><span className="text-xs font-semibold text-[#6b7280]">Evrywher</span></div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -398,7 +398,7 @@ export default function LandingPage() {
               <a href="#features" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Features</a>
               <a href="#pricing" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Pricing</a>
               <Link href="/login" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Log in</Link>
-              <a href="https://pocketchat.co" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Evrywyre</a>
+              <a href="https://pocketchat.co" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Evrywher</a>
               <span className="text-[#d1d5db]">&middot;</span>
               <a href="/privacy" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Privacy</a>
               <span className="text-[#d1d5db]">&middot;</span>

@@ -116,7 +116,7 @@ export async function POST(request: Request) {
       cached: false,
     })
   } catch (err) {
-    console.error('[Evrywyre] Translation failed:', err)
+    console.error('[Evrywher] Translation failed:', err)
     return NextResponse.json({ error: 'Translation failed' }, { status: 500 })
   }
 }

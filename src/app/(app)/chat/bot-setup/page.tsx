@@ -109,7 +109,7 @@ export default function BotSetupPage() {
         .single();
 
       if (botConvo && nameChanged) {
-        const introMsg = `Hi! I'm ${botName} — your Evrywyre assistant. I've been updated and I'm ready to help!`;
+        const introMsg = `Hi! I'm ${botName} — your Evrywher assistant. I've been updated and I'm ready to help!`;
         await supabase.from('messages').insert({
           conversation_id: botConvo.id,
           organization_id: organization.id,

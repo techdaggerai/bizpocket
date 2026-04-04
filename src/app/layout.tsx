@@ -19,10 +19,10 @@ const dmMono = DM_Mono({
 export async function generateMetadata() {
   const headersList = await headers();
   const host = headersList.get('host') || '';
-  const isPocketChat = host.includes('evrywyre') || host.includes('pocketchat');
+  const isPocketChat = host.includes('evrywher') || host.includes('evrywyre') || host.includes('pocketchat') || host.includes('evrywhere');
 
   return {
-    title: isPocketChat ? 'Evrywyre' : 'BizPocket — Your business in your pocket',
+    title: isPocketChat ? 'Evrywher' : 'BizPocket — Your business in your pocket',
     description: isPocketChat
       ? 'Chat in any language. AI-powered translation messenger.'
       : 'Mobile-first business toolkit for foreigners running businesses in Japan. Invoices, cash flow, expenses, accountant sharing.',

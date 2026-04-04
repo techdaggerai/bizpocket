@@ -6,14 +6,14 @@ const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/']; // Public invoice + publis
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
-  // Evrywyre domain routing — evrywyre.com / pocketchat.co serves Evrywyre experience
+  // Evrywher domain routing — evrywher.com / evrywyre.com / pocketchat.co serves Evrywher experience
   const hostname = request.headers.get('host') || '';
-  const isPocketChat = hostname === 'evrywyre.com' || hostname === 'www.evrywyre.com' || hostname.endsWith('.evrywyre.com') || hostname === 'pocketchat.co' || hostname === 'www.pocketchat.co' || hostname.endsWith('.pocketchat.co');
+  const isPocketChat = hostname.includes('evrywher') || hostname.includes('evrywyre') || hostname.includes('pocketchat') || hostname.includes('evrywhere');
 
   if (isPocketChat) {
     const path = request.nextUrl.pathname;
 
-    // Root → Evrywyre landing (no auth needed)
+    // Root → Evrywher landing (no auth needed)
     if (path === '/') {
       return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Evrywyre users should never see BizPocket dashboard
+    // Evrywher users should never see BizPocket dashboard
     if (path === '/dashboard') {
       return NextResponse.redirect(new URL('/chat', request.url));
     }

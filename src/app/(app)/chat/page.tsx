@@ -114,9 +114,9 @@ export default function PocketChatPage() {
   const supabase = createClient();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
-  useEffect(() => { document.title = 'Evrywyre'; }, []);
+  useEffect(() => { document.title = 'Evrywher'; }, []);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
@@ -730,7 +730,7 @@ export default function PocketChatPage() {
     return c.name.toLowerCase().includes(q) || (c.company ?? '').toLowerCase().includes(q);
   });
 
-  // Auto-create bot for PocketChat/Speko users — skip onboarding entirely
+  // Auto-create bot for Evrywher users — skip onboarding entirely
   const [autoCreating, setAutoCreating] = useState(false);
 
   useEffect(() => {
@@ -752,12 +752,12 @@ export default function PocketChatPage() {
           return;
         }
 
-        const botGreeting = "Hi! I'm your Speko assistant. I can help you communicate in 21 languages!";
+        const botGreeting = "Hi! I'm your Evrywher assistant. I can help you communicate in 21 languages!";
         const { error } = await supabase
           .from('pocket_bot_config')
           .upsert({
             organization_id: organization.id,
-            bot_name: 'Speko AI',
+            bot_name: 'Evrywher AI',
             bot_icon: '1',
             greeting_message: botGreeting,
             bot_personality: 'friendly',
@@ -784,7 +784,7 @@ export default function PocketChatPage() {
             .insert({
               organization_id: organization.id,
               is_bot_chat: true,
-              title: 'Speko AI',
+              title: 'Evrywher AI',
               last_message: botGreeting,
               last_message_at: new Date().toISOString(),
             })
@@ -796,7 +796,7 @@ export default function PocketChatPage() {
               conversation_id: newConvo.id,
               organization_id: organization.id,
               sender_type: 'bot',
-              sender_name: 'Speko AI',
+              sender_name: 'Evrywher AI',
               message: botGreeting,
               message_type: 'text',
             });
@@ -1438,7 +1438,7 @@ export default function PocketChatPage() {
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
-          <h1 className="text-xl font-bold text-[#0A0A0A]">Evrywyre</h1>
+          <h1 className="text-xl font-bold text-[#0A0A0A]">Evrywher</h1>
           <p className="text-[13px] text-[#999]">Chat in 21 languages — AI translates in real-time</p>
         </div>
         <div className="flex items-center gap-2">

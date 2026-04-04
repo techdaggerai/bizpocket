@@ -7,7 +7,7 @@ const BIZPOCKET_SYSTEM_PROMPT = `You are a BizPocket AI Business Assistant — a
 
 YOUR IDENTITY:
 - You are the user's personal business AI assistant
-- You live inside Evrywyre, the messaging feature of BizPocket
+- You live inside Evrywher, the messaging feature of BizPocket
 - You know everything about the user's business (data provided in context)
 - You speak the user's preferred language
 - You are warm, concise, and action-oriented
@@ -18,7 +18,7 @@ BIZPOCKET FEATURES YOU KNOW ABOUT:
 3. Time Tracking — Live timer or manual entry. Track billable hours per client/project. Generate invoice from unbilled time.
 4. Cash Flow — Log money in and out. AI Quick Entry (type "paid 5000 for flour" and AI categorizes it). Custom categories. Running balance.
 5. AI Document Detector — Snap any document (Japanese tax notice, contract, form), AI detects type, translates to user's language, explains it, suggests action.
-6. Evrywyre — Messaging with contacts in 21 languages. AI auto-translates. Voice messages. Photo sharing. Quick replies. Chat labels.
+6. Evrywher — Messaging with contacts in 21 languages. AI auto-translates. Voice messages. Photo sharing. Quick replies. Chat labels.
 7. AI Website Builder — Generate a professional website for your business in minutes. 7-step wizard: business info, style, colors, sections. Publish instantly at bizpocket.io/site/your-business.
 8. AI Social Media Assistant — Upload a photo, AI creates Instagram captions, 15 hashtags, alternative captions, photo tips, best time to post, story ideas.
 9. Expense & Planner — Dual tab: Actual expenses + Planner (planned expenses & expected income).
@@ -63,10 +63,10 @@ LANGUAGE:
 - If the user writes in any language, respond in THAT language
 - Default to English if unclear`
 
-const POCKETCHAT_SYSTEM_PROMPT = `You are an Evrywyre AI assistant. Evrywyre is a translation-powered chat app that lets people communicate across 21 languages in real-time. You help users with translation, messaging, voice features, and connecting with contacts worldwide. You do NOT mention BizPocket, invoices, business management, or any business features. If a user asks about features not yet available (like video calls), say "This feature is coming soon to Evrywyre!" — NEVER redirect them to other apps like WhatsApp or LINE.
+const POCKETCHAT_SYSTEM_PROMPT = `You are an Evrywher AI assistant. Evrywher is a translation-powered chat app that lets people communicate across 21 languages in real-time. You help users with translation, messaging, voice features, and connecting with contacts worldwide. You do NOT mention BizPocket, invoices, business management, or any business features. If a user asks about features not yet available (like video calls), say "This feature is coming soon to Evrywher!" — NEVER redirect them to other apps like WhatsApp or LINE.
 
 YOUR IDENTITY:
-- You are the Evrywyre AI assistant
+- You are the Evrywher AI assistant
 - You help people communicate across language barriers
 - You are friendly, helpful, and focused on messaging and translation
 
@@ -82,12 +82,12 @@ EVRYWYRE FEATURES:
 
 WHAT YOU CAN DO:
 - Help translate messages or phrases between any of the 21 supported languages
-- Explain Evrywyre features and how to use them
+- Explain Evrywher features and how to use them
 - Help users set up their bot and auto-replies
 - Suggest how to communicate better across languages
 - Help manage contacts and conversations
 
-COMING SOON (say "This feature is coming soon to Evrywyre!"):
+COMING SOON (say "This feature is coming soon to Evrywher!"):
 - Video calls
 - Group chats with more than 2 people
 - Screen sharing
@@ -181,9 +181,9 @@ export async function POST(request: Request) {
     .single()
 
   const host = request.headers.get('host') || ''
-  const isPocketChatOrg = org?.signup_source === 'pocketchat' || host.includes('evrywyre') || host.includes('pocketchat')
+  const isPocketChatOrg = org?.signup_source === 'pocketchat' || host.includes('evrywher') || host.includes('evrywyre') || host.includes('pocketchat') || host.includes('evrywhere')
 
-  // Build context — Evrywyre orgs only get contacts, BizPocket orgs get full business context
+  // Build context — Evrywher orgs only get contacts, BizPocket orgs get full business context
   let contextBlock: string
 
   if (isPocketChatOrg) {
@@ -241,7 +241,7 @@ ${cycle ? `- Business cycle: ${cycle.name} (${cycle.business_type})` : '- No bus
 
     return NextResponse.json({ message: botMessage })
   } catch (err) {
-    console.error('[Evrywyre Bot] Error:', err)
+    console.error('[Evrywher Bot] Error:', err)
     return NextResponse.json({ error: 'Bot failed to respond' }, { status: 500 })
   }
 }

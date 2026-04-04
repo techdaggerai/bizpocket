@@ -15,12 +15,12 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const supabase = createClient();
 
   const [step, setStep] = useState<'welcome' | 'name' | 'icon'>('welcome');
-  const [botName, setBotName] = useState('Pocket');
+  const [botName, setBotName] = useState('Evrywher AI');
   const [botIcon, setBotIcon] = useState('1');
   const [saving, setSaving] = useState(false);
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
   async function handleFinish() {
     setSaving(true);
@@ -113,8 +113,8 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
         <h1 className="text-2xl font-bold text-[var(--text-1)] mb-2">Meet your AI Assistant</h1>
         <p className="text-sm text-[var(--text-3)] max-w-sm mb-2">
           {isPocketChatMode
-            ? 'Your personal AI lives right here in Evrywyre. It speaks every language, translates your conversations, and helps you connect with anyone worldwide.'
-            : 'Your personal business AI lives right here in Evrywyre. It knows your business, speaks your language, and helps you manage everything through conversation.'}
+            ? 'Your personal AI lives right here in Evrywher. It speaks every language, translates your conversations, and helps you connect with anyone worldwide.'
+            : 'Your personal business AI lives right here in Evrywher. It knows your business, speaks your language, and helps you manage everything through conversation.'}
         </p>
         <p className="text-xs text-[var(--text-4)] max-w-xs mb-8">
           {isPocketChatMode
@@ -139,7 +139,7 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
         </div>
         <h2 className="text-xl font-bold text-[var(--text-1)] mb-2">Name your assistant</h2>
         <p className="text-sm text-[var(--text-3)] max-w-sm mb-6">
-          Give your AI a name. It&apos;ll appear as your first contact in Evrywyre.
+          Give your AI a name. It&apos;ll appear as your first contact in Evrywher.
         </p>
         <input
           type="text"

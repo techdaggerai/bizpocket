@@ -75,7 +75,7 @@ export default function SettingsPage() {
   const router = useRouter();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
   // Shared state
   const [inviteEmail, setInviteEmail] = useState('');
@@ -298,7 +298,7 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
-        <p className="text-center text-xs text-[var(--text-4)] pt-2">Evrywyre by TechDagger</p>
+        <p className="text-center text-xs text-[var(--text-4)] pt-2">Evrywher by TechDagger</p>
       </div>
     );
   }

@@ -33,7 +33,23 @@
       "Bash(xargs wc:*)",
       "Bash(ls C:/TechDagger/BIZPOCKET/src/app/\\\\\\(app\\\\\\)/settings/upgrade)",
       "Bash(node:*)",
-      "Bash(grep -r \"recurring\\\\|schedule\" /c/TechDagger/BIZPOCKET/src --include=*.tsx --include=*.ts)"
+      "Bash(grep -r \"recurring\\\\|schedule\" /c/TechDagger/BIZPOCKET/src --include=*.tsx --include=*.ts)",
+      "Bash(head -3 src/app/\\\\\\(app\\\\\\)/detect/page.tsx)",
+      "Bash(head -3 src/app/\\\\\\(app\\\\\\)/expenses/page.tsx)",
+      "Bash(grep -E \"\\\\.\\(sql|ts\\)$\")",
+      "Bash(grep:*)",
+      "Bash(codex:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(gh api:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx cap:*)",
+      "Skill(codex:setup)",
+      "WebFetch(domain:bizpocket.io)",
+      "Bash(claude config:*)",
+      "Bash(git pull:*)",
+      "Bash(wait)",
+      "Bash(git config:*)",
+      "Skill(codex:rescue)"
     ]
   }
 }

@@ -15,7 +15,7 @@ const FULL_NAV = [
   {
     label: 'CORE',
     items: [
-      { href: '/chat', label: 'Evrywyre', icon: '__pocketchat__' },
+      { href: '/chat', label: 'Evrywher', icon: '__pocketchat__' },
       { href: '/invoices', label: 'Invoices', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M8 13h8M8 17h5' },
       { href: '/cash-flow', label: 'Cash Flow', icon: 'M4 14h3.5v6H4zM10 8h3.5v12H10zM16 4h3.5v16H16z' },
       { href: '/detect', label: 'AI Detect', icon: 'M3 3h18v18H3zM11 11a4 4 0 100-8M15 15l4 4' },
@@ -51,7 +51,7 @@ const POCKETCHAT_NAV = [
   {
     label: '',
     items: [
-      { href: '/chat', label: 'Evrywyre', icon: '__pocketchat__' },
+      { href: '/chat', label: 'Evrywher', icon: '__pocketchat__' },
       { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
       { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
       { href: '/settings', label: 'Settings', icon: 'M12 8a4 4 0 100-8M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82' },
@@ -64,7 +64,7 @@ export default function Sidebar() {
   const { organization } = useAuth();
   const plan = organization?.plan || 'free';
   const isPocketChatOnly = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
   const NAV_SECTIONS = isPocketChatOnly ? POCKETCHAT_NAV : FULL_NAV;
 
   return (

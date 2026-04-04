@@ -69,7 +69,7 @@ function WidgetChatInner() {
     return (
       <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
         <div style={{ background: '#4F46E5', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div><p style={{ margin: 0, color: 'white', fontSize: 15, fontWeight: 600 }}>Chat with {orgName}</p><p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Powered by Evrywyre</p></div>
+          <div><p style={{ margin: 0, color: 'white', fontSize: 15, fontWeight: 600 }}>Chat with {orgName}</p><p style={{ margin: '2px 0 0', color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Powered by Evrywher</p></div>
         </div>
         <div style={{ padding: 20, flex: 1 }}>
           <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 16px' }}>Enter your name and language. Messages are auto-translated.</p>
@@ -81,7 +81,7 @@ function WidgetChatInner() {
           <button onClick={handleSetup} disabled={!name.trim() || !lang} style={{ width: '100%', padding: 12, borderRadius: 10, background: name.trim() && lang ? '#4F46E5' : '#d1d5db', color: 'white', border: 'none', fontSize: 14, fontWeight: 600, cursor: name.trim() && lang ? 'pointer' : 'default' }}>Start chatting</button>
         </div>
         <div style={{ borderTop: '1px solid #f3f4f6', padding: '10px 20px', textAlign: 'center' }}>
-          <a href="https://www.bizpocket.io?ref=widget" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#9ca3af', textDecoration: 'none' }}>Powered by <span style={{ color: '#4F46E5', fontWeight: 600 }}>Evrywyre</span></a>
+          <a href="https://www.bizpocket.io?ref=widget" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#9ca3af', textDecoration: 'none' }}>Powered by <span style={{ color: '#4F46E5', fontWeight: 600 }}>Evrywher</span></a>
         </div>
       </div>
     );
@@ -120,7 +120,7 @@ function WidgetChatInner() {
         </button>
       </div>
       <div style={{ borderTop: '1px solid #f3f4f6', padding: '7px 14px', textAlign: 'center', flexShrink: 0 }}>
-        <a href="https://www.bizpocket.io?ref=widget" target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: '#9ca3af', textDecoration: 'none' }}>Powered by <span style={{ color: '#4F46E5', fontWeight: 600 }}>Evrywyre</span></a>
+        <a href="https://www.bizpocket.io?ref=widget" target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: '#9ca3af', textDecoration: 'none' }}>Powered by <span style={{ color: '#4F46E5', fontWeight: 600 }}>Evrywher</span></a>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const elevenLabsForm = new FormData();
     elevenLabsForm.append('name', `pocketchat_${user.id}_${botName}`);
     elevenLabsForm.append('files', audioFile);
-    elevenLabsForm.append('description', `Evrywyre voice clone for ${botName}`);
+    elevenLabsForm.append('description', `Evrywher voice clone for ${botName}`);
 
     const response = await fetch('https://api.elevenlabs.io/v1/voices/add', {
       method: 'POST',

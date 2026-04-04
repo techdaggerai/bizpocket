@@ -1,5 +1,5 @@
 /**
- * Evrywyre Translation Bridge
+ * Evrywher Translation Bridge
  * Real-time AI translation between any two of 21 supported languages.
  */
 

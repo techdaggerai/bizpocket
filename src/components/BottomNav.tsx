@@ -79,7 +79,7 @@ export default function BottomNav() {
   const { organization } = useAuth();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
   const items = isPocketChatMode
     ? NAV_ITEMS.filter(item => !item.bizpocketOnly)

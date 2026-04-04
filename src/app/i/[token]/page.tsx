@@ -471,14 +471,14 @@ export default function PublicInvoicePage() {
           </div>
         </div>
 
-        {/* Evrywyre */}
+        {/* Evrywher */}
         <div className="bg-white rounded-[14px] border border-[#E5E5E5] mt-4 overflow-hidden">
           {/* Chat header */}
           <div className="px-5 py-3.5 border-b border-[#E5E5E5] flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            <span className="text-base font-semibold text-[#0A0A0A]">Evrywyre</span>
+            <span className="text-base font-semibold text-[#0A0A0A]">Evrywher</span>
           </div>
 
           {/* Messages */}

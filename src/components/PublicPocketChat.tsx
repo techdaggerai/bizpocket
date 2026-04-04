@@ -124,7 +124,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
         <div className="bg-[#4F46E5] px-5 py-4 flex justify-between items-center">
           <div>
             <p className="text-white text-[15px] font-semibold">Chat with {ownerName}</p>
-            <p className="text-white/70 text-xs">Powered by Evrywyre</p>
+            <p className="text-white/70 text-xs">Powered by Evrywher</p>
           </div>
           <button onClick={() => setChatOpen(false)} className="bg-white/20 rounded-lg w-7 h-7 flex items-center justify-center text-white text-base">×</button>
         </div>

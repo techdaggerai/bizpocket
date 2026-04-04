@@ -88,7 +88,7 @@ export default function ContactsPage() {
   const supabase = createClient();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat')));
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
 
   const defaultType: ContactType = isPocketChatMode ? 'friend' : 'customer';
   const tabs = isPocketChatMode ? POCKETCHAT_TABS : BIZPOCKET_TABS;
