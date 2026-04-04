@@ -208,6 +208,11 @@ export default function SettingsPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
+  // Delete account state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !user?.id) return;
@@ -234,6 +239,25 @@ export default function SettingsPage() {
       toast('Upload failed. Please try again.', 'error');
     } finally {
       setUploadingAvatar(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirmText.toLowerCase() !== 'delete') return;
+    setDeleting(true);
+    try {
+      // Delete profile data (cascade will clean up org data via RLS policies)
+      await supabase.from('profiles').delete().eq('id', profile.id);
+      // Call the delete user endpoint
+      const { error } = await supabase.rpc('delete_user_account').throwOnError().then(() => ({ error: null })).catch((e: unknown) => ({ error: e }));
+      if (error) console.warn('[Delete account]', error);
+      await supabase.auth.signOut();
+      router.push('/');
+    } catch (err) {
+      console.error('[Delete account]', err);
+      toast('Failed to delete account. Please contact support.', 'error');
+      setDeleting(false);
+      setShowDeleteDialog(false);
     }
   }
 
@@ -503,12 +527,91 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
-        <div className="flex items-center justify-center gap-3 pt-3">
-          <Link href="/privacy" className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]">Privacy</Link>
-          <span className="text-[var(--text-4)]">&middot;</span>
-          <Link href="/terms" className="text-xs text-[var(--text-4)] hover:text-[var(--text-2)]">Terms</Link>
+        {/* ABOUT EVRYWHER */}
+        <div>
+          <SectionLabel>About Evrywher</SectionLabel>
+          <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3" style={{ marginTop: 0 }}>
+              <span className="text-[14px] text-[var(--text-2)]">Version</span>
+              <span className="text-[14px] text-[var(--text-3)] font-mono">1.0.0</span>
+            </div>
+            <div className="h-px bg-[#EFEFEF]" />
+            <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
+              <span className="text-[14px] text-[var(--text-2)]">Website</span>
+              <span className="text-[14px] text-[#4F46E5] flex items-center gap-1">
+                evrywher.io
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+              </span>
+            </a>
+            <div className="h-px bg-[#EFEFEF]" />
+            <Link href="/privacy" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
+              <span className="text-[14px] text-[var(--text-2)]">Privacy Policy</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+            <div className="h-px bg-[#EFEFEF]" />
+            <Link href="/terms" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors" style={{ borderRadius: '0 0 8px 8px' }}>
+              <span className="text-[14px] text-[var(--text-2)]">Terms of Service</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </div>
+          <p className="text-center text-[12px] text-[var(--text-4)] mt-3">Made with ❤️ in Japan · TechDagger</p>
         </div>
-        <p className="text-center text-xs text-[var(--text-4)] pt-1">Evrywher by TechDagger</p>
+
+        {/* DELETE ACCOUNT */}
+        <div className="pb-2">
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full rounded-lg border border-[#DC2626]/20 bg-[#FEF2F2] py-3 text-[14px] font-medium text-[#DC2626] hover:bg-[#DC2626]/10 transition-colors"
+          >
+            Delete Account
+          </button>
+        </div>
+
+        {/* DELETE CONFIRM DIALOG */}
+        {showDeleteDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-[15px] font-semibold text-[var(--text-1)]">Delete Account</p>
+                  <p className="text-[12px] text-[var(--text-3)]">This cannot be undone</p>
+                </div>
+              </div>
+              <p className="text-[13px] text-[var(--text-2)] mb-4">
+                All your data — messages, contacts, settings — will be permanently deleted. Type <strong>delete</strong> to confirm.
+              </p>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="Type &quot;delete&quot; to confirm"
+                className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2.5 text-[13px] text-[var(--text-1)] focus:border-[#DC2626] focus:outline-none mb-3"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setShowDeleteDialog(false); setDeleteConfirmText(''); }}
+                  className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-[14px] font-medium text-[var(--text-2)] hover:bg-[#F9FAFB] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteConfirmText.toLowerCase() !== 'delete' || deleting}
+                  className="flex-1 rounded-lg bg-[#DC2626] py-2.5 text-[14px] font-medium text-white disabled:opacity-40 hover:bg-[#B91C1C] transition-colors"
+                >
+                  {deleting ? 'Deleting...' : 'Delete Forever'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -742,6 +845,82 @@ export default function SettingsPage() {
           {t('nav.logout')}
         </button>
       </div>
+
+      {/* About */}
+      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">About</h2>
+        <div className="space-y-2.5">
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--text-3)]">Version</span>
+            <span className="font-mono text-[var(--text-1)]">1.0.0</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--text-3)]">Made with</span>
+            <span className="text-[var(--text-1)]">❤️ in Japan</span>
+          </div>
+          <div className="flex gap-4 pt-1">
+            <Link href="/privacy" className="text-xs text-[#4F46E5] hover:underline">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs text-[#4F46E5] hover:underline">Terms of Service</Link>
+            <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer" className="text-xs text-[#4F46E5] hover:underline">evrywher.io ↗</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Delete Account */}
+      <button
+        onClick={() => setShowDeleteDialog(true)}
+        className="flex w-full items-center justify-center gap-2 rounded-btn border border-[#DC2626]/20 bg-[#DC2626]/5 py-3 text-sm font-medium text-[#DC2626] transition-colors hover:bg-[#DC2626]/10"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+        </svg>
+        Delete Account
+      </button>
+
+      {/* Delete Confirm Dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                </svg>
+              </div>
+              <div>
+                <p className="text-[15px] font-semibold text-[var(--text-1)]">Delete Account</p>
+                <p className="text-[12px] text-[var(--text-3)]">This cannot be undone</p>
+              </div>
+            </div>
+            <p className="text-[13px] text-[var(--text-2)] mb-4">
+              All your data — invoices, cash flows, contacts, messages — will be permanently deleted. Type <strong>delete</strong> to confirm.
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder={`Type "delete" to confirm`}
+              className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2.5 text-[13px] text-[var(--text-1)] focus:border-[#DC2626] focus:outline-none mb-3"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowDeleteDialog(false); setDeleteConfirmText(''); }}
+                className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-[14px] font-medium text-[var(--text-2)] hover:bg-[#F9FAFB] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText.toLowerCase() !== 'delete' || deleting}
+                className="flex-1 rounded-lg bg-[#DC2626] py-2.5 text-[14px] font-medium text-white disabled:opacity-40 hover:bg-[#B91C1C] transition-colors"
+              >
+                {deleting ? 'Deleting...' : 'Delete Forever'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <p className="text-center text-xs text-[var(--text-4)]">A TechDagger Product · MS Dynamics LLC</p>
     </div>

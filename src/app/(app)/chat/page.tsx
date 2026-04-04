@@ -12,6 +12,7 @@ import BotOnboarding from '@/components/BotOnboarding';
 import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
 import VoiceMessagePlayer from '@/components/VoiceMessagePlayer';
+import EmojiPicker from '@/components/EmojiPicker';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
@@ -159,6 +160,9 @@ export default function PocketChatPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const [showLabels, setShowLabels] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const [translationsUsed, setTranslationsUsed] = useState(0);
   const [botMessagesUsed, setBotMessagesUsed] = useState(0);
   const isFreePlan = (organization?.plan || 'free') === 'free';
@@ -1071,14 +1075,28 @@ export default function PocketChatPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAFAFA]">
+        <div
+          ref={chatScrollRef}
+          className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAFAFA] relative"
+          onScroll={() => {
+            const el = chatScrollRef.current;
+            if (el) setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);
+          }}
+        >
           {messages.length === 0 && (
-            <p className="text-center text-sm text-[#A3A3A3] mt-12">No messages yet. Say hello!</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="text-4xl mb-3">👋</div>
+              <p className="text-sm font-medium text-[#374151]">Say hello!</p>
+              <p className="text-xs text-[#9CA3AF] mt-1">Messages are translated in real-time</p>
+            </div>
           )}
-          {messages.map((msg) => {
+          {messages.map((msg, idx) => {
             const isOwner = msg.sender_type === 'owner';
             const isBot = msg.sender_type === 'bot';
-
+            // Date separator check
+            const msgDate = new Date(msg.created_at).toDateString();
+            const prevDate = idx > 0 ? new Date(messages[idx - 1].created_at).toDateString() : null;
+            const showDateSep = idx === 0 || msgDate !== prevDate;
             // Payment confirmed
             if (msg.message_type === 'payment_confirmed') {
               return (
@@ -1256,7 +1274,15 @@ export default function PocketChatPage() {
             const langFlag = origLang ? LANG_FLAGS[origLang] || '' : '';
 
             return (
-              <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
+              <div key={msg.id}>
+                {showDateSep && (
+                  <div className="flex items-center gap-3 py-2">
+                    <div className="flex-1 h-px bg-[#E5E5E5]" />
+                    <span className="text-[11px] font-medium text-[#9CA3AF] shrink-0">{(() => { const d = new Date(msg.created_at); const t = new Date().toDateString(); const y = new Date(Date.now()-86400000).toDateString(); if (msgDate===t) return 'Today'; if (msgDate===y) return 'Yesterday'; return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); })()}</span>
+                    <div className="flex-1 h-px bg-[#E5E5E5]" />
+                  </div>
+                )}
+                <div className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
                 {isBot && (
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
                     {botConfig?.avatar_url ? (
@@ -1324,6 +1350,7 @@ export default function PocketChatPage() {
                   </div>
                 </div>
               </div>
+              </div>
             );
           })}
           {typingUser && (
@@ -1337,6 +1364,17 @@ export default function PocketChatPage() {
             </div>
           )}
           <div ref={messagesEndRef} />
+
+          {/* Scroll to bottom button */}
+          {showScrollBtn && (
+            <button
+              onClick={() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); setShowScrollBtn(false); }}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-white border border-[#E5E5E5] px-4 py-2 text-xs font-medium text-[#4F46E5] shadow-lg hover:bg-[#F9FAFB] transition-colors z-10"
+            >
+              New messages
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7-7-7"/></svg>
+            </button>
+          )}
         </div>
 
         {/* Hidden file input */}
@@ -1464,11 +1502,28 @@ export default function PocketChatPage() {
             {/* Quick reply trigger */}
             <button
               onClick={() => setShowQuickReplies(!showQuickReplies)}
-              className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors"
+              className="hidden sm:flex h-[42px] w-[42px] items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors"
               title="Quick replies"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
             </button>
+
+            {/* Emoji trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setShowEmoji(!showEmoji)}
+                className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#F59E0B] hover:border-[#F59E0B] transition-colors"
+                title="Emoji"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </button>
+              {showEmoji && (
+                <EmojiPicker
+                  onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
+                  onClose={() => setShowEmoji(false)}
+                />
+              )}
+            </div>
 
             {/* Message input */}
             <textarea

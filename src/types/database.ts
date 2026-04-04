@@ -38,6 +38,7 @@ export interface Profile {
   full_name?: string;
   email: string;
   language: string;
+  avatar_url?: string | null;
   created_at: string;
 }
 

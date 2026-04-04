@@ -57,6 +57,16 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&family=Noto+Sans+Sinhala:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className={`${dmSans.variable} ${dmMono.variable} font-sans bg-[var(--bg)] text-[var(--text-1)] antialiased`}>
+        {/* Prevent dark mode flash on load */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var m = localStorage.getItem('evrywher-theme') || 'system';
+              var dark = m === 'dark' || (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+              if (dark) document.documentElement.classList.add('dark');
+            } catch(e){}
+          })();
+        `}} />
         <ToastProvider>
           {children}
         </ToastProvider>
