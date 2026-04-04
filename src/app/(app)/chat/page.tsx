@@ -329,6 +329,11 @@ export default function PocketChatPage() {
       setMessages([]);
       setContactLastSeen(null);
     }
+    // Clear smart replies and on-demand translations when switching conversations
+    setSmartReplies([]);
+    setSmartRepliesLoading(false);
+    setMsgTranslations({});
+    setTranslatePickerMsgId(null);
   }, [activeConvoId, fetchMessages]);
 
   // Scroll to bottom on new messages
@@ -384,6 +389,10 @@ export default function PocketChatPage() {
               });
               return [...filtered, newMsg];
             });
+            // Smart replies: generate suggestions for incoming contact/bot messages
+            if (newMsg.sender_type !== 'owner' && newMsg.message_type === 'text' && newMsg.message?.trim()) {
+              fetchSmartReplies(newMsg.message, newMsg.sender_name || '', newMsg.conversation_id);
+            }
           }
 
           // Update conversation list
@@ -486,6 +495,90 @@ export default function PocketChatPage() {
     await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', actionMenu.msgId);
     setMessages(prev => prev.map(m => m.id === actionMenu.msgId ? { ...m, deleted_at: new Date().toISOString() } : m));
     setActionMenu(null);
+  }
+
+  // ── Smart reply: fetch suggestions after incoming message ──────────────
+  const fetchSmartReplies = useCallback(async (message: string, senderName: string, convoId: string) => {
+    if (!message.trim() || !activeConvoId) return;
+    smartRepliesConvoRef.current = convoId;
+    setSmartRepliesLoading(true);
+    setSmartReplies([]);
+    try {
+      const isPro = ['pro', 'business', 'enterprise'].includes(organization?.plan || '');
+      const contactLang = activeConvo?.contact?.language || 'en';
+      const res = await fetch('/api/ai/smart-replies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          senderName,
+          userLanguage: profile?.language || 'en',
+          recipientLanguage: contactLang,
+          isPro,
+        }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      // Only update if still in same conversation
+      if (smartRepliesConvoRef.current === convoId && data.suggestions?.length) {
+        setSmartReplies(data.suggestions);
+      }
+    } catch (err) {
+      console.error('[smart-replies]', err);
+    } finally {
+      setSmartRepliesLoading(false);
+    }
+  }, [activeConvoId, activeConvo, organization?.plan, profile?.language]);
+
+  // ── On-demand translate: translate a specific message ──────────────────
+  async function handleTranslateMessage(msgId: string, text: string, toLang: string) {
+    setTranslatingMsgId(msgId);
+    setTranslatePickerMsgId(null);
+    setActionMenu(null);
+    try {
+      const res = await fetch('/api/ai/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, fromLanguage: 'auto', toLanguage: toLang }),
+      });
+      if (!res.ok) { toast('Translation failed', 'error'); return; }
+      const data = await res.json();
+      const translated = data.translation || data.translatedText || data.text || text;
+      setMsgTranslations(prev => ({ ...prev, [msgId]: { text: translated, toLang } }));
+    } catch (err) {
+      console.error('[on-demand-translate]', err);
+      toast('Translation failed', 'error');
+    } finally {
+      setTranslatingMsgId(null);
+    }
+  }
+
+  // ── Conversation summary ────────────────────────────────────────────────
+  async function handleSummarize() {
+    if (!messages.length) { toast('No messages to summarize', 'info'); return; }
+    setShowSummary(true);
+    setSummaryLoading(true);
+    setSummaryText('');
+    setShowChatMenu(false);
+    try {
+      const res = await fetch('/api/ai/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: messages.slice(-50),
+          contactName: activeConvo?.contact?.name || activeConvo?.title || 'Contact',
+          userLanguage: profile?.language || 'en',
+        }),
+      });
+      if (!res.ok) { setSummaryText('Could not summarize this conversation.'); return; }
+      const data = await res.json();
+      setSummaryText(data.summary || 'Nothing to summarize.');
+    } catch (err) {
+      console.error('[summarize]', err);
+      setSummaryText('Failed to generate summary. Please try again.');
+    } finally {
+      setSummaryLoading(false);
+    }
   }
 
   /* ---------- Voice recording ---------- */
@@ -1170,6 +1263,58 @@ export default function PocketChatPage() {
               />
             </div>
           )}
+
+          {/* ⋮ More options menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowChatMenu(v => !v)}
+              className="p-1.5 hover:bg-[#F3F3F1] rounded-lg transition-colors"
+              title="More options"
+            >
+              <svg className="h-5 w-5 text-[#A3A3A3]" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+              </svg>
+            </button>
+            {showChatMenu && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowChatMenu(false)} />
+                <div className="absolute right-0 top-9 z-50 w-48 rounded-xl border border-[#E5E5E5] bg-white shadow-xl py-1">
+                  {/* Summarize — Pro/Business only */}
+                  {['pro', 'business', 'enterprise'].includes(organization?.plan || '') ? (
+                    <button
+                      onClick={handleSummarize}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                    >
+                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
+                      Summarize chat
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { setShowChatMenu(false); toast('Summarize is a Pro feature', 'info'); }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#9CA3AF] hover:bg-[#F3F4F6]"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
+                      Summarize <span className="ml-auto text-[10px] bg-[#EEF2FF] text-[#4F46E5] px-1.5 py-0.5 rounded-full font-medium">PRO</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => { setShowChatMenu(false); router.push(`/chat/call/${activeConvoId}`); }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                  >
+                    <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 6.75Z" /></svg>
+                    Voice call
+                  </button>
+                  <button
+                    onClick={() => { setShowChatMenu(false); setShowInvite(true); }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                  >
+                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
+                    Invite contact
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Messages */}
@@ -1557,6 +1702,52 @@ export default function PocketChatPage() {
                 <span className="text-base">😊</span>
                 React
               </button>
+              {/* Translate to… */}
+              <div className="relative">
+                <button
+                  onClick={() => setTranslatePickerMsgId(p => p === actionMenu.msgId ? null : actionMenu.msgId)}
+                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                >
+                  <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>
+                  Translate to…
+                  <svg className="h-3 w-3 ml-auto text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                {translatePickerMsgId === actionMenu.msgId && (
+                  <div className="absolute left-full top-0 z-60 w-44 max-h-56 overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white shadow-xl py-1 ml-1">
+                    {[
+                      { code: 'en', name: 'English', flag: '🇬🇧' },
+                      { code: 'ja', name: '日本語', flag: '🇯🇵' },
+                      { code: 'ar', name: 'العربية', flag: '🇦🇪' },
+                      { code: 'ko', name: '한국어', flag: '🇰🇷' },
+                      { code: 'zh', name: '中文', flag: '🇨🇳' },
+                      { code: 'es', name: 'Español', flag: '🇪🇸' },
+                      { code: 'pt', name: 'Português', flag: '🇧🇷' },
+                      { code: 'fr', name: 'Français', flag: '🇫🇷' },
+                      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+                      { code: 'ur', name: 'اردو', flag: '🇵🇰' },
+                      { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
+                      { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+                      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+                      { code: 'tl', name: 'Filipino', flag: '🇵🇭' },
+                      { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
+                      { code: 'th', name: 'ไทย', flag: '🇹🇭' },
+                      { code: 'fa', name: 'فارسی', flag: '🇮🇷' },
+                      { code: 'ps', name: 'پښتو', flag: '🇦🇫' },
+                      { code: 'ne', name: 'नेपाली', flag: '🇳🇵' },
+                      { code: 'si', name: 'සිංහල', flag: '🇱🇰' },
+                      { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+                    ].map(lang => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleTranslateMessage(actionMenu.msgId, actionMenu.text, lang.code)}
+                        className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                      >
+                        <span>{lang.flag}</span> {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               {actionMenu.isOwner && (
                 <button onClick={handleDeleteMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#DC2626] hover:bg-[#FEF2F2]">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
