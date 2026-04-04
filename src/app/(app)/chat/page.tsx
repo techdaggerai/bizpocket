@@ -107,6 +107,15 @@ function formatTimestamp(dateStr: string): string {
   });
 }
 
+function onlineStatus(lastSeen: string | null): { online: boolean; text: string } {
+  if (!lastSeen) return { online: false, text: '' };
+  const diff = Math.floor((Date.now() - new Date(lastSeen).getTime()) / 1000);
+  if (diff < 120) return { online: true, text: 'Online' };
+  if (diff < 3600) return { online: false, text: `Last seen ${Math.floor(diff / 60)}m ago` };
+  if (diff < 86400) return { online: false, text: `Last seen ${Math.floor(diff / 3600)}h ago` };
+  return { online: false, text: `Last seen ${Math.floor(diff / 86400)}d ago` };
+}
+
 function avatarColor(name: string): string {
   const colors = ['#4F46E5', '#0891B2', '#059669', '#D97706', '#DC2626', '#7C3AED', '#DB2777'];
   let hash = 0;
@@ -152,6 +161,7 @@ export default function PocketChatPage() {
   const [translationsUsed, setTranslationsUsed] = useState(0);
   const [botMessagesUsed, setBotMessagesUsed] = useState(0);
   const isFreePlan = (organization?.plan || 'free') === 'free';
+  const [contactLastSeen, setContactLastSeen] = useState<string | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -272,8 +282,18 @@ export default function PocketChatPage() {
   useEffect(() => {
     if (activeConvoId) {
       fetchMessages(activeConvoId);
+      // Fetch contact's last_seen for online status
+      const convo = conversations.find(c => c.id === activeConvoId);
+      if (convo?.contact_id && !convo.is_bot_chat) {
+        supabase.from('profiles').select('last_seen').eq('user_id', convo.contact_id).single().then(({ data }) => {
+          setContactLastSeen(data?.last_seen || null);
+        });
+      } else {
+        setContactLastSeen(null);
+      }
     } else {
       setMessages([]);
+      setContactLastSeen(null);
     }
   }, [activeConvoId, fetchMessages]);
 
@@ -863,6 +883,15 @@ export default function PocketChatPage() {
     });
   }, [isFreePlan, organization?.id, sending]);
 
+  // Update last_seen for online status
+  useEffect(() => {
+    if (!user?.id) return;
+    const updateLastSeen = () => supabase.from('profiles').update({ last_seen: new Date().toISOString() }).eq('user_id', user.id);
+    updateLastSeen();
+    const interval = setInterval(updateLastSeen, 60000); // every 60s
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
   // Evrywher users: NEVER block with setup screen — go straight to chat UI.
   // Bot auto-creates in background via useEffect above.
 
@@ -904,7 +933,10 @@ export default function PocketChatPage() {
               <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
             ) : <AnimatedPocketChatLogo size={40} />
           ) : (
-            <PocketAvatar name={contactName} size={40} />
+            <div className="relative">
+              <PocketAvatar name={contactName} size={40} />
+              {(() => { const s = onlineStatus(contactLastSeen); return s.online ? <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-[#22C55E] border-2 border-white" /> : null; })()}
+            </div>
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
@@ -912,6 +944,10 @@ export default function PocketChatPage() {
               {activeConvo.is_bot_chat ? (
                 <span className="inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">
                   AI Assistant
+                </span>
+              ) : contactLastSeen ? (
+                <span className={`text-[11px] ${onlineStatus(contactLastSeen).online ? 'text-[#22C55E]' : 'text-[#9CA3AF]'}`}>
+                  {onlineStatus(contactLastSeen).text}
                 </span>
               ) : contactType ? (
                 <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
@@ -1594,7 +1630,7 @@ export default function PocketChatPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">{name}</p>
+                      <p className={`text-[15px] text-[#0A0A0A] truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
