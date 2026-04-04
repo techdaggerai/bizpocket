@@ -816,35 +816,10 @@ export default function PocketChatPage() {
     return () => { cancelled = true; };
   }, [organization?.id, isPocketChatMode, botConfigLoaded, isSetupComplete]);
 
-  // PocketChat users: timeout fallback — only if no botConfig exists at all
-  useEffect(() => {
-    if (!isPocketChatMode || !botConfigLoaded || isSetupComplete || botConfig) return;
-    const retries = parseInt(sessionStorage.getItem('bot_retries') || '0');
-    if (retries >= 2) {
-      sessionStorage.removeItem('bot_retries');
-      return;
-    }
-    const timer = setTimeout(() => {
-      sessionStorage.setItem('bot_retries', String(retries + 1));
-      window.location.reload();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [isPocketChatMode, botConfigLoaded, isSetupComplete, botConfig]);
+  // PocketChat users: NEVER block with setup screen — go straight to chat UI.
+  // Bot auto-creates in background via useEffect above.
 
-  // PocketChat: only show "Setting up..." if botConfig doesn't exist AND retries not exhausted
-  if (isPocketChatMode && botConfigLoaded && !isSetupComplete && !botConfig) {
-    const retries = typeof window !== 'undefined' ? parseInt(sessionStorage.getItem('bot_retries') || '0') : 0;
-    if (retries < 2) {
-      return (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-80px)] bg-white gap-3">
-          <div className="h-10 w-10 rounded-full border-3 border-[#4F46E5] border-t-transparent animate-spin" />
-          <p className="text-sm text-[#6b7280]">Setting up your assistant...</p>
-        </div>
-      );
-    }
-  }
-
-  // Show bot onboarding if not set up (BizPocket users only)
+  // Show bot onboarding if not set up (BizPocket users only — never PocketChat)
   if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
     return (
       <div className="h-[calc(100vh-80px)] bg-white">
