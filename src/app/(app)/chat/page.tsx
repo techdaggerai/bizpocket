@@ -63,6 +63,7 @@ interface Message {
   original_text: string | null;
   original_language: string | null;
   translations: Record<string, string> | null;
+  deleted_at?: string | null;
   created_at: string;
 }
 
@@ -162,6 +163,8 @@ export default function PocketChatPage() {
   const [botMessagesUsed, setBotMessagesUsed] = useState(0);
   const isFreePlan = (organization?.plan || 'free') === 'free';
   const [contactLastSeen, setContactLastSeen] = useState<string | null>(null);
+  const [actionMenu, setActionMenu] = useState<{ msgId: string; x: number; y: number; isOwner: boolean; text: string } | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -396,6 +399,37 @@ export default function PocketChatPage() {
   const broadcastTyping = useCallback(() => {
     typingChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: user?.id, name: profile?.full_name || profile?.name || 'Someone' } });
   }, [user?.id, profile?.name]);
+
+  /* ---------- Message actions ---------- */
+
+  function openActionMenu(msgId: string, x: number, y: number, isOwner: boolean, text: string) {
+    setActionMenu({ msgId, x: Math.min(x, (typeof window !== 'undefined' ? window.innerWidth : 375) - 180), y, isOwner, text });
+  }
+
+  function handleLongPressStart(e: React.TouchEvent, msgId: string, isOwner: boolean, text: string) {
+    const touch = e.touches[0];
+    longPressTimer.current = setTimeout(() => {
+      openActionMenu(msgId, touch.clientX, touch.clientY - 60, isOwner, text);
+    }, 400);
+  }
+
+  function handleLongPressEnd() {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  }
+
+  async function handleCopyText() {
+    if (!actionMenu) return;
+    await navigator.clipboard.writeText(actionMenu.text);
+    toast('Copied', 'success');
+    setActionMenu(null);
+  }
+
+  async function handleDeleteMessage() {
+    if (!actionMenu) return;
+    await supabase.from('messages').update({ deleted_at: new Date().toISOString() }).eq('id', actionMenu.msgId);
+    setMessages(prev => prev.map(m => m.id === actionMenu.msgId ? { ...m, deleted_at: new Date().toISOString() } : m));
+    setActionMenu(null);
+  }
 
   /* ---------- Voice recording ---------- */
 
@@ -1194,6 +1228,17 @@ export default function PocketChatPage() {
               );
             }
 
+            // Deleted message
+            if (msg.deleted_at) {
+              return (
+                <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`rounded-[12px] px-3.5 py-2.5 ${isOwner ? 'bg-[#E5E5E5]/50' : 'bg-[#F3F3F1]/50'}`}>
+                    <p className="text-[13px] italic text-[#9CA3AF]">Message deleted</p>
+                  </div>
+                </div>
+              );
+            }
+
             // Regular text message with translation
             const userLang = profile?.language || 'en';
             const display = getDisplayText({
@@ -1227,7 +1272,11 @@ export default function PocketChatPage() {
                     <p className="text-[15px] text-[#F59E0B] mb-1 ml-1 font-semibold">{botName}</p>
                   )}
                   <div
-                    className={`rounded-[12px] px-3.5 py-2.5 ${
+                    onContextMenu={(e) => { e.preventDefault(); openActionMenu(msg.id, e.clientX, e.clientY, isOwner, displayText); }}
+                    onTouchStart={(e) => handleLongPressStart(e, msg.id, isOwner, displayText)}
+                    onTouchEnd={handleLongPressEnd}
+                    onTouchMove={handleLongPressEnd}
+                    className={`rounded-[12px] px-3.5 py-2.5 select-none ${
                       isOwner
                         ? 'bg-[#4F46E5] text-white'
                         : isBot
@@ -1328,6 +1377,28 @@ export default function PocketChatPage() {
           <div className="flex-1" />
           <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
         </div>
+
+        {/* Message action menu */}
+        {actionMenu && (
+          <>
+            <div className="fixed inset-0 z-50" onClick={() => setActionMenu(null)} />
+            <div
+              className="fixed z-50 w-44 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1 animate-in fade-in zoom-in-95 duration-150"
+              style={{ top: actionMenu.y, left: actionMenu.x }}
+            >
+              <button onClick={handleCopyText} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                Copy text
+              </button>
+              {actionMenu.isOwner && (
+                <button onClick={handleDeleteMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#DC2626] hover:bg-[#FEF2F2]">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                  Delete
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Free tier usage indicator */}
         {isFreePlan && activeConvo && (

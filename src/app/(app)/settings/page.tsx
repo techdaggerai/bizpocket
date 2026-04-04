@@ -1,12 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+// ─── Dark mode helpers ────────────────────────────────────────────────────────
+type ThemeMode = 'light' | 'dark' | 'system';
+
+function applyTheme(mode: ThemeMode) {
+  const root = document.documentElement;
+  if (mode === 'dark') {
+    root.classList.add('dark');
+  } else if (mode === 'light') {
+    root.classList.remove('dark');
+  } else {
+    // system
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.classList.toggle('dark', prefersDark);
+  }
+}
+
+function useDarkMode(): [ThemeMode, (m: ThemeMode) => void] {
+  const [mode, setModeState] = useState<ThemeMode>('system');
+
+  useEffect(() => {
+    const saved = (localStorage.getItem('evrywher-theme') as ThemeMode) || 'system';
+    setModeState(saved);
+    applyTheme(saved);
+
+    // Listen for system pref changes when in system mode
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => {
+      if ((localStorage.getItem('evrywher-theme') || 'system') === 'system') {
+        applyTheme('system');
+      }
+    };
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  const setMode = (m: ThemeMode) => {
+    localStorage.setItem('evrywher-theme', m);
+    setModeState(m);
+    applyTheme(m);
+  };
+
+  return [mode, setMode];
+}
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
