@@ -35,20 +35,42 @@ export default function GlobalSearch() {
     cashFlows: any[];
     documents: any[];
     contacts: any[];
-  }>({ invoices: [], customers: [], cashFlows: [], documents: [], contacts: [] });
+    conversations: any[];
+    messages: any[];
+  }>({ invoices: [], customers: [], cashFlows: [], documents: [], contacts: [], conversations: [], messages: [] });
   const [loaded, setLoaded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const currency = organization.currency || 'JPY';
+
+  // Cmd/Ctrl + K shortcut
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen(prev => !prev);
+      }
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (open) { loadData(); setTimeout(() => inputRef.current?.focus(), 100); }
+  }, [open]);
 
   // Load all data once when search opens
   const loadData = useCallback(async () => {
     if (loaded) return;
-    const [invRes, custRes, cfRes, docRes, conRes] = await Promise.all([
+    const [invRes, custRes, cfRes, docRes, conRes, convRes, msgRes] = await Promise.all([
       supabase.from('invoices').select('id, invoice_number, customer_name, total, currency, status, created_at').eq('organization_id', organization.id).order('created_at', { ascending: false }).limit(200),
       supabase.from('customers').select('id, name, company, phone, email').eq('organization_id', organization.id).limit(200),
       supabase.from('cash_flows').select('id, category, from_to, description, amount, flow_type, date, currency').eq('organization_id', organization.id).order('date', { ascending: false }).limit(200),
       supabase.from('documents').select('id, title, category, date').eq('organization_id', organization.id).limit(200),
       supabase.from('contacts').select('id, name, company, phone, email, contact_type').eq('organization_id', organization.id).limit(200),
+      supabase.from('conversations').select('id, title, group_name, last_message, is_bot_chat, is_group').eq('organization_id', organization.id).order('last_message_at', { ascending: false }).limit(100),
+      supabase.from('messages').select('id, conversation_id, message, sender_name, created_at').eq('organization_id', organization.id).eq('message_type', 'text').order('created_at', { ascending: false }).limit(200),
     ]);
     setAllData({
       invoices: invRes.data || [],
@@ -56,6 +78,8 @@ export default function GlobalSearch() {
       cashFlows: cfRes.data || [],
       documents: docRes.data || [],
       contacts: conRes.data || [],
+      conversations: convRes.data || [],
+      messages: msgRes.data || [],
     });
     setLoaded(true);
   }, [organization.id, supabase, loaded]);
@@ -165,7 +189,34 @@ export default function GlobalSearch() {
       }
     }
 
-    setResults(matched.slice(0, 20));
+    // Search conversations
+    for (const conv of allData.conversations) {
+      const name = conv.group_name || conv.title || '';
+      if (name.toLowerCase().includes(q) || conv.last_message?.toLowerCase().includes(q)) {
+        matched.push({
+          type: 'contact',
+          id: conv.id,
+          title: name,
+          subtitle: conv.is_group ? 'Group' : conv.is_bot_chat ? 'AI Assistant' : (conv.last_message?.slice(0, 50) || 'Conversation'),
+          url: `/chat?convo=${conv.id}`,
+        });
+      }
+    }
+
+    // Search messages
+    for (const msg of allData.messages) {
+      if (msg.message?.toLowerCase().includes(q)) {
+        matched.push({
+          type: 'document',
+          id: msg.id,
+          title: msg.sender_name || 'Message',
+          subtitle: msg.message.slice(0, 60) + (msg.message.length > 60 ? '...' : ''),
+          url: `/chat?convo=${msg.conversation_id}`,
+        });
+      }
+    }
+
+    setResults(matched.slice(0, 25));
   }, [query, allData, loaded, currency]);
 
   // Group results by type
@@ -182,6 +233,7 @@ export default function GlobalSearch() {
           <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
         </svg>
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

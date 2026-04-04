@@ -48,6 +48,9 @@ interface Conversation {
   is_bot_chat?: boolean;
   is_group?: boolean;
   group_name?: string | null;
+  is_pinned?: boolean;
+  pinned_at?: string | null;
+  is_archived?: boolean;
   label?: string | null;
   label_color?: string | null;
   contact?: Contact | null;
@@ -170,6 +173,7 @@ export default function PocketChatPage() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [showGroupCreate, setShowGroupCreate] = useState(false);
   const [reactionMsgId, setReactionMsgId] = useState<string | null>(null);
+  const [convoActionId, setConvoActionId] = useState<string | null>(null);
   const [chatWallpaper, setChatWallpaper] = useState<string>(() => typeof window !== 'undefined' ? localStorage.getItem('chat_wallpaper') || '' : '');
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [groupName, setGroupName] = useState('');
@@ -581,6 +585,25 @@ export default function PocketChatPage() {
     }
   }
 
+  async function handlePinConvo(convoId: string) {
+    const convo = conversations.find(c => c.id === convoId);
+    const pinned = conversations.filter(c => c.is_pinned).length;
+    if (!convo?.is_pinned && pinned >= 3) { toast('Max 3 pinned conversations', 'info'); setConvoActionId(null); return; }
+    const newVal = !convo?.is_pinned;
+    await supabase.from('conversations').update({ is_pinned: newVal, pinned_at: newVal ? new Date().toISOString() : null }).eq('id', convoId);
+    setConversations(prev => prev.map(c => c.id === convoId ? { ...c, is_pinned: newVal, pinned_at: newVal ? new Date().toISOString() : null } : c));
+    toast(newVal ? 'Pinned' : 'Unpinned', 'success');
+    setConvoActionId(null);
+  }
+
+  async function handleArchiveConvo(convoId: string) {
+    await supabase.from('conversations').update({ is_archived: true }).eq('id', convoId);
+    setConversations(prev => prev.filter(c => c.id !== convoId));
+    toast('Conversation archived', 'success');
+    setConvoActionId(null);
+    if (activeConvoId === convoId) setActiveConvoId(null);
+  }
+
   /* ---------- Voice recording ---------- */
 
   const startRecording = useCallback(async () => {
@@ -977,11 +1000,17 @@ export default function PocketChatPage() {
     return true;
   });
 
-  const sortedConversations = [...filteredConversations].sort((a, b) => {
-    if (a.is_bot_chat && !b.is_bot_chat) return -1;
-    if (!a.is_bot_chat && b.is_bot_chat) return 1;
-    return 0;
-  });
+  const sortedConversations = [...filteredConversations]
+    .filter(c => !c.is_archived)
+    .sort((a, b) => {
+      // Pinned first
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      // Bot chat next
+      if (a.is_bot_chat && !b.is_bot_chat) return -1;
+      if (!a.is_bot_chat && b.is_bot_chat) return 1;
+      return 0;
+    });
 
   const filteredContacts = contacts.filter((c) => {
     if (!contactSearch) return true;
@@ -2086,6 +2115,7 @@ export default function PocketChatPage() {
               <button
                 key={convo.id}
                 onClick={() => setActiveConvoId(convo.id)}
+                onContextMenu={(e) => { e.preventDefault(); setConvoActionId(convo.id); }}
                 className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] hover:shadow-sm transition-all border-b border-[#F3F3F1] text-left overflow-hidden ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
               >
                 {/* Avatar */}
@@ -2106,6 +2136,7 @@ export default function PocketChatPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className={`text-[15px] text-[#0A0A0A] truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
+                      {convo.is_pinned && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>}
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
                       {convo.is_group && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Group</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
@@ -2132,6 +2163,26 @@ export default function PocketChatPage() {
           })
         )}
       </div>
+
+      {/* Conversation action menu (pin/archive) */}
+      {convoActionId && (
+        <>
+          <div className="fixed inset-0 z-50" onClick={() => setConvoActionId(null)} />
+          <div className="fixed z-50 bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg border-t border-[#E5E5E5] p-4 space-y-1 safe-bottom">
+            <button onClick={() => handlePinConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#374151] hover:bg-[#F3F4F6]">
+              <svg className="h-5 w-5 text-[#6B7280]" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
+              {conversations.find(c => c.id === convoActionId)?.is_pinned ? 'Unpin' : 'Pin to top'}
+            </button>
+            <button onClick={() => handleArchiveConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#374151] hover:bg-[#F3F4F6]">
+              <svg className="h-5 w-5 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
+              Archive
+            </button>
+            <button onClick={() => setConvoActionId(null)} className="w-full rounded-xl px-4 py-3 text-sm font-medium text-[#9CA3AF] hover:bg-[#F3F4F6]">
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Group Create Modal */}
       {showGroupCreate && (
