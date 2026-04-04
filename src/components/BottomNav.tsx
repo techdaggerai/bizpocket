@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth-context';
 
 interface NavItem {
   href: string;
-  labelKey: string;
+  label: string;
   icon: React.ReactNode;
   bizpocketOnly?: boolean;
 }
@@ -15,7 +14,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   {
     href: '/dashboard',
-    labelKey: 'nav.dashboard',
+    label: 'Home',
     bizpocketOnly: true,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -25,7 +24,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/invoices',
-    labelKey: 'nav.invoices',
+    label: 'Invoices',
     bizpocketOnly: true,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -35,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/contacts',
-    labelKey: 'nav.contacts',
+    label: 'Contacts',
     bizpocketOnly: false,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -45,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/chat',
-    labelKey: 'nav.chat',
+    label: 'Chat',
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
         <path d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h3l3.5 4 3.5-4H20a2 2 0 002-2V4a2 2 0 00-2-2z"/>
@@ -54,7 +53,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/cash-flow',
-    labelKey: 'nav.cash_flow',
+    label: 'Cash Flow',
     bizpocketOnly: true,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -64,10 +63,10 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     href: '/settings',
-    labelKey: 'nav.more',
+    label: 'Settings',
     icon: (
-      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="12" cy="5" r="2.5"/><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="19" r="2.5"/>
+      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82"/>
       </svg>
     ),
   },
@@ -75,7 +74,6 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { t } = useI18n();
   const { organization } = useAuth();
 
   const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
@@ -83,7 +81,7 @@ export default function BottomNav() {
 
   const items = isPocketChatMode
     ? NAV_ITEMS.filter(item => !item.bizpocketOnly)
-    : NAV_ITEMS.filter(item => item.href !== '/contacts'); // BizPocket doesn't need separate contacts tab
+    : NAV_ITEMS.filter(item => item.href !== '/contacts');
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-[#E5E5E5] bg-white safe-bottom">
@@ -95,14 +93,14 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex min-w-[48px] flex-col items-center gap-0.5 px-2 py-2 text-xs transition-colors ${
+              className={`flex min-w-[48px] flex-col items-center gap-0.5 px-2 py-2 transition-colors ${
                 isActive
                   ? 'text-[#4F46E5]'
                   : 'text-[#A3A3A3] hover:text-[var(--text-2)]'
               }`}
             >
               {item.icon}
-              <span className="mt-0.5 text-[11px] font-medium">{t(item.labelKey)}</span>
+              <span className="mt-0.5 text-[11px] font-medium">{item.label}</span>
             </Link>
           );
         })}

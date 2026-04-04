@@ -335,6 +335,20 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
+        {/* BOT & AI */}
+        <div>
+          <SectionLabel>Bot & AI</SectionLabel>
+          <SettingsRow first last>
+            <Link href="/chat/bot-setup" className="flex items-center justify-between w-full">
+              <div>
+                <p className="text-[14px] text-[var(--text-1)] font-medium">Bot Setup</p>
+                <p className="text-[12px] text-[var(--text-3)]">Name, personality, rules, avatar</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </SettingsRow>
+        </div>
+
         {/* FEEDBACK */}
         <FeedbackSection />
 
