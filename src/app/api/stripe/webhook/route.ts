@@ -14,7 +14,7 @@ function getSupabase() {
 }
 
 function planFromPriceId(priceId: string): 'pro' | 'business' {
-  if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) return 'business'
+  if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID || priceId === process.env.STRIPE_EVRYWHER_BUSINESS_PRICE_ID) return 'business'
   return 'pro'
 }
 

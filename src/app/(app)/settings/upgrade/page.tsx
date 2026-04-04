@@ -22,8 +22,10 @@ const PLANS = [
     key: 'pro' as const,
     name: 'Pro',
     price: '¥980',
+    priceUsd: '$6.99',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_1TGXQoKiugpuK1mjtDYwA15I',
+    evrywherPriceId: process.env.NEXT_PUBLIC_STRIPE_EVRYWHER_PRO_PRICE_ID,
     features: [
       'Unlimited invoices',
       'Evrywher unlimited',
@@ -36,8 +38,10 @@ const PLANS = [
     key: 'business' as const,
     name: 'Business',
     price: '¥2,980',
+    priceUsd: '$19.99',
     period: '/month',
     priceId: process.env.NEXT_PUBLIC_STRIPE_BUSINESS_PRICE_ID || 'price_1TGXRfKiugpuK1mjK5oI8CsA',
+    evrywherPriceId: process.env.NEXT_PUBLIC_STRIPE_EVRYWHER_BUSINESS_PRICE_ID,
     features: [
       'Everything in Pro',
       'Voice translation',
@@ -60,6 +64,8 @@ export default function UpgradePage() {
   const targetPlan = searchParams.get('plan');
   const rawPlan = organization.plan || 'free';
   const currentPlan = rawPlan;
+  const isEvrywherMode = organization?.signup_source === 'pocketchat' ||
+    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
   const trialEndsAt = organization.trial_ends_at ? new Date(organization.trial_ends_at) : null;
   const isOnTrial = trialEndsAt && trialEndsAt > new Date() && currentPlan === 'free';
   const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
@@ -91,7 +97,8 @@ export default function UpgradePage() {
       const plan = PLANS.find((p) => p.key === targetPlan);
       if (plan && plan.priceId) {
         setAutoTriggered(true);
-        handleCheckout(plan.priceId, plan.key);
+        const pid = (isEvrywherMode && plan.evrywherPriceId) ? plan.evrywherPriceId : plan.priceId;
+        if (pid) handleCheckout(pid, plan.key);
       }
     }
   }, [autoCheckout, targetPlan, autoTriggered]);
@@ -173,10 +180,13 @@ export default function UpgradePage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-[var(--text-1)]">{plan.name}</h3>
-                  <div className="mt-1 flex items-baseline gap-0.5">
+                  <div className="mt-1 flex items-baseline gap-1">
                     <span className="text-2xl font-bold text-[var(--text-1)]">{plan.price}</span>
                     {plan.period && (
                       <span className="text-sm text-[var(--text-3)]">{plan.period}</span>
+                    )}
+                    {'priceUsd' in plan && plan.priceUsd && (
+                      <span className="text-xs text-[var(--text-4)] ml-1">({plan.priceUsd})</span>
                     )}
                   </div>
                 </div>
@@ -224,7 +234,7 @@ export default function UpgradePage() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleCheckout(plan.priceId!, plan.key)}
+                    onClick={() => handleCheckout((isEvrywherMode && plan.evrywherPriceId) ? plan.evrywherPriceId : plan.priceId!, plan.key)}
                     disabled={loading === plan.key || profile.role !== 'owner'}
                     className="w-full rounded-btn bg-[#4F46E5] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4338CA] disabled:opacity-50"
                   >
