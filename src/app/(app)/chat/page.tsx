@@ -13,6 +13,8 @@ import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
 import VoiceMessagePlayer from '@/components/VoiceMessagePlayer';
 import EmojiPicker from '@/components/EmojiPicker';
+import StickerPicker from '@/components/StickerPicker';
+import GifPicker from '@/components/GifPicker';
 import LinkPreview from '@/components/LinkPreview';
 import ChatLabels from '@/components/ChatLabels';
 import { usePocketBot } from '@/lib/use-pocket-bot';
@@ -188,6 +190,10 @@ export default function PocketChatPage() {
   const [contactLastSeen, setContactLastSeen] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<{ id: string; sender: string; text: string } | null>(null);
   const [editingMsg, setEditingMsg] = useState<{ id: string; text: string } | null>(null);
+  const [pickerTab, setPickerTab] = useState<'emoji' | 'stickers' | 'gifs'>('emoji');
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [broadcastContacts, setBroadcastContacts] = useState<string[]>([]);
+  const [broadcastMsg, setBroadcastMsg] = useState('');
   const [actionMenu, setActionMenu] = useState<{ msgId: string; x: number; y: number; isOwner: boolean; text: string } | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -612,6 +618,57 @@ export default function PocketChatPage() {
     setMessages(prev => prev.map(m => m.id === editingMsg.id ? { ...m, message: newMessage.trim(), edited_at: new Date().toISOString() } : m));
     setEditingMsg(null);
     setNewMessage('');
+  }
+
+  async function sendBroadcast() {
+    if (!broadcastMsg.trim() || broadcastContacts.length === 0 || !organization?.id) return;
+    setSending(true);
+    for (const contactId of broadcastContacts) {
+      // Find or create conversation with each contact
+      const { data: existing } = await supabase.from('conversations').select('id').eq('organization_id', organization.id).eq('contact_id', contactId).single();
+      const convoId = existing?.id;
+      let targetConvoId = convoId;
+      if (!targetConvoId) {
+        const contact = contacts.find(c => c.id === contactId);
+        const { data: newConvo } = await supabase.from('conversations').insert({ organization_id: organization.id, contact_id: contactId, title: contact?.name || 'Contact', unread_count: 0 }).select('id').single();
+        targetConvoId = newConvo?.id;
+      }
+      if (targetConvoId) {
+        await supabase.from('messages').insert({
+          conversation_id: targetConvoId, organization_id: organization.id,
+          sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+          message: broadcastMsg.trim(), message_type: 'text',
+          original_text: broadcastMsg.trim(), original_language: profile?.language || 'en',
+        });
+        await supabase.from('conversations').update({ last_message: broadcastMsg.trim(), last_message_at: new Date().toISOString() }).eq('id', targetConvoId);
+      }
+    }
+    toast(`Broadcast sent to ${broadcastContacts.length} contacts`, 'success');
+    setShowBroadcast(false);
+    setBroadcastMsg('');
+    setBroadcastContacts([]);
+    setSending(false);
+    fetchConversations();
+  }
+
+  function exportChat() {
+    if (!messages.length) { toast('No messages to export', 'info'); return; }
+    const lines = messages.map(m => {
+      const date = new Date(m.created_at);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      const text = m.deleted_at ? 'Message deleted' : m.message;
+      return `[${dateStr}, ${timeStr}] ${m.sender_name}: ${text}`;
+    });
+    const header = `Evrywher Chat Export\n${activeConvo?.title || 'Chat'}\nExported: ${new Date().toLocaleString()}\n${'─'.repeat(40)}\n\n`;
+    const blob = new Blob([header + lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `evrywher-chat-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Chat exported', 'success');
   }
 
   async function handleMuteConvo(duration: string) {
@@ -1393,6 +1450,13 @@ export default function PocketChatPage() {
                     <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
                     Invite contact
                   </button>
+                  <button
+                    onClick={() => { setShowChatMenu(false); exportChat(); }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
+                  >
+                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                    Export chat
+                  </button>
                 </div>
               </>
             )}
@@ -1952,20 +2016,63 @@ export default function PocketChatPage() {
               <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
             </button>
 
-            {/* Emoji trigger */}
+            {/* Emoji/Sticker/GIF trigger */}
             <div className="relative">
               <button
                 onClick={() => setShowEmoji(!showEmoji)}
                 className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#F59E0B] hover:border-[#F59E0B] transition-colors"
-                title="Emoji"
+                title="Emoji, Stickers, GIFs"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
               </button>
               {showEmoji && (
-                <EmojiPicker
-                  onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
-                  onClose={() => setShowEmoji(false)}
-                />
+                <div className="absolute bottom-full mb-2 left-0 w-[320px] bg-white rounded-xl border border-[#E5E5E5] shadow-lg z-50 overflow-hidden">
+                  {/* Tabs */}
+                  <div className="flex border-b border-[#F0F0F0]">
+                    {[{k:'emoji' as const,l:'😊'},{k:'stickers' as const,l:'🎨'},{k:'gifs' as const,l:'GIF'}].map(t => (
+                      <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]' : 'text-[#9CA3AF]'}`}>{t.l}</button>
+                    ))}
+                  </div>
+                  {pickerTab === 'emoji' && (
+                    <EmojiPicker
+                      onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
+                      onClose={() => setShowEmoji(false)}
+                    />
+                  )}
+                  {pickerTab === 'stickers' && (
+                    <StickerPicker
+                      isOpen={true}
+                      onSelect={(stickerUrl) => {
+                        // Send sticker as image message
+                        if (activeConvoId && organization?.id) {
+                          supabase.from('messages').insert({
+                            conversation_id: activeConvoId, organization_id: organization.id,
+                            sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+                            message: '🎨 Sticker', message_type: 'image', attachment_url: stickerUrl,
+                          });
+                        }
+                        setShowEmoji(false);
+                      }}
+                      onClose={() => setShowEmoji(false)}
+                    />
+                  )}
+                  {pickerTab === 'gifs' && (
+                    <GifPicker
+                      isOpen={true}
+                      onSelect={(gif) => {
+                        if (activeConvoId && organization?.id) {
+                          supabase.from('messages').insert({
+                            conversation_id: activeConvoId, organization_id: organization.id,
+                            sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+                            message: gif.title || 'GIF', message_type: 'image', attachment_url: gif.url,
+                          });
+                        }
+                        setShowEmoji(false);
+                      }}
+                      onClose={() => setShowEmoji(false)}
+                    />
+                  )}
+                </div>
               )}
             </div>
 
@@ -2265,6 +2372,43 @@ export default function PocketChatPage() {
         </>
       )}
 
+      {/* Broadcast Modal */}
+      {showBroadcast && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setShowBroadcast(false); setBroadcastContacts([]); setBroadcastMsg(''); }} />
+          <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#0A0A0A]">Broadcast Message</h2>
+              <button onClick={() => { setShowBroadcast(false); setBroadcastContacts([]); setBroadcastMsg(''); }} className="text-[#A3A3A3] hover:text-[#0A0A0A]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-4 space-y-4 overflow-y-auto">
+              <textarea value={broadcastMsg} onChange={e => setBroadcastMsg(e.target.value)} placeholder="Type your broadcast message..." rows={3} maxLength={5000}
+                className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5] resize-none" />
+              <p className="text-sm font-medium text-[#374151]">Select recipients ({broadcastContacts.length})</p>
+              <div className="max-h-[200px] overflow-y-auto space-y-1">
+                {contacts.map(c => {
+                  const sel = broadcastContacts.includes(c.id);
+                  return (
+                    <button key={c.id} onClick={() => setBroadcastContacts(prev => sel ? prev.filter(id => id !== c.id) : [...prev, c.id])}
+                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${sel ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-[#F9FAFB] border border-transparent'}`}>
+                      <PocketAvatar name={c.name} size={32} />
+                      <span className="text-sm font-medium text-[#0A0A0A] flex-1 truncate">{c.name}</span>
+                      {sel && <svg width="16" height="16" viewBox="0 0 24 24" fill="#4F46E5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
+                    </button>
+                  );
+                })}
+              </div>
+              <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastContacts.length === 0 || sending}
+                className="w-full rounded-lg bg-[#F59E0B] py-3 text-sm font-semibold text-[#111827] disabled:opacity-50 hover:bg-[#D97706] transition-colors">
+                {sending ? 'Sending...' : `Broadcast to ${broadcastContacts.length} contacts`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Group Create Modal */}
       {showGroupCreate && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -2411,11 +2555,11 @@ export default function PocketChatPage() {
               </button>
             </div>
 
-            {/* New Group button */}
-            <div className="px-4 pt-3">
+            {/* New Group + Broadcast buttons */}
+            <div className="px-4 pt-3 space-y-2">
               <button
                 onClick={() => { setShowGroupCreate(true); setShowNewChat(false); fetchContacts(); }}
-                className="w-full flex items-center gap-3 rounded-xl border border-[#E5E5E5] px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors mb-3"
+                className="w-full flex items-center gap-3 rounded-xl border border-[#E5E5E5] px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors"
               >
                 <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-[#4F46E5]">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -2423,6 +2567,18 @@ export default function PocketChatPage() {
                 <div>
                   <p className="text-sm font-semibold text-[#0A0A0A]">New Group</p>
                   <p className="text-xs text-[#9CA3AF]">Chat with multiple contacts</p>
+                </div>
+              </button>
+              <button
+                onClick={() => { setShowBroadcast(true); setShowNewChat(false); fetchContacts(); }}
+                className="w-full flex items-center gap-3 rounded-xl border border-[#E5E5E5] px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors"
+              >
+                <div className="h-10 w-10 rounded-full bg-[#F59E0B]/10 flex items-center justify-center text-[#F59E0B]">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46" /></svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#0A0A0A]">Broadcast</p>
+                  <p className="text-xs text-[#9CA3AF]">Send to many, delivered as 1:1</p>
                 </div>
               </button>
             </div>
