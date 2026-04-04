@@ -166,6 +166,7 @@ export default function PocketChatPage() {
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const [showGroupCreate, setShowGroupCreate] = useState(false);
+  const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
   const [translationsUsed, setTranslationsUsed] = useState(0);
@@ -991,8 +992,9 @@ export default function PocketChatPage() {
   /* ---------- Render: Active Conversation ---------- */
 
   if (activeConvoId && activeConvo) {
-    const contactName = activeConvo.is_bot_chat ? botName : (activeConvo.contact?.name ?? activeConvo.title ?? 'Chat');
+    const contactName = activeConvo.is_bot_chat ? botName : activeConvo.is_group ? (activeConvo.group_name || activeConvo.title) : (activeConvo.contact?.name ?? activeConvo.title ?? 'Chat');
     const contactType = activeConvo.contact?.contact_type;
+    const isGroup = activeConvo.is_group;
 
     return (
       <div className="chat-fullbleed h-[calc(100vh-80px)] flex flex-col bg-white">
@@ -1011,6 +1013,10 @@ export default function PocketChatPage() {
             botConfig?.avatar_url ? (
               <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
             ) : <AnimatedPocketChatLogo size={40} />
+          ) : isGroup ? (
+            <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center shrink-0 cursor-pointer" onClick={() => setShowGroupInfo(true)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
           ) : (
             <div className="relative">
               <PocketAvatar name={contactName} size={40} />
@@ -1018,12 +1024,16 @@ export default function PocketChatPage() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
+            <p className={`text-sm font-semibold text-[#0A0A0A] truncate ${isGroup ? 'cursor-pointer' : ''}`} onClick={isGroup ? () => setShowGroupInfo(true) : undefined}>{contactName}</p>
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
                 <span className="inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">
                   AI Assistant
                 </span>
+              ) : isGroup ? (
+                <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-[#4F46E5] hover:underline">
+                  Tap for group info
+                </button>
               ) : contactLastSeen ? (
                 <span className={`text-[11px] ${onlineStatus(contactLastSeen).online ? 'text-[#22C55E]' : 'text-[#9CA3AF]'}`}>
                   {onlineStatus(contactLastSeen).text}
@@ -1323,7 +1333,7 @@ export default function PocketChatPage() {
                     <div className="flex-1 h-px bg-[#E5E5E5]" />
                   </div>
                 )}
-                <div className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot ? 'gap-2' : ''}`}>
+                <div className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot || (isGroup && !isOwner) ? 'gap-2' : ''}`}>
                 {isBot && (
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
                     {botConfig?.avatar_url ? (
@@ -1331,9 +1341,14 @@ export default function PocketChatPage() {
                     ) : <AnimatedPocketChatLogo size={32} />}
                   </div>
                 )}
+                {isGroup && !isOwner && !isBot && (
+                  <div className="h-8 w-8 shrink-0 mt-5">
+                    <PocketAvatar name={msg.sender_name || 'U'} size={28} />
+                  </div>
+                )}
                 <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
-                    <p className="text-[12px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
+                    <p className="text-[12px] mb-1 ml-1 font-medium" style={{ color: avatarColor(msg.sender_name || '') }}>{msg.sender_name}</p>
                   )}
                   {isBot && (
                     <p className="text-[15px] text-[#F59E0B] mb-1 ml-1 font-semibold">{botName}</p>
@@ -1869,6 +1884,79 @@ export default function PocketChatPage() {
                 className="w-full rounded-lg bg-[#4F46E5] py-3 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#4338CA] transition-colors">
                 Create Group ({selectedContacts.length} members)
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Group Info Modal */}
+      {showGroupInfo && activeConvo?.is_group && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowGroupInfo(false)} />
+          <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div className="p-5 border-b border-[#E5E5E5] flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#0A0A0A]">Group Info</h2>
+              <button onClick={() => setShowGroupInfo(false)} className="text-[#A3A3A3] hover:text-[#0A0A0A]">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-5 space-y-5 overflow-y-auto">
+              {/* Group avatar + name */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-16 w-16 rounded-full bg-[#4F46E5]/10 flex items-center justify-center">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <p className="text-lg font-bold text-[#0A0A0A]">{activeConvo.group_name || activeConvo.title}</p>
+                <span className="text-xs text-[#9CA3AF]">Group · Created {new Date(activeConvo.created_at).toLocaleDateString()}</span>
+              </div>
+
+              {/* Members */}
+              <div>
+                <p className="text-sm font-semibold text-[#374151] mb-3">Members</p>
+                <div className="space-y-2">
+                  {/* Owner (you) */}
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#F9FAFB]">
+                    <PocketAvatar name={profile?.full_name || profile?.name || 'You'} size={36} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#0A0A0A] truncate">{profile?.full_name || profile?.name || 'You'}</p>
+                      <p className="text-xs text-[#9CA3AF]">You · {profile?.language || 'en'}</p>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Creator</span>
+                  </div>
+                  {/* Contact members (from contacts in this org who were selected) */}
+                  {contacts.filter(c => selectedContacts.includes(c.id) || true).slice(0, 10).map(c => (
+                    <div key={c.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F9FAFB]">
+                      <PocketAvatar name={c.name} size={36} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#0A0A0A] truncate">{c.name}</p>
+                        <p className="text-xs text-[#9CA3AF]">{c.language || 'en'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="space-y-2 pt-2 border-t border-[#F0F0F0]">
+                <button onClick={() => { fetchContacts(); setShowGroupInfo(false); setShowGroupCreate(true); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#4F46E5] hover:bg-[#4F46E5]/5 transition-colors">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                  Add Member
+                </button>
+                <button
+                  onClick={async () => {
+                    if (confirm('Leave this group?')) {
+                      await supabase.from('conversations').delete().eq('id', activeConvo.id);
+                      setConversations(prev => prev.filter(c => c.id !== activeConvo.id));
+                      setActiveConvoId(null);
+                      setShowGroupInfo(false);
+                    }
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  Leave Group
+                </button>
+              </div>
             </div>
           </div>
         </div>
