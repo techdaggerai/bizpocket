@@ -864,7 +864,7 @@ export default function PocketChatPage() {
             <p className="text-sm font-semibold text-[#0A0A0A] truncate">{contactName}</p>
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
-                <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${isPocketChatMode ? 'bg-[#F43F5E]/10 text-[#F43F5E]' : 'bg-[#4F46E5]/10 text-[#4F46E5]'}`}>
+                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">
                   AI Assistant
                 </span>
               ) : contactType ? (
