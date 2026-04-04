@@ -15,7 +15,7 @@ const TRANSLATIONS = [
   { text: 'Ikaw ang nagdadala ng nawawalang E. Kami ang nagdadala ng mundo.', color: '#3B82F6', rtl: false },
 ];
 
-const ENGLISH_LINE = 'You bring the missing E. We bring the world.';
+const ENGLISH_LINE = 'You bring the missing e. We bring the world.';
 
 export default function AnimatedTagline() {
   const [engText, setEngText] = useState('');
@@ -84,16 +84,16 @@ export default function AnimatedTagline() {
   const current = TRANSLATIONS[transIdx];
   const showCursor = typing === 'eng' || typing === 'trans';
 
-  // Render English text with rose-red "E" — "You bring the missing E. We..."
-  // "You bring the missing " = 22 chars, "E" at index 22
+  // Render English text with emerald "e" — "You bring the missing e. We..."
+  // "You bring the missing " = 22 chars, "e" at index 22
   const eIdx = 22;
   const engRendered = engText.length <= eIdx
     ? <>{engText}</>
-    : <>{engText.slice(0, eIdx)}<span className="text-[#F43F5E] text-[26px] italic" style={{ fontFamily: "Georgia, 'Times New Roman', serif", letterSpacing: '2px' }}> {engText[eIdx]} </span>{engText.slice(eIdx + 1)}</>;
+    : <>{engText.slice(0, eIdx)}<span className="text-[#10B981] text-[24px] italic" style={{ fontFamily: "Georgia, serif" }}> {engText[eIdx]} </span>{engText.slice(eIdx + 1)}</>;
 
   return (
     <div className="mt-2 space-y-1">
-      <p className="text-[20px] font-semibold text-[#0A0A0A]" style={{ minHeight: '1.5em' }}>
+      <p className="text-[18px] text-[#1F2937] dark:text-[#E0E0E0]" style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 500, minHeight: '1.5em' }}>
         {engRendered}
         {typing === 'eng' && <span className="animate-pulse text-[#F59E0B]">|</span>}
       </p>
