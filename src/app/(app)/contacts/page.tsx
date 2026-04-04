@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import OutlinePillButton from '@/components/OutlinePillButton';
 import PocketAvatar from '@/components/PocketAvatar';
+import QRCode from 'qrcode';
 
 type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner' | 'friend' | 'family' | 'work';
 
@@ -109,6 +110,9 @@ export default function ContactsPage() {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [showQR, setShowQR] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const fetchContacts = useCallback(async () => {
     if (!organization?.id) return;
@@ -235,6 +239,45 @@ export default function ContactsPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  const inviteUrl = `https://evrywher.io/invite/${organization?.id || ''}`;
+
+  async function openQRModal() {
+    setShowQR(true);
+    try {
+      const dataUrl = await QRCode.toDataURL(inviteUrl, {
+        width: 280,
+        margin: 2,
+        color: { dark: '#0A0A0A', light: '#FFFFFF' },
+      });
+      setQrDataUrl(dataUrl);
+    } catch {
+      toast('Failed to generate QR code', 'error');
+    }
+  }
+
+  async function downloadQR() {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.download = 'evrywher-invite.png';
+    link.href = qrDataUrl;
+    link.click();
+  }
+
+  async function shareQR() {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Chat with me on Evrywher',
+          text: 'Scan to chat with me on Evrywher — AI-powered translation in 21 languages',
+          url: inviteUrl,
+        });
+      } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(inviteUrl);
+      toast('Invite link copied!', 'success');
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -258,7 +301,7 @@ export default function ContactsPage() {
             label="QR Code"
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /><rect x="18" y="14" width="3" height="3" /><rect x="14" y="18" width="3" height="3" /><rect x="18" y="18" width="3" height="3" /></svg>}
             color="#F59E0B"
-            onClick={() => toast('QR Code sharing coming soon!', 'info')}
+            onClick={openQRModal}
           />
           {!isPocketChatMode && (
             <button
@@ -460,6 +503,36 @@ export default function ContactsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {showQR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowQR(false)} />
+          <div className="relative bg-white rounded-2xl p-6 w-full max-w-xs mx-4 text-center">
+            <button onClick={() => setShowQR(false)} className="absolute top-3 right-3 text-[#A3A3A3] hover:text-[#0A0A0A]">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h3 className="text-lg font-bold text-[#0A0A0A] mb-4">Your Invite QR</h3>
+            {qrDataUrl ? (
+              <img src={qrDataUrl} alt="Invite QR Code" className="mx-auto w-[280px] h-[280px] rounded-xl" />
+            ) : (
+              <div className="flex items-center justify-center w-[280px] h-[280px] mx-auto">
+                <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
+              </div>
+            )}
+            <p className="mt-4 text-sm text-[#6B7280]">Scan to chat with me on Evrywher</p>
+            <canvas ref={qrCanvasRef} className="hidden" />
+            <div className="flex gap-2 mt-5">
+              <button onClick={downloadQR} className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#374151] hover:bg-[#F9FAFB] transition-colors">
+                Download
+              </button>
+              <button onClick={shareQR} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors">
+                Share
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
