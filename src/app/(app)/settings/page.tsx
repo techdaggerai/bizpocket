@@ -23,12 +23,15 @@ function applyTheme(mode: ThemeMode) {
   const root = document.documentElement;
   if (mode === 'dark') {
     root.classList.add('dark');
+    root.setAttribute('data-theme', 'dark');
   } else if (mode === 'light') {
     root.classList.remove('dark');
+    root.setAttribute('data-theme', 'light');
   } else {
     // system
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     root.classList.toggle('dark', prefersDark);
+    root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
   }
 }
 

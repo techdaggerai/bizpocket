@@ -72,7 +72,8 @@ export default function RootLayout({
             try {
               var m = localStorage.getItem('evrywher-theme') || 'system';
               var dark = m === 'dark' || (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-              if (dark) document.documentElement.classList.add('dark');
+              if (dark) { document.documentElement.classList.add('dark'); document.documentElement.setAttribute('data-theme','dark'); }
+              else { document.documentElement.setAttribute('data-theme','light'); }
             } catch(e){}
           })();
         `}} />
