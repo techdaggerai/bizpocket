@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { createClient } from '@/lib/supabase-client';
+import GlassCard from '@/components/ui/GlassCard';
+import PocketAvatar from '@/components/ui/PocketAvatar';
+import Button from '@/components/ui/Button';
 import TierBadge from '@/components/profile/TierBadge';
 import TrustScoreBar from '@/components/profile/TrustScoreBar';
-import NextActions from '@/components/profile/NextActions';
 import CorridorBadge from '@/components/profile/CorridorBadge';
+import NextActions from '@/components/profile/NextActions';
 import type { Tier } from '@/lib/tier-system';
 
 interface ProfileData {
@@ -39,7 +42,6 @@ export default function ProfilePreviewPage() {
   const [showBioNative, setShowBioNative] = useState(false);
 
   useEffect(() => {
-    // Try sessionStorage first (coming from build page)
     try {
       const cached = sessionStorage.getItem('spaceship_profile_build');
       if (cached) {
@@ -52,7 +54,6 @@ export default function ProfilePreviewPage() {
         return;
       }
     } catch {}
-    // Fallback: fetch from API
     fetchProfile();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -76,15 +77,12 @@ export default function ProfilePreviewPage() {
 
   async function saveField(field: string, value: any) {
     try {
-      const res = await fetch('/api/profile/update', {
+      await fetch('/api/profile/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [field]: value }),
       });
-      if (!res.ok) console.error('[ProfilePreview] Save failed:', field);
-    } catch (err) {
-      console.error('[ProfilePreview] Save error:', err);
-    }
+    } catch {}
   }
 
   function handleAddService() {
@@ -111,10 +109,7 @@ export default function ProfilePreviewPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ is_published: true }),
       });
-      if (!res.ok) {
-        setPublishing(false);
-        return;
-      }
+      if (!res.ok) { setPublishing(false); return; }
       try { sessionStorage.removeItem('spaceship_profile_build'); } catch {}
       router.push('/profile/published');
     } catch {
@@ -125,7 +120,7 @@ export default function ProfilePreviewPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
       </div>
     );
   }
@@ -147,236 +142,219 @@ export default function ProfilePreviewPage() {
 
   return (
     <div className="space-y-4 py-6 px-1">
-      {/* Header */}
-      <h1 className="text-lg font-bold text-[var(--text-1)] dark:text-white px-3">Your Global Profile</h1>
+      <h1
+        className="text-lg font-semibold text-[var(--pm-text-primary)] px-3"
+        style={{ fontFamily: 'var(--font-display), sans-serif' }}
+      >
+        Your Global Profile
+      </h1>
 
       {/* ─── Card 1: Header ─── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5">
+      <GlassCard adaptiveRefraction>
         <div className="flex items-start gap-4">
-          {/* Avatar */}
           <div className="relative flex-shrink-0">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-16 h-16 rounded-full object-cover border-2 border-[#E5E5E5] dark:border-gray-600" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-2xl font-bold text-[#4F46E5]">
-                {displayName.charAt(0).toUpperCase() || '?'}
-              </div>
-            )}
+            <PocketAvatar
+              src={avatarUrl}
+              name={displayName}
+              size="xl"
+              tier={tier}
+            />
             <button
               onClick={() => router.push('/settings')}
-              className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-gray-800 border border-[#E5E5E5] dark:border-gray-600 rounded-full flex items-center justify-center text-xs shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="absolute -bottom-1 -right-1 w-7 h-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-600 rounded-full flex items-center justify-center text-xs shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               {'\u{1F4F7}'}
             </button>
           </div>
-          {/* Info */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white truncate">{displayName}</h2>
+            <h2 className="text-lg font-semibold text-[var(--pm-text-primary)] truncate">{displayName}</h2>
             {/* Title - editable */}
             {editingTitle ? (
               <div className="flex gap-2 mt-1">
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="flex-1 text-sm border border-[#C7D2FE] dark:border-indigo-800 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 text-[var(--text-1)] dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+                  className="flex-1 text-sm border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 py-1 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') { saveField('title', title); setEditingTitle(false); }
                     if (e.key === 'Escape') setEditingTitle(false);
                   }}
                 />
-                <button onClick={() => { saveField('title', title); setEditingTitle(false); }} className="text-xs text-[#4F46E5] font-semibold">Save</button>
+                <button onClick={() => { saveField('title', title); setEditingTitle(false); }} className="text-xs text-indigo-600 font-semibold">Save</button>
               </div>
             ) : (
               <button onClick={() => setEditingTitle(true)} className="flex items-center gap-1.5 mt-0.5 group">
-                <span className="text-sm text-[var(--text-2)] dark:text-gray-300">{title || 'Add your title'}</span>
+                <span className="text-sm text-[var(--pm-text-secondary)]">{title || 'Add your title'}</span>
                 <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity">{'\u270F\uFE0F'}</span>
               </button>
             )}
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-sm">{'\u{1F1EF}\u{1F1F5}'}</span>
-              <span className="text-xs text-[var(--text-3)] dark:text-gray-400">{organization.name}</span>
+              <TierBadge tier={tier} size="sm" />
+            </div>
+            <p className="text-xs text-[var(--pm-text-tertiary)] mt-1">{organization.name}</p>
+          </div>
+        </div>
+      </GlassCard>
+
+      {/* ─── Card 2: Bio ─── */}
+      <GlassCard adaptiveRefraction>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">About</h3>
+            <button onClick={() => setEditingBio(!editingBio)} className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+              {editingBio ? 'Done' : '\u270F\uFE0F Edit'}
+            </button>
+          </div>
+          {editingBio ? (
+            <textarea
+              value={bioEn}
+              onChange={(e) => setBioEn(e.target.value)}
+              onBlur={() => saveField('bio_en', bioEn)}
+              rows={4}
+              className="w-full text-sm border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+              autoFocus
+            />
+          ) : (
+            <p className="text-sm text-[var(--pm-text-secondary)] leading-relaxed whitespace-pre-wrap">
+              {bioEn || 'Your bio will appear here.'}
+            </p>
+          )}
+
+          {/* Japanese bio */}
+          {bioJa && (
+            <div>
+              <button onClick={() => setShowBioJa(!showBioJa)} className="flex items-center gap-1.5 text-xs text-[var(--pm-text-tertiary)] hover:text-[var(--pm-text-secondary)]">
+                <span>{'\u{1F1EF}\u{1F1F5}'}</span>
+                <span>Japanese</span>
+                <svg className={`w-3 h-3 transition-transform ${showBioJa ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {showBioJa && (
+                <p className="text-sm text-[var(--pm-text-secondary)] mt-2 pl-5 leading-relaxed">{bioJa}</p>
+              )}
+            </div>
+          )}
+
+          {/* Native bio */}
+          {bioNative && bioNative !== bioEn && (
+            <div>
+              <button onClick={() => setShowBioNative(!showBioNative)} className="flex items-center gap-1.5 text-xs text-[var(--pm-text-tertiary)] hover:text-[var(--pm-text-secondary)]">
+                <span>{'\u{1F310}'}</span>
+                <span>Native language</span>
+                <svg className={`w-3 h-3 transition-transform ${showBioNative ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {showBioNative && (
+                <p className="text-sm text-[var(--pm-text-secondary)] mt-2 pl-5 leading-relaxed">{bioNative}</p>
+              )}
+            </div>
+          )}
+        </div>
+      </GlassCard>
+
+      {/* ─── Card 3: Services ─── */}
+      <GlassCard adaptiveRefraction>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">Services</h3>
+            <button onClick={() => setEditingServices(!editingServices)} className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+              {editingServices ? 'Done' : '\u270F\uFE0F Edit'}
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {services.map((s, i) => (
+              <span key={i} className="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                {s}
+                {editingServices && (
+                  <button onClick={() => handleRemoveService(i)} className="text-indigo-400 hover:text-red-500 ml-0.5">&times;</button>
+                )}
+              </span>
+            ))}
+            {services.length === 0 && !editingServices && (
+              <span className="text-sm text-[var(--pm-text-tertiary)]">No services yet</span>
+            )}
+          </div>
+          {editingServices && (
+            <div className="flex gap-2">
+              <input
+                value={newService}
+                onChange={(e) => setNewService(e.target.value)}
+                placeholder="Add a service..."
+                className="flex-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddService()}
+              />
+              <button onClick={handleAddService} className="text-xs bg-indigo-600 text-white px-3 py-2 rounded-lg font-semibold">Add</button>
+            </div>
+          )}
+        </div>
+      </GlassCard>
+
+      {/* ─── Card 4: Corridors ─── */}
+      {corridors.length > 0 && (
+        <GlassCard adaptiveRefraction>
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">Operating Corridors</h3>
+            <div className="flex flex-wrap gap-2">
+              {corridors.map((c: any, i: number) => (
+                <CorridorBadge key={i} from={c.from} to={c.to} flagFrom={c.flag_from} flagTo={c.flag_to} variant="card" />
+              ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* ─── Card 2: Tier + Trust ─── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <TierBadge tier={tier} size="md" />
-          {tier === 'starter' && (
-            <span className="text-xs text-[var(--text-3)] dark:text-gray-400">First week boost active</span>
-          )}
-        </div>
-        <TrustScoreBar score={trustScore} tier={tier} showBreakdown />
-        {nextActions.length > 0 && tier === 'starter' && (
-          <NextActions
-            actions={nextActions}
-            onActionTap={(a) => {
-              if (a.action.includes('invoice')) router.push('/invoices/new');
-              else if (a.action.includes('photo')) router.push('/settings');
-              else if (a.action.includes('phone') || a.action.includes('address')) router.push('/settings/business-setup');
-              else if (a.action.includes('tax')) router.push('/settings/business-setup');
-            }}
-          />
-        )}
-      </div>
-
-      {/* ─── Card 3: Bio ─── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">About</h3>
-          <button onClick={() => setEditingBio(!editingBio)} className="text-xs text-[#4F46E5] font-semibold">{editingBio ? 'Done' : '\u270F\uFE0F Edit'}</button>
-        </div>
-        {editingBio ? (
-          <textarea
-            value={bioEn}
-            onChange={(e) => setBioEn(e.target.value)}
-            onBlur={() => saveField('bio_en', bioEn)}
-            rows={4}
-            className="w-full text-sm border border-[#C7D2FE] dark:border-indigo-800 rounded-xl px-3 py-2.5 bg-white dark:bg-gray-800 text-[var(--text-1)] dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none"
-            autoFocus
-          />
-        ) : (
-          <p className="text-sm text-[var(--text-2)] dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-            {bioEn || 'Your bio will appear here.'}
-          </p>
-        )}
-
-        {/* Japanese bio */}
-        {bioJa && (
-          <div>
-            <button onClick={() => setShowBioJa(!showBioJa)} className="flex items-center gap-1.5 text-xs text-[var(--text-3)] dark:text-gray-400 hover:text-[var(--text-2)] dark:hover:text-gray-300">
-              <span>{'\u{1F1EF}\u{1F1F5}'}</span>
-              <span>Japanese</span>
-              <svg className={`w-3 h-3 transition-transform ${showBioJa ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            {showBioJa && (
-              <p className="text-sm text-[var(--text-2)] dark:text-gray-300 mt-2 pl-5 leading-relaxed">{bioJa}</p>
-            )}
-          </div>
-        )}
-
-        {/* Native bio */}
-        {bioNative && bioNative !== bioEn && (
-          <div>
-            <button onClick={() => setShowBioNative(!showBioNative)} className="flex items-center gap-1.5 text-xs text-[var(--text-3)] dark:text-gray-400 hover:text-[var(--text-2)] dark:hover:text-gray-300">
-              <span>{'\u{1F310}'}</span>
-              <span>Native language</span>
-              <svg className={`w-3 h-3 transition-transform ${showBioNative ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
-            </button>
-            {showBioNative && (
-              <p className="text-sm text-[var(--text-2)] dark:text-gray-300 mt-2 pl-5 leading-relaxed">{bioNative}</p>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ─── Card 4: Services ─── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">Services</h3>
-          <button onClick={() => setEditingServices(!editingServices)} className="text-xs text-[#4F46E5] font-semibold">{editingServices ? 'Done' : '\u270F\uFE0F Edit'}</button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {services.map((s, i) => (
-            <span key={i} className="inline-flex items-center gap-1.5 bg-[#EEF2FF] dark:bg-indigo-950/30 text-[#4338CA] dark:text-indigo-300 text-xs font-medium px-3 py-1.5 rounded-full border border-[#C7D2FE] dark:border-indigo-800">
-              {s}
-              {editingServices && (
-                <button onClick={() => handleRemoveService(i)} className="text-[#4338CA]/60 hover:text-[#DC2626] ml-0.5">&times;</button>
-              )}
-            </span>
-          ))}
-          {services.length === 0 && !editingServices && (
-            <span className="text-sm text-[var(--text-3)] dark:text-gray-400">No services yet</span>
-          )}
-        </div>
-        {editingServices && (
-          <div className="flex gap-2">
-            <input
-              value={newService}
-              onChange={(e) => setNewService(e.target.value)}
-              placeholder="Add a service..."
-              className="flex-1 text-sm border border-[#E5E5E5] dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-[var(--text-1)] dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
-              onKeyDown={(e) => e.key === 'Enter' && handleAddService()}
-            />
-            <button onClick={handleAddService} className="text-xs bg-[#4F46E5] text-white px-3 py-2 rounded-lg font-semibold">Add</button>
-          </div>
-        )}
-      </div>
-
-      {/* ─── Card 5: Corridors ─── */}
-      {corridors.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">Operating Corridors</h3>
-          <div className="flex flex-wrap gap-2">
-            {corridors.map((c: any, i: number) => (
-              <CorridorBadge key={i} from={c.from} to={c.to} flagFrom={c.flag_from} flagTo={c.flag_to} />
-            ))}
-          </div>
-        </div>
+        </GlassCard>
       )}
 
-      {/* ─── Card 6: Compliance ─── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-[#E5E5E5] dark:border-gray-700 p-5 space-y-3">
-        <h3 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">Verification</h3>
-        <div className="space-y-2">
-          {[
-            { label: 'Email verified', verified: !!user.email_confirmed_at },
-            { label: 'Tax registration', verified: cls.rawData?.hasTaxInfo, action: '/settings/business-setup', actionLabel: 'Add T-number \u2192' },
-            { label: 'Profile photo', verified: cls.rawData?.hasPhoto, action: '/settings', actionLabel: 'Upload photo \u2192' },
-            { label: 'Business address', verified: cls.rawData?.hasAddress, action: '/settings/business-setup', actionLabel: 'Add address \u2192' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between py-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{item.verified ? '\u2705' : '\u2B1C'}</span>
-                <span className={`text-sm ${item.verified ? 'text-[var(--text-1)] dark:text-gray-200' : 'text-[var(--text-3)] dark:text-gray-400'}`}>{item.label}</span>
-              </div>
-              {!item.verified && item.action && (
-                <button onClick={() => router.push(item.action!)} className="text-xs text-[#4F46E5] font-semibold">{item.actionLabel}</button>
-              )}
-            </div>
-          ))}
+      {/* ─── Card 5: Trust ─── */}
+      <GlassCard tier={tier} glow adaptiveRefraction>
+        <div className="space-y-4">
+          <TierBadge tier={tier} trustScore={trustScore} size="lg" />
+          {nextActions.length > 0 && tier === 'starter' && (
+            <NextActions
+              actions={nextActions}
+              onActionTap={(a) => {
+                if (a.action.includes('invoice')) router.push('/invoices/new');
+                else if (a.action.includes('photo')) router.push('/settings');
+                else if (a.action.includes('phone') || a.action.includes('address')) router.push('/settings/business-setup');
+                else if (a.action.includes('tax')) router.push('/settings/business-setup');
+              }}
+            />
+          )}
         </div>
-      </div>
+      </GlassCard>
 
-      {/* ─── Card 7: Next Milestone ─── */}
+      {/* ─── Card 6: Next Milestone ─── */}
       {nextMilestone && (
-        <div className="bg-gradient-to-r from-[#EEF2FF] to-[#F0FDF4] dark:from-indigo-950/30 dark:to-emerald-950/30 rounded-2xl border border-[#C7D2FE] dark:border-indigo-800 p-5 space-y-3">
-          <h3 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">Next Milestone</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-lg">{tier === 'starter' ? '\u{1F33F}' : '\u{1F333}'}</span>
-            <span className="text-sm font-medium text-[var(--text-1)] dark:text-gray-200">{nextMilestone.nextTier}</span>
-          </div>
-          <p className="text-xs text-[var(--text-2)] dark:text-gray-300">{nextMilestone.requirement}</p>
-          {/* Progress */}
-          <div className="space-y-1">
-            <div className="h-2 rounded-full bg-white/50 dark:bg-gray-800 overflow-hidden">
-              {(() => {
-                const parts = nextMilestone.progress.split('/');
-                const pct = parts.length === 2 ? Math.min(100, (parseInt(parts[0]) / parseInt(parts[1])) * 100) : 0;
-                return <div className="h-full rounded-full bg-[#4F46E5] transition-all duration-500" style={{ width: `${pct}%` }} />;
-              })()}
+        <GlassCard adaptiveRefraction className="bg-gradient-to-r from-indigo-50/80 to-emerald-50/80 dark:from-indigo-950/30 dark:to-emerald-950/30">
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">Next Milestone</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-lg">{tier === 'starter' ? '\u{1F33F}' : '\u{1F333}'}</span>
+              <span className="text-sm font-medium text-[var(--pm-text-primary)]">{nextMilestone.nextTier}</span>
             </div>
-            <p className="text-xs text-[var(--text-3)] dark:text-gray-400 text-right">{nextMilestone.progress}</p>
+            <p className="text-xs text-[var(--pm-text-secondary)]">{nextMilestone.requirement}</p>
+            <div className="space-y-1">
+              <div className="h-2 rounded-full bg-white/50 dark:bg-gray-800 overflow-hidden">
+                {(() => {
+                  const parts = nextMilestone.progress.split('/');
+                  const pct = parts.length === 2 ? Math.min(100, (parseInt(parts[0]) / parseInt(parts[1])) * 100) : 0;
+                  return <div className="h-full rounded-full bg-indigo-500 transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]" style={{ width: `${pct}%` }} />;
+                })()}
+              </div>
+              <p className="text-xs text-[var(--pm-text-tertiary)] text-right">{nextMilestone.progress}</p>
+            </div>
           </div>
-        </div>
+        </GlassCard>
       )}
 
       {/* Publish button */}
       <div className="pt-4 pb-8">
-        <button
+        <Button
+          variant="primary"
+          size="xl"
           onClick={handlePublish}
-          disabled={publishing}
-          className="w-full bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-60 text-white font-semibold text-base py-4 rounded-xl transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
+          loading={publishing}
+          className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
         >
-          {publishing ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-          ) : (
-            <>Publish & Go Live {'\u{1F680}'}</>
-          )}
-        </button>
+          Publish & Go Live {'\u{1F680}'}
+        </Button>
       </div>
     </div>
   );
