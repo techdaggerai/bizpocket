@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Invoice, InvoiceChat, InvoiceStatus } from '@/types/database';
 import CorridorMilestoneToast from '@/components/ui/CorridorMilestoneToast';
+import { useDelight } from '@/contexts/DelightContext';
 
 const statusColors: Record<InvoiceStatus, string> = {
   draft: 'bg-[#F4F4F5] text-[#71717A] border border-[#E4E4E7]',
@@ -23,6 +24,7 @@ export default function InvoiceDetailPage() {
   const id = params.id as string;
   const { organization, profile } = useAuth();
   const { toast } = useToast();
+  const { trigger: triggerDelight } = useDelight();
   const supabase = createClient();
 
   const [invoice, setInvoice] = useState<Invoice | null>(null);
@@ -173,13 +175,16 @@ export default function InvoiceDetailPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ event_type: 'first_paid_invoice' }),
         }).then(r => r.json()).then(res => {
-          // If first_paid was skipped (already awarded), log regular invoice_paid
-          if (res.skipped) {
+          if (!res.skipped) {
+            // First ever paid invoice — big celebration
+            triggerDelight({ type: 'first_paid', points: 5 })
+          } else {
+            // Subsequent paid — smaller delight + log regular event
             fetch('/api/trust/log-event', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ event_type: 'invoice_paid' }),
-            }).catch(() => {})
+            }).then(() => triggerDelight({ type: 'trust_earned', points: 2 })).catch(() => {})
           }
         }).catch(() => {})
         // ─── Corridor milestone check ───────────────────
@@ -194,6 +199,7 @@ export default function InvoiceDetailPage() {
               toFlag: res.milestone.to_flag,
               label: res.milestone.label,
             })
+            triggerDelight({ type: 'corridor_milestone', data: res.milestone })
           }
         }).catch(() => {})
       }

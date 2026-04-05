@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
+import { useDelight } from '@/contexts/DelightContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
@@ -13,6 +14,7 @@ export default function BusinessSetupPage() {
   const { organization } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
+  const { trigger: triggerDelight } = useDelight();
   const supabase = createClient();
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -97,6 +99,8 @@ export default function BusinessSetupPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ event_type: evt }),
+        }).then(r => r.json()).then(res => {
+          if (!res.skipped) triggerDelight({ type: 'trust_earned', points: evt === 'tax_info_added' ? 3 : 2 })
         }).catch(() => {})
       }
       router.push('/settings');

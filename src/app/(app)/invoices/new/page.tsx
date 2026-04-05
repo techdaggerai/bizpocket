@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
+import { useDelight } from '@/contexts/DelightContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import AIInvoiceHelper from '@/components/AIInvoiceHelper';
 import PageHeader from '@/components/PageHeader';
@@ -45,6 +46,7 @@ export default function NewInvoicePage() {
   const { organization, user } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
+  const { trigger: triggerDelight } = useDelight();
   const [supabase] = useState(() => createClient());
   const currency = organization.currency || 'JPY';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -282,7 +284,9 @@ export default function NewInvoicePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_type: 'first_invoice' }),
-      }).catch(() => {}) // fire-and-forget, dedup handled server-side
+      }).then(r => r.json()).then(res => {
+        if (!res.skipped) triggerDelight({ type: 'first_invoice', points: 3 })
+      }).catch(() => {})
     }
     setSaving(false); toast(status === 'draft' ? 'Invoice saved as draft' : 'Invoice sent', 'success'); router.push('/invoices');
   }

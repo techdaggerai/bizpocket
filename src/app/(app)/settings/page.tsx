@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
+import { useDelight } from '@/contexts/DelightContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NotificationSoundPicker from '@/components/NotificationSoundPicker';
@@ -182,6 +183,7 @@ export default function SettingsPage() {
   const { profile, organization, user } = useAuth();
   const { t, lang, setLang } = useI18n();
   const { toast } = useToast();
+  const { trigger: triggerDelight } = useDelight();
   const supabase = createClient();
   const router = useRouter();
   const [themeMode, setThemeMode] = useDarkMode();
@@ -280,6 +282,8 @@ export default function SettingsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_type: 'photo_uploaded' }),
+      }).then(r => r.json()).then(res => {
+        if (!res.skipped) triggerDelight({ type: 'trust_earned', points: 2 })
       }).catch(() => {})
     } catch (err: unknown) {
       console.error('[Avatar upload]', err);

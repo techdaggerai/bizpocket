@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useDelight } from '@/contexts/DelightContext';
 import { createClient } from '@/lib/supabase-client';
 import GlassCard from '@/components/ui/GlassCard';
 import PocketAvatar from '@/components/ui/PocketAvatar';
@@ -22,6 +23,7 @@ interface ProfileData {
 export default function ProfilePreviewPage() {
   const router = useRouter();
   const { user, profile, organization } = useAuth();
+  const { trigger: triggerDelight } = useDelight();
   const supabase = createClient();
 
   const [data, setData] = useState<ProfileData | null>(null);
@@ -111,6 +113,7 @@ export default function ProfilePreviewPage() {
       });
       if (!res.ok) { setPublishing(false); return; }
       try { sessionStorage.removeItem('spaceship_profile_build'); } catch {}
+      triggerDelight({ type: 'profile_published' });
       router.push('/profile/published');
     } catch {
       setPublishing(false);
