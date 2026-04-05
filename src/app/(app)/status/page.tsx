@@ -451,8 +451,8 @@ export default function StatusPage() {
   return (
     <div className="max-w-lg mx-auto pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#F0F0F0] px-4 py-3">
-        <h1 className="text-[18px] font-bold text-[#0A0A0A]">Status</h1>
+      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-[#F0F0F0] dark:border-gray-800 px-4 py-3">
+        <h1 className="text-[18px] font-bold text-[#0A0A0A] dark:text-white">Status</h1>
       </div>
 
       {loading ? (
@@ -496,7 +496,7 @@ export default function StatusPage() {
                 </div>
               </button>
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#0A0A0A]">{myName}</p>
+                <p className="text-[14px] font-semibold text-[#0A0A0A] dark:text-white">{myName}</p>
                 <p className="text-[12px] text-[#9CA3AF]">
                   {hasMyStatus ? `${myStatuses.length} status${myStatuses.length !== 1 ? 'es' : ''} · ${timeLeft(myStatuses[0].expires_at)}` : 'Tap to add status'}
                 </p>
@@ -523,7 +523,7 @@ export default function StatusPage() {
                     <button
                       key={latest.user_id}
                       onClick={() => setViewer({ statuses: group.statuses, index: 0 })}
-                      className="w-full flex items-center gap-3 py-2 hover:bg-[#F9FAFB] rounded-xl px-2 transition-colors text-left"
+                      className="w-full flex items-center gap-3 py-2 hover:bg-[#F9FAFB] dark:hover:bg-gray-800 rounded-xl px-2 transition-colors text-left"
                     >
                       <div className="relative h-[52px] w-[52px] shrink-0">
                         <StatusRing count={group.statuses.length} viewed={viewed} size={52} />
@@ -537,7 +537,7 @@ export default function StatusPage() {
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[14px] truncate ${viewed ? 'font-medium text-[#374151]' : 'font-bold text-[#0A0A0A]'}`}>
+                        <p className={`text-[14px] truncate ${viewed ? 'font-medium text-[#374151] dark:text-gray-300' : 'font-bold text-[#0A0A0A] dark:text-white'}`}>
                           {group.name}
                         </p>
                         <p className="text-[12px] text-[#9CA3AF] truncate">
@@ -562,8 +562,8 @@ export default function StatusPage() {
               <div className="h-16 w-16 rounded-full bg-[#EEF2FF] flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
               </div>
-              <p className="text-[15px] font-semibold text-[#0A0A0A]">No updates yet</p>
-              <p className="text-[13px] text-[#9CA3AF] leading-relaxed">
+              <p className="text-[15px] font-semibold text-[#0A0A0A] dark:text-white">No updates yet</p>
+              <p className="text-[13px] text-[#9CA3AF] dark:text-gray-400 leading-relaxed">
                 When your contacts post statuses, you&apos;ll see them here. Post your own to get started.
               </p>
               <button

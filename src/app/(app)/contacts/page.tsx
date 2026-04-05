@@ -21,6 +21,7 @@ type Contact = {
   country: string | null;
   avatar_url: string | null;
   contact_type: ContactType;
+  category?: ContactType | null;
   language?: string | null;
   notes: string | null;
   created_at: string;
@@ -33,6 +34,7 @@ type ContactForm = {
   email: string;
   country: string;
   contact_type: ContactType;
+  category: ContactType;
   notes: string;
 };
 
@@ -97,7 +99,7 @@ export default function ContactsPage() {
 
   const emptyForm: ContactForm = {
     name: '', company: '', phone: '', email: '', country: '',
-    contact_type: defaultType, notes: '',
+    contact_type: defaultType, category: defaultType, notes: '',
   };
 
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -137,7 +139,9 @@ export default function ContactsPage() {
   useEffect(() => { fetchContacts(); }, [fetchContacts]);
 
   const filtered = contacts.filter((c) => {
-    if (activeTab !== 'all' && c.contact_type !== activeTab) return false;
+    // Use category column if set, fall back to contact_type
+    const effectiveCategory = c.category ?? c.contact_type;
+    if (activeTab !== 'all' && effectiveCategory !== activeTab) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     return c.name.toLowerCase().includes(q) ||
@@ -153,10 +157,11 @@ export default function ContactsPage() {
   }
 
   function openEdit(c: Contact) {
+    const resolvedType = c.category ?? c.contact_type;
     setForm({
       name: c.name, company: c.company ?? '', phone: c.phone ?? '',
       email: c.email ?? '', country: c.country ?? '',
-      contact_type: c.contact_type, notes: c.notes ?? '',
+      contact_type: resolvedType, category: resolvedType, notes: c.notes ?? '',
     });
     setEditingId(c.id);
     setShowForm(true);
@@ -180,6 +185,7 @@ export default function ContactsPage() {
       email: form.email.trim() || null,
       country: form.country.trim() || null,
       contact_type: form.contact_type,
+      category: form.contact_type, // keep category in sync
       notes: form.notes.trim() || null,
       organization_id: organization!.id,
     };
@@ -349,27 +355,27 @@ export default function ContactsPage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search contacts..."
-        className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+        className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
       />
 
       {/* Inline Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-[var(--text-1)]">
+        <form onSubmit={handleSubmit} className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-3">
+          <h2 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">
             {editingId ? 'Edit Contact' : 'New Contact'}
           </h2>
 
           <div>
             <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
             <input type="text" value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Contact name" required
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+              className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
           </div>
 
           {!isPocketChatMode && (
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Company</label>
               <input type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} placeholder="Company name"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
           )}
 
@@ -377,12 +383,12 @@ export default function ContactsPage() {
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Phone</label>
               <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="Phone number"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Email</label>
               <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="Email address"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
           </div>
 
@@ -390,12 +396,12 @@ export default function ContactsPage() {
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Country</label>
               <input type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} placeholder="Country"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             </div>
             <div>
               <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Type</label>
               <select value={form.contact_type} onChange={(e) => updateField('contact_type', e.target.value)}
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
                 {typeOptions.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
@@ -404,7 +410,7 @@ export default function ContactsPage() {
           <div>
             <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Notes</label>
             <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes" rows={2}
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
+              className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
           </div>
 
           <div className="flex gap-2 pt-1">
@@ -422,8 +428,8 @@ export default function ContactsPage() {
 
       {/* Contact List */}
       {filtered.length === 0 ? (
-        <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
-          <p className="text-sm text-[var(--text-3)]">
+        <div className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
+          <p className="text-sm text-[var(--text-3)] dark:text-gray-400">
             {search || activeTab !== 'all'
               ? 'No contacts match your filters.'
               : 'No contacts yet. Add your first contact.'}
@@ -434,7 +440,7 @@ export default function ContactsPage() {
           {filtered.map((c) => (
             <div
               key={c.id}
-              className="flex items-center gap-3 rounded-xl border border-[#F0F0F0] bg-white px-4 py-3 hover:bg-[#FAFAFA] transition-colors"
+              className="flex items-center gap-3 rounded-xl border border-[#F0F0F0] dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 hover:bg-[#FAFAFA] dark:hover:bg-gray-700 transition-colors"
             >
               {/* Avatar */}
               <PocketAvatar name={c.name} size={40} />
@@ -442,9 +448,9 @@ export default function ContactsPage() {
               {/* Name + badge + language */}
               <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailContact(c)}>
                 <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-medium text-[var(--text-1)] truncate">{c.name}</p>
-                  <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.contact_type] || BADGE_COLORS.friend}`}>
-                    {c.contact_type}
+                  <p className="text-[14px] font-medium text-[var(--text-1)] dark:text-white truncate">{c.name}</p>
+                  <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.category ?? c.contact_type] || BADGE_COLORS.friend}`}>
+                    {c.category ?? c.contact_type}
                   </span>
                 </div>
                 {(c.company || c.phone || c.email) && (
@@ -558,8 +564,8 @@ export default function ContactsPage() {
                 <PocketAvatar name={detailContact.name} size={80} />
                 <div className="text-center">
                   <p className="text-xl font-bold text-[#0A0A0A]">{detailContact.name}</p>
-                  <span className={`inline-block mt-1 text-xs font-medium rounded-full px-3 py-0.5 capitalize ${BADGE_COLORS[detailContact.contact_type] || BADGE_COLORS.friend}`}>
-                    {detailContact.contact_type}
+                  <span className={`inline-block mt-1 text-xs font-medium rounded-full px-3 py-0.5 capitalize ${BADGE_COLORS[detailContact.category ?? detailContact.contact_type] || BADGE_COLORS.friend}`}>
+                    {detailContact.category ?? detailContact.contact_type}
                   </span>
                 </div>
               </div>

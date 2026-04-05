@@ -8,6 +8,8 @@ import { useToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NotificationSoundPicker from '@/components/NotificationSoundPicker';
+import { useChatLock, ChatLockSetupModal } from '@/components/ChatLockScreen';
+import PocketAvatar from '@/components/PocketAvatar';
 
 // ─── Dark mode helpers ────────────────────────────────────────────────────────
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -94,7 +96,7 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="text-[11px] uppercase font-medium tracking-[0.5px] text-[var(--text-3)] mb-1.5 px-1">
+    <p className="text-[11px] uppercase font-medium tracking-[0.5px] text-[var(--text-3)] dark:text-gray-200 mb-1.5 px-1">
       {children}
     </p>
   );
@@ -104,7 +106,7 @@ function SettingsRow({ first, last, children }: { first?: boolean; last?: boolea
   const radius = first && last ? '8px' : first ? '8px 8px 0 0' : last ? '0 0 8px 8px' : '0';
   return (
     <div
-      className="flex items-center justify-between bg-[#F9FAFB] px-4 py-3"
+      className="flex items-center justify-between bg-[#F9FAFB] dark:bg-gray-800 px-4 py-3"
       style={{ borderRadius: radius, marginTop: first ? 0 : 1 }}
     >
       {children}
@@ -143,7 +145,7 @@ function FeedbackSection() {
   return (
     <div>
       <SectionLabel>Feedback</SectionLabel>
-      <div className="bg-[#F9FAFB] rounded-lg p-4 space-y-3">
+      <div className="bg-[#F9FAFB] dark:bg-gray-800 rounded-lg p-4 space-y-3">
         <select
           value={fbType}
           onChange={(e) => setFbType(e.target.value)}
@@ -212,6 +214,25 @@ export default function SettingsPage() {
   const [messageNotifs, setMessageNotifs] = useState(true);
   const [translationSounds, setTranslationSounds] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
+
+  // Chat Lock state
+  const { enabled: chatLockEnabled, enableLock, disableLock } = useChatLock();
+  const [showLockSetup, setShowLockSetup] = useState(false);
+
+  function handleChatLockToggle(val: boolean) {
+    if (val) {
+      setShowLockSetup(true);
+    } else {
+      disableLock();
+      toast('Chat Lock disabled', 'success');
+    }
+  }
+
+  async function handleLockSave(pin: string) {
+    await enableLock(pin);
+    setShowLockSetup(false);
+    toast('Chat Lock enabled', 'success');
+  }
 
   // Avatar upload state
   const [avatarUrl, setAvatarUrl] = useState<string>(profile.avatar_url || '');
@@ -339,7 +360,8 @@ export default function SettingsPage() {
   // ─── PocketChat Settings ───
   if (isPocketChatMode) {
     return (
-      <div className="max-w-lg mx-auto space-y-5 py-6">
+      <>
+      <div className="max-w-lg mx-auto space-y-5 py-6 dark:bg-gray-900">
         {/* Profile header */}
         <div className="flex flex-col items-center gap-2 pb-2">
           <div className="relative">
@@ -350,9 +372,7 @@ export default function SettingsPage() {
                 className="h-20 w-20 rounded-full object-cover"
               />
             ) : (
-              <div className="h-20 w-20 rounded-full bg-[#EDE9FE] flex items-center justify-center text-2xl font-semibold text-[#4F46E5]">
-                {userName.charAt(0).toUpperCase()}
-              </div>
+              <PocketAvatar name={userName} size={80} />
             )}
             <button
               onClick={() => avatarInputRef.current?.click()}
@@ -385,7 +405,7 @@ export default function SettingsPage() {
         <div>
           <SectionLabel>Profile</SectionLabel>
           <SettingsRow first>
-            <span className="text-[14px] text-[var(--text-2)]">Name</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Name</span>
             {editingName ? (
               <div className="flex items-center gap-2">
                 <input
@@ -403,7 +423,7 @@ export default function SettingsPage() {
             )}
           </SettingsRow>
           <SettingsRow>
-            <span className="text-[14px] text-[var(--text-2)]">Status message</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Status message</span>
             <button
               onClick={() => setEditingStatusMsg(true)}
               className="text-[14px] text-[var(--text-3)] flex items-center gap-1 max-w-[160px] truncate"
@@ -471,7 +491,7 @@ export default function SettingsPage() {
             </div>
           )}
           <SettingsRow last>
-            <span className="text-[14px] text-[var(--text-2)]">Email</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Email</span>
             <span className="text-[14px] text-[var(--text-3)]">{user.email}</span>
           </SettingsRow>
         </div>
@@ -480,7 +500,7 @@ export default function SettingsPage() {
         <div>
           <SectionLabel>Language & Translation</SectionLabel>
           <SettingsRow first>
-            <span className="text-[14px] text-[var(--text-2)]">My language</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">My language</span>
             <div className="relative">
               <button onClick={() => setShowLangPicker(!showLangPicker)} className="text-[14px] text-[var(--text-1)] font-medium flex items-center gap-1">
                 {currentLang.flag} {currentLang.name}
@@ -502,7 +522,7 @@ export default function SettingsPage() {
             </div>
           </SettingsRow>
           <SettingsRow last>
-            <span className="text-[14px] text-[var(--text-2)]">Auto-translate messages</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Auto-translate messages</span>
             <Toggle on={autoTranslate} onChange={setAutoTranslate} />
           </SettingsRow>
         </div>
@@ -511,15 +531,15 @@ export default function SettingsPage() {
         <div>
           <SectionLabel>Privacy</SectionLabel>
           <SettingsRow first>
-            <span className="text-[14px] text-[var(--text-2)]">Last seen</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Last seen</span>
             <span className="text-[14px] text-[var(--text-3)]">Everyone</span>
           </SettingsRow>
           <SettingsRow>
-            <span className="text-[14px] text-[var(--text-2)]">Read receipts</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Read receipts</span>
             <Toggle on={readReceipts} onChange={setReadReceipts} />
           </SettingsRow>
           <SettingsRow last>
-            <span className="text-[14px] text-[var(--text-2)]">Block list</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Block list</span>
             <span className="text-[14px] text-[var(--text-3)] flex items-center gap-1">
               0 blocked
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
@@ -527,19 +547,33 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
+        {/* CHAT LOCK */}
+        <div>
+          <SectionLabel>Chat Lock</SectionLabel>
+          <SettingsRow first last>
+            <div>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Require PIN to open app</span>
+              <p className="text-[11px] text-[var(--text-4)] mt-0.5">
+                {chatLockEnabled ? '4–6 digit PIN set' : 'Disabled'}
+              </p>
+            </div>
+            <Toggle on={chatLockEnabled} onChange={handleChatLockToggle} />
+          </SettingsRow>
+        </div>
+
         {/* NOTIFICATIONS */}
         <div>
           <SectionLabel>Notifications</SectionLabel>
           <SettingsRow first>
-            <span className="text-[14px] text-[var(--text-2)]">Message notifications</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Message notifications</span>
             <Toggle on={messageNotifs} onChange={setMessageNotifs} />
           </SettingsRow>
           <SettingsRow>
-            <span className="text-[14px] text-[var(--text-2)]">Translation sounds</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Translation sounds</span>
             <Toggle on={translationSounds} onChange={setTranslationSounds} />
           </SettingsRow>
           <SettingsRow last>
-            <span className="text-[14px] text-[var(--text-2)]">Notification sound</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Notification sound</span>
             <button
               onClick={() => setShowSoundPicker(v => !v)}
               className="text-[14px] text-[#4F46E5] font-medium flex items-center gap-1"
@@ -566,9 +600,9 @@ export default function SettingsPage() {
         {/* APPEARANCE */}
         <div>
           <SectionLabel>Appearance</SectionLabel>
-          <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+          <div className="bg-[#F9FAFB] dark:bg-gray-800 rounded-lg overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3" style={{ borderRadius: '8px 8px 0 0' }}>
-              <span className="text-[14px] text-[var(--text-2)]">Theme</span>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Theme</span>
               <div className="flex items-center gap-1 bg-white rounded-lg p-0.5 border border-[#E5E5E5]">
                 {(['light', 'system', 'dark'] as const).map((m) => (
                   <button
@@ -591,7 +625,7 @@ export default function SettingsPage() {
         {/* CHAT WALLPAPER */}
         <div>
           <SectionLabel>Chat Wallpaper</SectionLabel>
-          <div className="bg-[#F9FAFB] rounded-lg p-4">
+          <div className="bg-[#F9FAFB] dark:bg-gray-800 rounded-lg p-4">
             <div className="flex gap-2 flex-wrap">
               {[
                 { label: 'Default', value: '' },
@@ -638,7 +672,7 @@ export default function SettingsPage() {
         <div>
           <SectionLabel>Account</SectionLabel>
           <SettingsRow first>
-            <span className="text-[14px] text-[var(--text-2)]">Plan</span>
+            <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Plan</span>
             <span className={`text-[12px] font-medium px-2.5 py-0.5 rounded-full ${plan === 'free' ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-[#EDE9FE] text-[#4F46E5]'}`}>
               {plan.charAt(0).toUpperCase() + plan.slice(1)}
             </span>
@@ -660,15 +694,15 @@ export default function SettingsPage() {
         {/* ABOUT EVRYWHER */}
         <div>
           <SectionLabel>About Evrywher</SectionLabel>
-          <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+          <div className="bg-[#F9FAFB] dark:bg-gray-800 rounded-lg overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3" style={{ marginTop: 0 }}>
-              <span className="text-[14px] text-[var(--text-2)]">Version</span>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Version</span>
               <span className="text-[14px] text-[var(--text-3)] font-mono">1.0.0</span>
             </div>
             <div className="h-px bg-[#EFEFEF]" />
             <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer"
               className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
-              <span className="text-[14px] text-[var(--text-2)]">Website</span>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Website</span>
               <span className="text-[14px] text-[#4F46E5] flex items-center gap-1">
                 evrywher.io
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
@@ -676,12 +710,12 @@ export default function SettingsPage() {
             </a>
             <div className="h-px bg-[#EFEFEF]" />
             <Link href="/privacy" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
-              <span className="text-[14px] text-[var(--text-2)]">Privacy Policy</span>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Privacy Policy</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
             <div className="h-px bg-[#EFEFEF]" />
             <Link href="/terms" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors" style={{ borderRadius: '0 0 8px 8px' }}>
-              <span className="text-[14px] text-[var(--text-2)]">Terms of Service</span>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Terms of Service</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
           </div>
@@ -743,16 +777,26 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Chat Lock PIN Setup Modal */}
+      {showLockSetup && (
+        <ChatLockSetupModal
+          onSave={handleLockSave}
+          onCancel={() => setShowLockSetup(false)}
+        />
+      )}
+    </>
     );
   }
 
   // ─── BizPocket Settings (unchanged) ───
   return (
-    <div className="space-y-6 py-4">
-      <h1 className="text-xl font-bold text-[var(--text-1)]">{t('settings.title')}</h1>
+    <>
+    <div className="space-y-6 py-4 dark:bg-gray-900">
+      <h1 className="text-xl font-bold text-[var(--text-1)] dark:text-white">{t('settings.title')}</h1>
 
       {/* Business Profile */}
-      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+      <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('settings.business_profile')}</h2>
         <div className="space-y-2.5">
           <div className="flex justify-between text-sm">
@@ -775,7 +819,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Language */}
-      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+      <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('settings.language')}</h2>
         <select
           value={lang}
@@ -787,7 +831,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Appearance / Dark Mode */}
-      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+      <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Appearance</h2>
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--text-1)]">Theme</span>
@@ -810,7 +854,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Currency */}
-      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+      <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Primary Currency</h2>
         <select
           value={organization.currency || 'JPY'}
@@ -841,7 +885,7 @@ export default function SettingsPage() {
 
       {/* Away Message */}
       {profile.role === 'owner' && (
-        <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">Away Message</h2>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -885,7 +929,7 @@ export default function SettingsPage() {
 
       {/* Team Management */}
       {profile.role === 'owner' && (
-        <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
           <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">{t('settings.team')}</h2>
           <form onSubmit={handleInvite} className="space-y-3">
             <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)}
@@ -933,23 +977,23 @@ export default function SettingsPage() {
       {/* Navigation Links */}
       <div className="space-y-2">
         <Link href="/settings/business-setup"
-          className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          className="flex items-center justify-between rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover:shadow-sm">
           <span className="text-sm font-medium text-[var(--text-1)]">Business Profile & Bank</span>
           <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
         </Link>
         <Link href="/customers"
-          className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          className="flex items-center justify-between rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover:shadow-sm">
           <span className="text-sm font-medium text-[var(--text-1)]">Customers</span>
           <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
         </Link>
         <Link href="/expenses"
-          className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+          className="flex items-center justify-between rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover:shadow-sm">
           <span className="text-sm font-medium text-[var(--text-1)]">Expenses</span>
           <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
         </Link>
         {profile.role === 'owner' && (
           <Link href="/accountant"
-            className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white p-4 transition-shadow hover:shadow-sm">
+            className="flex items-center justify-between rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-shadow hover:shadow-sm">
             <span className="text-sm font-medium text-[var(--text-1)]">Accountant Portal</span>
             <svg className="h-4 w-4 text-[var(--text-4)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
           </Link>
@@ -957,7 +1001,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Account + Logout */}
-      <div className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3">
+      <div className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-3">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F46E5] text-white text-sm font-semibold">
             {userName.charAt(0).toUpperCase()}
@@ -977,7 +1021,7 @@ export default function SettingsPage() {
       </div>
 
       {/* About */}
-      <section className="rounded-card border border-[#E5E5E5] bg-white p-4">
+      <section className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">About</h2>
         <div className="space-y-2.5">
           <div className="flex justify-between text-sm">
@@ -1054,5 +1098,14 @@ export default function SettingsPage() {
 
       <p className="text-center text-xs text-[var(--text-4)]">A TechDagger Product · MS Dynamics LLC</p>
     </div>
+
+    {/* Chat Lock PIN Setup Modal */}
+    {showLockSetup && (
+      <ChatLockSetupModal
+        onSave={handleLockSave}
+        onCancel={() => setShowLockSetup(false)}
+      />
+    )}
+    </>
   );
 }
