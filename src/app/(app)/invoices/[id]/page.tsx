@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Invoice, InvoiceChat, InvoiceStatus } from '@/types/database';
+import CorridorMilestoneToast from '@/components/ui/CorridorMilestoneToast';
 
 const statusColors: Record<InvoiceStatus, string> = {
   draft: 'bg-[#F4F4F5] text-[#71717A] border border-[#E4E4E7]',
@@ -31,6 +32,7 @@ export default function InvoiceDetailPage() {
   const [sending, setSending] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [corridorMilestone, setCorridorMilestone] = useState<{ fromFlag: string; toFlag: string; label: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -178,6 +180,20 @@ export default function InvoiceDetailPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ event_type: 'invoice_paid' }),
             }).catch(() => {})
+          }
+        }).catch(() => {})
+        // ─── Corridor milestone check ───────────────────
+        fetch('/api/trust/corridor-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invoice_id: invoice.id }),
+        }).then(r => r.json()).then(res => {
+          if (res.milestone) {
+            setCorridorMilestone({
+              fromFlag: res.milestone.from_flag,
+              toFlag: res.milestone.to_flag,
+              label: res.milestone.label,
+            })
           }
         }).catch(() => {})
       }
@@ -330,6 +346,15 @@ export default function InvoiceDetailPage() {
 
   return (
     <div className="space-y-6">
+      {/* Corridor Milestone Toast */}
+      {corridorMilestone && (
+        <CorridorMilestoneToast
+          fromFlag={corridorMilestone.fromFlag}
+          toFlag={corridorMilestone.toFlag}
+          label={corridorMilestone.label}
+          onDismiss={() => setCorridorMilestone(null)}
+        />
+      )}
       <PageHeader title="Invoice" backPath="/invoices" />
 
       {/* Invoice Detail Card */}

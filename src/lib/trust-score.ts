@@ -20,6 +20,7 @@ export type TrustEventType =
   | 'referral_published'
   | 'id_verified'
   | 'deal_closed'
+  | 'corridor_milestone'
   | 'tier_upgrade'
 
 export type BadgeTier = 'none' | 'activity_verified' | 'id_verified'
