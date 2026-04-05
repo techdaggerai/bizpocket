@@ -120,6 +120,23 @@ export async function POST(request: Request) {
       })
       .eq('id', messageId)
 
+    // Auto-extract vocabulary for language learning (non-blocking)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user && detectedLang === 'ja') {
+      fetch(new URL('/api/ai/vocabulary-extract', request.url).toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Cookie: request.headers.get('cookie') || '' },
+        body: JSON.stringify({
+          text: originalText,
+          context: 'chat',
+          sourceType: 'chat_translation',
+          sourceId: messageId,
+          targetLanguage: detectedLang,
+          nativeLanguage: targetLanguage,
+        }),
+      }).catch(() => {})
+    }
+
     return NextResponse.json({
       translation,
       originalLanguage: detectedLang,

@@ -134,6 +134,23 @@ export async function POST(request: Request) {
       }
     }
 
+    // Auto-extract vocabulary for language learning (non-blocking)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user && result.translation) {
+      const vocabText = result.translation.substring(0, 500)
+      fetch(new URL('/api/ai/vocabulary-extract', request.url).toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Cookie: request.headers.get('cookie') || '' },
+        body: JSON.stringify({
+          text: vocabText,
+          context: result.category || 'document_scan',
+          sourceType: 'document_scan',
+          targetLanguage: 'ja',
+          nativeLanguage: language || 'en',
+        }),
+      }).catch(() => {})
+    }
+
     return NextResponse.json({ result })
   } catch (err) {
     console.error('[BizPocket AI] Document detection failed:', err)
