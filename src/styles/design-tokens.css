@@ -137,6 +137,7 @@
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-intent: cubic-bezier(0.25, 1.2, 0.3, 1);
   --ease-calm: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-active: var(--ease-intent); /* overridden by adaptive-glass.ts per country */
 }
 
 /* DARK MODE */

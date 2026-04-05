@@ -21,6 +21,7 @@ import GrowthCompanion from '@/components/ui/GrowthCompanion';
 import TierUpgradeOverlay from '@/components/ui/TierUpgradeOverlay';
 import { useTierCheck } from '@/hooks/useTierCheck';
 import type { Tier } from '@/lib/tier-system';
+import { initAdaptiveGlass, deriveCountry } from '@/lib/adaptive-glass';
 const PocketChatQR = dynamic(() => import('@/components/PocketChatQR'), { ssr: false });
 
 const BRIEFING_CACHE_KEY = 'bizpocket_ai_briefing';
@@ -97,6 +98,7 @@ export default function DashboardPage() {
   const [actionsToday, setActionsToday] = useState(0);
   const [smartSuggestion, setSmartSuggestion] = useState<any>(null);
   const [smartTiles, setSmartTiles] = useState<any[] | null>(null);
+  const [activeFestival, setActiveFestival] = useState<{ name: string; greeting: string; suggestion?: string } | null>(null);
 
   const DEFAULT_CLOCKS = [
     { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
@@ -167,6 +169,14 @@ export default function DashboardPage() {
         if (d.tiles) setSmartTiles(d.tiles);
       })
       .catch(() => {});
+    // Fetch active festival + init adaptive glass
+    fetch('/api/festivals/active')
+      .then(r => r.json())
+      .then(d => {
+        if (d.festival) setActiveFestival(d.festival);
+        initAdaptiveGlass(d.country || deriveCountry(organization.currency));
+      })
+      .catch(() => initAdaptiveGlass(deriveCountry(organization.currency)));
     // Count today's actions for energy meter
     const todayStr = new Date().toISOString().slice(0, 10);
     Promise.all([
@@ -287,6 +297,18 @@ export default function DashboardPage() {
           </GlassCard>
         );
       })()}
+
+      {/* Festival Greeting */}
+      {activeFestival && (
+        <GlassCard elevated className="p-4 text-center">
+          <p className="text-xl mb-1" style={{ animation: 'emojiFloat 2s ease-in-out infinite' }}>
+            {activeFestival.greeting}
+          </p>
+          {activeFestival.suggestion && (
+            <p className="text-[12px] text-[var(--pm-text-tertiary)]">{activeFestival.suggestion}</p>
+          )}
+        </GlassCard>
+      )}
 
       {/* Smart Actions — API-driven tiles */}
       {smartTiles && smartTiles.length > 0 && (
