@@ -77,6 +77,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
   const [briefing, setBriefing] = useState<string | null>(null);
+  const [hasGlobalProfile, setHasGlobalProfile] = useState<boolean | null>(null);
   const [briefingLoading, setBriefingLoading] = useState(true);
   const [now, setNow] = useState(new Date());
   const [activeCycle, setActiveCycle] = useState<{ id: string; name: string; business_type: string } | null>(null);
@@ -140,6 +141,8 @@ export default function DashboardPage() {
       setLoading(false);
     }
     load(); fetchBriefing();
+    // Check for global profile
+    fetch('/api/profile/me').then(r => r.json()).then(d => setHasGlobalProfile(!!d.profile)).catch(() => setHasGlobalProfile(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization.id, month, fetchBriefing]);
 
@@ -209,6 +212,27 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Global Profile CTA */}
+      {hasGlobalProfile === false && (
+        <Link href="/profile/build" className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] p-4 text-white no-underline hover:opacity-95 transition-opacity">
+          <span className="text-3xl">{'\u{1F30D}'}</span>
+          <div className="flex-1">
+            <p className="text-[15px] font-semibold">Build Your Global Profile</p>
+            <p className="text-[12px] text-white/80 mt-0.5">AI-powered professional profile from your real activity</p>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+        </Link>
+      )}
+      {hasGlobalProfile === true && (
+        <Link href="/profile/preview" className="flex items-center gap-3 rounded-xl border border-[#C7D2FE] bg-[#EEF2FF] p-3.5 transition-colors hover:bg-[#E0E7FF]">
+          <span className="text-xl">{'\u{1F30D}'}</span>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-[#4338CA]">View Global Profile</p>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338CA" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        </Link>
+      )}
 
       {/* 4 Quick Shortcuts */}
       <div className="grid grid-cols-4 gap-2">

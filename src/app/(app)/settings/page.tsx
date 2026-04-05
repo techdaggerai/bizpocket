@@ -686,6 +686,23 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
+        {/* GLOBAL PROFILE */}
+        <div>
+          <SectionLabel>Global Profile</SectionLabel>
+          <SettingsRow first last>
+            <Link href="/profile/build" className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{'\u{1F30D}'}</span>
+                <div>
+                  <p className="text-[14px] text-[var(--text-1)] dark:text-gray-200 font-medium">Global Profile</p>
+                  <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">AI-powered professional profile</p>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </SettingsRow>
+        </div>
+
         {/* FEEDBACK */}
         <FeedbackSection />
 
