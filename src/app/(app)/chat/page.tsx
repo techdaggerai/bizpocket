@@ -74,6 +74,7 @@ interface Message {
   attachment_url: string | null;
   invoice_id: string | null;
   read_at: string | null;
+  delivered_at?: string | null;
   original_text: string | null;
   original_language: string | null;
   translations: Record<string, string> | null;
@@ -277,7 +278,18 @@ export default function PocketChatPage() {
         setMessages((data as Message[]) ?? []);
       }
 
-      // Mark messages as read
+      // Mark incoming messages as delivered + read
+      const incomingIds = ((data as Message[]) ?? [])
+        .filter(m => m.sender_type !== 'owner' && !m.delivered_at)
+        .map(m => m.id);
+      if (incomingIds.length > 0) {
+        fetch('/api/messages/delivered', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messageIds: incomingIds }),
+        }).catch(() => {});
+      }
+
       await supabase
         .from('messages')
         .update({ read_at: new Date().toISOString() })
@@ -390,11 +402,16 @@ export default function PocketChatPage() {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE') {
-            // Background translation completed — merge updated fields
+            // Merge updated fields: translations, delivered_at, read_at
             const updated = payload.new as Message;
             if (updated.conversation_id === activeConvoId) {
               setMessages((prev) =>
-                prev.map((m) => m.id === updated.id ? { ...m, translations: updated.translations } : m)
+                prev.map((m) => m.id === updated.id ? {
+                  ...m,
+                  translations: updated.translations ?? m.translations,
+                  delivered_at: updated.delivered_at ?? m.delivered_at,
+                  read_at: updated.read_at ?? m.read_at,
+                } : m)
               );
             }
             return;
@@ -1840,12 +1857,21 @@ export default function PocketChatPage() {
                     {isOwner && (
                       <span className="inline-flex ml-0.5">
                         {msg.read_at ? (
-                          <svg className="h-3 w-3 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 7l-1.41-1.41L10 12.17l-3.59-3.58L5 10l5 5L18 7zm-2.41-1.41L9 12.17l-1.59-1.58L6 12l3 3 8-8-1.41-1.41z"/>
+                          /* Read: double blue checks */
+                          <svg className="h-3 w-[18px]" viewBox="0 0 18 12" fill="none">
+                            <path d="M1 6l3.5 4L14 1" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5 6l3.5 4L18 1" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        ) : msg.delivered_at ? (
+                          /* Delivered: double gray checks */
+                          <svg className="h-3 w-[18px]" viewBox="0 0 18 12" fill="none">
+                            <path d="M1 6l3.5 4L14 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M5 6l3.5 4L18 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         ) : (
-                          <svg className="h-3 w-3 text-[#CCC]" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                          /* Sent: single gray check */
+                          <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                            <path d="M1 6l3.5 4L11 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
                       </span>
