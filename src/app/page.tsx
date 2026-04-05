@@ -346,6 +346,88 @@ function LandingPageInner() {
         </div>
       </section>
 
+      {/* BUSINESS JAPANESE — NEW */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="rounded-3xl bg-gradient-to-br from-indigo-50 to-amber-50 p-[clamp(32px,5vw,56px)]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+              <div>
+                <span className="inline-block rounded-full bg-[#4F46E5]/10 px-3 py-1 text-xs font-bold text-[#4F46E5] mb-4">LANGUAGE LEARNING</span>
+                <h2 className="text-[clamp(24px,4vw,32px)] font-bold text-[#111827] leading-tight mb-4">
+                  Business Japanese,<br />Finally.
+                </h2>
+                <p className="text-[15px] text-[#374151] leading-relaxed mb-6">
+                  You&apos;ve been in Japan for 5 years running a business. You still can&apos;t read 確定申告 (tax return) on a form. BizPocket teaches you the accounting and business Japanese you actually need — from the invoices and forms you use every day.
+                </p>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {[
+                    { icon: '🧾', label: 'Invoice & Billing' },
+                    { icon: '📊', label: 'Accounting Terms' },
+                    { icon: '🏢', label: 'Business Registration' },
+                    { icon: '📋', label: 'Tax Filing' },
+                    { icon: '🤝', label: 'Client Keigo' },
+                    { icon: '🏦', label: 'Business Banking' },
+                  ].map((t, i) => (
+                    <span key={i} className="flex items-center gap-1.5 rounded-full bg-white border border-[#e5e7eb] px-3 py-1.5 text-xs font-medium text-[#374151]">
+                      <span>{t.icon}</span>{t.label}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs text-[#6b7280] italic">&ldquo;Every invoice you create teaches you the Japanese your accountant wishes you knew.&rdquo;</p>
+              </div>
+              <div className="mx-auto max-w-[300px]">
+                <div className="rounded-2xl bg-white border border-[#e5e7eb] p-5 shadow-lg">
+                  <p className="text-[10px] font-bold text-[#4F46E5] uppercase tracking-wider mb-3">From your invoice</p>
+                  <div className="space-y-3">
+                    {[
+                      { jp: '売上', reading: 'うりあげ', en: 'Sales revenue' },
+                      { jp: '経費', reading: 'けいひ', en: 'Expenses' },
+                      { jp: '消費税', reading: 'しょうひぜい', en: 'Consumption tax' },
+                      { jp: '確定申告', reading: 'かくていしんこく', en: 'Tax return' },
+                    ].map((w, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <div>
+                          <span className="text-base font-bold text-[#111827]">{w.jp}</span>
+                          <span className="text-xs text-[#9ca3af] ml-1">({w.reading})</span>
+                        </div>
+                        <span className="text-xs font-medium text-[#4F46E5]">{w.en}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 rounded-lg bg-indigo-50 p-2 text-center">
+                    <p className="text-[9px] text-[#4F46E5] font-medium">30 topic packs · Spaced repetition · AI practice</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* EVRYWHER INSIDE — Cross-sell */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="rounded-3xl bg-[#eef2ff] p-[clamp(32px,5vw,48px)] text-center">
+            <div className="mb-5 flex items-center justify-center gap-3">
+              <AnimatedPocketChatLogo size={36} isTranslating={true} />
+              <EvryWherMark size="md" />
+            </div>
+            <h2 className="mb-3 text-[28px] font-bold text-[#111827]">Evrywher Inside Every Plan</h2>
+            <p className="mx-auto mb-6 max-w-[560px] text-[15px] leading-relaxed text-[#374151]">
+              Chat with Japanese clients, scan their documents, learn their language — all included. Every BizPocket plan comes with Evrywher at the matching tier.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {['AI Translation Chat', 'Camera Translation', 'Voice Translation', 'Language Learning', 'Cultural Coach', 'Emergency Card', 'Business Card Scanner'].map((f, i) => (
+                <span key={i} className="rounded-full border border-[#c7d2fe] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#4F46E5]">{f}</span>
+              ))}
+            </div>
+            <a href="/pocketchat" className="inline-block rounded-[10px] border-2 border-[#4F46E5] px-8 py-3 text-[15px] font-semibold text-[#4F46E5] hover:bg-[#4F46E5] hover:text-white transition-colors">
+              Explore Evrywher &rarr;
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* PRICING */}
       <section id="pricing" className="px-6 pb-20">
         <div className="mx-auto max-w-[1100px]">
@@ -417,7 +499,7 @@ function LandingPageInner() {
               <span className="text-[#d1d5db]">&middot;</span>
               <a href="/terms" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Terms</a>
             </div>
-            <p className="text-[11px] text-[#9ca3af]">&copy; 2026 TechDagger Inc.</p>
+            <p className="text-[11px] text-[#9ca3af]">&copy; 2026 MS Dynamics LLC · TechDagger Studio · Made in Japan 🇯🇵</p>
           </div>
         </div>
       </footer>
