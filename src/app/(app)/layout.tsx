@@ -6,6 +6,7 @@ import { I18nProvider } from '@/lib/i18n';
 import BottomNav from '@/components/BottomNav';
 import TopNav from '@/components/TopNav';
 import Sidebar from '@/components/Sidebar';
+import ChatLockWrapper from '@/components/ChatLockWrapper';
 import type { Language } from '@/lib/i18n';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -63,17 +64,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             return (
               <AuthProvider user={user} profile={freshProfile} organization={freshOrg}>
                 <I18nProvider initialLang={(freshProfile.language || 'en') as Language}>
-                  <div className="min-h-screen bg-[var(--bg)]">
-                    <div className="lg:hidden"><TopNav /></div>
+                  <ChatLockWrapper>
+                  <div className="min-h-screen bg-[var(--bg)] overflow-x-hidden group/root has-[.chat-fullbleed]:overflow-hidden">
+                    <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><TopNav /></div>
                     <div className="flex">
                       <Sidebar />
-                      <main className="flex-1 min-h-screen pb-20 lg:pb-0">
+                      <main className="flex-1 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
                         <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white"><TopNav /></div>
                         <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">{children}</div>
                       </main>
                     </div>
-                    <div className="lg:hidden"><BottomNav /></div>
+                    <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><BottomNav /></div>
                   </div>
+                  </ChatLockWrapper>
                 </I18nProvider>
               </AuthProvider>
             );
@@ -124,16 +127,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <AuthProvider user={user} profile={profile} organization={organization}>
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
-        <div className="min-h-screen bg-[var(--bg)]">
-          {/* Mobile: TopNav */}
-          <div className="lg:hidden">
+        <ChatLockWrapper>
+        <div className="min-h-screen bg-[var(--bg)] overflow-x-hidden group/root has-[.chat-fullbleed]:overflow-hidden">
+          {/* Mobile: TopNav — hidden when chat view is active */}
+          <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden">
             <TopNav />
           </div>
 
           {/* Desktop: Sidebar + Content | Mobile: Full width */}
           <div className="flex">
             <Sidebar />
-            <main className="flex-1 min-h-screen pb-20 lg:pb-0">
+            <main className="flex-1 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
               {/* Desktop mini top bar */}
               <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
                 <TopNav />
@@ -144,11 +148,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </main>
           </div>
 
-          {/* Mobile: Bottom Nav */}
-          <div className="lg:hidden">
+          {/* Mobile: Bottom Nav — hidden when chat view is active */}
+          <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden">
             <BottomNav />
           </div>
         </div>
+        </ChatLockWrapper>
       </I18nProvider>
     </AuthProvider>
   );

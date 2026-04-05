@@ -1281,7 +1281,7 @@ export default function PocketChatPage() {
   // Show bot onboarding if not set up (BizPocket users only — never PocketChat)
   if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
     return (
-      <div className="chat-fullbleed h-[calc(100vh-80px)] bg-white">
+      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] bg-white">
         <BotOnboarding
           onComplete={(name, icon) => {
             fetchBotConfig();
@@ -1300,15 +1300,15 @@ export default function PocketChatPage() {
     const isGroup = activeConvo.is_group;
 
     return (
-      <div className="chat-fullbleed h-[calc(100vh-80px)] flex flex-col bg-white">
+      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white">
         {/* Header */}
         <div className="p-3 border-b border-[#E5E5E5] flex items-center gap-3">
           <button
             onClick={() => setActiveConvoId(null)}
-            className="p-1 hover:bg-[#F3F3F1] rounded-lg transition-colors"
+            className="min-w-[44px] min-h-[44px] p-2.5 -ml-1 flex items-center justify-center hover:bg-[#F3F3F1] rounded-lg transition-colors"
             aria-label="Back"
           >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -1354,12 +1354,12 @@ export default function PocketChatPage() {
               )}
             </div>
             {!activeConvo.is_bot_chat && (
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mt-1 overflow-hidden">
                 <AnimatedPocketChatLogo size={32} isTranslating={sending} />
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5]">{(profile?.language || 'en').toUpperCase()}</span>
                 <span className="text-[11px] text-[#d1d5db]">⇄</span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
-                <span className={`text-[11px] ${sending ? 'text-[#F59E0B]' : 'text-[#9ca3af]'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
+                <span className={`text-[11px] whitespace-nowrap ${sending ? 'text-[#F59E0B]' : 'text-[#9ca3af]'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
               </div>
             )}
           </div>
@@ -1716,7 +1716,7 @@ export default function PocketChatPage() {
                     <PocketAvatar name={msg.sender_name || 'U'} size={28} />
                   </div>
                 )}
-                <div className={`max-w-[80%] ${isOwner ? 'ml-auto' : ''}`}>
+                <div className={`max-w-[75vw] sm:max-w-[80%] min-w-0 ${isOwner ? 'ml-auto' : ''}`}>
                   {!isOwner && !isBot && (
                     <p className="text-[12px] mb-1 ml-1 font-medium" style={{ color: avatarColor(msg.sender_name || '') }}>{msg.sender_name}</p>
                   )}
@@ -1742,7 +1742,7 @@ export default function PocketChatPage() {
                         <p className={`truncate ${isOwner ? 'text-white/60' : 'text-[#6B7280]'}`}>{orig.message?.slice(0, 60)}</p>
                       </div>
                     ) : null; })()}
-                    <p className="text-[15px] whitespace-pre-wrap break-words" style={/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : undefined}>{displayText}</p>
+                    <p className="text-[15px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', ...(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : {}) } as React.CSSProperties}>{displayText}</p>
                     {msg.edited_at && <p className={`text-[10px] mt-0.5 ${isOwner ? 'text-white/40' : 'text-[#9CA3AF]'}`}>(edited)</p>}
                     {(() => { const urlMatch = displayText.match(/https?:\/\/[^\s]+/); return urlMatch ? <LinkPreview url={urlMatch[0]} /> : null; })()}
                   </div>
@@ -1962,8 +1962,8 @@ export default function PocketChatPage() {
 
         {/* Free tier usage indicator */}
         {isFreePlan && activeConvo && (
-          <div className="px-3 py-1.5 border-t border-[#F0F0F0] bg-[#FAFAFA] flex items-center justify-between">
-            <span className="text-[11px] text-[#9CA3AF]">
+          <div className="px-4 py-1.5 border-t border-[#F0F0F0] bg-[#FAFAFA] flex items-center justify-between">
+            <span className="text-[11px] sm:text-xs text-[#9CA3AF] whitespace-nowrap">
               {activeConvo.is_bot_chat
                 ? null
                 : `${Math.max(0, 10 - translationsUsed)}/10 translations left today`
@@ -2248,7 +2248,7 @@ export default function PocketChatPage() {
       ];
 
   return (
-    <div className="chat-fullbleed h-[calc(100vh-80px)] flex flex-col bg-white">
+    <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
