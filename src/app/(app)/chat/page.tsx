@@ -200,6 +200,11 @@ export default function PocketChatPage() {
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [showCameraTranslate, setShowCameraTranslate] = useState(false);
+  const [culturalCoach, setCulturalCoach] = useState<{
+    tip: string; suggested_revision: string; cultural_note: string;
+    severity: 'suggestion' | 'warning'; originalText: string;
+  } | null>(null);
+  const [culturalCoachEnabled] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('cultural_coach') !== 'off' : true);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
   const [broadcastContacts, setBroadcastContacts] = useState<string[]>([]);
@@ -1108,6 +1113,71 @@ export default function PocketChatPage() {
     }
     setSending(false);
   }, [newMessage, activeConvoId, organization?.id, sending, activeConvo, sendBotMessage, botName, chatLang, profile]);
+
+  /* ---------- Cultural Coach intercept ---------- */
+  const trySendMessage = useCallback(async () => {
+    const text = newMessage.trim();
+    if (!text || sending) return;
+
+    // Skip cultural coach for: bot chats, short messages, same-language, disabled, editing
+    const senderLang = chatLang || profile?.language || 'en';
+    const recipientLang = activeConvo?.contact?.language || 'ja';
+    const wordCount = text.split(/\s+/).length;
+
+    if (
+      activeConvo?.is_bot_chat ||
+      editingMsg ||
+      !culturalCoachEnabled ||
+      wordCount <= 10 ||
+      senderLang === recipientLang
+    ) {
+      sendMessage();
+      return;
+    }
+
+    // Quick AI check
+    try {
+      const res = await fetch('/api/ai/cultural-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          senderLanguage: senderLang,
+          contactLanguage: recipientLang,
+          context: messages.slice(-3).map(m => `${m.sender_name}: ${m.message}`).join('\n'),
+        }),
+      });
+      const data = await res.json();
+
+      if (data.severity === 'suggestion' || data.severity === 'warning') {
+        setCulturalCoach({
+          tip: data.tip || '',
+          suggested_revision: data.suggested_revision || '',
+          cultural_note: data.cultural_note || '',
+          severity: data.severity,
+          originalText: text,
+        });
+        return; // Don't send yet — show the coach card
+      }
+    } catch {
+      // On error, send normally
+    }
+
+    sendMessage();
+  }, [newMessage, sending, chatLang, profile?.language, activeConvo, editingMsg, culturalCoachEnabled, sendMessage, messages]);
+
+  function handleCoachSendOriginal() {
+    setCulturalCoach(null);
+    sendMessage();
+  }
+
+  function handleCoachUseSuggestion() {
+    if (culturalCoach?.suggested_revision) {
+      setNewMessage(culturalCoach.suggested_revision);
+    }
+    setCulturalCoach(null);
+    // Don't auto-send — let user review the suggestion first
+  }
 
   /* ---------- Create new conversation ---------- */
 
@@ -2045,6 +2115,41 @@ export default function PocketChatPage() {
           </div>
         )}
 
+        {/* Cultural Coach card */}
+        {culturalCoach && (
+          <div className={`px-3 py-3 border-t ${culturalCoach.severity === 'warning' ? 'bg-[#FEF2F2] border-[#FECACA] dark:bg-red-950/30 dark:border-red-900' : 'bg-[#FFFBEB] border-[#FDE68A] dark:bg-amber-950/30 dark:border-amber-900'}`}>
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base">🌏</span>
+                <span className="text-[13px] font-semibold text-[#0A0A0A] dark:text-white">Cultural Tip</span>
+              </div>
+              <button onClick={() => setCulturalCoach(null)} className="text-[#9CA3AF] hover:text-[#374151] dark:hover:text-white p-0.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-[13px] text-[#374151] dark:text-gray-300 leading-relaxed mb-2">{culturalCoach.tip}</p>
+            {culturalCoach.cultural_note && (
+              <p className="text-[11px] text-[#6B7280] dark:text-gray-400 italic mb-2">{culturalCoach.cultural_note}</p>
+            )}
+            {culturalCoach.suggested_revision && (
+              <div className="bg-white/60 dark:bg-gray-800/60 rounded-lg px-3 py-2 mb-2 border border-[#E5E5E5]/50 dark:border-gray-700">
+                <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">Suggested version</p>
+                <p className="text-[13px] text-[#0A0A0A] dark:text-white leading-relaxed">{culturalCoach.suggested_revision}</p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <button onClick={handleCoachSendOriginal} className="flex-1 rounded-lg border border-[#D1D5DB] dark:border-gray-600 py-2 text-[12px] font-medium text-[#374151] dark:text-gray-300 active:bg-[#F3F4F6]">
+                Send Original
+              </button>
+              {culturalCoach.suggested_revision && (
+                <button onClick={handleCoachUseSuggestion} className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-[12px] font-medium text-white active:bg-[#4338CA]">
+                  Use Suggestion
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Reply/Edit preview above input */}
         {(replyTo || editingMsg) && (
           <div className="px-3 py-2 border-t border-[#F0F0F0] bg-[#F9FAFB] flex items-center gap-2">
@@ -2269,7 +2374,7 @@ export default function PocketChatPage() {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       setShowQuickReplies(false);
-                      sendMessage();
+                      trySendMessage();
                     }
                   }}
                   placeholder="Type a message..."
@@ -2282,7 +2387,7 @@ export default function PocketChatPage() {
                 {/* Right: Mic OR Send — mutually exclusive */}
                 {newMessage.trim() ? (
                   <button
-                    onClick={sendMessage}
+                    onClick={trySendMessage}
                     disabled={sending}
                     className="h-[42px] w-[42px] shrink-0 flex items-center justify-center bg-[#4F46E5] text-white rounded-full hover:bg-[#4338CA] transition-colors disabled:opacity-60"
                     aria-label="Send"
