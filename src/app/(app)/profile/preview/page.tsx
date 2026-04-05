@@ -113,7 +113,12 @@ export default function ProfilePreviewPage() {
       });
       if (!res.ok) { setPublishing(false); return; }
       try { sessionStorage.removeItem('spaceship_profile_build'); } catch {}
+      const result = await res.json();
       triggerDelight({ type: 'profile_published' });
+      if (result.referralAwarded) {
+        // Delay referral delight so it doesn't overlap with profile_published confetti
+        setTimeout(() => triggerDelight({ type: 'referral_published', points: 15 }), 3000);
+      }
       router.push('/profile/published');
     } catch {
       setPublishing(false);

@@ -133,7 +133,7 @@ export async function recalculateTrust(
     supabase.from('messages').select('id').eq('sender_id', userId).limit(1),
     supabase.from('profiles').select('full_name, avatar_url, created_at').eq('user_id', userId).eq('organization_id', orgId).single(),
     supabase.from('organizations').select('phone, address, tax_number').eq('id', orgId).single(),
-    supabase.from('referrals').select('id').eq('referrer_id', userId),
+    supabase.from('referrals').select('id').eq('inviter_id', userId),
     supabase.from('id_verifications').select('status').eq('user_id', userId).eq('status', 'approved').limit(1),
   ])
 

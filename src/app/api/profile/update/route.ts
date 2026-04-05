@@ -128,10 +128,14 @@ export async function PUT(request: Request) {
   }
 
   // Check referral rewards when publishing
+  let referralAwarded = false
   if (updates.is_published === true) {
-    await checkAndAwardReferralTrust(user.id, supabase).catch((err: any) => {
+    try {
+      const referralResult = await checkAndAwardReferralTrust(user.id, supabase)
+      referralAwarded = referralResult.awarded
+    } catch (err: any) {
       console.error('[ProfileUpdate] Referral reward error:', err)
-    })
+    }
   }
 
   // Return updated profile
@@ -148,6 +152,7 @@ export async function PUT(request: Request) {
   return NextResponse.json({
     profile: updatedProfile,
     tierInfo,
+    referralAwarded,
     classification: {
       trustScore: trustResult.trustScore,
       tier: trustResult.tier,
