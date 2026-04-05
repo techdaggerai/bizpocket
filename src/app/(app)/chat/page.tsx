@@ -1988,8 +1988,8 @@ export default function PocketChatPage() {
           </div>
         )}
 
-        {/* Input area */}
-        <div className="p-3 border-t border-[#E5E5E5] bg-white">
+        {/* Input area — single consolidated bar */}
+        <div className="px-2 py-2 border-t border-[#E5E5E5] bg-white">
           <div className="relative">
             <QuickReplies
               isOpen={showQuickReplies}
@@ -1998,180 +1998,51 @@ export default function PocketChatPage() {
               inputValue={newMessage}
             />
           </div>
-          <div className="flex items-end gap-2">
-            {/* Language selector — translate outgoing */}
-            {!activeConvo?.is_bot_chat && (
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-[8px] text-[#999] font-medium">SEND AS</span>
-                <select
-                  value={chatLang}
-                  onChange={(e) => setChatLang(e.target.value)}
-                  className="h-[42px] rounded-[10px] border border-[#E5E5E5] bg-white px-2 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
-                  title="Message language"
-                >
-                  <option value="en">🇬🇧</option>
-                  <option value="ja">🇯🇵</option>
-                  <option value="ur">🇵🇰</option>
-                  <option value="ar">🇦🇪</option>
-                  <option value="bn">🇧🇩</option>
-                  <option value="pt">🇧🇷</option>
-                  <option value="tl">🇵🇭</option>
-                  <option value="vi">🇻🇳</option>
-                  <option value="tr">🇹🇷</option>
-                  <option value="zh">🇨🇳</option>
-                  <option value="fr">🇫🇷</option>
-                  <option value="nl">🇳🇱</option>
-                  <option value="es">🇪🇸</option>
-                  <option value="ps">🇦🇫</option>
-                  <option value="fa">🇮🇷</option>
-                  <option value="hi">🇮🇳</option>
-                  <option value="ko">🇰🇷</option>
-                  <option value="th">🇹🇭</option>
-                  <option value="id">🇮🇩</option>
-                  <option value="ne">🇳🇵</option>
-                  <option value="si">🇱🇰</option>
-                </select>
-              </div>
-            )}
 
-            {/* Quick reply trigger */}
-            <button
-              onClick={() => setShowQuickReplies(!showQuickReplies)}
-              className="hidden sm:flex h-[42px] w-[42px] items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors"
-              title="Quick replies"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
-            </button>
-
-            {/* Emoji/Sticker/GIF trigger */}
-            <div className="relative">
-              <button
-                onClick={() => setShowEmoji(!showEmoji)}
-                className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#F59E0B] hover:border-[#F59E0B] transition-colors"
-                title="Emoji, Stickers, GIFs"
+          {/* SEND AS language selector — desktop only */}
+          {!activeConvo?.is_bot_chat && (
+            <div className="hidden md:flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] text-[#999] font-medium">SEND AS</span>
+              <select
+                value={chatLang}
+                onChange={(e) => setChatLang(e.target.value)}
+                className="h-7 rounded-lg border border-[#E5E5E5] bg-white px-1.5 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
+                title="Message language"
               >
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-              </button>
-              {showEmoji && (
-                <div className="absolute bottom-full mb-2 left-0 w-[320px] bg-white rounded-xl border border-[#E5E5E5] shadow-lg z-50 overflow-hidden">
-                  {/* Tabs */}
-                  <div className="flex border-b border-[#F0F0F0]">
-                    {[{k:'emoji' as const,l:'😊'},{k:'stickers' as const,l:'🎨'},{k:'gifs' as const,l:'GIF'}].map(t => (
-                      <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]' : 'text-[#9CA3AF]'}`}>{t.l}</button>
-                    ))}
-                  </div>
-                  {pickerTab === 'emoji' && (
-                    <EmojiPicker
-                      onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
-                      onClose={() => setShowEmoji(false)}
-                    />
-                  )}
-                  {pickerTab === 'stickers' && (
-                    <StickerPicker
-                      isOpen={true}
-                      onSelect={(stickerUrl) => {
-                        // Send sticker as image message
-                        if (activeConvoId && organization?.id) {
-                          supabase.from('messages').insert({
-                            conversation_id: activeConvoId, organization_id: organization.id,
-                            sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
-                            message: '🎨 Sticker', message_type: 'image', attachment_url: stickerUrl,
-                          });
-                        }
-                        setShowEmoji(false);
-                      }}
-                      onClose={() => setShowEmoji(false)}
-                    />
-                  )}
-                  {pickerTab === 'gifs' && (
-                    <GifPicker
-                      isOpen={true}
-                      onSelect={(gif) => {
-                        if (activeConvoId && organization?.id) {
-                          supabase.from('messages').insert({
-                            conversation_id: activeConvoId, organization_id: organization.id,
-                            sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
-                            message: gif.title || 'GIF', message_type: 'image', attachment_url: gif.url,
-                          });
-                        }
-                        setShowEmoji(false);
-                      }}
-                      onClose={() => setShowEmoji(false)}
-                    />
-                  )}
-                </div>
-              )}
+                <option value="en">🇬🇧 EN</option>
+                <option value="ja">🇯🇵 JA</option>
+                <option value="ur">🇵🇰 UR</option>
+                <option value="ar">🇦🇪 AR</option>
+                <option value="bn">🇧🇩 BN</option>
+                <option value="pt">🇧🇷 PT</option>
+                <option value="tl">🇵🇭 TL</option>
+                <option value="vi">🇻🇳 VI</option>
+                <option value="tr">🇹🇷 TR</option>
+                <option value="zh">🇨🇳 ZH</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="nl">🇳🇱 NL</option>
+                <option value="es">🇪🇸 ES</option>
+                <option value="ps">🇦🇫 PS</option>
+                <option value="fa">🇮🇷 FA</option>
+                <option value="hi">🇮🇳 HI</option>
+                <option value="ko">🇰🇷 KO</option>
+                <option value="th">🇹🇭 TH</option>
+                <option value="id">🇮🇩 ID</option>
+                <option value="ne">🇳🇵 NE</option>
+                <option value="si">🇱🇰 SI</option>
+              </select>
             </div>
+          )}
 
-            {/* Message input */}
-            <textarea
-              ref={inputRef}
-              value={newMessage}
-              onChange={(e) => {
-                setNewMessage(e.target.value);
-                if (e.target.value.startsWith('/')) setShowQuickReplies(true);
-                else setShowQuickReplies(false);
-                broadcastTyping();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  setShowQuickReplies(false);
-                  sendMessage();
-                }
-              }}
-              placeholder="Type a message..."
-              rows={1}
-              maxLength={5000}
-              aria-label="Message input"
-              className="flex-1 bg-white border border-[#D1D5DB] rounded-[10px] px-3.5 py-2.5 text-base text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
-            />
-
-            {/* Attachment menu */}
-            <div className="relative">
-              <button
-                onClick={() => setShowAttachMenu(!showAttachMenu)}
-                disabled={uploading}
-                className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
-                title="Attach"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-                </svg>
-              </button>
-              {showAttachMenu && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowAttachMenu(false)} />
-                  <div className="absolute bottom-full mb-2 right-0 z-50 w-48 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1">
-                    <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
-                      Photo
-                    </button>
-                    <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                      <svg className="h-4 w-4 text-[#F43F5E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-                      Video
-                    </button>
-                    <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                      <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                      Document
-                    </button>
-                    <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                      <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
-                      Location
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Voice / Send toggle */}
+          {/* Main input row: emoji + attach | input | mic/send */}
+          <div className="flex items-end gap-1.5">
             {recording ? (
               <>
                 {/* Recording indicator */}
-                <div className="flex items-center gap-2 flex-1 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-[10px] px-3 py-2">
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#DC2626] animate-pulse" />
+                <div className="flex items-center gap-2 flex-1 bg-[#DC2626]/5 border border-[#DC2626]/20 rounded-[10px] px-3 py-2 min-h-[42px]">
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#DC2626] animate-pulse shrink-0" />
                   <div className="flex-1 flex items-center gap-0.5">
-                    {Array.from({ length: 20 }, (_, i) => (
+                    {Array.from({ length: 16 }, (_, i) => (
                       <div
                         key={i}
                         className="w-1 rounded-full bg-[#DC2626]/40"
@@ -2184,7 +2055,7 @@ export default function PocketChatPage() {
                 {/* Cancel */}
                 <button
                   onClick={cancelRecording}
-                  className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                  className="h-[42px] w-[42px] shrink-0 flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
                   title="Cancel"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -2194,7 +2065,7 @@ export default function PocketChatPage() {
                 {/* Stop & Send */}
                 <button
                   onClick={stopRecording}
-                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#DC2626] text-white rounded-[10px] hover:bg-[#B91C1C] transition-colors"
+                  className="h-[42px] w-[42px] shrink-0 flex items-center justify-center bg-[#DC2626] text-white rounded-[10px] hover:bg-[#B91C1C] transition-colors"
                   title="Send voice note"
                 >
                   <PocketSendIcon size={22} />
@@ -2202,28 +2073,161 @@ export default function PocketChatPage() {
               </>
             ) : (
               <>
-                {/* Mic button */}
+                {/* Left: Emoji button */}
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowEmoji(!showEmoji)}
+                    className="h-[42px] w-[36px] flex items-center justify-center text-[#A3A3A3] hover:text-[#F59E0B] transition-colors"
+                    title="Emoji, Stickers, GIFs"
+                  >
+                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                  </button>
+                  {showEmoji && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowEmoji(false)} />
+                      <div className="absolute bottom-full mb-2 left-0 w-[min(320px,calc(100vw-24px))] bg-white rounded-xl border border-[#E5E5E5] shadow-lg z-50 overflow-hidden">
+                        {/* Tabs */}
+                        <div className="flex border-b border-[#F0F0F0]">
+                          {[{k:'emoji' as const,l:'😊'},{k:'stickers' as const,l:'🎨'},{k:'gifs' as const,l:'GIF'}].map(t => (
+                            <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]' : 'text-[#9CA3AF]'}`}>{t.l}</button>
+                          ))}
+                        </div>
+                        {pickerTab === 'emoji' && (
+                          <EmojiPicker
+                            onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
+                            onClose={() => setShowEmoji(false)}
+                          />
+                        )}
+                        {pickerTab === 'stickers' && (
+                          <StickerPicker
+                            isOpen={true}
+                            onSelect={(stickerUrl) => {
+                              if (activeConvoId && organization?.id) {
+                                supabase.from('messages').insert({
+                                  conversation_id: activeConvoId, organization_id: organization.id,
+                                  sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+                                  message: '🎨 Sticker', message_type: 'image', attachment_url: stickerUrl,
+                                });
+                              }
+                              setShowEmoji(false);
+                            }}
+                            onClose={() => setShowEmoji(false)}
+                          />
+                        )}
+                        {pickerTab === 'gifs' && (
+                          <GifPicker
+                            isOpen={true}
+                            onSelect={(gif) => {
+                              if (activeConvoId && organization?.id) {
+                                supabase.from('messages').insert({
+                                  conversation_id: activeConvoId, organization_id: organization.id,
+                                  sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
+                                  message: gif.title || 'GIF', message_type: 'image', attachment_url: gif.url,
+                                });
+                              }
+                              setShowEmoji(false);
+                            }}
+                            onClose={() => setShowEmoji(false)}
+                          />
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Left: Attachment button */}
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowAttachMenu(!showAttachMenu)}
+                    disabled={uploading}
+                    className="h-[42px] w-[36px] flex items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors disabled:opacity-40"
+                    title="Attach"
+                  >
+                    <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+                    </svg>
+                  </button>
+                  {showAttachMenu && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowAttachMenu(false)} />
+                      <div className="absolute bottom-full mb-2 left-0 z-50 w-48 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1">
+                        <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
+                          Photo
+                        </button>
+                        <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <svg className="h-4 w-4 text-[#F43F5E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                          Video
+                        </button>
+                        <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                          Document
+                        </button>
+                        <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+                          Location
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Quick reply trigger — desktop only */}
                 <button
-                  onMouseDown={startRecording}
-                  onTouchStart={startRecording}
-                  disabled={uploading}
-                  className="h-[42px] w-[42px] flex items-center justify-center rounded-[10px] border border-[#E5E5E5] text-[#A3A3A3] hover:text-[#4F46E5] hover:border-[#4F46E5] transition-colors disabled:opacity-40"
-                  title="Hold to record"
+                  onClick={() => setShowQuickReplies(!showQuickReplies)}
+                  className="hidden md:flex h-[42px] w-[36px] shrink-0 items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors"
+                  title="Quick replies"
                 >
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
-                  </svg>
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
                 </button>
 
-                {/* Send button */}
-                <button
-                  onClick={sendMessage}
-                  disabled={!newMessage.trim() || sending}
-                  className="h-[42px] w-[42px] flex items-center justify-center bg-[#4F46E5] text-white rounded-[10px] hover:bg-[#4338CA] transition-colors disabled:bg-[#4F46E5]/60 disabled:text-white/80"
-                  aria-label="Send"
-                >
-                  <PocketSendIcon size={22} />
-                </button>
+                {/* Center: Message input */}
+                <textarea
+                  ref={inputRef}
+                  value={newMessage}
+                  onChange={(e) => {
+                    setNewMessage(e.target.value);
+                    if (e.target.value.startsWith('/')) setShowQuickReplies(true);
+                    else setShowQuickReplies(false);
+                    broadcastTyping();
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      setShowQuickReplies(false);
+                      sendMessage();
+                    }
+                  }}
+                  placeholder="Type a message..."
+                  rows={1}
+                  maxLength={5000}
+                  aria-label="Message input"
+                  className="flex-1 min-w-0 bg-[#F3F4F6] rounded-[20px] px-3.5 py-2.5 text-[15px] text-[#0A0A0A] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-white"
+                />
+
+                {/* Right: Mic OR Send — mutually exclusive */}
+                {newMessage.trim() ? (
+                  <button
+                    onClick={sendMessage}
+                    disabled={sending}
+                    className="h-[42px] w-[42px] shrink-0 flex items-center justify-center bg-[#4F46E5] text-white rounded-full hover:bg-[#4338CA] transition-colors disabled:opacity-60"
+                    aria-label="Send"
+                  >
+                    <PocketSendIcon size={20} />
+                  </button>
+                ) : (
+                  <button
+                    onMouseDown={startRecording}
+                    onTouchStart={(e) => { e.preventDefault(); startRecording(); }}
+                    disabled={uploading}
+                    className="h-[42px] w-[42px] shrink-0 flex items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors disabled:opacity-40"
+                    title="Hold to record"
+                  >
+                    <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                    </svg>
+                  </button>
+                )}
               </>
             )}
           </div>
