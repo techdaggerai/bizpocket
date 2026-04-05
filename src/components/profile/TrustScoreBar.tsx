@@ -7,46 +7,87 @@ interface TrustScoreBarProps {
   score: number;
   maxScore?: number;
   tier: Tier;
+  animated?: boolean;
+  showNumber?: boolean;
+  showMilestones?: boolean;
   showBreakdown?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const TIER_COLORS: Record<Tier, { bar: string; track: string }> = {
-  starter: { bar: 'bg-amber-500', track: 'bg-amber-100 dark:bg-amber-950/50' },
-  growing: { bar: 'bg-blue-500', track: 'bg-blue-100 dark:bg-blue-950/50' },
-  established: { bar: 'bg-emerald-500', track: 'bg-emerald-100 dark:bg-emerald-950/50' },
+const TIER_GRADIENT: Record<Tier, string> = {
+  starter: 'from-amber-300 to-amber-500',
+  growing: 'from-blue-300 to-blue-500',
+  established: 'from-emerald-300 to-emerald-500',
 };
 
-export default function TrustScoreBar({ score, maxScore = 100, tier, showBreakdown }: TrustScoreBarProps) {
-  const [animatedWidth, setAnimatedWidth] = useState(0);
+const TIER_TEXT: Record<Tier, string> = {
+  starter: 'text-amber-600 dark:text-amber-400',
+  growing: 'text-blue-600 dark:text-blue-400',
+  established: 'text-emerald-600 dark:text-emerald-400',
+};
+
+const SIZE_H: Record<string, string> = {
+  sm: 'h-1',
+  md: 'h-1.5',
+  lg: 'h-2',
+};
+
+const MILESTONES = [
+  { pct: 40, label: 'Starter ceiling' },
+  { pct: 50, label: 'Badge threshold' },
+  { pct: 75, label: 'Growing ceiling' },
+];
+
+export default function TrustScoreBar({
+  score,
+  maxScore = 100,
+  tier,
+  animated = true,
+  showNumber = false,
+  showMilestones = false,
+  size = 'md',
+}: TrustScoreBarProps) {
+  const [fillWidth, setFillWidth] = useState(0);
   const pct = Math.min(100, Math.max(0, (score / maxScore) * 100));
-  const colors = TIER_COLORS[tier] || TIER_COLORS.starter;
 
   useEffect(() => {
-    const timer = setTimeout(() => setAnimatedWidth(pct), 100);
-    return () => clearTimeout(timer);
-  }, [pct]);
+    if (!animated) { setFillWidth(pct); return; }
+    const t = setTimeout(() => setFillWidth(pct), 50);
+    return () => clearTimeout(t);
+  }, [pct, animated]);
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-[var(--text-2)] dark:text-gray-300">Trust Score</span>
-        <span className="text-sm font-bold text-[var(--text-1)] dark:text-white">{score}<span className="text-xs font-normal text-[var(--text-3)] dark:text-gray-400">/{maxScore}</span></span>
-      </div>
-      <div className={`h-2.5 rounded-full overflow-hidden ${colors.track}`}>
-        <div
-          className={`h-full rounded-full transition-all duration-700 ease-out ${colors.bar}`}
-          style={{ width: `${animatedWidth}%` }}
-        />
-      </div>
-      {showBreakdown && (
-        <div className="flex justify-between text-[10px] text-[var(--text-3)] dark:text-gray-500 px-0.5">
-          <span>0</span>
-          <span>20</span>
-          <span>45</span>
-          <span>76</span>
-          <span>100</span>
+    <div className="space-y-1" role="progressbar" aria-valuenow={score} aria-valuemin={0} aria-valuemax={maxScore} aria-label={`Trust score: ${score} out of ${maxScore}`}>
+      {/* Number display */}
+      {showNumber && size !== 'sm' && (
+        <div className="flex items-baseline justify-between">
+          <span
+            className={`text-sm font-bold ${TIER_TEXT[tier]}`}
+            style={{ fontFamily: 'var(--font-display), sans-serif' }}
+          >
+            {score}
+          </span>
+          <span className="text-xs text-gray-400">/{maxScore}</span>
         </div>
       )}
+
+      {/* Bar */}
+      <div className={`relative ${SIZE_H[size]} rounded-full bg-gray-200 dark:bg-gray-700 overflow-visible`}>
+        <div
+          className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${TIER_GRADIENT[tier]} transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]`}
+          style={{ width: `${fillWidth}%` }}
+        />
+
+        {/* Milestones */}
+        {showMilestones && MILESTONES.map((m) => (
+          <div
+            key={m.pct}
+            className="absolute top-0 bottom-0 w-px bg-gray-400/40 dark:bg-gray-500/40"
+            style={{ left: `${m.pct}%` }}
+            title={m.label}
+          />
+        ))}
+      </div>
     </div>
   );
 }
