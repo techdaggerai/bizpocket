@@ -722,6 +722,19 @@ export default function SettingsPage() {
           <p className="text-center text-[12px] text-[var(--text-4)] mt-3">Made with ❤️ in Japan · TechDagger</p>
         </div>
 
+        {/* EMERGENCY CARD */}
+        <div>
+          <SectionLabel>Safety</SectionLabel>
+          <Link href="/emergency" className="flex items-center gap-3 bg-[#FEF2F2] dark:bg-red-950/20 rounded-lg px-4 py-3 border border-[#FECACA]/50 dark:border-red-900/30">
+            <span className="text-xl">🆘</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-semibold text-[#DC2626] dark:text-red-400">Emergency Card</p>
+              <p className="text-[11px] text-[#991B1B]/60 dark:text-red-400/60">Offline emergency phrases + your medical info</p>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+          </Link>
+        </div>
+
         {/* DELETE ACCOUNT */}
         <div className="pb-2">
           <button
