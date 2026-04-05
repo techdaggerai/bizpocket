@@ -129,11 +129,11 @@ function LandingPageInner() {
       {/* POCKETCHAT CALLOUT */}
       <section id="pocketchat" className="px-6 py-20">
         <div className="mx-auto max-w-[1100px]">
-          <div className="rounded-3xl border-l-4 border-[#F59E0B] bg-[#fffbeb]/40 p-[clamp(32px,5vw,56px)]">
+          <div className="rounded-3xl border-l-4 border-[#F59E0B] bg-[#fffbeb]/40 dark:bg-slate-800/60 p-[clamp(32px,5vw,56px)]">
             <div className="mb-8 text-center">
-              <span className="inline-block rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] mb-4">{t('evrywher_badge')}</span>
-              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">{t('evrywher_title')}</h2>
-              <p className="mt-3 max-w-[560px] mx-auto text-[15px] text-[#374151] leading-relaxed">{t('evrywher_subtitle')}</p>
+              <span className="inline-block rounded-full bg-[#fef3c7] dark:bg-amber-500/20 px-4 py-1.5 text-xs font-semibold text-[#92400e] dark:text-amber-300 mb-4">{t('evrywher_badge')}</span>
+              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-gray-900 dark:text-white">{t('evrywher_title')}</h2>
+              <p className="mt-3 max-w-[560px] mx-auto text-[15px] text-gray-600 dark:text-gray-300 leading-relaxed">{t('evrywher_subtitle')}</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               {/* LEFT — Live Typing Indicator */}
@@ -205,8 +205,8 @@ function LandingPageInner() {
       <section id="features" className="px-6 pb-16">
         <div className="mx-auto max-w-[1100px]">
           <div className="text-center mb-10">
-            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[#111827]">{t('features_title')}</h2>
-            <p className="text-base text-[#374151] mt-2">{t('features_subtitle')}</p>
+            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-gray-900 dark:text-white">{t('features_title')}</h2>
+            <p className="text-base text-gray-600 dark:text-gray-300 mt-2">{t('features_subtitle')}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
@@ -219,10 +219,10 @@ function LandingPageInner() {
               { title: 'Accountant Portal', desc: 'Your Japanese accountant gets read-only access. Monthly packages auto-generated.', svg: '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>', color: '#4F46E5' },
               { title: 'Social Media AI', desc: 'AI generates posts, captions, and hashtags. Connect Instagram to orders.', svg: '<rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>', color: '#F59E0B' },
             ].map((f, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#E5E5E5] p-5">
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-2xl border border-[#E5E5E5] dark:border-slate-700 p-5">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={f.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-3" dangerouslySetInnerHTML={{ __html: f.svg }} />
-                <h4 className="text-[15px] font-semibold text-[#111827] mb-1.5">{f.title}</h4>
-                <p className="text-[13px] text-[#374151] leading-relaxed">{f.desc}</p>
+                <h4 className="text-[15px] font-semibold text-gray-900 dark:text-white mb-1.5">{f.title}</h4>
+                <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -233,8 +233,8 @@ function LandingPageInner() {
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-[1100px]">
           <div className="text-center mb-10">
-            <h2 className="text-[32px] font-bold text-[#111827]">{t('personas_title')}</h2>
-            <p className="text-base text-[#374151] mt-3">{t('personas_subtitle')}</p>
+            <h2 className="text-[32px] font-bold text-gray-900 dark:text-white">{t('personas_title')}</h2>
+            <p className="text-base text-gray-600 dark:text-gray-300 mt-3">{t('personas_subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -260,11 +260,11 @@ function LandingPageInner() {
       {/* AI BUSINESS CYCLE ENGINE */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-[1100px]">
-          <div className="bg-[#faf9f7] rounded-3xl p-[clamp(32px,5vw,56px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="bg-[#faf9f7] dark:bg-slate-800/60 rounded-3xl p-[clamp(32px,5vw,56px)] grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-              <span className="inline-block px-3 py-1 rounded-full bg-[#fef3c7] text-xs font-semibold text-[#92400e] mb-4">AI-POWERED</span>
-              <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">AI learns your business.<br />Builds your pipeline.<br /><span className="text-[#F59E0B]">Runs it for you.</span></h2>
-              <p className="text-[15px] text-[#374151] leading-relaxed mb-6">No two businesses are the same. BizPocket AI interviews you, understands your operations, and creates a custom pipeline that adapts as your business grows.</p>
+              <span className="inline-block px-3 py-1 rounded-full bg-[#fef3c7] dark:bg-amber-500/20 text-xs font-semibold text-[#92400e] dark:text-amber-300 mb-4">AI-POWERED</span>
+              <h2 className="text-[28px] font-bold leading-[1.2] text-gray-900 dark:text-white mb-3">AI learns your business.<br />Builds your pipeline.<br /><span className="text-[#F59E0B]">Runs it for you.</span></h2>
+              <p className="text-[15px] text-gray-600 dark:text-gray-300 leading-relaxed mb-6">No two businesses are the same. BizPocket AI interviews you, understands your operations, and creates a custom pipeline that adapts as your business grows.</p>
               <div className="space-y-2.5">
                 {['AI interviews you in your language', 'Generates custom pipeline stages', 'Tracks every item through your cycle', 'Learns and improves over time', 'Morning briefing on bottlenecks'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
@@ -299,8 +299,8 @@ function LandingPageInner() {
           <InvoiceShowcase />
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#eef2ff] text-xs font-semibold text-[#4338ca] mb-4">CANVA-STYLE BUILDER</span>
-            <h2 className="text-[28px] font-bold leading-[1.2] text-[#111827] mb-3">Invoice fired.<br />Before you leave<br /><span className="text-[#4F46E5]">the parking lot.</span></h2>
-            <p className="text-[15px] text-[#374151] leading-relaxed mb-6">Professional invoices in 60 seconds. Split-view live preview so you see exactly what your client sees. 10 templates. 16 currencies. E-signature. Share via link or PDF.</p>
+            <h2 className="text-[28px] font-bold leading-[1.2] text-gray-900 dark:text-white mb-3">Invoice fired.<br />Before you leave<br /><span className="text-indigo-600 dark:text-indigo-300">the parking lot.</span></h2>
+            <p className="text-[15px] text-gray-600 dark:text-gray-300 leading-relaxed mb-6">Professional invoices in 60 seconds. Split-view live preview so you see exactly what your client sees. 10 templates. 16 currencies. E-signature. Share via link or PDF.</p>
             <div className="space-y-2.5">
               {['10 invoice templates', 'Split-view live preview (Canva-style)', 'E-signature capture', 'PDF download + share link', 'T-number for Japanese compliance (インボイス制度)', '16 currencies with auto tax calculation', 'Custom columns, discounts, attachments'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-sm text-[#374151]">{f}</span></div>
@@ -320,7 +320,7 @@ function LandingPageInner() {
             </div>
             <span className="inline-block px-3 py-1 rounded-full bg-[#4F46E5]/20 text-xs font-semibold text-[#a5b4fc] mb-5">SOCIAL MEDIA → ORDERS → MONEY</span>
             <h2 className="text-[28px] font-bold leading-[1.3] mb-4" style={{ background: 'linear-gradient(to right, #a5b4fc, #f0abfc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>One link. Every platform.<br />Instant orders.</h2>
-            <p className="text-[15px] text-[#94a3b8] leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link on Instagram, TikTok, Facebook, LINE, WhatsApp, your business card — anywhere. Customers tap it, see your catalog, and chat with you in their language.</p>
+            <p className="text-[15px] text-gray-300 leading-relaxed max-w-[520px] mx-auto mb-10">Put your BizPocket link on Instagram, TikTok, Facebook, LINE, WhatsApp, your business card — anywhere. Customers tap it, see your catalog, and chat with you in their language.</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 32, flexWrap: 'wrap' }}>
               {[
                 { name: 'Instagram', bg: 'linear-gradient(135deg, #833AB4, #C13584, #E4405F)', text: '#fff' },
@@ -341,7 +341,7 @@ function LandingPageInner() {
                 <span key={i} className="flex items-center gap-2"><span className="bg-[#1e293b] border border-[#334155] rounded-[14px] px-4 py-3 text-[11px] font-medium text-[#e2e8f0]" style={{ borderTop: `2px solid ${s.c}` }}>{s.l}</span>{i < 4 && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2"><path d="M9 18l6-6-6-6" /></svg>}</span>
               ))}
             </div>
-            <p className="text-sm text-[#64748b]">Works for any business — cake shop, car dealer, import-export, freelancer, restaurant.</p>
+            <p className="text-sm text-gray-400">Works for any business — cake shop, car dealer, import-export, freelancer, restaurant.</p>
           </div>
         </div>
       </section>
@@ -407,13 +407,13 @@ function LandingPageInner() {
       {/* EVRYWHER INSIDE — Cross-sell */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-[1100px]">
-          <div className="rounded-3xl bg-[#eef2ff] p-[clamp(32px,5vw,48px)] text-center">
+          <div className="rounded-3xl bg-[#eef2ff] dark:bg-indigo-500/10 p-[clamp(32px,5vw,48px)] text-center">
             <div className="mb-5 flex items-center justify-center gap-3">
               <AnimatedPocketChatLogo size={36} isTranslating={true} />
               <EvryWherMark size="md" />
             </div>
-            <h2 className="mb-3 text-[28px] font-bold text-[#111827]">Evrywher Inside Every Plan</h2>
-            <p className="mx-auto mb-6 max-w-[560px] text-[15px] leading-relaxed text-[#374151]">
+            <h2 className="mb-3 text-[28px] font-bold text-gray-900 dark:text-white">Evrywher Inside Every Plan</h2>
+            <p className="mx-auto mb-6 max-w-[560px] text-[15px] leading-relaxed text-gray-600 dark:text-gray-300">
               Chat with Japanese clients, scan their documents, learn their language — all included. Every BizPocket plan comes with Evrywher at the matching tier.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -437,8 +437,8 @@ function LandingPageInner() {
               <span className="text-[13px] text-[#d1d5db]">+</span>
               <div className="flex items-center gap-1.5"><AnimatedPocketChatLogo size={32} isTranslating={true} /><EvryWherMark size="sm" /></div>
             </div>
-            <h2 className="text-[32px] font-bold text-[#111827]">{t('pricing_title')}</h2>
-            <p className="text-base text-[#374151] mt-3">{t('pricing_subtitle')}</p>
+            <h2 className="text-[32px] font-bold text-gray-900 dark:text-white">{t('pricing_title')}</h2>
+            <p className="text-base text-gray-600 dark:text-gray-300 mt-3">{t('pricing_subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
