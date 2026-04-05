@@ -27,6 +27,9 @@ import PollBubble from '@/components/PollBubble';
 import ScheduleMessageModal from '@/components/ScheduleMessageModal';
 import LearnFromMessage from '@/components/LearnFromMessage';
 import { usePocketBot } from '@/lib/use-pocket-bot';
+import BusinessCardMessage from '@/components/chat/BusinessCardMessage';
+import BizCardGate from '@/components/profile/BizCardGate';
+import { canShareBizCard } from '@/lib/tier-system';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
@@ -210,6 +213,8 @@ export default function PocketChatPage() {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [showCameraTranslate, setShowCameraTranslate] = useState(false);
   const [showVoiceTranslator, setShowVoiceTranslator] = useState(false);
+  const [showBizCardGate, setShowBizCardGate] = useState(false);
+  const [bizCardGateData, setBizCardGateData] = useState<any>(null);
   const [chatSearch, setChatSearch] = useState('');
   const [showChatSearch, setShowChatSearch] = useState(false);
   const [chatSearchIdx, setChatSearchIdx] = useState(0);
@@ -2028,6 +2033,42 @@ export default function PocketChatPage() {
               }
             }
 
+            // Business Card message
+            if ((msg.message_type as string) === 'business_card') {
+              const cardData = (() => {
+                try { return JSON.parse(msg.message); } catch { return null; }
+              })();
+              if (cardData) {
+                return (
+                  <div key={msg.id}>
+                    {showDateSep && <div className="text-center text-[10px] text-[#A3A3A3] my-3">{msgDate}</div>}
+                    <BusinessCardMessage
+                      cardData={{
+                        ...cardData,
+                        sender_name: msg.sender_name,
+                        onQuoteRequest: (text: string) => {
+                          if (activeConvoId) {
+                            supabase.from('messages').insert({
+                              conversation_id: activeConvoId,
+                              organization_id: organization.id,
+                              sender_type: 'owner',
+                              sender_name: profile?.full_name || profile?.name || 'You',
+                              message: `\u{1F4CB} Quote Request: ${text}`,
+                              message_type: 'text',
+                              original_text: `Quote Request: ${text}`,
+                              original_language: profile?.language || 'en',
+                            });
+                          }
+                        },
+                      }}
+                      isOwner={isOwner}
+                      timestamp={formatTimestamp(msg.created_at)}
+                    />
+                  </div>
+                );
+              }
+            }
+
             // Invoice message
             if (msg.message_type === 'invoice') {
               const invoiceData = (() => {
@@ -2370,6 +2411,32 @@ export default function PocketChatPage() {
             onSendToChat={(text) => {
               setNewMessage(text);
               setShowCameraTranslate(false);
+            }}
+          />
+        )}
+
+        {/* Business Card Gate */}
+        {showBizCardGate && bizCardGateData && (
+          <BizCardGate
+            trustScore={bizCardGateData.trustScore}
+            tier={bizCardGateData.tier}
+            nextActions={bizCardGateData.nextActions}
+            onClose={() => setShowBizCardGate(false)}
+            onSendInvoice={() => router.push('/invoices/new')}
+            onShareLink={() => {
+              const shareUrl = bizCardGateData?.shareToken ? `https://evrywher.io/p/${bizCardGateData.shareToken}` : 'https://evrywher.io';
+              if (activeConvoId) {
+                supabase.from('messages').insert({
+                  conversation_id: activeConvoId,
+                  organization_id: organization.id,
+                  sender_type: 'owner',
+                  sender_name: profile?.full_name || profile?.name || 'You',
+                  message: `Check out my profile: ${shareUrl}`,
+                  message_type: 'text',
+                  original_text: `Check out my profile: ${shareUrl}`,
+                  original_language: profile?.language || 'en',
+                });
+              }
             }}
           />
         )}
@@ -2769,6 +2836,68 @@ export default function PocketChatPage() {
                         <button onClick={() => { setShowAttachMenu(false); setShowVoiceTranslator(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
                           <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
                           Voice Translate
+                        </button>
+                        <button onClick={async () => {
+                          setShowAttachMenu(false);
+                          // Check if user can share biz card
+                          try {
+                            const res = await fetch('/api/profile/me');
+                            const data = await res.json();
+                            if (!data.profile) {
+                              router.push('/profile/build');
+                              return;
+                            }
+                            const gp = data.profile;
+                            const ti = data.tierInfo || {};
+                            if (canShareBizCard(gp.tier || 'starter', gp.trust_score || 0, gp.is_published || false)) {
+                              // Snapshot card data from server profile (not client-editable)
+                              const cardData = {
+                                display_name: profile?.full_name || profile?.name || '',
+                                avatar_url: (profile as any).avatar_url || null,
+                                title: gp.title || '',
+                                company_name: organization?.name || '',
+                                tier: gp.tier,
+                                trust_score: gp.trust_score,
+                                services: gp.services || [],
+                                operating_corridors: gp.operating_corridors || [],
+                                badge_tier: gp.badge_tier || 'none',
+                                deals: 0,
+                                share_token: gp.share_token || '',
+                              };
+                              // Insert biz card record (server-side snapshot)
+                              const { data: cardRecord } = await supabase.from('business_cards').insert({
+                                user_id: user.id,
+                                organization_id: organization.id,
+                                card_data: cardData,
+                              }).select('id').single();
+                              // Send message with card_id reference
+                              if (cardRecord && activeConvoId) {
+                                await supabase.from('messages').insert({
+                                  conversation_id: activeConvoId,
+                                  organization_id: organization.id,
+                                  sender_type: 'owner',
+                                  sender_name: profile?.full_name || profile?.name || 'You',
+                                  message: JSON.stringify({ ...cardData, card_id: cardRecord.id }),
+                                  message_type: 'business_card',
+                                  original_text: `Business Card: ${cardData.display_name}`,
+                                  original_language: profile?.language || 'en',
+                                });
+                              }
+                            } else {
+                              // Show gate with all three requirements
+                              setBizCardGateData({
+                                trustScore: gp.trust_score || 0,
+                                tier: gp.tier || 'starter',
+                                isPublished: gp.is_published || false,
+                                nextActions: ti.nextActions || [],
+                                shareToken: gp.share_token || '',
+                              });
+                              setShowBizCardGate(true);
+                            }
+                          } catch { /* ignore errors */ }
+                        }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <span className="h-4 w-4 flex items-center justify-center text-[14px]">{'\u{1F4C7}'}</span>
+                          Business Card
                         </button>
                         {activeConvo?.is_group && (
                           <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
