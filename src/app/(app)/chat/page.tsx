@@ -36,6 +36,10 @@ import PocketChatTypingIndicator from '@/components/PocketChatTypingIndicator';
 import PocketSendIcon from '@/components/PocketSendIcon';
 import OutlinePillButton from '@/components/OutlinePillButton';
 import PocketAvatar from '@/components/PocketAvatar';
+import TierBadge from '@/components/profile/TierBadge';
+import CorridorBadge from '@/components/profile/CorridorBadge';
+import BottomSheet from '@/components/ui/BottomSheet';
+import type { Tier } from '@/lib/tier-system';
 
 /* ---------- Types ---------- */
 
@@ -211,6 +215,9 @@ export default function PocketChatPage() {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [matchPillDismissed, setMatchPillDismissed] = useState(false);
+  const [bizCardTipDismissed, setBizCardTipDismissed] = useState(() => { try { return localStorage.getItem('tipDismissed_bizcard') === '1'; } catch { return false; } });
+  const [showBizCardGateSheet, setShowBizCardGateSheet] = useState(false);
   const [showCameraTranslate, setShowCameraTranslate] = useState(false);
   const [showVoiceTranslator, setShowVoiceTranslator] = useState(false);
   const [showBizCardGate, setShowBizCardGate] = useState(false);
@@ -1661,7 +1668,23 @@ export default function PocketChatPage() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate cursor-pointer" onClick={() => isGroup ? setShowGroupInfo(true) : !activeConvo.is_bot_chat && openContactInfo()}>{contactName}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate cursor-pointer" onClick={() => isGroup ? setShowGroupInfo(true) : !activeConvo.is_bot_chat && openContactInfo()}>{contactName}</p>
+              {!activeConvo.is_bot_chat && !isGroup && activeConvo.contact?.tier && (
+                <TierBadge tier={(activeConvo.contact.tier || 'starter') as Tier} size="sm" />
+              )}
+            </div>
+            {/* Corridor sub-header + keigo indicator */}
+            {!activeConvo.is_bot_chat && !isGroup && activeConvo.contact?.corridor_tag && (
+              <div className="flex items-center gap-2 mt-0.5">
+                <CorridorBadge fromFlag={activeConvo.contact.corridor_from_flag || ''} toFlag={activeConvo.contact.corridor_to_flag || ''} variant="inline" pulseStrength="gentle" />
+                {(activeConvo.contact?.language === 'ja' || (activeConvo.contact?.language || '').startsWith('ja')) && (
+                  <span className="text-[10px] text-[var(--pm-text-tertiary)]">
+                    {activeConvo.contact.tier === 'established' ? '\u{1F3A9} Keigo' : activeConvo.contact.tier === 'growing' ? '\u{1F4AC} Standard' : '\u{1F5E3} Casual'}
+                  </span>
+                )}
+              </div>
+            )}
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
                 <span className="inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">
@@ -1899,6 +1922,32 @@ export default function PocketChatPage() {
             if (el) setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);
           }}
         >
+          {/* Match Origin Pill */}
+          {activeConvo.contact?.corridor_tag && !matchPillDismissed && (
+            <div className="flex justify-center mb-2">
+              <button
+                onClick={() => setMatchPillDismissed(true)}
+                className="inline-flex items-center gap-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-[12px] border border-white/50 dark:border-white/[0.06] rounded-full px-4 py-2 text-xs text-[var(--pm-text-secondary)] shadow-sm"
+              >
+                {'\u{1F91D}'} AI Matched you! {'\u00B7'} {activeConvo.contact.corridor_tag}
+                <span className="text-[10px] text-[var(--pm-text-tertiary)] ml-1">{'\u2715'}</span>
+              </button>
+            </div>
+          )}
+
+          {/* Biz Card Tip */}
+          {activeConvo.contact?.corridor_tag && !bizCardTipDismissed && messages.length > 0 && (
+            <div className="flex justify-center mb-2">
+              <button
+                onClick={() => { setBizCardTipDismissed(true); try { localStorage.setItem('tipDismissed_bizcard', '1'); } catch {} }}
+                className="inline-flex items-center gap-2 bg-emerald-50/80 dark:bg-emerald-950/30 backdrop-blur-[12px] border border-emerald-200/50 dark:border-emerald-800/30 rounded-full px-4 py-2 text-xs text-emerald-700 dark:text-emerald-300"
+              >
+                {'\u{1F4A1}'} Share your Business Card to build trust faster
+                <span className="text-[10px] opacity-50 ml-1">{'\u2715'}</span>
+              </button>
+            </div>
+          )}
+
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="text-4xl mb-3">👋</div>
@@ -1990,8 +2039,8 @@ export default function PocketChatPage() {
                   <div className="max-w-[80%]">
                     {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
                     <div
-                      className={`rounded-[12px] px-3.5 py-2.5 min-w-[200px] ${
-                        isOwner ? 'bg-[#4F46E5]' : 'bg-[#F3F3F1]'
+                      className={`rounded-2xl px-3.5 py-2.5 min-w-[200px] ${
+                        isOwner ? 'bg-[#4F46E5]' : 'bg-white/80 dark:bg-slate-800/80 backdrop-blur-[12px] border border-white/50 dark:border-white/[0.06]'
                       }`}
                     >
                       <VoiceMessagePlayer
@@ -2197,12 +2246,12 @@ export default function PocketChatPage() {
                     onTouchStart={(e) => handleLongPressStart(e, msg.id, isOwner, displayText)}
                     onTouchEnd={handleLongPressEnd}
                     onTouchMove={handleLongPressEnd}
-                    className={`rounded-[12px] px-3.5 py-2.5 select-none ${
+                    className={`rounded-2xl px-3.5 py-2.5 select-none ${
                       isOwner
                         ? 'bg-[#4F46E5] text-white'
                         : isBot
-                          ? 'bg-[#F59E0B]/5 text-[#0A0A0A] border border-[#F59E0B]/10'
-                          : 'bg-[#F3F3F1] text-[#0A0A0A]'
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/30 text-[#0A0A0A] dark:text-gray-200 backdrop-blur-[12px] border border-white/50 dark:border-white/[0.06]'
+                          : 'bg-white/80 dark:bg-slate-800/80 text-[#0A0A0A] dark:text-gray-200 backdrop-blur-[12px] border border-white/50 dark:border-white/[0.06]'
                     }`}
                   >
                     {msg.is_forwarded && (
@@ -2415,31 +2464,37 @@ export default function PocketChatPage() {
           />
         )}
 
-        {/* Business Card Gate */}
-        {showBizCardGate && bizCardGateData && (
-          <BizCardGate
-            trustScore={bizCardGateData.trustScore}
-            tier={bizCardGateData.tier}
-            nextActions={bizCardGateData.nextActions}
-            onClose={() => setShowBizCardGate(false)}
-            onSendInvoice={() => router.push('/invoices/new')}
-            onShareLink={() => {
-              const shareUrl = bizCardGateData?.shareToken ? `https://evrywher.io/p/${bizCardGateData.shareToken}` : 'https://evrywher.io';
-              if (activeConvoId) {
-                supabase.from('messages').insert({
-                  conversation_id: activeConvoId,
-                  organization_id: organization.id,
-                  sender_type: 'owner',
-                  sender_name: profile?.full_name || profile?.name || 'You',
-                  message: `Check out my profile: ${shareUrl}`,
-                  message_type: 'text',
-                  original_text: `Check out my profile: ${shareUrl}`,
-                  original_language: profile?.language || 'en',
-                });
-              }
-            }}
-          />
-        )}
+        {/* Business Card Gate — in BottomSheet */}
+        <BottomSheet
+          isOpen={showBizCardGate && !!bizCardGateData}
+          onClose={() => setShowBizCardGate(false)}
+          title="Share Business Card"
+        >
+          {bizCardGateData && (
+            <BizCardGate
+              currentTrust={bizCardGateData.trustScore}
+              tier={bizCardGateData.tier}
+              nextActions={bizCardGateData.nextActions}
+              onDismiss={() => setShowBizCardGate(false)}
+              onSendInvoice={() => router.push('/invoices/new')}
+              onShareProfile={() => {
+                const shareUrl = bizCardGateData?.shareToken ? `https://evrywher.io/p/${bizCardGateData.shareToken}` : 'https://evrywher.io';
+                if (activeConvoId) {
+                  supabase.from('messages').insert({
+                    conversation_id: activeConvoId,
+                    organization_id: organization.id,
+                    sender_type: 'owner',
+                    sender_name: profile?.full_name || profile?.name || 'You',
+                    message: `Check out my profile: ${shareUrl}`,
+                    message_type: 'text',
+                    original_text: `Check out my profile: ${shareUrl}`,
+                    original_language: profile?.language || 'en',
+                  });
+                }
+              }}
+            />
+          )}
+        </BottomSheet>
 
         {/* Upload progress */}
         {uploading && (
