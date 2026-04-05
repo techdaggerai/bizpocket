@@ -12,7 +12,7 @@ const LANG_NAMES: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { image, userLanguage = 'en' } = body;
+    const { image, userLanguage = 'en', userName = '' } = body;
 
     if (!image) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 });
@@ -56,7 +56,19 @@ Please analyze this image and provide:
 2. TRANSLATION: Full translation to ${targetLang}
 3. DOCUMENT TYPE: What type of document/sign this is
 4. CONTEXT: Cultural context and any important notes
-5. FIELD GUIDE: If it's a form, explain each field and what to write
+5. FIELD GUIDE: If it's a form, explain each field and what to write.
+   For each field, provide a SPECIFIC suggested value the user can copy and paste.
+   ${userName ? `The user's name is "${userName}" — convert to katakana if a name field requires it.` : ''}
+   For dates, use today's date in Japanese format (令和 era).
+   For addresses, explain the Japanese format (〒postal code, prefecture, city).
+
+Common Japanese forms to recognize:
+- 振込用紙 (Bank transfer slip)
+- 転入届 (Moving-in notification)
+- 在留カード変更届 (Residence card change)
+- 国民健康保険 (National health insurance)
+- 住民票 (Resident registration)
+- 確定申告 (Tax return)
 
 Respond in this EXACT JSON format only:
 {

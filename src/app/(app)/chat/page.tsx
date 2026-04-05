@@ -2121,6 +2121,7 @@ export default function PocketChatPage() {
         {showCameraTranslate && (
           <CameraTranslate
             userLanguage={profile?.language || 'en'}
+            userName={profile?.full_name || profile?.name || ''}
             onClose={() => setShowCameraTranslate(false)}
             onSendToChat={(text) => {
               setNewMessage(text);

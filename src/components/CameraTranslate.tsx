@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-type Step = 'camera' | 'preview' | 'loading' | 'result';
+type Step = 'camera' | 'preview' | 'loading' | 'result' | 'fillAssist';
 
 interface TranslationResult {
   extracted_text: string;
@@ -15,19 +15,22 @@ interface TranslationResult {
 
 interface Props {
   userLanguage: string;
+  userName?: string;
   onClose: () => void;
   onSendToChat?: (text: string) => void;
 }
 
 const LOADING_STEPS = ['Reading text...', 'Translating...', 'Almost done...'];
 
-export default function CameraTranslate({ userLanguage, onClose, onSendToChat }: Props) {
+export default function CameraTranslate({ userLanguage, userName, onClose, onSendToChat }: Props) {
   const [step, setStep] = useState<Step>('camera');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [result, setResult] = useState<TranslationResult | null>(null);
   const [error, setError] = useState('');
   const [loadingMsg, setLoadingMsg] = useState(LOADING_STEPS[0]);
   const [showOriginal, setShowOriginal] = useState(false);
+  const [fillFieldIdx, setFillFieldIdx] = useState(0);
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [cameraReady, setCameraReady] = useState(false);
 
@@ -128,7 +131,7 @@ export default function CameraTranslate({ userLanguage, onClose, onSendToChat }:
       const res = await fetch('/api/ai/camera-translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: capturedImage, userLanguage }),
+        body: JSON.stringify({ image: capturedImage, userLanguage, userName }),
       });
 
       clearInterval(msgTimer);
@@ -264,6 +267,105 @@ export default function CameraTranslate({ userLanguage, onClose, onSendToChat }:
     );
   }
 
+  // ─── Fill Assist Step ───
+  if (step === 'fillAssist' && result?.fields && result.fields.length > 0) {
+    const field = result.fields[fillFieldIdx];
+    const total = result.fields.length;
+    const isLast = fillFieldIdx === total - 1;
+
+    return (
+      <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5] dark:border-gray-800 shrink-0">
+          <button onClick={() => setStep('result')} className="text-sm text-[#4F46E5] font-medium">← Back</button>
+          <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">📝 Field {fillFieldIdx + 1} of {total}</p>
+          <button onClick={() => setStep('result')} className="text-sm text-[#9CA3AF]">Done</button>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-1 bg-[#F3F4F6] dark:bg-gray-800">
+          <div className="h-full bg-[#4F46E5] transition-all duration-300" style={{ width: `${((fillFieldIdx + 1) / total) * 100}%` }} />
+        </div>
+
+        {/* Field content */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Japanese label */}
+          <div className="bg-[#FFFBEB] dark:bg-amber-950/20 rounded-xl p-4 border border-[#FDE68A]/40 dark:border-amber-800/30">
+            <p className="text-[11px] font-semibold text-[#92400E] dark:text-[#FDE68A] uppercase tracking-wider mb-1">Japanese Label</p>
+            <p className="text-[18px] font-medium text-[#0A0A0A] dark:text-white">{field.japanese}</p>
+          </div>
+
+          {/* English meaning */}
+          <div>
+            <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1">Meaning</p>
+            <p className="text-[15px] text-[#374151] dark:text-gray-300 leading-relaxed">{field.english}</p>
+          </div>
+
+          {/* What to write */}
+          <div className="bg-[#EEF2FF] dark:bg-indigo-950/20 rounded-xl p-4 border border-[#C7D2FE]/40 dark:border-indigo-800/30">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-base">💡</span>
+              <p className="text-[11px] font-semibold text-[#4338CA] dark:text-[#A5B4FC] uppercase tracking-wider">What to Write</p>
+            </div>
+            <p className="text-[16px] font-medium text-[#0A0A0A] dark:text-white leading-relaxed">{field.instruction}</p>
+          </div>
+
+          {/* Copy button */}
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(field.instruction);
+              setCopiedIdx(fillFieldIdx);
+              setTimeout(() => setCopiedIdx(null), 2000);
+            }}
+            className={`w-full rounded-xl py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
+              copiedIdx === fillFieldIdx
+                ? 'bg-[#22C55E] text-white'
+                : 'bg-[#F3F4F6] dark:bg-gray-800 text-[#374151] dark:text-gray-300 active:bg-[#E5E7EB]'
+            }`}
+          >
+            {copiedIdx === fillFieldIdx ? (
+              <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg> Copied!</>
+            ) : (
+              <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy &quot;{field.instruction.slice(0, 30)}{field.instruction.length > 30 ? '…' : ''}&quot;</>
+            )}
+          </button>
+
+          {/* Write instruction */}
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#F9FAFB] dark:bg-gray-800 border border-[#E5E5E5]/50 dark:border-gray-700">
+            <span className="text-sm">✏️</span>
+            <p className="text-[12px] text-[#6B7280] dark:text-gray-400">Write this in the field marked <span className="font-bold text-[#4F46E5]">#{fillFieldIdx + 1}</span> on the form</p>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 flex gap-2">
+          <button
+            onClick={() => setFillFieldIdx(i => Math.max(0, i - 1))}
+            disabled={fillFieldIdx === 0}
+            className="flex-1 rounded-xl border border-[#E5E5E5] dark:border-gray-700 py-3 text-sm font-semibold text-[#374151] dark:text-gray-300 disabled:opacity-30"
+          >
+            ← Previous
+          </button>
+          {isLast ? (
+            <button
+              onClick={() => setStep('result')}
+              className="flex-1 rounded-xl bg-[#22C55E] py-3 text-sm font-semibold text-white"
+            >
+              ✓ All Done
+            </button>
+          ) : (
+            <button
+              onClick={() => setFillFieldIdx(i => i + 1)}
+              className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white"
+            >
+              Next Field →
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // ─── Result Step ───
   return (
     <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
@@ -346,18 +448,29 @@ export default function CameraTranslate({ userLanguage, onClose, onSendToChat }:
       </div>
 
       {/* Bottom actions */}
-      <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 flex gap-2">
-        {onSendToChat && result && (
+      <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 space-y-2">
+        {/* Show fill assist button when form fields detected */}
+        {result && result.fields && result.fields.length > 0 && (
           <button
-            onClick={() => onSendToChat(`📄 ${result.document_type}\n\n${result.translation}`)}
-            className="flex-1 rounded-xl border border-[#4F46E5] py-2.5 text-sm font-semibold text-[#4F46E5]"
+            onClick={() => { setFillFieldIdx(0); setStep('fillAssist'); }}
+            className="w-full rounded-xl bg-[#F59E0B] py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 active:bg-[#D97706]"
           >
-            Send to Chat
+            <span>📝</span> Help Me Fill This Out
           </button>
         )}
-        <button onClick={retake} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white">
-          Scan Another
-        </button>
+        <div className="flex gap-2">
+          {onSendToChat && result && (
+            <button
+              onClick={() => onSendToChat(`📄 ${result.document_type}\n\n${result.translation}`)}
+              className="flex-1 rounded-xl border border-[#4F46E5] py-2.5 text-sm font-semibold text-[#4F46E5]"
+            >
+              Send to Chat
+            </button>
+          )}
+          <button onClick={retake} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white">
+            Scan Another
+          </button>
+        </div>
       </div>
     </div>
   );
