@@ -35,8 +35,26 @@ type ContactForm = {
   country: string;
   contact_type: ContactType;
   category: ContactType;
+  language: string;
   notes: string;
 };
+
+const CONTACT_LANGUAGES = [
+  { code: '', label: 'Auto-detect' },
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語 (Japanese)' },
+  { code: 'ur', label: 'اردو (Urdu)' },
+  { code: 'ar', label: 'العربية (Arabic)' },
+  { code: 'bn', label: 'বাংলা (Bengali)' },
+  { code: 'pt', label: 'Português (BR)' },
+  { code: 'tl', label: 'Filipino' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'tr', label: 'Türkçe' },
+  { code: 'zh', label: '中文 (Chinese)' },
+  { code: 'fr', label: 'Français' },
+  { code: 'nl', label: 'Nederlands' },
+  { code: 'es', label: 'Español' },
+];
 
 const BADGE_COLORS: Record<string, string> = {
   friend: 'bg-[#FEF3C7] text-[#854D0E]',
@@ -99,7 +117,7 @@ export default function ContactsPage() {
 
   const emptyForm: ContactForm = {
     name: '', company: '', phone: '', email: '', country: '',
-    contact_type: defaultType, category: defaultType, notes: '',
+    contact_type: defaultType, category: defaultType, language: '', notes: '',
   };
 
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -161,7 +179,8 @@ export default function ContactsPage() {
     setForm({
       name: c.name, company: c.company ?? '', phone: c.phone ?? '',
       email: c.email ?? '', country: c.country ?? '',
-      contact_type: resolvedType, category: resolvedType, notes: c.notes ?? '',
+      contact_type: resolvedType, category: resolvedType,
+      language: c.language ?? '', notes: c.notes ?? '',
     });
     setEditingId(c.id);
     setShowForm(true);
@@ -186,6 +205,7 @@ export default function ContactsPage() {
       country: form.country.trim() || null,
       contact_type: form.contact_type,
       category: form.contact_type, // keep category in sync
+      language: form.language || null,
       notes: form.notes.trim() || null,
       organization_id: organization!.id,
     };
@@ -358,72 +378,92 @@ export default function ContactsPage() {
         className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
       />
 
-      {/* Inline Form */}
+      {/* Contact Form Modal / Bottom Sheet */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-3">
-          <h2 className="text-sm font-semibold text-[var(--text-1)] dark:text-white">
-            {editingId ? 'Edit Contact' : 'New Contact'}
-          </h2>
-
-          <div>
-            <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
-            <input type="text" value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Contact name" required
-              className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
-          </div>
-
-          {!isPocketChatMode && (
-            <div>
-              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Company</label>
-              <input type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} placeholder="Company name"
-                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={cancelForm} />
+          <div className="relative w-full max-w-md sm:mx-4 bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl">
+              <h2 className="text-[15px] font-bold text-[var(--text-1)] dark:text-white">
+                {editingId ? 'Edit Contact' : 'New Contact'}
+              </h2>
+              <button onClick={cancelForm} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F3F4F6] dark:hover:bg-gray-700 text-[#9CA3AF] hover:text-[#374151] dark:hover:text-white transition-colors" aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
             </div>
-          )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Phone</label>
-              <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="Phone number"
-                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Email</label>
-              <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="Email address"
-                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
-            </div>
-          </div>
+            <form onSubmit={handleSubmit} className="p-5 space-y-3">
+              <div>
+                <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
+                <input type="text" value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Contact name" required
+                  className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+              </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Country</label>
-              <input type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} placeholder="Country"
-                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Type</label>
-              <select value={form.contact_type} onChange={(e) => updateField('contact_type', e.target.value)}
-                className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
-                {typeOptions.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select>
-            </div>
-          </div>
+              {!isPocketChatMode && (
+                <div>
+                  <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Company</label>
+                  <input type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} placeholder="Company name"
+                    className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                </div>
+              )}
 
-          <div>
-            <label className="text-sm font-medium text-[var(--text-2)] mb-1.5 block">Notes</label>
-            <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes" rows={2}
-              className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
-          </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Phone</label>
+                  <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="Phone number"
+                    className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Email</label>
+                  <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="Email address"
+                    className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                </div>
+              </div>
 
-          <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving}
-              className="rounded-btn bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA] disabled:opacity-50">
-              {saving ? 'Saving...' : editingId ? 'Update' : 'Save'}
-            </button>
-            <button type="button" onClick={cancelForm}
-              className="rounded-btn border border-[#E5E5E5] px-4 py-2 text-sm text-[var(--text-2)]">
-              Cancel
-            </button>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Country</label>
+                  <input type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} placeholder="Country"
+                    className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Type</label>
+                  <select value={form.contact_type} onChange={(e) => updateField('contact_type', e.target.value)}
+                    className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                    {typeOptions.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Language</label>
+                <select value={form.language} onChange={(e) => updateField('language', e.target.value)}
+                  className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                  {CONTACT_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+                </select>
+                <p className="text-[11px] text-[var(--text-4)] dark:text-gray-500 mt-1">AI will translate messages to this language</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-[var(--text-2)] dark:text-gray-300 mb-1.5 block">Notes</label>
+                <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes" rows={2}
+                  className="w-full rounded-input border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-base text-[var(--text-1)] dark:text-white placeholder-[var(--text-4)] dark:placeholder-gray-500 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button type="submit" disabled={saving}
+                  className="flex-1 rounded-btn bg-[#4F46E5] py-2.5 text-sm font-medium text-white hover:bg-[#4338CA] disabled:opacity-50">
+                  {saving ? 'Saving...' : editingId ? 'Update' : 'Save Contact'}
+                </button>
+                <button type="button" onClick={cancelForm}
+                  className="rounded-btn border border-[#E5E5E5] dark:border-gray-700 px-4 py-2.5 text-sm text-[var(--text-2)] dark:text-gray-400">
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       )}
 
       {/* Contact List */}
@@ -460,30 +500,21 @@ export default function ContactsPage() {
                 )}
               </div>
 
-              {/* Action icons */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                {c.phone && (
-                  <a href={`tel:${c.phone}`}
-                    className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors"
-                    title="Call">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                    </svg>
-                  </a>
-                )}
+              {/* Action icons — 44px tap targets */}
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => router.push(`/chat?contact=${c.id}`)}
-                  className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors"
                   title="Chat">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                   </svg>
                 </button>
                 <button
                   onClick={() => openEdit(c)}
-                  className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#9CA3AF] hover:bg-[#F3F4F6] transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#9CA3AF] hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors"
                   title="Edit">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
@@ -491,19 +522,19 @@ export default function ContactsPage() {
                 {deleteConfirmId === c.id ? (
                   <div className="flex items-center gap-1">
                     <button onClick={() => handleDelete(c.id)}
-                      className="rounded-full bg-[#DC2626] px-2 py-1 text-[10px] font-medium text-white">
+                      className="rounded-full bg-[#DC2626] px-3 py-1.5 text-[11px] font-medium text-white">
                       Delete?
                     </button>
                     <button onClick={() => setDeleteConfirmId(null)}
-                      className="text-[10px] text-[var(--text-3)]">
+                      className="text-[11px] text-[var(--text-3)] dark:text-gray-400 px-1">
                       No
                     </button>
                   </div>
                 ) : (
                   <button onClick={() => setDeleteConfirmId(c.id)}
-                    className="h-8 w-8 rounded-full bg-[#F9FAFB] flex items-center justify-center text-[#DC2626]/50 hover:text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
+                    className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#DC2626]/40 hover:text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
                     title="Delete">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="3 6 5 6 21 6" />
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
