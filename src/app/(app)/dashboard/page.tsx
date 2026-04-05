@@ -12,6 +12,13 @@ import HealthScore from '@/components/HealthScore';
 import Link from 'next/link';
 import type { CashFlow, Invoice } from '@/types/database';
 import dynamic from 'next/dynamic';
+import GlassCard from '@/components/ui/GlassCard';
+import TierBadge from '@/components/profile/TierBadge';
+import TrustScoreBar from '@/components/profile/TrustScoreBar';
+import CorridorBadge from '@/components/profile/CorridorBadge';
+import MagicFAB from '@/components/ui/MagicFAB';
+import GrowthCompanion from '@/components/ui/GrowthCompanion';
+import type { Tier } from '@/lib/tier-system';
 const PocketChatQR = dynamic(() => import('@/components/PocketChatQR'), { ssr: false });
 
 const BRIEFING_CACHE_KEY = 'bizpocket_ai_briefing';
@@ -83,6 +90,8 @@ export default function DashboardPage() {
   const [activeCycle, setActiveCycle] = useState<{ id: string; name: string; business_type: string } | null>(null);
   const [cycleStages, setCycleStages] = useState<{ name: string; color: string; stage_order: number }[]>([]);
   const [cycleItemCount, setCycleItemCount] = useState(0);
+  const [globalProfile, setGlobalProfile] = useState<any>(null);
+  const [actionsToday, setActionsToday] = useState(0);
 
   const DEFAULT_CLOCKS = [
     { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
@@ -142,7 +151,16 @@ export default function DashboardPage() {
     }
     load(); fetchBriefing();
     // Check for global profile
-    fetch('/api/profile/me').then(r => r.json()).then(d => setHasGlobalProfile(!!d.profile)).catch(() => setHasGlobalProfile(false));
+    fetch('/api/profile/me').then(r => r.json()).then(d => { setHasGlobalProfile(!!d.profile); if (d.profile) setGlobalProfile(d.profile); }).catch(() => setHasGlobalProfile(false));
+    // Count today's actions for energy meter
+    const todayStr = new Date().toISOString().slice(0, 10);
+    Promise.all([
+      supabase.from('messages').select('id', { count: 'exact', head: true }).eq('organization_id', organization.id).gte('created_at', todayStr),
+      supabase.from('invoices').select('id', { count: 'exact', head: true }).eq('organization_id', organization.id).gte('created_at', todayStr),
+      supabase.from('documents').select('id', { count: 'exact', head: true }).eq('organization_id', organization.id).gte('created_at', todayStr),
+    ]).then(([msgs, invs, docs]) => {
+      setActionsToday((msgs.count || 0) + (invs.count || 0) + (docs.count || 0));
+    }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organization.id, month, fetchBriefing]);
 
@@ -162,10 +180,130 @@ export default function DashboardPage() {
       <GlobalSearch />
 
       {/* Greeting */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#0A0A0A]">{getGreeting()}{firstName ? `, ${firstName}` : ''}</h1>
-        <p className="text-sm text-[#999] mt-0.5">{organization.name} · {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-      </div>
+      {(() => {
+        const hour = new Date().getHours();
+        const greeting = hour >= 5 && hour < 12 ? 'Good morning' : hour >= 12 && hour < 17 ? 'Good afternoon' : hour >= 17 && hour < 21 ? 'Good evening' : 'Working late';
+        const emoji = hour >= 5 && hour < 12 ? '\u2600\uFE0F' : hour >= 12 && hour < 17 ? '\u{1F324}\uFE0F' : hour >= 17 && hour < 21 ? '\u{1F305}' : '\u{1F319}';
+        const jaGreeting = hour >= 5 && hour < 12 ? '\u304A\u306F\u3088\u3046\u3054\u3056\u3044\u307E\u3059' : hour >= 12 && hour < 17 ? '\u3053\u3093\u306B\u3061\u306F' : hour >= 17 && hour < 21 ? '\u3053\u3093\u3070\u3093\u306F' : '\u304A\u75B2\u308C\u69D8\u3067\u3059';
+        const showJa = profile?.country === 'JP' || (profile?.languages || []).includes('ja');
+        return (
+          <div>
+            <h1 className="text-2xl text-[var(--pm-text-primary)]" style={{ fontFamily: 'var(--font-display), sans-serif', fontWeight: 600 }}>
+              {greeting}{firstName ? `, ${firstName}` : ''} {emoji}
+            </h1>
+            {showJa && <p className="text-sm text-[var(--pm-text-tertiary)] mt-0.5">{jaGreeting}</p>}
+            <p className="text-sm text-[var(--pm-text-tertiary)] mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          </div>
+        );
+      })()}
+
+      {/* Pocket Pulse Hero */}
+      {globalProfile && (() => {
+        const tier = (globalProfile.tier || 'starter') as Tier;
+        const trustScore = globalProfile.trust_score || 0;
+        const maxScore = tier === 'starter' ? 40 : tier === 'growing' ? 75 : 100;
+        const pct = Math.min(100, (trustScore / maxScore) * 100);
+        const energyLevel = actionsToday < 3 ? 'low' : actionsToday < 7 ? 'medium' : 'high';
+        const energyLabel = energyLevel === 'low' ? 'Take it easy' : energyLevel === 'medium' ? 'Building momentum' : 'On fire! \u26A1';
+        const energyColor = energyLevel === 'low' ? 'bg-gray-300' : energyLevel === 'medium' ? 'bg-amber-500' : 'bg-emerald-500';
+        const energyPct = Math.min(100, (actionsToday / 10) * 100);
+        const corridors = globalProfile.operating_corridors || [];
+        const nextTierLabel = tier === 'starter' ? '\u{1F33F} Growing' : tier === 'growing' ? '\u{1F333} Established' : null;
+        const nextTierMax = tier === 'starter' ? 40 : tier === 'growing' ? 75 : 100;
+
+        const quickActions = tier === 'starter'
+          ? [{ emoji: '\u{1F4F7}', label: '+2', href: '/settings' }, { emoji: '\u{1F4F1}', label: '+2', href: '/settings/business-setup' }, { emoji: '\u{1F9FE}', label: '+3', href: '/invoices/new' }, { emoji: '\u{1F4B0}', label: '+5', href: '/invoices/new' }]
+          : tier === 'growing'
+          ? [{ emoji: '\u{1F91D}', label: 'Match', href: '/opportunities' }, { emoji: '\u{1F9FE}', label: 'Status', href: '/invoices/new' }, { emoji: '\u{1F3F7}\uFE0F', label: '+3', href: '/settings/business-setup' }, { emoji: '\u{1F4E4}', label: 'Invite', href: '/invite' }]
+          : [{ emoji: '\u{1F91D}', label: 'Deals', href: '/opportunities' }, { emoji: '\u{1F9FE}', label: 'Revenue', href: '/cash-flow' }, { emoji: '\u{1F4E4}', label: 'Network', href: '/invite' }, { emoji: '\u{1F6E1}\uFE0F', label: 'Verify', href: '/verification' }];
+
+        return (
+          <GlassCard tier={tier} glow>
+            <div className="space-y-3">
+              {/* Trust ring + info */}
+              <div className="flex items-center gap-4">
+                <div className="relative" style={{ width: 56, height: 56 }}>
+                  <svg width="56" height="56">
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-200 dark:text-gray-700" />
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 24} strokeDashoffset={2 * Math.PI * 24 * (1 - pct / 100)}
+                      className={tier === 'starter' ? 'text-amber-500' : tier === 'growing' ? 'text-blue-500' : 'text-emerald-500'}
+                      transform="rotate(-90 28 28)"
+                      style={{ transition: 'stroke-dashoffset 1200ms var(--ease-out)' }}
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-base font-bold text-[var(--pm-text-primary)]" style={{ fontFamily: 'var(--font-display), sans-serif', fontWeight: 700 }}>
+                    {trustScore}
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-[var(--pm-text-tertiary)] uppercase tracking-wide font-semibold">Trust Score</p>
+                  <TierBadge tier={tier} size="sm" />
+                </div>
+              </div>
+
+              {/* Energy meter */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-[var(--pm-text-secondary)]">{energyLabel}</span>
+                  <span className="text-[10px] text-[var(--pm-text-tertiary)]">{actionsToday} action{actionsToday !== 1 ? 's' : ''} today</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div className={`h-full rounded-full ${energyColor} transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]`} style={{ width: `${energyPct}%` }} />
+                </div>
+              </div>
+
+              {/* Next milestone */}
+              {nextTierLabel && (
+                <p className="text-sm text-[var(--pm-text-secondary)]">
+                  Next: {nextTierLabel} ({trustScore}/{nextTierMax})
+                </p>
+              )}
+
+              {/* Quick action chips */}
+              <div className="flex gap-2">
+                {quickActions.map((a, i) => (
+                  <Link key={i} href={a.href} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[var(--pm-surface-2)] text-xs font-medium text-[var(--pm-text-secondary)] hover:bg-[var(--pm-surface-3)] transition-colors no-underline ${i === 0 && tier === 'starter' ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
+                    <span>{a.emoji}</span><span>{a.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        );
+      })()}
+
+      {/* Smart Actions */}
+      {globalProfile && (() => {
+        const tier = (globalProfile.tier || 'starter') as Tier;
+        const tiles = tier === 'starter'
+          ? [{ emoji: '\u{1F9FE}', label: 'Invoice', sub: '+3', href: '/invoices/new', highlight: true }, { emoji: '\u{1F91D}', label: 'Matches', sub: '', href: '/opportunities' }, { emoji: '\u{1F4F7}', label: 'Camera', sub: '+2', href: '/detect' }, { emoji: '\u{1F4F1}', label: 'Add Phone', sub: '+2', href: '/settings/business-setup' }]
+          : tier === 'growing'
+          ? [{ emoji: '\u{1F91D}', label: 'Opportunities', sub: '', href: '/opportunities', highlight: true }, { emoji: '\u{1F9FE}', label: 'Invoice Status', sub: '', href: '/invoices/new' }, { emoji: '\u{1F3F7}\uFE0F', label: 'Add Tax', sub: '+3', href: '/settings/business-setup' }, { emoji: '\u{1F4E4}', label: 'Invite', sub: '', href: '/invite' }]
+          : [{ emoji: '\u{1F91D}', label: 'Deals', sub: '', href: '/opportunities', highlight: true }, { emoji: '\u{1F9FE}', label: 'Revenue', sub: '', href: '/cash-flow' }, { emoji: '\u{1F4E4}', label: 'Network', sub: '', href: '/invite' }, { emoji: '\u{1F6E1}\uFE0F', label: 'Verify', sub: '', href: '/verification' }];
+        return (
+          <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+            {tiles.map((t, i) => (
+              <Link key={i} href={t.href} className="no-underline shrink-0" style={{ width: 120 }}>
+                <GlassCard elevated className={`text-center py-3 px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
+                  <span className="text-lg">{t.emoji}</span>
+                  <p className="text-[12px] font-semibold text-[var(--pm-text-primary)] mt-1">{t.label}</p>
+                  {t.sub && <p className="text-[10px] text-[var(--pm-text-tertiary)]">{t.sub}</p>}
+                </GlassCard>
+              </Link>
+            ))}
+          </div>
+        );
+      })()}
+
+      {/* Live Corridors */}
+      {globalProfile?.operating_corridors?.length > 0 && (
+        <div className="flex items-center gap-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {globalProfile.operating_corridors.map((c: any, i: number) => (
+            <CorridorBadge key={i} from={c.from} to={c.to} flagFrom={c.flag_from} flagTo={c.flag_to} variant="inline" pulseStrength="gentle" />
+          ))}
+        </div>
+      )}
 
       {/* Profile incomplete warning */}
       {profileIncomplete && (
@@ -446,6 +584,41 @@ export default function DashboardPage() {
           })}
         </div>
       </div>
+
+      {/* MagicFAB */}
+      <MagicFAB
+        tier={(globalProfile?.tier || 'starter') as Tier}
+        onInvoice={() => window.location.href = '/invoices/new'}
+        onChat={() => window.location.href = '/chat'}
+        onMatch={() => window.location.href = '/opportunities'}
+        onCamera={() => window.location.href = '/detect'}
+      />
+
+      {/* GrowthCompanion */}
+      {globalProfile && (() => {
+        const tier = (globalProfile.tier || 'starter') as Tier;
+        const showCompanion = tier === 'starter' || (tier === 'growing' && actionsToday >= 3) || tier === 'established';
+        if (!showCompanion) return null;
+
+        const suggestion = tier === 'starter'
+          ? { title: 'Send your first invoice', description: 'Invoicing builds trust fast. Send one to earn +3 Trust Score.', points: 3, action: 'Create Invoice', corridor: globalProfile.operating_corridors?.[0] ? { fromFlag: globalProfile.operating_corridors[0].flag_from, toFlag: globalProfile.operating_corridors[0].flag_to } : undefined }
+          : tier === 'growing'
+          ? { title: 'You\'re building momentum!', description: `${actionsToday} actions today. Add your tax info to unlock +3 Trust.`, points: 3, action: 'Add Tax Info' }
+          : { title: 'Close a deal', description: 'You have strong connections. Follow up on your latest matches.', points: 5, action: 'View Matches' };
+
+        return (
+          <GrowthCompanion
+            suggestion={suggestion}
+            tier={tier}
+            onAction={() => {
+              if (tier === 'starter') window.location.href = '/invoices/new';
+              else if (tier === 'growing') window.location.href = '/settings/business-setup';
+              else window.location.href = '/opportunities';
+            }}
+            onDismiss={() => {}}
+          />
+        );
+      })()}
     </div>
   );
 }
