@@ -209,6 +209,9 @@ export default function PocketChatPage() {
   const [chatSearchIdx, setChatSearchIdx] = useState(0);
   const [showContactInfo, setShowContactInfo] = useState(false);
   const [sharedMedia, setSharedMedia] = useState<Message[]>([]);
+  const [convoSummary, setConvoSummary] = useState<{ summary: string; relationship_context: string; key_topics: string[]; formality_level: string } | null>(null);
+  const [showSummaryPopup, setShowSummaryPopup] = useState(false);
+  const summaryCheckRef = useRef<number>(0);
   const [culturalCoach, setCulturalCoach] = useState<{
     tip: string; suggested_revision: string; cultural_note: string;
     severity: 'suggestion' | 'warning'; originalText: string;
@@ -290,6 +293,28 @@ export default function PocketChatPage() {
         toast('Failed to load messages', 'error');
       } else {
         setMessages((data as Message[]) ?? []);
+        summaryCheckRef.current = (data as Message[])?.length || 0;
+
+        // Fetch existing conversation summary
+        fetch(`/api/ai/conversation-summary?conversationId=${convoId}`)
+          .then(r => r.json())
+          .then(d => { if (d?.summary) setConvoSummary(d); else setConvoSummary(null); })
+          .catch(() => setConvoSummary(null));
+
+        // Auto-generate summary if enough messages (every 20)
+        const msgCount = (data as Message[])?.length || 0;
+        if (msgCount >= 20 && msgCount % 20 < 5) {
+          const recent = ((data as Message[]) ?? []).slice(-20);
+          fetch('/api/ai/conversation-summary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversationId: convoId,
+              orgId: organization.id,
+              messages: recent.map(m => ({ sender_name: m.sender_name, message: m.message })),
+            }),
+          }).then(r => r.json()).then(d => { if (d?.summary) setConvoSummary(d); }).catch(() => {});
+        }
       }
 
       // Mark incoming messages as delivered + read
@@ -1106,7 +1131,12 @@ export default function PocketChatPage() {
           fetch('/api/ai/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, fromLanguage: senderLang, toLanguage: recipientLang }),
+            body: JSON.stringify({
+              text,
+              fromLanguage: senderLang,
+              toLanguage: recipientLang,
+              ...(convoSummary ? { context: `Relationship: ${convoSummary.relationship_context}. ${convoSummary.summary}` } : {}),
+            }),
           }).then(r => r.json()).then(data => {
             if (data.translatedText) {
               supabase.from('messages').update({
@@ -1549,6 +1579,14 @@ export default function PocketChatPage() {
               </div>
             )}
           </div>
+          {/* Memory icon */}
+          {convoSummary && (
+            <button onClick={() => setShowSummaryPopup(v => !v)} className="relative min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors shrink-0" title="AI Context">
+              <span className="text-lg">🧠</span>
+              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#22C55E]" />
+            </button>
+          )}
+
           {/* Search icon */}
           <button onClick={() => setShowChatSearch(v => !v)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -1673,6 +1711,32 @@ export default function PocketChatPage() {
             )}
           </div>
         </div>
+
+        {/* Summary popup */}
+        {showSummaryPopup && convoSummary && (
+          <div className="px-3 py-2.5 border-b border-[#FDE68A]/40 dark:border-amber-800/30 bg-[#FFFBEB] dark:bg-amber-950/20 shrink-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-1.5 mb-1.5">
+                <span className="text-sm">🧠</span>
+                <span className="text-[11px] font-semibold text-[#92400E] dark:text-[#FDE68A] uppercase tracking-wider">AI Context</span>
+                {convoSummary.relationship_context && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] dark:bg-amber-900/40 text-[#92400E] dark:text-[#FDE68A] font-medium capitalize">{convoSummary.relationship_context}</span>
+                )}
+              </div>
+              <button onClick={() => setShowSummaryPopup(false)} className="text-[#9CA3AF] p-0.5">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-[12px] text-[#374151] dark:text-gray-300 leading-relaxed">{convoSummary.summary}</p>
+            {convoSummary.key_topics?.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {convoSummary.key_topics.map((t, i) => (
+                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 dark:bg-gray-800 text-[#6B7280] dark:text-gray-400">{t}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* In-chat search bar */}
         {showChatSearch && (
