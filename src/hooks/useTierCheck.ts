@@ -23,21 +23,22 @@ export function useTierCheck() {
       const data = await res.json()
 
       if (data.tierChanged) {
-        // Only celebrate upgrades, not downgrades
-        const TIER_ORDER: Record<string, number> = { starter: 0, growing: 1, established: 2 }
-        const isUpgrade = (TIER_ORDER[data.newTier] ?? 0) > (TIER_ORDER[data.oldTier] ?? 0)
-        if (!isUpgrade) return
-
-        // Check localStorage to avoid re-showing after refresh
+        // Handle upgrades including multi-tier jumps (starter → established)
+        const tierOrder = ['starter', 'growing', 'established']
         const lastCelebrated = localStorage.getItem(CELEBRATED_KEY)
-        if (lastCelebrated === data.newTier) return
+        const lastIndex = tierOrder.indexOf(lastCelebrated || '')
+        const newIndex = tierOrder.indexOf(data.newTier)
 
-        setTierUpgrade({
-          from: data.oldTier,
-          to: data.newTier,
-          show: true,
-        })
-        localStorage.setItem(CELEBRATED_KEY, data.newTier)
+        // Only celebrate if new tier is higher than last celebrated
+        if (newIndex > lastIndex) {
+          setTierUpgrade({
+            from: data.oldTier,
+            to: data.newTier,
+            show: true,
+          })
+          localStorage.setItem(CELEBRATED_KEY, data.newTier)
+          localStorage.setItem('lastUpgradeTrustScore', String(data.newScore))
+        }
       }
     } catch {
       // Silent fail — tier check is non-critical

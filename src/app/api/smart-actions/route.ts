@@ -104,19 +104,8 @@ export async function POST() {
       ? { fromFlag: corridors[0].flag_from, toFlag: corridors[0].flag_to }
       : undefined
 
-  // PRIORITY 1: No profile yet → build one
-  if (!globalProfile?.is_published) {
-    suggestion = {
-      title: 'Build your global profile',
-      description:
-        'AI creates your professional profile in 30 seconds. Get discovered by business partners.',
-      points: 5,
-      action: 'Build Profile',
-      route: '/profile/build',
-    }
-  }
-  // PRIORITY 2: Unpaid invoices exist → follow up
-  else if (pendingInvoices.length > 0) {
+  // PRIORITY 1: Unpaid invoices (most revenue-generating)
+  if (pendingInvoices.length > 0) {
     const inv = pendingInvoices[0]
     suggestion = {
       title: `Follow up with ${inv.customer_name || 'client'}`,
@@ -127,7 +116,7 @@ export async function POST() {
       corridor,
     }
   }
-  // PRIORITY 3: Unviewed matches → check them
+  // PRIORITY 2: Pending matches (time-sensitive, they expire)
   else if (recentMatches.length > 0) {
     suggestion = {
       title: `${recentMatches.length} new match${recentMatches.length > 1 ? 'es' : ''} waiting`,
@@ -139,7 +128,31 @@ export async function POST() {
       corridor,
     }
   }
-  // PRIORITY 4: No invoices yet → send first
+  // PRIORITY 3: No profile yet → build one
+  else if (!globalProfile?.is_published) {
+    suggestion = {
+      title: 'Build your global profile',
+      description:
+        'AI creates your professional profile in 30 seconds. Get discovered by business partners.',
+      points: 5,
+      action: 'Build Profile',
+      route: '/profile/build',
+    }
+  }
+  // PRIORITY 4: Missing profile fields (photo, phone, tax)
+  else if (classification.nextActions.length > 0) {
+    const next = classification.nextActions[0]
+    const nextTierLabel =
+      classification.nextMilestone?.nextTier || 'the next tier'
+    suggestion = {
+      title: next.action,
+      description: `Complete this to earn +${next.points} Trust Score and get closer to ${nextTierLabel}.`,
+      points: next.points,
+      action: 'Do It Now',
+      route: '/settings',
+    }
+  }
+  // PRIORITY 5: No invoices yet → send first one
   else if (classification.rawData.invoiceCount === 0) {
     suggestion = {
       title: 'Send your first invoice',
@@ -151,17 +164,15 @@ export async function POST() {
       corridor,
     }
   }
-  // PRIORITY 5: Missing profile fields → next action
-  else if (classification.nextActions.length > 0) {
-    const next = classification.nextActions[0]
-    const nextTierLabel =
-      classification.nextMilestone?.nextTier || 'the next tier'
+
+  // FALLBACK — always return something
+  if (!suggestion) {
     suggestion = {
-      title: next.action,
-      description: `Complete this to earn +${next.points} Trust Score and get closer to ${nextTierLabel}.`,
-      points: next.points,
-      action: 'Do It Now',
-      route: '/settings',
+      title: 'Explore your corridors',
+      description: 'Check your trade corridors for new opportunities.',
+      points: 0,
+      action: 'View Dashboard',
+      route: '/',
     }
   }
 

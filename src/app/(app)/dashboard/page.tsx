@@ -298,17 +298,24 @@ export default function DashboardPage() {
         );
       })()}
 
-      {/* Festival Greeting */}
-      {activeFestival && (
-        <GlassCard elevated className="p-4 text-center">
-          <p className="text-xl mb-1" style={{ animation: 'emojiFloat 2s ease-in-out infinite' }}>
-            {activeFestival.greeting}
-          </p>
-          {activeFestival.suggestion && (
-            <p className="text-[12px] text-[var(--pm-text-tertiary)]">{activeFestival.suggestion}</p>
-          )}
-        </GlassCard>
-      )}
+      {/* Festival Greeting — show once per day */}
+      {(() => {
+        if (!activeFestival) return null;
+        const today = new Date().toISOString().split('T')[0];
+        const lastShown = typeof window !== 'undefined' ? localStorage.getItem('lastFestivalShown') : null;
+        if (lastShown === today) return null;
+        if (typeof window !== 'undefined') localStorage.setItem('lastFestivalShown', today);
+        return (
+          <GlassCard elevated className="p-4 text-center">
+            <p className="text-xl mb-1" style={{ animation: 'emojiFloat 2s ease-in-out infinite' }}>
+              {activeFestival.greeting}
+            </p>
+            {activeFestival.suggestion && (
+              <p className="text-[12px] text-[var(--pm-text-tertiary)]">{activeFestival.suggestion}</p>
+            )}
+          </GlassCard>
+        );
+      })()}
 
       {/* Smart Actions — API-driven tiles */}
       {smartTiles && smartTiles.length > 0 && (

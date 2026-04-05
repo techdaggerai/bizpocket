@@ -57,9 +57,10 @@ export function useDelightSequence() {
         break
 
       case 'corridor_milestone':
-        // Confetti (CorridorMilestoneToast handles its own display)
+        // Confetti + flying points (CorridorMilestoneToast handles its own display)
         setShowConfetti(true)
-        setTimeout(() => setShowConfetti(false), 2500)
+        setFlyingPoints({ points: 10, x: 0, y: 0 })
+        setTimeout(() => { setShowConfetti(false); setFlyingPoints(null) }, 2500)
         break
 
       case 'referral_published':

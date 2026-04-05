@@ -50,12 +50,15 @@ export async function checkAndAwardReferralTrust(
   try {
     // Award trust to both sides via recalculation
     // The referrals count in trust-score.ts will pick up the new referral
+    // Include referral_id in metadata for dedup at event level
     await logTrustEvent(supabase, referral.inviter_id, 'referral_published', {
       invitee_id: userId,
+      referral_id: referral.id,
     })
 
     await logTrustEvent(supabase, userId, 'referral_published', {
       inviter_id: referral.inviter_id,
+      referral_id: referral.id,
     })
 
     // Get invitee name for notification

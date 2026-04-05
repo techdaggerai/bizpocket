@@ -54,14 +54,26 @@ export async function checkCorridorMilestone(
   userId: string,
   invoiceId: string,
 ): Promise<CorridorMilestoneResult | null> {
+  // Minimum amounts to prevent test invoice spam
+  const MIN_AMOUNTS: Record<string, number> = {
+    JPY: 5000, USD: 50, PKR: 5000, INR: 2000,
+    BDT: 5000, NPR: 5000, AED: 200, SAR: 200,
+    LKR: 10000, GBP: 40, EUR: 45,
+  }
+
   // Load invoice + org + customer data
   const { data: invoice } = await supabase
     .from('invoices')
-    .select('id, paid_at, customer_id, organization_id, currency')
+    .select('id, paid_at, customer_id, organization_id, currency, total')
     .eq('id', invoiceId)
     .single()
 
   if (!invoice?.paid_at) return null
+
+  // Skip tiny invoices
+  const currency = invoice.currency || 'JPY'
+  const minAmount = MIN_AMOUNTS[currency] || 5000
+  if ((invoice.total || 0) < minAmount) return null
 
   // Get org currency for sender country
   const { data: org } = await supabase
