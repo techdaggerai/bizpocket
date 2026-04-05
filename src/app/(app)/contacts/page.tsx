@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import OutlinePillButton from '@/components/OutlinePillButton';
 import PocketAvatar from '@/components/PocketAvatar';
 import QRCode from 'qrcode';
+import BusinessCardScanner from '@/components/BusinessCardScanner';
 
 type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner' | 'friend' | 'family' | 'work';
 
@@ -134,6 +135,7 @@ export default function ContactsPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
+  const [showCardScanner, setShowCardScanner] = useState(false);
 
   useEffect(() => { document.title = 'Evrywher — Contacts'; }, []);
 
@@ -326,6 +328,12 @@ export default function ContactsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <OutlinePillButton
+            label="Scan Card"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h4v4H7zM13 7h4v4h-4zM7 13h4v4H7z"/></svg>}
+            color="#F59E0B"
+            onClick={() => setShowCardScanner(true)}
+          />
           <OutlinePillButton
             label="QR Code"
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /><rect x="18" y="14" width="3" height="3" /><rect x="14" y="18" width="3" height="3" /><rect x="18" y="18" width="3" height="3" /></svg>}
@@ -686,6 +694,30 @@ export default function ContactsPage() {
             </div>
           </div>
         </div>
+      )}
+      {/* Business Card Scanner */}
+      {showCardScanner && (
+        <BusinessCardScanner
+          onClose={() => setShowCardScanner(false)}
+          onSave={async (data) => {
+            setShowCardScanner(false);
+            const payload = {
+              name: data.name,
+              company: data.company || null,
+              phone: data.phone || null,
+              email: data.email || null,
+              country: null,
+              contact_type: isPocketChatMode ? 'work' as ContactType : 'customer' as ContactType,
+              category: isPocketChatMode ? 'work' as ContactType : 'customer' as ContactType,
+              language: data.language || 'ja',
+              notes: data.notes || null,
+              organization_id: organization!.id,
+            };
+            const { error: insertErr } = await supabase.from('contacts').insert(payload);
+            if (insertErr) toast(insertErr.message, 'error');
+            else { toast('Contact saved from business card!', 'success'); fetchContacts(); }
+          }}
+        />
       )}
     </div>
   );
