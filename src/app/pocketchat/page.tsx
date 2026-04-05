@@ -97,29 +97,29 @@ export default function PocketChatLanding() {
   const s1 = useFadeIn(), s2 = useFadeIn(), s3 = useFadeIn(), s4 = useFadeIn(), s5 = useFadeIn(), s6 = useFadeIn(), s7 = useFadeIn(), s8 = useFadeIn(), s9 = useFadeIn();
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
       {/* ═══ NAVBAR ════════════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.04]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-black/[0.04] dark:border-white/[0.06]">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <AnimatedPocketChatLogo size={32} isTranslating={true} />
             <EvryWherMark size="md" />
           </div>
           <div className="hidden sm:flex items-center gap-6">
-            <a href="#features" className="text-[13px] text-[#666] hover:text-[#111] transition-colors">Features</a>
-            <a href="#learn" className="text-[13px] text-[#666] hover:text-[#111] transition-colors">Learn</a>
-            <a href="#pricing" className="text-[13px] text-[#666] hover:text-[#111] transition-colors">Pricing</a>
+            <a href="#features" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Features</a>
+            <a href="#learn" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Learn</a>
+            <a href="#pricing" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-[#6b7280] hover:text-[#111827] transition-colors">Log in</Link>
-            <Link href="/signup?mode=pocketchat" className="rounded-lg bg-[#4F46E5] px-5 py-2 text-sm font-semibold text-white hover:bg-[#4338ca] transition-colors">Start Free</Link>
+            <Link href="/login" className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Log in</Link>
+            <Link href="/signup?mode=pocketchat" className="rounded-[20px] bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">Start Free</Link>
           </div>
         </div>
       </nav>
 
       {/* ═══ 1. HERO ══════════════════════════════════════════════════════ */}
-      <section className="pt-24 pb-16 bg-gradient-to-b from-indigo-50/40 via-white to-white">
+      <section className="pt-24 pb-16 bg-gradient-to-b from-indigo-50 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
         <div className="mx-auto max-w-[1100px] px-6">
           {/* Brand */}
           <div className="text-center pt-8 pb-6">
@@ -133,19 +133,19 @@ export default function PocketChatLanding() {
             <div className="mx-auto w-full max-w-[420px] lg:mx-0 order-2 lg:order-1" aria-hidden="true">
               <HeroChatMockup />
             </div>
-            <div className="text-center lg:text-left order-1 lg:order-2">
-              <span className="mb-5 inline-block rounded-full bg-[#eef2ff] px-4 py-1.5 text-xs font-semibold tracking-wide text-[#4F46E5]">TRANSLATE · CHAT · LEARN</span>
-              <h1 className="mb-4 text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-tight text-[#111827]">
-                Break Every<br />Language <span className="text-[#4F46E5]">Barrier</span>
+            <div className="text-center lg:text-left order-1 lg:order-2 rounded-[20px] bg-white/[0.78] dark:bg-white/[0.06] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
+              <span className="mb-5 inline-block rounded-full bg-indigo-50 dark:bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-600 dark:text-indigo-300">TRANSLATE · CHAT · LEARN</span>
+              <h1 className="mb-4 text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-tight text-gray-900 dark:text-white" style={{ fontFamily: 'var(--font-outfit)' }}>
+                Break Every<br />Language <span className="text-indigo-600 dark:text-indigo-400">Barrier</span>
               </h1>
-              <p className="mx-auto mb-6 max-w-[480px] text-[16px] leading-relaxed text-[#374151] lg:mx-0">
+              <p className="mx-auto mb-6 max-w-[480px] text-[16px] leading-relaxed text-gray-600 dark:text-gray-300 lg:mx-0" style={{ fontFamily: 'var(--font-dm-sans)' }}>
                 Translate. Chat. Learn. All from your real life in Japan. The only app where every translation becomes a lesson.
               </p>
               <div className="mb-6 flex flex-wrap justify-center gap-3 lg:justify-start">
-                <Link href="/signup?mode=pocketchat" className="rounded-xl bg-[#4F46E5] px-8 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-indigo-500/20 hover:bg-[#4338ca] transition-all hover:-translate-y-0.5">Get Started Free</Link>
-                <a href="#features" className="rounded-xl border border-[#e5e7eb] px-8 py-3.5 text-[15px] font-semibold text-[#374151] hover:border-[#d1d5db] transition-colors">See Features</a>
+                <Link href="/signup?mode=pocketchat" className="rounded-[20px] bg-indigo-600 px-8 h-14 inline-flex items-center text-[15px] font-semibold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition-all hover:-translate-y-0.5">Get Started Free</Link>
+                <a href="#features" className="rounded-[20px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/10 px-8 h-14 inline-flex items-center text-[15px] font-semibold text-gray-700 dark:text-gray-200 hover:border-gray-300 dark:hover:border-white/20 transition-colors">See Features</a>
               </div>
-              <p className="text-xs text-[#9ca3af]">No download needed. No credit card. Works on any phone.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">No download needed. No credit card. Works on any phone.</p>
             </div>
           </div>
         </div>

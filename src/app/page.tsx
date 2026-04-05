@@ -63,59 +63,59 @@ function LandingPageInner() {
   const { t } = useLandingI18n();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/30 via-white to-white text-[#0A0A0A]">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900 text-[#0A0A0A] dark:text-white">
 
       {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-black/[0.06] dark:border-white/[0.06]">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2">
             <PocketMark variant="lg" />
-            <span className="text-[15px] font-semibold tracking-tight text-[#0A0A0A]">BizPocket</span>
+            <span className="text-[15px] font-semibold tracking-tight text-gray-900 dark:text-white" style={{ fontFamily: 'var(--font-outfit)' }}>BizPocket</span>
           </Link>
           <div className="hidden sm:flex items-center gap-8">
-            <a href="#features" className="text-[13px] text-[#666] hover:text-[#0A0A0A] transition-colors">{t('nav_features')}</a>
-            <a href="#pricing" className="text-[13px] text-[#666] hover:text-[#0A0A0A] transition-colors">{t('nav_pricing')}</a>
+            <a href="#features" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{t('nav_features')}</a>
+            <a href="#pricing" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{t('nav_pricing')}</a>
           </div>
           <div className="flex items-center gap-3">
             <LandingLanguageDropdown />
-            <Link href="/login" className="text-[13px] text-[#666] hover:text-[#0A0A0A] transition-colors">{t('nav_login')}</Link>
-            <Link href="/signup" className="rounded-full bg-[#0A0A0A] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#333] transition-colors">
+            <Link href="/login" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">{t('nav_login')}</Link>
+            <Link href="/signup" className="rounded-[20px] bg-indigo-600 px-5 py-2.5 text-[13px] font-medium text-white hover:bg-indigo-700 transition-colors">
               {t('nav_signup')}
             </Link>
           </div>
         </div>
       </nav>
 
-      {/* HERO — Split layout */}
+      {/* HERO — Split layout with Liquid Glass card */}
       <section className="pt-32 pb-16 px-6">
         <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 items-center">
-          {/* LEFT — Text */}
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-[#E5E5E5] mb-6">
+          {/* LEFT — Text inside Liquid Glass card */}
+          <div className="text-center lg:text-left rounded-[20px] bg-white/[0.78] dark:bg-white/[0.06] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-gray-200 dark:border-white/10 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] inline-block" />
-              <span className="text-[13px] text-[#6b7280] font-medium">{t('hero_badge')}</span>
+              <span className="text-[13px] text-gray-600 dark:text-gray-300 font-medium">{t('hero_badge')}</span>
             </div>
-            <h1 className="text-[clamp(2.25rem,5vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.02em] text-[#111827]">
-              {t('hero_title_1')}<br /><span className="text-[#4F46E5]">{t('hero_title_2')}</span>
+            <h1 className="text-[clamp(2.25rem,5vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.02em] text-gray-900 dark:text-white" style={{ fontFamily: 'var(--font-outfit)' }}>
+              {t('hero_title_1')}<br /><span className="text-indigo-600 dark:text-indigo-400">{t('hero_title_2')}</span>
             </h1>
-            <p className="mt-4 text-lg text-[#6b7280] max-w-[420px] mx-auto lg:mx-0 leading-relaxed">
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-[420px] mx-auto lg:mx-0 leading-relaxed" style={{ fontFamily: 'var(--font-dm-sans)' }}>
               {t('hero_subtitle')} <span className="text-[#F59E0B]">AI</span>.
             </p>
             <div className="mt-8 flex justify-center lg:justify-start gap-3 flex-wrap">
-              <Link href="/signup" className="inline-flex items-center gap-2 bg-[#4F46E5] text-white px-7 py-3.5 rounded-xl text-[15px] font-semibold hover:bg-[#4338CA] transition-colors">
+              <Link href="/signup" className="inline-flex items-center gap-2 bg-indigo-600 text-white px-7 h-14 rounded-[20px] text-[15px] font-semibold hover:bg-indigo-700 transition-colors">
                 {t('hero_cta')}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </Link>
-              <a href="#features" className="bg-white text-[#374151] px-7 py-3.5 rounded-xl text-[15px] font-semibold border border-[#E5E5E5] hover:border-[#CCC] transition-colors">
+              <a href="#features" className="bg-white dark:bg-white/10 text-gray-700 dark:text-gray-200 px-7 h-14 inline-flex items-center rounded-[20px] text-[15px] font-semibold border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-colors">
                 {t('hero_cta2')}
               </a>
             </div>
             <div className="flex justify-center lg:justify-start gap-5 mt-6 flex-wrap">
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-[#6b7280] font-medium">{t('hero_stat_langs')}</span></div>
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-[#6b7280] font-medium">{t('hero_stat_ai')}</span></div>
-              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-[#6b7280] font-medium">{t('hero_stat_noapp')}</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></svg><span className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('hero_stat_langs')}</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg><span className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('hero_stat_ai')}</span></div>
+              <div className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><path d="M22 4L12 14.01l-3-3" /></svg><span className="text-xs text-gray-600 dark:text-gray-400 font-medium">{t('hero_stat_noapp')}</span></div>
             </div>
-            <a href="#pocketchat" className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#fef3c7] px-4 py-1.5 text-xs font-semibold text-[#92400e] hover:bg-[#fde68a] transition-colors">
+            <a href="#pocketchat" className="mt-6 inline-flex items-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-colors">
               <AnimatedPocketChatLogo size={32} isTranslating={true} />
               {t('hero_evrywher_cta')}
             </a>
