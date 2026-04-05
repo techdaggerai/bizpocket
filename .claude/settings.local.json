@@ -52,7 +52,8 @@
       "Skill(codex:rescue)",
       "Bash(npx tailwindcss:*)",
       "Bash(npx sharp-cli:*)",
-      "Bash(wc -l src/locales/landing/*.json)"
+      "Bash(wc -l src/locales/landing/*.json)",
+      "Bash(mv /tmp/learn_temp.tsx src/app/\\\\\\(app\\\\\\)/learn/page.tsx)"
     ]
   }
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface LearningProfile {
@@ -69,6 +70,7 @@ const SOURCE_LABELS: Record<string, { icon: string; label: string }> = {
 export default function LearnPage() {
   const { profile } = useAuth();
   const supabase = createClient();
+  const router = useRouter();
   const userId = profile?.id;
 
   const [learningProfile, setLearningProfile] = useState<LearningProfile | null>(null);
@@ -76,7 +78,6 @@ export default function LearnPage() {
   const [realWorldGroups, setRealWorldGroups] = useState<{ source: string; count: number; words: VocabWord[] }[]>([]);
   const [todayStats, setTodayStats] = useState<TodayStats>({ wordsToday: 0, reviewDue: 0 });
   const [loading, setLoading] = useState(true);
-  const [showSetup, setShowSetup] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -92,15 +93,11 @@ export default function LearnPage() {
       .single();
 
     if (!lp) {
-      const { data: newLp } = await supabase
-        .from('learning_profiles')
-        .insert({ user_id: userId, target_language: 'ja', native_language: profile?.language || 'en' })
-        .select()
-        .single();
-      lp = newLp;
-      setShowSetup(true);
+      // No profile yet — redirect to onboarding
+      router.push('/learn/onboarding');
+      return;
     }
-    if (lp) setLearningProfile(lp);
+    setLearningProfile(lp);
 
     // Fetch topics with progress
     const { data: allTopics } = await supabase
@@ -169,20 +166,11 @@ export default function LearnPage() {
     setLoading(false);
   }
 
-  async function saveSetup(targetLang: string, level: string, goal: number) {
-    if (!userId) return;
-    await supabase.from('learning_profiles').update({
-      target_language: targetLang,
-      level,
-      daily_goal: goal,
-    }).eq('user_id', userId);
-    setLearningProfile(prev => prev ? { ...prev, target_language: targetLang, level, daily_goal: goal } : prev);
-    setShowSetup(false);
-  }
-
   const dailyGoal = learningProfile?.daily_goal || 10;
   const dailyProgress = Math.min(todayStats.wordsToday / dailyGoal, 1);
   const targetLang = learningProfile?.target_language || 'ja';
+  const totalXp = learningProfile?.total_xp || 0;
+  const xpLevel = totalXp >= 5000 ? 'Advanced' : totalXp >= 2000 ? 'Intermediate' : totalXp >= 500 ? 'Elementary' : 'Beginner';
 
   if (loading) {
     return (
@@ -201,7 +189,7 @@ export default function LearnPage() {
             {LANG_FLAGS[targetLang]} Learn {LANG_NAMES[targetLang] || targetLang}
           </h1>
           <p className="text-xs text-[var(--text-4)] mt-0.5">
-            {learningProfile?.total_words_learned || 0} words learned · Level: {learningProfile?.level}
+            {learningProfile?.total_words_learned || 0} words · {xpLevel} · {learningProfile?.total_xp || 0} XP
           </p>
         </div>
         {(learningProfile?.streak_days || 0) > 0 && (
@@ -318,13 +306,20 @@ export default function LearnPage() {
           Topic Lessons
         </h2>
 
-        {/* Category filter pills */}
-        {['daily', 'business', 'travel', 'emergency'].map(cat => {
+        {/* Category sections */}
+        {[
+          { key: 'daily', label: 'Daily Life', icon: '🏪' },
+          { key: 'essential', label: 'Essential', icon: '🏥' },
+          { key: 'living', label: 'Living in Japan', icon: '🏠' },
+          { key: 'work', label: 'Work & Business', icon: '💼' },
+          { key: 'culture', label: 'Culture', icon: '🎌' },
+          { key: 'travel', label: 'Travel', icon: '✈️' },
+        ].map(({ key: cat, label: catLabel, icon: catIcon }) => {
           const catTopics = topics.filter(t => t.category === cat);
           if (catTopics.length === 0) return null;
           return (
             <div key={cat} className="mb-4">
-              <p className="text-xs font-semibold text-[var(--text-2)] mb-2 capitalize">{cat}</p>
+              <p className="text-xs font-semibold text-[var(--text-2)] mb-2">{catIcon} {catLabel}</p>
               <div className="grid grid-cols-3 gap-2">
                 {catTopics.map(topic => {
                   const completed = topic.progress?.words_completed || 0;
@@ -381,109 +376,7 @@ export default function LearnPage() {
         </Link>
       </div>
 
-      {/* Setup Modal */}
-      {showSetup && (
-        <SetupModal
-          onSave={saveSetup}
-          onClose={() => setShowSetup(false)}
-          defaultLang={targetLang}
-        />
-      )}
     </div>
   );
 }
 
-// ─── Setup Modal ─────────────────────────────────────────────────────────────
-
-function SetupModal({ onSave, onClose, defaultLang }: {
-  onSave: (lang: string, level: string, goal: number) => void;
-  onClose: () => void;
-  defaultLang: string;
-}) {
-  const [lang, setLang] = useState(defaultLang);
-  const [level, setLevel] = useState('beginner');
-  const [goal, setGoal] = useState(10);
-
-  const languages = [
-    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'ko', name: 'Korean', flag: '🇰🇷' },
-    { code: 'zh', name: 'Chinese', flag: '🇨🇳' },
-    { code: 'fr', name: 'French', flag: '🇫���' },
-    { code: 'es', name: 'Spanish', flag: '🇪🇸' },
-  ];
-
-  const levels = [
-    { value: 'beginner', label: 'Beginner', desc: 'Just starting out' },
-    { value: 'elementary', label: 'Elementary', desc: 'Know basic phrases' },
-    { value: 'intermediate', label: 'Intermediate', desc: 'Can have conversations' },
-    { value: 'advanced', label: 'Advanced', desc: 'Near fluent' },
-  ];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center" onClick={onClose}>
-      <div className="w-full max-w-md rounded-t-3xl sm:rounded-3xl bg-white dark:bg-gray-900 p-6" onClick={e => e.stopPropagation()}>
-        <h2 className="text-lg font-bold text-[var(--text-1)] text-center">Set Up Learning</h2>
-        <p className="text-xs text-[var(--text-4)] text-center mt-1">We&apos;ll personalize lessons for you</p>
-
-        {/* Language */}
-        <p className="text-xs font-semibold text-[var(--text-2)] mt-4 mb-2">I want to learn:</p>
-        <div className="flex flex-wrap gap-2">
-          {languages.map(l => (
-            <button
-              key={l.code}
-              onClick={() => setLang(l.code)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                lang === l.code ? 'bg-[#4F46E5] text-white' : 'bg-[var(--bg-2)] text-[var(--text-2)]'
-              }`}
-            >
-              {l.flag} {l.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Level */}
-        <p className="text-xs font-semibold text-[var(--text-2)] mt-4 mb-2">My level:</p>
-        <div className="grid grid-cols-2 gap-2">
-          {levels.map(l => (
-            <button
-              key={l.value}
-              onClick={() => setLevel(l.value)}
-              className={`rounded-xl p-2.5 text-left transition-colors border ${
-                level === l.value
-                  ? 'border-[#4F46E5] bg-[#4F46E5]/5'
-                  : 'border-gray-100 dark:border-gray-800'
-              }`}
-            >
-              <p className="text-xs font-semibold text-[var(--text-1)]">{l.label}</p>
-              <p className="text-[10px] text-[var(--text-4)]">{l.desc}</p>
-            </button>
-          ))}
-        </div>
-
-        {/* Daily goal */}
-        <p className="text-xs font-semibold text-[var(--text-2)] mt-4 mb-2">Daily goal:</p>
-        <div className="flex gap-2">
-          {[5, 10, 15, 20].map(g => (
-            <button
-              key={g}
-              onClick={() => setGoal(g)}
-              className={`flex-1 rounded-xl py-2 text-xs font-bold transition-colors ${
-                goal === g ? 'bg-[#4F46E5] text-white' : 'bg-[var(--bg-2)] text-[var(--text-2)]'
-              }`}
-            >
-              {g} words
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={() => onSave(lang, level, goal)}
-          className="mt-5 w-full rounded-xl bg-[#4F46E5] py-3 text-sm font-bold text-white hover:bg-[#4338CA] transition-colors"
-        >
-          Start Learning 🚀
-        </button>
-      </div>
-    </div>
-  );
-}
