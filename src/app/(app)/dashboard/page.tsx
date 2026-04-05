@@ -18,6 +18,8 @@ import TrustScoreBar from '@/components/profile/TrustScoreBar';
 import CorridorBadge from '@/components/profile/CorridorBadge';
 import MagicFAB from '@/components/ui/MagicFAB';
 import GrowthCompanion from '@/components/ui/GrowthCompanion';
+import TierUpgradeOverlay from '@/components/ui/TierUpgradeOverlay';
+import { useTierCheck } from '@/hooks/useTierCheck';
 import type { Tier } from '@/lib/tier-system';
 const PocketChatQR = dynamic(() => import('@/components/PocketChatQR'), { ssr: false });
 
@@ -66,6 +68,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const [supabase] = useState(() => createClient());
+  const { tierUpgrade, checkTier, dismissUpgrade } = useTierCheck();
 
   // Show upgrade success toast
   useEffect(() => {
@@ -152,6 +155,8 @@ export default function DashboardPage() {
     load(); fetchBriefing();
     // Check for global profile
     fetch('/api/profile/me').then(r => r.json()).then(d => { setHasGlobalProfile(!!d.profile); if (d.profile) setGlobalProfile(d.profile); }).catch(() => setHasGlobalProfile(false));
+    // Check for tier upgrade celebration
+    checkTier();
     // Count today's actions for energy meter
     const todayStr = new Date().toISOString().slice(0, 10);
     Promise.all([
@@ -593,6 +598,15 @@ export default function DashboardPage() {
         onMatch={() => window.location.href = '/opportunities'}
         onCamera={() => window.location.href = '/detect'}
       />
+
+      {/* Tier Upgrade Celebration Overlay */}
+      {tierUpgrade?.show && (
+        <TierUpgradeOverlay
+          from={tierUpgrade.from}
+          to={tierUpgrade.to}
+          onDismiss={dismissUpgrade}
+        />
+      )}
 
       {/* GrowthCompanion */}
       {globalProfile && (() => {
