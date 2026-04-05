@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import EvryWherMark from '@/components/EvryWherMark';
 import type { Invoice, InvoiceChat, InvoiceStatus } from '@/types/database';
 import CorridorMilestoneToast from '@/components/ui/CorridorMilestoneToast';
 import { useDelight } from '@/contexts/DelightContext';
@@ -480,7 +481,7 @@ export default function InvoiceDetailPage() {
         {/* Chat Header */}
         <div className="p-4 border-b border-[#E5E5E5]">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[#0A0A0A]">Evrywher</h2>
+            <h2 className="text-base font-semibold text-[#0A0A0A]"><EvryWherMark size="sm" /></h2>
             <span className="text-xs text-[#A3A3A3]">
               {messages.length} message{messages.length !== 1 ? 's' : ''}
             </span>

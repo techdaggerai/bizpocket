@@ -89,15 +89,12 @@ export default function PWAInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [showIOSSheet, setShowIOSSheet] = useState(false);
-  const [isPocketChat, setIsPocketChat] = useState(false);
-
-  useEffect(() => {
+  const [isPocketChat] = useState(() => {
+    if (typeof window === 'undefined') return false;
     const host = window.location.hostname;
-    setIsPocketChat(
-      host.includes('evrywher') || host.includes('evrywyre') ||
-      host.includes('pocketchat') || host.includes('evrywhere')
-    );
-  }, []);
+    return host.includes('evrywher') || host.includes('evrywyre') ||
+      host.includes('pocketchat') || host.includes('evrywhere');
+  });
 
   // Listen for Android install prompt
   useEffect(() => {

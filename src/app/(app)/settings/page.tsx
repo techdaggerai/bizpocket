@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useDelight } from '@/contexts/DelightContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import EvryWherMark from '@/components/EvryWherMark';
 import NotificationSoundPicker from '@/components/NotificationSoundPicker';
 import { useChatLock, ChatLockSetupModal } from '@/components/ChatLockScreen';
 import PocketAvatar from '@/components/PocketAvatar';
@@ -785,7 +786,7 @@ export default function SettingsPage() {
 
         {/* ABOUT EVRYWHER */}
         <div>
-          <SectionLabel>About Evrywher</SectionLabel>
+          <SectionLabel>About <EvryWherMark size="sm" /></SectionLabel>
           <div className="bg-[#F9FAFB] dark:bg-gray-800 rounded-lg overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3" style={{ marginTop: 0 }}>
               <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Version</span>

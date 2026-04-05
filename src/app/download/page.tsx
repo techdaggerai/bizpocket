@@ -14,19 +14,19 @@ interface BeforeInstallPromptEvent extends Event {
 export default function DownloadPage() {
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
-  const [isPocketChat, setIsPocketChat] = useState(true);
+  const [isPocketChat] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    const host = window.location.hostname;
+    return host.includes('evrywher') || host.includes('evrywyre') ||
+      host.includes('pocketchat') || host.includes('evrywhere') ||
+      host.includes('localhost');
+  });
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
     setIsAndroid(/Android/.test(navigator.userAgent));
-    const host = window.location.hostname;
-    setIsPocketChat(
-      host.includes('evrywher') || host.includes('evrywyre') ||
-      host.includes('pocketchat') || host.includes('evrywhere') ||
-      host.includes('localhost')
-    );
     setInstalled(window.matchMedia('(display-mode: standalone)').matches);
 
     const handler = (e: Event) => {

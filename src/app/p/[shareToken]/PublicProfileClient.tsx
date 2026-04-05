@@ -10,6 +10,7 @@ import CorridorBadge from '@/components/profile/CorridorBadge';
 import type { Tier } from '@/lib/tier-system';
 import type { BadgeTier } from '@/lib/trust-score';
 import dynamic from 'next/dynamic';
+import EvryWherMark from '@/components/EvryWherMark';
 
 const QRCodeCanvas = dynamic(
   () => import('qrcode.react').then((mod) => mod.QRCodeCanvas),
@@ -65,12 +66,7 @@ export default function PublicProfileClient({ profile, shareToken }: Props) {
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">{'\u{1F30D}'}</span>
-            <span
-              className="text-lg font-bold text-indigo-600"
-              style={{ fontFamily: 'var(--font-display), system-ui' }}
-            >
-              Evrywher
-            </span>
+            <EvryWherMark size="sm" />
           </div>
           {/* Language dropdown */}
           <div className="relative">

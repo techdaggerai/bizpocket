@@ -74,7 +74,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                     <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><TopNav /></div>
                     <div className="flex">
                       <Sidebar />
-                      <main className="flex-1 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
+                      <main className="flex-1 min-h-screen pb-20 lg:pb-0 lg:ml-[220px] overflow-x-hidden">
                         <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white"><TopNav /></div>
                         <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">{children}</div>
                       </main>
@@ -146,7 +146,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {/* Desktop: Sidebar + Content | Mobile: Full width */}
           <div className="flex">
             <Sidebar />
-            <main className="flex-1 min-h-screen pb-20 lg:pb-0 overflow-x-hidden">
+            <main className="flex-1 min-h-screen pb-20 lg:pb-0 lg:ml-[220px] overflow-x-hidden">
               {/* Desktop mini top bar */}
               <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
                 <TopNav />

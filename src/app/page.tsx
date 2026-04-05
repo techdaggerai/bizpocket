@@ -176,7 +176,7 @@ function LandingPageInner() {
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <AnimatedPocketChatLogo size={40} isTranslating={true} />
-                <span className="text-[15px] font-bold text-[#111827]">Evrywher</span>
+                <EvryWherMark size="sm" />
               </div>
               <p className="text-sm text-[#374151]">{t('evrywher_standalone')}</p>
             </div>
@@ -412,9 +412,9 @@ function LandingPageInner() {
               <AnimatedPocketChatLogo size={36} isTranslating={true} />
               <EvryWherMark size="md" />
             </div>
-            <h2 className="mb-3 text-[28px] font-bold text-gray-900 dark:text-white">Evrywher Inside Every Plan</h2>
+            <h2 className="mb-3 text-[28px] font-bold text-gray-900 dark:text-white"><EvryWherMark size="lg" /> Inside Every Plan</h2>
             <p className="mx-auto mb-6 max-w-[560px] text-[15px] leading-relaxed text-gray-600 dark:text-gray-300">
-              Chat with Japanese clients, scan their documents, learn their language — all included. Every BizPocket plan comes with Evrywher at the matching tier.
+              Chat with Japanese clients, scan their documents, learn their language — all included. Every BizPocket plan comes with <EvryWherMark size="sm" /> at the matching tier.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mb-8">
               {['AI Translation Chat', 'Camera Translation', 'Voice Translation', 'Language Learning', 'Cultural Coach', 'Emergency Card', 'Business Card Scanner'].map((f, i) => (
@@ -422,7 +422,7 @@ function LandingPageInner() {
               ))}
             </div>
             <a href="/pocketchat" className="inline-block rounded-[10px] border-2 border-[#4F46E5] px-8 py-3 text-[15px] font-semibold text-[#4F46E5] hover:bg-[#4F46E5] hover:text-white transition-colors">
-              Explore Evrywher &rarr;
+              Explore <EvryWherMark size="sm" /> &rarr;
             </a>
           </div>
         </div>
@@ -493,7 +493,7 @@ function LandingPageInner() {
               <a href="#features" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Features</a>
               <a href="#pricing" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Pricing</a>
               <Link href="/login" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Log in</Link>
-              <a href="https://pocketchat.co" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Evrywher</a>
+              <a href="https://pocketchat.co" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]"><EvryWherMark size="xs" /></a>
               <span className="text-[#d1d5db]">&middot;</span>
               <a href="/privacy" className="text-[12px] text-[#6b7280] hover:text-[#0A0A0A]">Privacy</a>
               <span className="text-[#d1d5db]">&middot;</span>

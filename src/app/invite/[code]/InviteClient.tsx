@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import TierBadge from '@/components/profile/TierBadge';
 import CorridorBadge from '@/components/profile/CorridorBadge';
 import type { Tier } from '@/lib/tier-system';
+import EvryWherMark from '@/components/EvryWherMark';
 
 interface Props {
   inviter: any;
@@ -23,12 +24,7 @@ export default function InviteClient({ inviter, code }: Props) {
       {/* Evrywher header */}
       <div className="flex items-center gap-2 mb-8">
         <span className="text-2xl">{'\u{1F30D}'}</span>
-        <span
-          className="text-xl font-bold text-indigo-600"
-          style={{ fontFamily: 'var(--font-display), system-ui' }}
-        >
-          Evrywher
-        </span>
+        <EvryWherMark size="md" />
       </div>
 
       {/* Invite card */}

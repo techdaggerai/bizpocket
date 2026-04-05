@@ -72,7 +72,7 @@ export default function Sidebar() {
   const NAV_SECTIONS = isPocketChatOnly ? POCKETCHAT_NAV : FULL_NAV;
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:sticky lg:top-0 lg:overflow-y-auto">
+    <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:fixed lg:top-0 lg:left-0 lg:z-40 lg:overflow-y-auto">
       {/* Logo */}
       <div className="px-4 py-4 border-b border-[#F0F0F0]">
         <Link href={isPocketChatOnly ? '/chat' : '/dashboard'} className="flex items-center gap-2">

@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/Toast';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketAvatar from '@/components/PocketAvatar';
 import PageHeader from '@/components/PageHeader';
+import EvryWherMark from '@/components/EvryWherMark';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -182,7 +183,7 @@ export default function EvryWherOnboarding() {
             </div>
 
             <h1 className="text-[28px] font-bold text-[var(--text-1)] mb-3 leading-tight">
-              Welcome to<br />Evrywher
+              Welcome to<br /><EvryWherMark size="lg" />
             </h1>
             <p className="text-[16px] text-[var(--text-3)] mb-2 leading-relaxed">
               Chat in 21 languages with AI translation

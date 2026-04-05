@@ -6,6 +6,7 @@ import SignaturePad from '@/components/SignaturePad'
 import PublicPocketChat from '@/components/PublicPocketChat'
 import { createBrowserClient } from '@supabase/ssr'
 import type { Invoice, InvoiceItem, InvoiceChat, Organization } from '@/types/database'
+import EvryWherMark from '@/components/EvryWherMark'
 
 const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -478,7 +479,7 @@ export default function PublicInvoicePage() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            <span className="text-base font-semibold text-[#0A0A0A]">Evrywher</span>
+            <EvryWherMark size="sm" />
           </div>
 
           {/* Messages */}
