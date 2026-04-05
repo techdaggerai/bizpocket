@@ -741,6 +741,15 @@ export default function SettingsPage() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
           </SettingsRow>
+          <SettingsRow>
+            <Link href="/verification" className="flex items-center justify-between w-full">
+              <div>
+                <p className="text-[14px] text-[var(--text-1)] dark:text-gray-200 font-medium">{'\u{1F7E2}'} ID Verification</p>
+                <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">Get the green verified badge</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </SettingsRow>
           <SettingsRow last>
             <button onClick={handleLogout} className="text-[14px] text-[#DC2626] font-medium">Log out</button>
           </SettingsRow>
