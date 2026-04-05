@@ -10,6 +10,7 @@ interface GlassCardProps {
   elevated?: boolean;
   adaptiveRefraction?: boolean;
   className?: string;
+  style?: React.CSSProperties;
   onClick?: () => void;
   children: React.ReactNode;
 }
@@ -39,6 +40,7 @@ export default function GlassCard({
   elevated,
   adaptiveRefraction,
   className = '',
+  style: styleProp,
   onClick,
   children,
 }: GlassCardProps) {
@@ -77,6 +79,7 @@ export default function GlassCard({
           'var(--glass-shadow)',
           glowShadow,
         ].filter(Boolean).join(', '),
+        ...styleProp,
       }}
     >
       {children}
