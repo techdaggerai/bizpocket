@@ -158,7 +158,7 @@ export default function ItemsPage() {
 
       {showAddForm && (
         <form onSubmit={addItem} className="rounded-xl border border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-4 space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#4F46E5]">New Pipeline Item</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-indigo-400">New Pipeline Item</h3>
           <input type="text" placeholder="Item name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputClass} required />
           <div className="grid grid-cols-2 gap-2">
             <input type="text" placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputClass} />

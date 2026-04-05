@@ -14,7 +14,7 @@ const ROLES = [
 ];
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: 'bg-[#4F46E5]/10 text-[#4F46E5]',
+  owner: 'bg-[#4F46E5]/10 text-indigo-400',
   manager: 'bg-[#7C3AED]/10 text-[#7C3AED]',
   staff: 'bg-[#16A34A]/10 text-[#16A34A]',
   accountant: 'bg-[#F59E0B]/10 text-[#F59E0B]',
@@ -161,7 +161,7 @@ export default function TeamHubPage() {
   };
 
   const isAdmin = profile.role === 'owner' || profile.role === 'manager';
-  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-slate-400 focus:border-[#4F46E5] focus:outline-none';
 
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>;
 
@@ -171,8 +171,8 @@ export default function TeamHubPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-50">Team Hub</h1>
-          <p className="text-sm text-[#999]">{members.length} member{members.length !== 1 ? 's' : ''} · {organization.name}</p>
+          <h1 className="text-2xl font-bold text-white">Team Hub</h1>
+          <p className="text-sm text-slate-400">{members.length} member{members.length !== 1 ? 's' : ''} · {organization.name}</p>
         </div>
         {isAdmin && (
           showInvite ? (
@@ -196,7 +196,7 @@ export default function TeamHubPage() {
         {([['team', 'Team'], ['docs', 'Shared Docs'], ['activity', 'Activity']] as [TabKey, string][]).map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-              tab === key ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]' : 'text-[#999] hover:text-[#333]'
+              tab === key ? 'text-indigo-400 border-b-2 border-[#4F46E5]' : 'text-slate-400 hover:text-white'
             }`}>
             {label}
           </button>
@@ -208,7 +208,7 @@ export default function TeamHubPage() {
         <div className="space-y-4">
           {showInvite && (
             <div className="rounded-xl border border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-4 space-y-3">
-              <h3 className="text-sm font-semibold text-slate-50">Invite a team member</h3>
+              <h3 className="text-sm font-semibold text-white">Invite a team member</h3>
               <input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}
                 placeholder="Email address" className={inputClass} />
               <div className="space-y-2">
@@ -218,11 +218,11 @@ export default function TeamHubPage() {
                       inviteRole === r.key ? 'border-[#4F46E5] bg-[#4F46E5]/5' : 'border-slate-700 hover:bg-slate-800'
                     }`}>
                     <div>
-                      <p className="text-sm font-medium text-slate-50">{r.label}</p>
-                      <p className="text-[10px] text-[#999]">{r.desc}</p>
+                      <p className="text-sm font-medium text-white">{r.label}</p>
+                      <p className="text-[10px] text-slate-400">{r.desc}</p>
                     </div>
                     {inviteRole === r.key && (
-                      <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                      <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
                     )}
                   </button>
                 ))}
@@ -235,16 +235,16 @@ export default function TeamHubPage() {
           )}
 
           <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Members</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Members</p>
             {members.map(m => (
               <div key={m.user_id} className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F46E5]/10 text-sm font-bold text-[#4F46E5]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F46E5]/10 text-sm font-bold text-indigo-400">
                     {(m.full_name || m.name || 'U').slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-50">{m.full_name || m.name || 'Unknown'}</p>
-                    <p className="text-[10px] text-[#999]">{m.email}</p>
+                    <p className="text-sm font-medium text-white">{m.full_name || m.name || 'Unknown'}</p>
+                    <p className="text-[10px] text-slate-400">{m.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -261,12 +261,12 @@ export default function TeamHubPage() {
 
           {invites.filter(i => i.status === 'pending').length > 0 && (
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Pending Invitations</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Pending Invitations</p>
               {invites.filter(i => i.status === 'pending').map(inv => (
                 <div key={inv.id} className="flex items-center justify-between rounded-xl border border-dashed border-slate-700 bg-slate-800 p-3">
                   <div>
-                    <p className="text-sm text-[#666]">{inv.email}</p>
-                    <p className="text-[10px] text-[#999]">Invited as {inv.role} · {formatTime(inv.created_at)}</p>
+                    <p className="text-sm text-slate-400">{inv.email}</p>
+                    <p className="text-[10px] text-slate-400">Invited as {inv.role} · {formatTime(inv.created_at)}</p>
                   </div>
                   {isAdmin && <button onClick={() => cancelInvite(inv.id)} className="text-[10px] text-[#DC2626]">Cancel</button>}
                 </div>
@@ -293,8 +293,8 @@ export default function TeamHubPage() {
 
           {docs.length === 0 ? (
             <div className="rounded-xl border border-slate-700 p-8 text-center">
-              <p className="text-sm text-[#999]">No shared documents yet</p>
-              <p className="text-[10px] text-[#CCC] mt-1">Upload files for your team to access</p>
+              <p className="text-sm text-slate-400">No shared documents yet</p>
+              <p className="text-[10px] text-slate-400 mt-1">Upload files for your team to access</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -313,9 +313,9 @@ export default function TeamHubPage() {
                         </svg>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-50 truncate">{doc.title}</p>
-                        <p className="text-[10px] text-[#999]">{doc.uploaded_by_name} · {formatTime(doc.created_at)}{doc.file_size ? ` · ${formatSize(doc.file_size)}` : ''}</p>
-                        {doc.notes && <p className="text-[10px] text-[#666] mt-0.5">{doc.notes}</p>}
+                        <p className="text-sm font-medium text-white truncate">{doc.title}</p>
+                        <p className="text-[10px] text-slate-400">{doc.uploaded_by_name} · {formatTime(doc.created_at)}{doc.file_size ? ` · ${formatSize(doc.file_size)}` : ''}</p>
+                        {doc.notes && <p className="text-[10px] text-slate-400 mt-0.5">{doc.notes}</p>}
                       </div>
                     </a>
                     {isAdmin && <button onClick={() => deleteDoc(doc.id)} className="text-[10px] text-[#DC2626] ml-2 shrink-0">Delete</button>}
@@ -332,7 +332,7 @@ export default function TeamHubPage() {
         <div className="space-y-1.5">
           {activity.length === 0 ? (
             <div className="rounded-xl border border-slate-700 p-8 text-center">
-              <p className="text-sm text-[#999]">No activity yet</p>
+              <p className="text-sm text-slate-400">No activity yet</p>
             </div>
           ) : (
             activity.map(a => {
@@ -344,11 +344,11 @@ export default function TeamHubPage() {
                 <div key={a.id} className="flex items-start gap-3 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
                   <span className="text-base mt-0.5">{icons[a.action] || icons.default}</span>
                   <div className="flex-1">
-                    <p className="text-[13px] text-slate-50">
+                    <p className="text-[13px] text-white">
                       <span className="font-medium">{a.user_name || 'Someone'}</span>{' '}
-                      <span className="text-[#666]">{a.details || a.action.replace(/_/g, ' ')}</span>
+                      <span className="text-slate-400">{a.details || a.action.replace(/_/g, ' ')}</span>
                     </p>
-                    <p className="text-[10px] text-[#999]">{formatTime(a.created_at)}</p>
+                    <p className="text-[10px] text-slate-400">{formatTime(a.created_at)}</p>
                   </div>
                 </div>
               );

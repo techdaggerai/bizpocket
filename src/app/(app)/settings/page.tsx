@@ -442,7 +442,7 @@ export default function SettingsPage() {
                   className="w-36 border border-[#475569] rounded-lg px-2 py-1 text-[14px] text-right focus:outline-none focus:border-[#4F46E5]"
                   autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
                 />
-                <button onClick={handleSaveName} className="text-[#4F46E5] text-[13px] font-medium">Save</button>
+                <button onClick={handleSaveName} className="text-indigo-400 text-[13px] font-medium">Save</button>
               </div>
             ) : (
               <button onClick={() => setEditingName(true)} className="text-[14px] text-[var(--text-1)] font-medium flex items-center gap-1">
@@ -482,7 +482,7 @@ export default function SettingsPage() {
                       className={`px-3 py-1.5 rounded-full text-[12px] font-medium border transition-colors ${
                         statusMsg === preset
                           ? 'bg-[#4F46E5] text-white border-[#4F46E5]'
-                          : 'bg-slate-700 text-[#374151] border-slate-700 hover:border-[#4F46E5] hover:text-[#4F46E5]'
+                          : 'bg-slate-700 text-[#374151] border-slate-700 hover:border-[#4F46E5] hover:text-indigo-400'
                       }`}
                     >
                       {preset}
@@ -541,7 +541,7 @@ export default function SettingsPage() {
                   <div className="absolute right-0 top-8 z-50 w-48 max-h-60 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg">
                     {LANGUAGES.map(l => (
                       <button key={l.code} onClick={() => handleLanguageChange(l.code)}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${lang === l.code ? 'text-[#4F46E5] font-medium' : 'text-[var(--text-1)]'}`}>
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${lang === l.code ? 'text-indigo-400 font-medium' : 'text-[var(--text-1)]'}`}>
                         {l.flag} {l.name}
                       </button>
                     ))}
@@ -605,7 +605,7 @@ export default function SettingsPage() {
             <span className="text-[14px] text-[var(--text-2)]">Notification sound</span>
             <button
               onClick={() => setShowSoundPicker(v => !v)}
-              className="text-[14px] text-[#4F46E5] font-medium flex items-center gap-1"
+              className="text-[14px] text-indigo-400 font-medium flex items-center gap-1"
             >
               Choose
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
@@ -631,7 +631,7 @@ export default function SettingsPage() {
           <SectionLabel>Appearance</SectionLabel>
           <div className="bg-slate-800 rounded-lg overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-[14px] text-slate-300">Theme</span>
+              <span className="text-[14px] text-slate-200">Theme</span>
               <span className="px-3 py-1 rounded-md text-[12px] font-medium bg-[#4F46E5] text-white">Dark</span>
             </div>
           </div>
@@ -752,7 +752,7 @@ export default function SettingsPage() {
           <SectionLabel>Account</SectionLabel>
           <SettingsRow first>
             <span className="text-[14px] text-[var(--text-2)]">Plan</span>
-            <span className={`text-[12px] font-medium px-2.5 py-0.5 rounded-full ${plan === 'free' ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-[#EDE9FE] text-[#4F46E5]'}`}>
+            <span className={`text-[12px] font-medium px-2.5 py-0.5 rounded-full ${plan === 'free' ? 'bg-[#F0FDF4] text-[#166534]' : 'bg-[#EDE9FE] text-indigo-400'}`}>
               {plan.charAt(0).toUpperCase() + plan.slice(1)}
             </span>
           </SettingsRow>
@@ -782,7 +782,7 @@ export default function SettingsPage() {
             <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer"
               className="flex items-center justify-between px-4 py-3 hover:bg-slate-700 transition-colors">
               <span className="text-[14px] text-[var(--text-2)]">Website</span>
-              <span className="text-[14px] text-[#4F46E5] flex items-center gap-1">
+              <span className="text-[14px] text-indigo-400 flex items-center gap-1">
                 evrywher.io
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
               </span>
@@ -906,7 +906,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-[var(--text-3)]">Plan</span>
-            <span className="font-medium text-[#4F46E5] capitalize">{organization.plan}</span>
+            <span className="font-medium text-indigo-400 capitalize">{organization.plan}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-[var(--text-3)]">Your Role</span>
@@ -929,9 +929,9 @@ export default function SettingsPage() {
 
       {/* Appearance / Dark Mode — always dark */}
       <section className="rounded-card border border-slate-700 bg-slate-800 p-4">
-        <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400">Appearance</h2>
+        <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-300">Appearance</h2>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-50">Theme</span>
+          <span className="text-sm text-white">Theme</span>
           <span className="px-3 py-1 rounded-md text-[12px] font-medium bg-[#4F46E5] text-white">Dark</span>
         </div>
       </section>
@@ -1020,11 +1020,11 @@ export default function SettingsPage() {
               className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
             <div className="flex gap-2">
               <button type="button" onClick={() => setInviteRole('staff')}
-                className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-colors ${inviteRole === 'staff' ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]' : 'border-slate-700 text-[var(--text-3)]'}`}>
+                className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-colors ${inviteRole === 'staff' ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-indigo-400' : 'border-slate-700 text-[var(--text-3)]'}`}>
                 Staff
               </button>
               <button type="button" onClick={() => setInviteRole('accountant')}
-                className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-colors ${inviteRole === 'accountant' ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]' : 'border-slate-700 text-[var(--text-3)]'}`}>
+                className={`flex-1 rounded-lg border py-2 text-xs font-medium transition-colors ${inviteRole === 'accountant' ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-indigo-400' : 'border-slate-700 text-[var(--text-3)]'}`}>
                 Accountant (Read-only)
               </button>
             </div>
@@ -1048,10 +1048,10 @@ export default function SettingsPage() {
             </div>
             <div>
               <span className="text-sm font-semibold text-[var(--text-1)]">Upgrade Plan</span>
-              <p className="text-xs text-[var(--text-3)]">Current: <span className="capitalize font-medium text-[#4F46E5]">{organization.plan}</span></p>
+              <p className="text-xs text-[var(--text-3)]">Current: <span className="capitalize font-medium text-indigo-400">{organization.plan}</span></p>
             </div>
           </div>
-          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
           </svg>
         </Link>
@@ -1114,13 +1114,13 @@ export default function SettingsPage() {
             <span className="text-[var(--text-1)]">❤️ in Japan</span>
           </div>
           <div className="flex justify-between text-sm">
-            <Link href="/updates" className="text-[var(--text-3)] hover:text-[#4F46E5]">What&apos;s New ✨</Link>
-            <span className="text-xs text-[#4F46E5]">→</span>
+            <Link href="/updates" className="text-[var(--text-3)] hover:text-indigo-400">What&apos;s New ✨</Link>
+            <span className="text-xs text-indigo-400">→</span>
           </div>
           <div className="flex gap-4 pt-1">
-            <Link href="/privacy" className="text-xs text-[#4F46E5] hover:underline">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs text-[#4F46E5] hover:underline">Terms of Service</Link>
-            <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer" className="text-xs text-[#4F46E5] hover:underline">evrywher.io ↗</a>
+            <Link href="/privacy" className="text-xs text-indigo-400 hover:underline">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs text-indigo-400 hover:underline">Terms of Service</Link>
+            <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-400 hover:underline">evrywher.io ↗</a>
           </div>
         </div>
       </section>

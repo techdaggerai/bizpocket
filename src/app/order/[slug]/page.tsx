@@ -134,7 +134,7 @@ export default function PublicOrderPage() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-[#0A0A0A] mb-2">Store not found</h1>
           <p className="text-sm text-[#666]">This store doesn&apos;t exist yet.</p>
-          <a href="https://www.bizpocket.io" className="mt-4 inline-block text-sm text-[#4F46E5] font-medium">Create yours with BizPocket &rarr;</a>
+          <a href="https://www.bizpocket.io" className="mt-4 inline-block text-sm text-indigo-400 font-medium">Create yours with BizPocket &rarr;</a>
         </div>
       </div>
     );
@@ -151,8 +151,8 @@ export default function PublicOrderPage() {
           </div>
           <h1 className="text-xl font-bold text-[#0A0A0A] mb-2">Order Received!</h1>
           <p className="text-sm text-[#666] mb-1">{business?.name} will contact you shortly.</p>
-          {business?.phone && <p className="text-sm text-[#4F46E5]">Call: {business.phone}</p>}
-          <button onClick={() => { setOrderSuccess(false); setShowOrderForm(false); setSelectedItem(null); }} className="mt-4 text-sm text-[#4F46E5] font-medium">&larr; Back to store</button>
+          {business?.phone && <p className="text-sm text-indigo-400">Call: {business.phone}</p>}
+          <button onClick={() => { setOrderSuccess(false); setShowOrderForm(false); setSelectedItem(null); }} className="mt-4 text-sm text-indigo-400 font-medium">&larr; Back to store</button>
         </div>
       </div>
     );
@@ -206,8 +206,8 @@ export default function PublicOrderPage() {
                 <div className="p-3">
                   <p className="text-sm font-semibold text-[#0A0A0A] truncate">{item.name}</p>
                   {item.category && <p className="text-[10px] text-[#999]">{item.category}</p>}
-                  {item.price > 0 && <p className="text-sm font-bold text-[#4F46E5] mt-1">{fmt(item.price)}</p>}
-                  <p className="text-[10px] text-[#4F46E5] mt-1 font-medium">Order Now &rarr;</p>
+                  {item.price > 0 && <p className="text-sm font-bold text-indigo-400 mt-1">{fmt(item.price)}</p>}
+                  <p className="text-[10px] text-indigo-400 mt-1 font-medium">Order Now &rarr;</p>
                 </div>
               </button>
             ))}
@@ -217,13 +217,13 @@ export default function PublicOrderPage() {
         )}
 
         <button onClick={() => { setSelectedItem(null); setShowOrderForm(true); }} className="mt-4 w-full rounded-xl border-2 border-dashed border-[#4F46E5]/30 bg-[#4F46E5]/[0.02] py-4 text-center">
-          <p className="text-sm font-medium text-[#4F46E5]">Custom Order</p>
+          <p className="text-sm font-medium text-indigo-400">Custom Order</p>
           <p className="text-[10px] text-[#999]">Don&apos;t see what you want? Send a custom request</p>
         </button>
       </div>
 
       <div className="border-t border-[#E5E5E5] bg-white px-4 py-4 text-center">
-        <p className="text-[9px] text-[#CCC]">Powered by <a href="https://www.bizpocket.io?ref=order" className="text-[#4F46E5]">BizPocket</a> — AI Business Autopilot</p>
+        <p className="text-[9px] text-[#CCC]">Powered by <a href="https://www.bizpocket.io?ref=order" className="text-indigo-400">BizPocket</a> — AI Business Autopilot</p>
       </div>
 
       {orgId && (

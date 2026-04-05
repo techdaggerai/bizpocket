@@ -202,7 +202,7 @@ export default function GifPicker({ isOpen, onClose, onSelect, apiKey }: GifPick
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setCategory('trending'); }}
                 placeholder="Search GIFs…"
-                className="flex-1 bg-transparent text-[14px] text-slate-50 placeholder-[#9CA3AF] focus:outline-none"
+                className="flex-1 bg-transparent text-[14px] text-white placeholder-[#9CA3AF] focus:outline-none"
               />
               {query && (
                 <button onClick={() => setQuery('')} className="text-[#9CA3AF] hover:text-slate-300">

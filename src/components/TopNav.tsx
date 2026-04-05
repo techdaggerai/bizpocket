@@ -43,7 +43,7 @@ export default function TopNav() {
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                 </svg>
               </div>
-              <span className="text-base font-bold text-[#4F46E5]">BizPocket</span>
+              <span className="text-base font-bold text-indigo-400">BizPocket</span>
             </>
           )}
         </Link>
@@ -70,7 +70,7 @@ export default function TopNav() {
                 <div className="px-3 py-2 border-b border-[var(--border)] mb-1">
                   <p className="text-sm font-semibold text-[var(--text-1)] truncate">{profile?.full_name || profile?.name || ''}</p>
                   <p className="text-[10px] text-[var(--text-4)] truncate">{organization?.name || ''}</p>
-                  <span className="mt-1 inline-block rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[10px] font-semibold text-[#4F46E5] capitalize">{currentPlan} plan</span>
+                  <span className="mt-1 inline-block rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[10px] font-semibold text-indigo-400 capitalize">{currentPlan} plan</span>
                 </div>
                 {isPocketChatMode ? (
                   <Link href="/chat" onClick={() => setShowMenu(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">
@@ -84,7 +84,7 @@ export default function TopNav() {
                       Dashboard
                     </Link>
                     {(currentPlan === 'free') && (
-                      <Link href="/settings/upgrade" onClick={() => setShowMenu(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#4F46E5] hover:bg-[#4F46E5]/5 transition-colors">
+                      <Link href="/settings/upgrade" onClick={() => setShowMenu(false)} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-indigo-400 hover:bg-[#4F46E5]/5 transition-colors">
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
                         Upgrade to Pro
                       </Link>

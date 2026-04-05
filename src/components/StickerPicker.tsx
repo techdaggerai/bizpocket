@@ -339,7 +339,7 @@ export default function StickerPicker({ isOpen, onClose, onSelect }: StickerPick
                 onClick={() => setActivePack(i)}
                 className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
                   activePack === i
-                    ? 'border-b-2 border-[#4F46E5] bg-slate-800 text-[#4F46E5]'
+                    ? 'border-b-2 border-indigo-400 bg-slate-800 text-indigo-400'
                     : 'text-[#9CA3AF] hover:text-[#6B7280]'
                 }`}
               >
@@ -380,7 +380,7 @@ export default function StickerPicker({ isOpen, onClose, onSelect }: StickerPick
                     height={52}
                     className="h-13 w-13 group-hover:scale-110 transition-transform"
                   />
-                  <span className="text-[10px] text-[#9CA3AF] group-hover:text-[#4F46E5] font-medium leading-tight text-center">
+                  <span className="text-[10px] text-[#9CA3AF] group-hover:text-indigo-400 font-medium leading-tight text-center">
                     {sticker.label}
                   </span>
                 </button>

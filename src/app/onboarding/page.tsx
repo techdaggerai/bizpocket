@@ -221,7 +221,7 @@ function OnboardingInner() {
                         }
                         className={`rounded-lg border px-3 py-2.5 text-sm transition-colors ${
                           selected
-                            ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                            ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-indigo-400'
                             : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
                         }`}
                       >
@@ -278,7 +278,7 @@ function OnboardingInner() {
                   onClick={() => setForm({ ...form, currency: c.value })}
                   className={`w-full rounded-lg border px-4 py-3.5 text-left text-sm transition-colors ${
                     form.currency === c.value
-                      ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                      ? 'border-[#4F46E5] bg-[rgba(79,70,229,0.08)] text-indigo-400'
                       : 'border-[#E5E5E5] text-[var(--text-2)] hover:border-[#C5C5C5]'
                   }`}
                 >

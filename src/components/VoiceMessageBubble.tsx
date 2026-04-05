@@ -74,7 +74,7 @@ export default function VoiceMessageBubble({ audioUrl, duration, originalText, t
           {showText && (
             <div className="text-xs leading-relaxed">
               {originalText && <p className={`mb-1 ${isOwn ? 'text-white/50' : 'text-slate-500'}`}>Original: {originalText}</p>}
-              <p className={isOwn ? 'text-[#F59E0B] font-medium' : 'text-[#4F46E5] font-medium'}>Translation: {translatedText}</p>
+              <p className={isOwn ? 'text-[#F59E0B] font-medium' : 'text-indigo-400 font-medium'}>Translation: {translatedText}</p>
             </div>
           )}
         </div>

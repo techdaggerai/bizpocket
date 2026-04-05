@@ -45,7 +45,7 @@ function FaqSection() {
     <section className="px-6 py-20 bg-slate-800">
       <div className="mx-auto max-w-[720px]">
         <div className="mb-10 text-center">
-          <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Got questions?</p>
+          <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-indigo-400">Got questions?</p>
           <h2 className="text-[clamp(24px,4vw,34px)] font-bold text-slate-50">Frequently asked</h2>
         </div>
         <div className="space-y-2">
@@ -129,11 +129,11 @@ export default function PocketChatLanding() {
           </div>
 
           {/* Hero split */}
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 mt-8">
-            <div className="mx-auto w-full max-w-[420px] lg:mx-0 order-2 lg:order-1" aria-hidden="true">
+          <div className="grid grid-cols-1 items-stretch gap-12 lg:grid-cols-2 mt-8">
+            <div className="mx-auto w-full max-w-[420px] lg:mx-0 order-2 lg:order-1 min-h-[400px] flex flex-col" aria-hidden="true">
               <HeroChatMockup />
             </div>
-            <div className="text-center lg:text-left order-1 lg:order-2 rounded-[20px] bg-slate-800/[0.78] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
+            <div className="text-center lg:text-left order-1 lg:order-2 rounded-[20px] bg-slate-800/[0.78] backdrop-blur-[24px] p-8 min-h-[400px] flex flex-col justify-center" style={{ boxShadow: 'var(--glass-shadow)' }}>
               <span className="mb-5 inline-block rounded-full bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-300">TRANSLATE · CHAT · LEARN</span>
               <h1 className="mb-4 text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-tight text-white" style={{ fontFamily: 'var(--font-outfit)' }}>
                 Break Every<br />Language <span className="text-indigo-400">Barrier</span>
@@ -162,7 +162,7 @@ export default function PocketChatLanding() {
               <div className="rounded-2xl bg-gradient-to-br from-indigo-50 to-amber-50 p-6 text-center">
                 <div className="text-5xl mb-3">📸</div>
                 <div className="rounded-xl bg-white p-3 shadow-sm text-left space-y-2">
-                  <p className="text-[10px] font-bold text-[#4F46E5] uppercase tracking-wider">Detected: Bank Form</p>
+                  <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Detected: Bank Form</p>
                   <div className="flex justify-between text-xs"><span className="text-[#6b7280]">振込先</span><span className="font-medium">Transfer destination</span></div>
                   <div className="flex justify-between text-xs"><span className="text-[#6b7280]">口座番号</span><span className="font-medium">Account number</span></div>
                   <div className="flex justify-between text-xs"><span className="text-[#6b7280]">金額</span><span className="font-medium">Amount</span></div>
@@ -174,7 +174,7 @@ export default function PocketChatLanding() {
           </div>
           {/* Content */}
           <div>
-            <span className="inline-block rounded-full bg-[#4F46E5]/10 px-3 py-1 text-xs font-bold text-[#4F46E5] mb-4">CAMERA TRANSLATION</span>
+            <span className="inline-block rounded-full bg-[#4F46E5]/10 px-3 py-1 text-xs font-bold text-indigo-400 mb-4">CAMERA TRANSLATION</span>
             <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50 leading-tight mb-4">See It. Scan It.<br />Understand It.</h2>
             <p className="text-[15px] text-slate-300 leading-relaxed mb-6">
               Walk into any bank in Japan. Point your camera. Know exactly what every field means — and what to write. Works on signs, menus, forms, receipts, letters.
@@ -227,9 +227,9 @@ export default function PocketChatLanding() {
               <div className="rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 p-6 text-center">
                 <div className="text-5xl mb-3">🎙️</div>
                 <div className="rounded-xl bg-white p-4 shadow-sm space-y-3">
-                  <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-[#4F46E5] flex items-center justify-center text-xs text-white font-bold">EN</div><div className="flex-1 h-6 rounded-full bg-indigo-100 flex items-center px-2"><div className="flex gap-0.5">{[3,5,8,4,7,6,3,5,8,4].map((h,i)=><div key={i} className="w-1 rounded-full bg-[#4F46E5]" style={{height:h*2}}/>)}</div></div></div>
+                  <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-[#4F46E5] flex items-center justify-center text-xs text-white font-bold">EN</div><div className="flex-1 h-6 rounded-full bg-indigo-100 flex items-end px-2 pb-1"><div className="flex gap-0.5 items-end">{[3,5,8,4,7,6,3,5,8,4].map((h,i)=><div key={i} className="w-1 rounded-full bg-[#4F46E5]" style={{height:h*2}}/>)}</div></div></div>
                   <div className="text-xs text-[#6b7280]">AI translating...</div>
-                  <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-[#F59E0B] flex items-center justify-center text-xs text-white font-bold">JP</div><div className="flex-1 h-6 rounded-full bg-amber-100 flex items-center px-2"><div className="flex gap-0.5">{[5,3,7,4,6,8,3,5,4,7].map((h,i)=><div key={i} className="w-1 rounded-full bg-[#F59E0B]" style={{height:h*2}}/>)}</div></div></div>
+                  <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-[#F59E0B] flex items-center justify-center text-xs text-white font-bold">JP</div><div className="flex-1 h-6 rounded-full bg-amber-100 flex items-end px-2 pb-1"><div className="flex gap-0.5 items-end">{[5,3,7,4,6,8,3,5,4,7].map((h,i)=><div key={i} className="w-1 rounded-full bg-[#F59E0B]" style={{height:h*2}}/>)}</div></div></div>
                 </div>
                 <p className="mt-3 text-[9px] text-[#9ca3af]">Natural voice powered by ElevenLabs</p>
               </div>
@@ -263,7 +263,7 @@ export default function PocketChatLanding() {
             <h2 className="text-[clamp(28px,5vw,44px)] font-bold text-slate-50 leading-tight">
               Duolingo teaches you<br />&ldquo;the cat is on the table.&rdquo;
             </h2>
-            <p className="mt-4 text-[clamp(20px,3vw,28px)] font-bold text-[#4F46E5]">
+            <p className="mt-4 text-[clamp(20px,3vw,28px)] font-bold text-indigo-400">
               We teach you the word from the bank form you just scanned.
             </p>
           </div>
@@ -281,11 +281,11 @@ export default function PocketChatLanding() {
             </div>
             {/* US — vibrant, real */}
             <div className="rounded-2xl border-2 border-indigo-500 bg-slate-800 p-6 text-center shadow-lg shadow-indigo-500/20">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#4F46E5] mb-3">EVRYWHER</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-3">EVRYWHER</p>
               <div className="text-4xl mb-2">🏦</div>
               <p className="text-2xl font-bold text-slate-50">振込</p>
               <p className="text-sm text-slate-400">furikomi</p>
-              <p className="text-base font-semibold text-[#4F46E5] mt-1">bank transfer</p>
+              <p className="text-base font-semibold text-indigo-400 mt-1">bank transfer</p>
               <div className="mt-3 rounded-lg bg-indigo-500/10 px-3 py-1.5 inline-block">
                 <p className="text-[10px] text-indigo-300 font-medium">from your bank form scan at Mizuho Bank</p>
               </div>
@@ -419,27 +419,31 @@ export default function PocketChatLanding() {
       <section id="pricing" className="bg-slate-800 px-6 py-20">
         <div ref={s8.ref} className={`mx-auto max-w-[1100px] ${s8.className}`}>
           <div className="text-center mb-12">
-            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Simple pricing</p>
+            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-indigo-400">Simple pricing</p>
             <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50">Your first 10 translations are free. Every day. Forever.</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[900px] mx-auto">
             {[
-              { name: 'Free', price: '$0', period: 'forever', features: ['10 AI translations/day', 'Unlimited contacts', 'Camera translation', 'Emergency Card', '1 topic pack (Learn)'], highlight: false },
-              { name: 'Pro', price: '$6.99', period: '/month', features: ['Unlimited translations', 'Voice-to-voice translation', 'AI conversation practice', 'All 30 topic packs', 'Cultural Coach', 'Business Card Scanner', 'Includes BizPocket Pro'], highlight: true },
-              { name: 'Business', price: '$19.99', period: '/month', features: ['Everything in Pro', 'Team vocabulary sharing', 'Up to 5 team members', 'Priority support', 'Custom AI bot', 'Includes BizPocket Business'], highlight: false },
+              { name: 'Free', price: '$0', period: 'forever', desc: 'No credit card needed', features: ['10 AI translations/day', 'Unlimited contacts', 'Camera translation', 'Emergency Card', '1 topic pack (Learn)'], highlight: false },
+              { name: 'Pro', price: '$6.99', period: '/mo', desc: 'Most popular', features: ['Unlimited translations', 'Voice-to-voice translation', 'AI conversation practice', 'All 30 topic packs', 'Cultural Coach', 'Business Card Scanner', 'Includes BizPocket Pro'], highlight: true },
+              { name: 'Business', price: '$19.99', period: '/mo', desc: 'For teams', features: ['Everything in Pro', 'Team vocabulary sharing', 'Up to 5 team members', 'Priority support', 'Custom AI bot', 'Includes BizPocket Business'], highlight: false },
             ].map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-6 ${plan.highlight ? 'bg-[#4F46E5] text-white shadow-xl shadow-indigo-500/20 scale-[1.02]' : 'bg-white border border-slate-200'}`}>
-                <p className={`text-sm font-bold ${plan.highlight ? 'text-indigo-200' : 'text-[#4F46E5]'}`}>{plan.name}</p>
-                <p className="mt-2"><span className="text-3xl font-bold">{plan.price}</span><span className={`text-sm ${plan.highlight ? 'text-indigo-200' : 'text-[#6b7280]'}`}>{plan.period}</span></p>
+              <div key={i} className={`rounded-2xl p-6 ${plan.highlight ? 'bg-[#4F46E5] text-white shadow-xl shadow-indigo-500/20 scale-[1.02]' : 'bg-slate-800 border border-slate-700'}`}>
+                <p className={`text-sm font-bold ${plan.highlight ? 'text-indigo-200' : 'text-indigo-400'}`}>{plan.name}</p>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <p className="text-4xl font-bold text-white">{plan.price}</p>
+                  <span className={`text-sm ${plan.highlight ? 'text-indigo-200' : 'text-slate-400'}`}>{plan.period}</span>
+                </div>
+                <p className={`mt-1 text-xs ${plan.highlight ? 'text-indigo-200' : 'text-slate-400'}`}>{plan.desc}</p>
                 <div className="mt-5 space-y-2">
                   {plan.features.map((f, j) => (
                     <div key={j} className="flex items-center gap-2">
                       <svg className={`h-4 w-4 shrink-0 ${plan.highlight ? 'text-indigo-200' : 'text-[#16A34A]'}`} fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-                      <span className={`text-xs ${plan.highlight ? 'text-indigo-100' : 'text-[#374151]'}`}>{f}</span>
+                      <span className={`text-xs ${plan.highlight ? 'text-indigo-100' : 'text-slate-300'}`}>{f}</span>
                     </div>
                   ))}
                 </div>
-                <Link href="/signup?mode=pocketchat" className={`mt-6 block w-full rounded-xl py-3 text-center text-sm font-bold transition-colors ${plan.highlight ? 'bg-white text-[#4F46E5] hover:bg-indigo-50' : 'bg-[#4F46E5] text-white hover:bg-[#4338ca]'}`}>
+                <Link href="/signup?mode=pocketchat" className={`mt-6 block w-full rounded-xl py-3 text-center text-sm font-bold transition-colors ${plan.highlight ? 'bg-white text-indigo-400 hover:bg-indigo-50' : 'bg-[#4F46E5] text-white hover:bg-[#4338ca]'}`}>
                   {plan.name === 'Free' ? 'Get Started' : `Go ${plan.name}`}
                 </Link>
               </div>
@@ -452,7 +456,7 @@ export default function PocketChatLanding() {
       <section className="px-6 py-20 bg-slate-800">
         <div ref={s9.ref} className={`mx-auto max-w-[680px] text-center ${s9.className}`}>
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-3xl text-white font-bold">B</div>
-          <p className="text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5] mb-3">From a Fellow Foreigner</p>
+          <p className="text-[13px] font-semibold uppercase tracking-widest text-indigo-400 mb-3">From a Fellow Foreigner</p>
           <p className="text-[17px] leading-relaxed text-slate-300 italic">
             &ldquo;I built Evrywher because after years in Japan, I still couldn&apos;t read my own bank statement. I went to language school. They taught me &lsquo;the cat is on the table.&rsquo; I needed &lsquo;account number&rsquo; and &lsquo;transfer fee.&rsquo; So I built an app that learns from your actual life — not a textbook.&rdquo;
           </p>
@@ -465,7 +469,7 @@ export default function PocketChatLanding() {
       <section className="bg-slate-800 px-6 py-20">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-12 text-center">
-            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Real people. Real conversations.</p>
+            <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-indigo-400">Real people. Real conversations.</p>
             <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50">Trusted by expats worldwide</h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
@@ -547,9 +551,9 @@ export default function PocketChatLanding() {
       {/* ═══ 13. FINAL CTA ══════════════════════════════════════════════ */}
       <section className="px-6 py-24 text-center bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="mx-auto max-w-[560px]">
-          <p className="mb-4 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Translation. Communication. Education. One app.</p>
+          <p className="mb-4 text-[13px] font-semibold uppercase tracking-widest text-indigo-400">Translation. Communication. Education. One app.</p>
           <h2 className="mb-4 text-[clamp(28px,5vw,44px)] font-black leading-tight text-slate-50">
-            Start translating.<br />Start <span className="text-[#4F46E5]">learning</span>.
+            Start translating.<br />Start <span className="text-indigo-400">learning</span>.
           </h2>
           <p className="mb-2 text-[16px] text-slate-400">Your first 10 translations are free. Every day. Forever.</p>
           <p className="mb-10 text-[14px] text-[#9ca3af]">No download. No credit card. Open on your phone and go.</p>

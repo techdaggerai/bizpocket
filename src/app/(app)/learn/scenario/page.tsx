@@ -184,7 +184,7 @@ export default function ScenarioPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
         <p className="text-sm text-[var(--text-2)]">Failed to generate lesson</p>
-        <button onClick={() => router.push('/learn')} className="mt-4 text-sm text-[#4F46E5]">← Back</button>
+        <button onClick={() => router.push('/learn')} className="mt-4 text-sm text-indigo-400">← Back</button>
       </div>
     );
   }
@@ -201,7 +201,7 @@ export default function ScenarioPage() {
 
         <div className="mt-6 grid grid-cols-3 gap-3 w-full max-w-xs">
           <div className="rounded-2xl bg-[#EEF2FF] p-3 text-center">
-            <p className="text-xl font-bold text-[#4F46E5]">{lesson.scenes.length}</p>
+            <p className="text-xl font-bold text-indigo-400">{lesson.scenes.length}</p>
             <p className="text-[10px] text-[var(--text-4)]">Scenes</p>
           </div>
           <div className="rounded-2xl bg-[#D1FAE5] p-3 text-center">
@@ -216,7 +216,7 @@ export default function ScenarioPage() {
 
         <div className="mt-4 flex items-center gap-2 rounded-full bg-[#4F46E5]/10 px-4 py-2">
           <span className="text-sm">⭐</span>
-          <span className="text-sm font-bold text-[#4F46E5]">+{xp} XP</span>
+          <span className="text-sm font-bold text-indigo-400">+{xp} XP</span>
         </div>
 
         <button onClick={() => router.push('/learn')} className="mt-6 rounded-xl bg-[#4F46E5] px-8 py-3 text-sm font-bold text-white">
@@ -236,7 +236,7 @@ export default function ScenarioPage() {
       <div className="flex min-h-[80vh] flex-col px-4 pt-4">
         {/* Progress */}
         <div className="flex items-center gap-3 mb-6">
-          <span className="text-xs font-bold text-[#4F46E5]">QUIZ</span>
+          <span className="text-xs font-bold text-indigo-400">QUIZ</span>
           <div className="flex-1 h-2 rounded-full bg-slate-700">
             <div className="h-full rounded-full bg-[#4F46E5] transition-all" style={{ width: `${((quizIdx + 1) / lesson.quiz.length) * 100}%` }} />
           </div>
@@ -245,7 +245,7 @@ export default function ScenarioPage() {
 
         <div className="flex-1 flex flex-col items-center justify-center">
           <div className="w-full max-w-sm rounded-3xl border-2 border-slate-700 bg-slate-800 p-8 text-center">
-            <p className="text-xs font-semibold text-[#4F46E5] uppercase tracking-wider mb-4">Type the answer</p>
+            <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-4">Type the answer</p>
             <p className="text-base font-medium text-[var(--text-1)]">{q.question}</p>
             {q.hint && <p className="mt-2 text-xs text-[var(--text-4)] italic">Hint: {q.hint}</p>}
 
@@ -347,7 +347,7 @@ export default function ScenarioPage() {
               >
                 <span className="text-base font-bold text-[var(--text-1)]">{w.word}</span>
                 <span className="text-xs text-[var(--text-3)]">({w.reading})</span>
-                <span className="text-xs text-[#4F46E5] font-medium">{w.meaning}</span>
+                <span className="text-xs text-indigo-400 font-medium">{w.meaning}</span>
               </button>
             ))}
           </div>
@@ -363,7 +363,7 @@ export default function ScenarioPage() {
 
         {/* Practice prompt */}
         <div className="rounded-2xl border-2 border-[#4F46E5]/20 bg-slate-800 p-4">
-          <p className="text-xs font-bold text-[#4F46E5] uppercase tracking-wider mb-2">Your Turn</p>
+          <p className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">Your Turn</p>
           <p className="text-sm font-medium text-[var(--text-1)]">{scene.practice_prompt}</p>
 
           <div className="mt-3 flex gap-2">
@@ -389,7 +389,7 @@ export default function ScenarioPage() {
               <p className="text-base font-bold text-[var(--text-1)]">{scene.practice_answer.japanese}</p>
               <p className="text-xs text-[var(--text-3)]">{scene.practice_answer.reading}</p>
               <p className="text-xs text-[var(--text-2)] mt-1 italic">{scene.practice_answer.translation}</p>
-              <button onClick={() => speak(scene.practice_answer.japanese)} className="mt-2 text-[10px] text-[#4F46E5] font-medium">
+              <button onClick={() => speak(scene.practice_answer.japanese)} className="mt-2 text-[10px] text-indigo-400 font-medium">
                 🔊 Listen
               </button>
             </div>

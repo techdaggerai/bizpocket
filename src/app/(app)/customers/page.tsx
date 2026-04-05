@@ -345,13 +345,13 @@ export default function CustomersPage() {
                 <div className="ml-3 flex shrink-0 items-center gap-2">
                   <button
                     onClick={() => openEdit(c)}
-                    className="text-xs text-[#4F46E5] hover:opacity-80"
+                    className="text-xs text-indigo-400 hover:opacity-80"
                   >
                     Edit
                   </button>
                   <a
                     href={`/customers/${c.id}`}
-                    className="text-xs text-[var(--text-4)] hover:text-[#4F46E5]"
+                    className="text-xs text-[var(--text-4)] hover:text-indigo-400"
                   >
                     View
                   </a>

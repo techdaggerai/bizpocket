@@ -129,12 +129,12 @@ export default function LearningOnboarding() {
                   <span className="text-2xl">{l.flag}</span>
                   <span className="text-sm font-semibold text-[var(--text-1)] flex-1">{l.name}</span>
                   {l.rec && (
-                    <span className="rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[9px] font-bold text-[#4F46E5]">
+                    <span className="rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[9px] font-bold text-indigo-400">
                       RECOMMENDED
                     </span>
                   )}
                   {lang === l.code && (
-                    <svg className="h-5 w-5 text-[#4F46E5]" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                     </svg>
                   )}
@@ -170,7 +170,7 @@ export default function LearningOnboarding() {
                     <p className="text-xs text-[var(--text-4)] mt-0.5">{l.desc}</p>
                   </div>
                   {level === l.value && (
-                    <svg className="h-5 w-5 text-[#4F46E5] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-indigo-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                     </svg>
                   )}
@@ -208,7 +208,7 @@ export default function LearningOnboarding() {
                       <p className="text-[9px] text-[var(--text-4)]">{i.desc}</p>
                     </div>
                     {selected && (
-                      <svg className="h-4 w-4 text-[#4F46E5] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-4 w-4 text-indigo-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                       </svg>
                     )}
@@ -245,7 +245,7 @@ export default function LearningOnboarding() {
                     <p className="text-xs text-[var(--text-4)] mt-0.5">{g.desc}</p>
                   </div>
                   {dailyGoal === g.words && (
-                    <svg className="h-5 w-5 text-[#4F46E5] shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-indigo-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                     </svg>
                   )}

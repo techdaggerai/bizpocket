@@ -167,12 +167,12 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
         <div className="flex items-center gap-2">
-          <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
+          <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
             <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
           </svg>
-          <span className="text-[13px] font-medium text-slate-50">AI Invoice Helper</span>
+          <span className="text-[13px] font-medium text-white">AI Invoice Helper</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="text-[#999] hover:text-slate-50">
+        <button onClick={() => setIsOpen(false)} className="text-[#999] hover:text-white">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -233,7 +233,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage(message)}
           placeholder="Ask AI anything about your invoice..."
-          className="flex-1 text-[12px] text-slate-50 placeholder-[#BBB] bg-transparent focus:outline-none"
+          className="flex-1 text-[12px] text-white placeholder-[#BBB] bg-transparent focus:outline-none"
         />
         <button
           onClick={() => sendMessage(message)}

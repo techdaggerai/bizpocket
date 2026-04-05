@@ -167,7 +167,7 @@ export default function TopicPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center">
         <p className="text-sm text-[var(--text-4)]">Topic not found</p>
-        <button onClick={() => router.push('/learn')} className="mt-4 text-sm text-[#4F46E5]">← Back</button>
+        <button onClick={() => router.push('/learn')} className="mt-4 text-sm text-indigo-400">← Back</button>
       </div>
     );
   }
@@ -259,7 +259,7 @@ export default function TopicPage() {
                             </svg>
                           </button>
                         </div>
-                        <p className="text-sm text-[#4F46E5] font-medium mt-0.5">{w.meaning}</p>
+                        <p className="text-sm text-indigo-400 font-medium mt-0.5">{w.meaning}</p>
                         {w.example && (
                           <div className="mt-2 rounded-lg bg-[var(--bg-2)] p-2">
                             <p className="text-xs text-[var(--text-1)]">{w.example}</p>
@@ -275,7 +275,7 @@ export default function TopicPage() {
                         className={`ml-2 shrink-0 rounded-full h-8 w-8 flex items-center justify-center transition-colors ${
                           isSaved
                             ? 'bg-[#16A34A]/10 text-[#16A34A]'
-                            : 'bg-[var(--bg-2)] text-[var(--text-4)] hover:bg-[#4F46E5]/10 hover:text-[#4F46E5]'
+                            : 'bg-[var(--bg-2)] text-[var(--text-4)] hover:bg-[#4F46E5]/10 hover:text-indigo-400'
                         }`}
                       >
                         {isSaved ? (

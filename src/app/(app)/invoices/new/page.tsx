@@ -324,7 +324,7 @@ export default function NewInvoicePage() {
   };
 
   const TemplateComponent = (TEMPLATES[selectedTemplate] || TEMPLATES.classic).Component;
-  const inputClass = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
+  const inputClass = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-slate-400 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
 
   return (
     <>
@@ -334,10 +334,10 @@ export default function NewInvoicePage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-slate-800 rounded-2xl max-w-[95vw] w-full max-h-[90vh] overflow-y-auto p-8">
             <div className="flex items-center justify-between mb-4">
-              <div><h2 className="text-xl font-bold text-slate-50">Choose Your Template</h2><p className="text-sm text-[#999]">Select a template for your invoice</p></div>
+              <div><h2 className="text-xl font-bold text-white">Choose Your Template</h2><p className="text-sm text-slate-400">Select a template for your invoice</p></div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setShowTemplatePicker(false)} className="rounded-lg bg-[#4F46E5] px-5 py-2 text-sm font-medium text-white hover:bg-[#4338CA]">Use {TEMPLATES[selectedTemplate]?.name || 'Classic'}</button>
-                <button onClick={() => { setShowTemplatePicker(false); router.back(); }} className="text-[#999] hover:text-slate-50 p-1">
+                <button onClick={() => { setShowTemplatePicker(false); router.back(); }} className="text-slate-400 hover:text-white p-1">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -349,9 +349,9 @@ export default function NewInvoicePage() {
                   <div className="absolute inset-0 origin-top-left pointer-events-none" style={{ transform: 'scale(0.42)', width: '238%', height: '238%' }}>
                     <tpl.Component data={liveInvoiceData} />
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent pt-10 pb-3 px-3">
-                    <p className="text-sm font-semibold text-slate-50">{tpl.name}</p>
-                    <p className="text-[10px] text-[#999]">{tpl.description}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-10 pb-3 px-3">
+                    <p className="text-sm font-semibold text-white">{tpl.name}</p>
+                    <p className="text-[10px] text-slate-400">{tpl.description}</p>
                   </div>
                   {selectedTemplate === key && <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-[#4F46E5] flex items-center justify-center"><svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>}
                 </button>
@@ -366,7 +366,7 @@ export default function NewInvoicePage() {
         <div className="fixed inset-0 z-50 bg-slate-800 lg:hidden overflow-y-auto">
           <div className="sticky top-0 bg-slate-800 border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold">Live Preview</h3>
-            <button onClick={() => setShowMobilePreview(false)} className="text-sm text-[#4F46E5] font-medium">Close</button>
+            <button onClick={() => setShowMobilePreview(false)} className="text-sm text-indigo-400 font-medium">Close</button>
           </div>
           <div className="p-4"><div id="invoice-preview-mobile"><TemplateComponent data={liveInvoiceData} /></div></div>
         </div>
@@ -378,31 +378,31 @@ export default function NewInvoicePage() {
         <div className="flex-1 min-w-0 space-y-3 lg:max-w-[480px]">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-slate-50">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
-              <button onClick={() => setShowTemplatePicker(true)} className="text-xs text-[#4F46E5] font-medium hover:underline mt-0.5">Template: {TEMPLATES[selectedTemplate]?.name || 'Classic'} — Change</button>
+              <h1 className="text-xl font-bold text-white">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
+              <button onClick={() => setShowTemplatePicker(true)} className="text-xs text-indigo-400 font-medium hover:underline mt-0.5">Template: {TEMPLATES[selectedTemplate]?.name || 'Classic'} — Change</button>
             </div>
-            <button onClick={() => router.push('/invoices')} className="text-sm text-[#999]">Cancel</button>
+            <button onClick={() => router.push('/invoices')} className="text-sm text-slate-400">Cancel</button>
           </div>
 
           {/* Customer */}
           <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-2.5">
-            <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Customer</h3>
+            <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.1em]">Customer</h3>
             <div className="relative">
               <input value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} placeholder="Search or type customer name..." className={inputClass + ' pl-9'} />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#CCC]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             </div>
             {customerSearch && !selectedCustomer && filteredCustomers.length > 0 && (
               <div className="max-h-[160px] overflow-y-auto rounded-lg border border-slate-700 divide-y divide-[#F0F0F0]">
-                {filteredCustomers.map(c => (<button key={c.id} onClick={() => { setSelectedCustomerId(c.id); setCustomerSearch(c.name); }} className="w-full px-3 py-2 text-left hover:bg-slate-800"><p className="text-sm font-medium text-slate-50">{c.name}</p>{c.email && <p className="text-[10px] text-[#999]">{c.email}</p>}</button>))}
+                {filteredCustomers.map(c => (<button key={c.id} onClick={() => { setSelectedCustomerId(c.id); setCustomerSearch(c.name); }} className="w-full px-3 py-2 text-left hover:bg-slate-800"><p className="text-sm font-medium text-white">{c.name}</p>{c.email && <p className="text-[10px] text-slate-400">{c.email}</p>}</button>))}
               </div>
             )}
             {selectedCustomer && (
               <div className="flex items-center justify-between rounded-lg bg-[#4F46E5]/5 border border-[#4F46E5]/20 px-3 py-2">
-                <div><p className="text-sm font-medium text-slate-50">{selectedCustomer.name}</p>{selectedCustomer.email && <p className="text-[10px] text-[#999]">{selectedCustomer.email}</p>}</div>
+                <div><p className="text-sm font-medium text-white">{selectedCustomer.name}</p>{selectedCustomer.email && <p className="text-[10px] text-slate-400">{selectedCustomer.email}</p>}</div>
                 <button onClick={() => { setSelectedCustomerId(null); setCustomerSearch(''); }} className="text-[10px] text-[#DC2626]">Change</button>
               </div>
             )}
-            <button onClick={() => setShowNewCustomer(!showNewCustomer)} className="text-xs text-[#4F46E5] font-medium">{showNewCustomer ? 'Cancel' : '+ Add New Customer'}</button>
+            <button onClick={() => setShowNewCustomer(!showNewCustomer)} className="text-xs text-indigo-400 font-medium">{showNewCustomer ? 'Cancel' : '+ Add New Customer'}</button>
             {showNewCustomer && (
               <div className="space-y-2 border-t border-[var(--border)] pt-2">
                 <input value={newCustomer.name} onChange={e => setNewCustomer({...newCustomer, name: e.target.value})} placeholder="Name *" className={inputClass} />
@@ -417,12 +417,12 @@ export default function NewInvoicePage() {
             )}
             <div className="border-t border-[var(--border)] pt-2.5 space-y-2">
               <div className="grid grid-cols-2 gap-2">
-                <div><label className="text-[10px] text-[#999]">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
-                <div><label className="text-[10px] text-[#999]">Due Date</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} /></div>
+                <div><label className="text-[10px] text-slate-400">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
+                <div><label className="text-[10px] text-slate-400">Due Date</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} /></div>
               </div>
               <div>
-                <label className="text-[10px] text-[#999]">Language</label>
-                <div className="flex gap-1.5 mt-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-3 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{l}</button>))}</div>
+                <label className="text-[10px] text-slate-400">Language</label>
+                <div className="flex gap-1.5 mt-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-3 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-slate-400'}`}>{l}</button>))}</div>
               </div>
             </div>
           </div>
@@ -430,13 +430,13 @@ export default function NewInvoicePage() {
           {/* Items */}
           <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-2.5">
             <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Items</h3>
-              {(templates.length > 0 || cycleItems.length > 0) && <button onClick={() => setShowTemplates(!showTemplates)} className="text-[10px] text-[#4F46E5] font-medium">From Saved</button>}
+              <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.1em]">Items</h3>
+              {(templates.length > 0 || cycleItems.length > 0) && <button onClick={() => setShowTemplates(!showTemplates)} className="text-[10px] text-indigo-400 font-medium">From Saved</button>}
             </div>
             {showTemplates && (
               <div className="flex gap-1.5 overflow-x-auto pb-1">
                 {templates.map(tpl => (<button key={tpl.id} onClick={() => addFromTemplate(tpl)} className="shrink-0 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] hover:bg-slate-800">{tpl.name} — {formatCurrency(tpl.default_price, currency)}</button>))}
-                {cycleItems.map((ci, i) => (<button key={`ci-${i}`} onClick={() => { setLineItems(prev => [...prev, calcLineItem({ ...emptyLineItem(), line_number: prev.length + 1, description: ci.name, unit_price: ci.sale_price || ci.purchase_price || 0 })]); }} className="shrink-0 rounded-lg border border-[#4F46E5]/20 bg-[#4F46E5]/5 px-2.5 py-1.5 text-[10px] text-[#4F46E5]">{ci.name}</button>))}
+                {cycleItems.map((ci, i) => (<button key={`ci-${i}`} onClick={() => { setLineItems(prev => [...prev, calcLineItem({ ...emptyLineItem(), line_number: prev.length + 1, description: ci.name, unit_price: ci.sale_price || ci.purchase_price || 0 })]); }} className="shrink-0 rounded-lg border border-[#4F46E5]/20 bg-[#4F46E5]/5 px-2.5 py-1.5 text-[10px] text-indigo-400">{ci.name}</button>))}
               </div>
             )}
             {lineItems.map((item, i) => (
@@ -454,19 +454,19 @@ export default function NewInvoicePage() {
                   <div className="col-span-2"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
                   <div className="col-span-5"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
                   <div className="col-span-2"><select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' text-[10px]'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select></div>
-                  <div className="col-span-3 text-right"><p className="font-mono text-sm font-semibold text-slate-50">{formatCurrency(item.total_price, currency)}</p></div>
+                  <div className="col-span-3 text-right"><p className="font-mono text-sm font-semibold text-white">{formatCurrency(item.total_price, currency)}</p></div>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
               </div>
             ))}
             <div className="flex items-center gap-4 pt-1">
-              <button onClick={addLineItem} className="text-xs text-[#4F46E5] font-medium">+ Add Item</button>
+              <button onClick={addLineItem} className="text-xs text-indigo-400 font-medium">+ Add Item</button>
               <button onClick={() => setShowAddColumn(!showAddColumn)} className="text-xs text-[#F59E0B] font-medium">+ Add Column</button>
               <label className="text-xs text-[#0EA5E9] font-medium cursor-pointer">
                 + Attach Photo/File
                 <input type="file" className="hidden" accept="image/*,.pdf,.doc,.docx" onChange={handleAttachmentUpload} disabled={uploadingAttachment} />
               </label>
-              {uploadingAttachment && <span className="text-[10px] text-[#999]">Uploading...</span>}
+              {uploadingAttachment && <span className="text-[10px] text-slate-400">Uploading...</span>}
             </div>
             {attachments.length > 0 && (
               <div className="flex gap-2 flex-wrap">
@@ -477,7 +477,7 @@ export default function NewInvoicePage() {
                     ) : (
                       <svg className="h-4 w-4 text-[#DC2626]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>
                     )}
-                    <span className="text-[10px] text-[#666] max-w-[80px] truncate">{att.name}</span>
+                    <span className="text-[10px] text-slate-400 max-w-[80px] truncate">{att.name}</span>
                     <button onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))} className="text-[10px] text-[#DC2626]">✕</button>
                   </div>
                 ))}
@@ -485,7 +485,7 @@ export default function NewInvoicePage() {
             )}
             {customColumns.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[9px] text-[#999]">Custom:</span>
+                <span className="text-[9px] text-slate-400">Custom:</span>
                 {customColumns.map(col => (
                   <button key={col} onClick={() => { const u = customColumns.filter(c => c !== col); setCustomColumns(u); supabase.from('organizations').update({ custom_invoice_columns: u }).eq('id', organization.id); }}
                     className="rounded-full bg-[#F59E0B]/10 border border-[#F59E0B]/20 px-2.5 py-0.5 text-[10px] font-medium text-[#92400E] hover:bg-[#F59E0B]/20">{col} ✕</button>
@@ -500,28 +500,28 @@ export default function NewInvoicePage() {
               </div>
             )}
             <div className="border-t border-[var(--border)] pt-3">
-              <div className="flex gap-1.5 mb-2">{(['none','percent','fixed'] as const).map(d => (<button key={d} onClick={() => setDiscountType(d)} className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${discountType === d ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{d === 'none' ? 'No discount' : d === 'percent' ? '% Off' : currency + ' Off'}</button>))}</div>
+              <div className="flex gap-1.5 mb-2">{(['none','percent','fixed'] as const).map(d => (<button key={d} onClick={() => setDiscountType(d)} className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${discountType === d ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-slate-400'}`}>{d === 'none' ? 'No discount' : d === 'percent' ? '% Off' : currency + ' Off'}</button>))}</div>
               {discountType !== 'none' && <input type="number" value={discountValue || ''} onChange={e => setDiscountValue(parseInt(e.target.value) || 0)} placeholder={discountType === 'percent' ? 'Discount %' : 'Discount amount'} className={inputClass} />}
             </div>
             <div className="border-t border-[var(--border)] pt-3 space-y-1">
-              <div className="flex justify-between text-sm text-[#666]"><span>Subtotal</span><span className="font-mono">{formatCurrency(subtotal, currency)}</span></div>
+              <div className="flex justify-between text-sm text-slate-400"><span>Subtotal</span><span className="font-mono">{formatCurrency(subtotal, currency)}</span></div>
               {overallDiscountAmount > 0 && <div className="flex justify-between text-sm text-[#16A34A]"><span>Discount</span><span className="font-mono">-{formatCurrency(overallDiscountAmount, currency)}</span></div>}
-              <div className="flex justify-between text-sm text-[#666]"><span>Tax</span><span className="font-mono">{formatCurrency(taxTotal, currency)}</span></div>
-              <div className="flex justify-between text-base font-bold text-slate-50 pt-1 border-t border-[#0A0A0A]"><span>Total</span><span className="font-mono">{formatCurrency(grandTotal, currency)}</span></div>
+              <div className="flex justify-between text-sm text-slate-400"><span>Tax</span><span className="font-mono">{formatCurrency(taxTotal, currency)}</span></div>
+              <div className="flex justify-between text-base font-bold text-white pt-1 border-t border-[#0A0A0A]"><span>Total</span><span className="font-mono">{formatCurrency(grandTotal, currency)}</span></div>
             </div>
           </div>
 
           {/* Payment & Notes */}
           <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-3">
-            <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Payment & Notes</h3>
+            <h3 className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.1em]">Payment & Notes</h3>
             <div className="flex gap-1.5">
               {[{k:'bank_transfer',l:'Bank Transfer'},{k:'cash',l:'Cash'},{k:'credit_card',l:'Card'}].map(({k,l}) => (
-                <button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-2 text-[11px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{l}</button>
+                <button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-2 text-[11px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-slate-400'}`}>{l}</button>
               ))}
             </div>
             {paymentMethod === 'bank_transfer' && (
               <div className="space-y-2 rounded-lg bg-slate-800 p-3">
-                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider">Bank Details</p>
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Bank Details</p>
                 <div className="grid grid-cols-2 gap-2">
                   <input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="Bank name" className={inputClass} />
                   <input value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="Branch" className={inputClass} />
@@ -540,12 +540,12 @@ export default function NewInvoicePage() {
                   <button type="button" onClick={() => {
                     const field = prompt('Add payment field (e.g. SWIFT Code, IBAN, Routing Number, ACH):');
                     if (field) setInvoiceNotes(prev => prev ? prev + '\n' + field + ': ' : field + ': ');
-                  }} className="text-[10px] text-[#4F46E5] font-medium">+ Add SWIFT / IBAN / ACH</button>
+                  }} className="text-[10px] text-indigo-400 font-medium">+ Add SWIFT / IBAN / ACH</button>
                 </div>
               </div>
             )}
             <div>
-              <label className="text-[10px] text-[#999]">T-Number (インボイス制度)</label>
+              <label className="text-[10px] text-slate-400">T-Number (インボイス制度)</label>
               <input type="text" value={tNumber} onChange={e => setTNumber(e.target.value)} placeholder="T1234567890123" className={inputClass} />
             </div>
             <div className="space-y-2">
@@ -561,14 +561,14 @@ export default function NewInvoicePage() {
                 <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
               ) : (
                 <>
-                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
+                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-sm font-medium text-slate-400 disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
                   <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Sending...' : 'Send to Client'}</button>
                 </>
               )}
             </div>
             <div className="flex gap-2">
-              <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-[#999]">Download PDF</button>
-              <button onClick={handleShare} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-[#999]">Share Link</button>
+              <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-slate-400">Download PDF</button>
+              <button onClick={handleShare} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-slate-400">Share Link</button>
             </div>
           </div>
         </div>
@@ -577,15 +577,15 @@ export default function NewInvoicePage() {
         <div className="hidden lg:block flex-1 shrink-0">
           <div className="sticky top-4 h-[calc(100vh-2rem)]">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
-              <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.1em]">Live Preview</p>
+              <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-indigo-400 font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden shadow-sm">
               <div id="invoice-preview" className="origin-top-left h-full" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>
             </div>
-            {disclaimer && <div className="mt-2 rounded-lg bg-[#F5F5F5] px-3 py-2 text-[9px] text-[#999]">{disclaimer}</div>}
+            {disclaimer && <div className="mt-2 rounded-lg bg-[#F5F5F5] px-3 py-2 text-[9px] text-slate-400">{disclaimer}</div>}
           </div>
         </div>
       </div>

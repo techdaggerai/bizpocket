@@ -11,13 +11,13 @@ const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
   payment_due: { icon: '$', color: 'bg-[#16A34A]/10 text-[#16A34A]' },
   tax_deadline: { icon: 'T', color: 'bg-[#F59E0B]/10 text-[#F59E0B]' },
   low_balance: { icon: '!', color: 'bg-[#DC2626]/10 text-[#DC2626]' },
-  expense_reminder: { icon: 'E', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
+  expense_reminder: { icon: 'E', color: 'bg-[#4F46E5]/10 text-indigo-400' },
   planner_reminder: { icon: 'P', color: 'bg-[#7C3AED]/10 text-[#7C3AED]' },
-  new_message: { icon: '💬', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
+  new_message: { icon: '💬', color: 'bg-[#4F46E5]/10 text-indigo-400' },
   new_contact: { icon: '👤', color: 'bg-[#10B981]/10 text-[#10B981]' },
   trial_expiring: { icon: '⏰', color: 'bg-[#F59E0B]/10 text-[#F59E0B]' },
   limit_reached: { icon: '🔒', color: 'bg-[#9CA3AF]/10 text-[#6B7280]' },
-  system: { icon: '📢', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
+  system: { icon: '📢', color: 'bg-[#4F46E5]/10 text-indigo-400' },
 };
 
 function timeAgo(dateStr: string): string {
@@ -132,7 +132,7 @@ export default function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-[#4F46E5] hover:opacity-80"
+                className="text-xs text-indigo-400 hover:opacity-80"
               >
                 Mark all read
               </button>

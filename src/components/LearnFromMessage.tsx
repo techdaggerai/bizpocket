@@ -59,7 +59,7 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
               {learning.key_words.map((w, i) => (
                 <div key={i} className="flex items-center gap-2 py-1">
                   <div className="flex-1 min-w-0">
-                    <span className="text-[14px] font-semibold text-slate-50">{w.word}</span>
+                    <span className="text-[14px] font-semibold text-white">{w.word}</span>
                     {w.reading && <span className="text-[12px] text-slate-400 ml-1">({w.reading})</span>}
                     <span className="text-[12px] text-[#9CA3AF] ml-1.5">— {w.meaning}</span>
                   </div>

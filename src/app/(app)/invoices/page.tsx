@@ -90,7 +90,7 @@ export default function InvoicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-50">Your Invoices</h1>
+          <h1 className="text-xl font-bold text-white">Your Invoices</h1>
           <p className="text-xs text-[#999]">{invoices.length} total · {invoices.filter(i => i.status === 'paid').length} paid</p>
         </div>
         <a
@@ -103,11 +103,11 @@ export default function InvoicesPage() {
 
       {/* Quick Links — Estimates & Time */}
       <div className="flex gap-3">
-        <a href="/estimates" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-slate-50 hover:bg-[#F59E0B]/[0.06] transition-colors">
+        <a href="/estimates" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-white hover:bg-[#F59E0B]/[0.06] transition-colors">
           <svg className="h-5 w-5 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 12h6M9 16h6M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M13 2v6h6"/></svg>
           Estimates
         </a>
-        <a href="/time-tracking" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-slate-50 hover:bg-[#F59E0B]/[0.06] transition-colors">
+        <a href="/time-tracking" className="flex-1 flex items-center gap-3 rounded-xl border-2 border-[#F59E0B]/30 bg-[#F59E0B]/[0.03] px-4 py-3 text-sm font-medium text-white hover:bg-[#F59E0B]/[0.06] transition-colors">
           <svg className="h-5 w-5 text-[#F59E0B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           Time Tracking
         </a>

@@ -127,7 +127,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
         onClick={() => setIsOpen(true)}
         className="w-full rounded-xl border border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-3 text-center hover:bg-[#4F46E5]/[0.05] transition-colors"
       >
-        <p className="text-[13px] font-medium text-[#4F46E5]">Quick entry — tell AI what happened</p>
+        <p className="text-[13px] font-medium text-indigo-400">Quick entry — tell AI what happened</p>
         <p className="text-[10px] text-[#999] mt-0.5">&quot;Paid ¥5000 for flour&quot; or &quot;Got ¥50000 from Tanaka&quot;</p>
       </button>
     );
@@ -139,10 +139,10 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
         <>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              <span className="text-[13px] font-medium text-slate-50">Quick entry</span>
+              <span className="text-[13px] font-medium text-white">Quick entry</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-[#999] text-xs">Close</button>
           </div>
@@ -185,7 +185,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
       ) : (
         /* Confirm parsed entry */
         <div>
-          <p className="text-[11px] font-medium text-[#4F46E5] uppercase tracking-wider mb-3">AI parsed your entry — confirm?</p>
+          <p className="text-[11px] font-medium text-indigo-400 uppercase tracking-wider mb-3">AI parsed your entry — confirm?</p>
           <div className="space-y-2 mb-3">
             <div className="flex justify-between text-sm">
               <span className="text-[#666]">Type</span>

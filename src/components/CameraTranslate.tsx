@@ -198,7 +198,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-8">
               <div className="bg-slate-800 rounded-2xl p-6 text-center max-w-sm">
                 <p className="text-sm text-[#DC2626] font-medium mb-3">{error}</p>
-                <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Go Back</button>
+                <button onClick={onClose} className="text-sm text-indigo-400 font-medium">Go Back</button>
               </div>
             </div>
           )}
@@ -277,8 +277,8 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
       <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
-          <button onClick={() => setStep('result')} className="text-sm text-[#4F46E5] font-medium">← Back</button>
-          <p className="text-sm font-bold text-slate-50">📝 Field {fillFieldIdx + 1} of {total}</p>
+          <button onClick={() => setStep('result')} className="text-sm text-indigo-400 font-medium">← Back</button>
+          <p className="text-sm font-bold text-white">📝 Field {fillFieldIdx + 1} of {total}</p>
           <button onClick={() => setStep('result')} className="text-sm text-[#9CA3AF]">Done</button>
         </div>
 
@@ -292,7 +292,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           {/* Japanese label */}
           <div className="bg-amber-950/20 rounded-xl p-4 border border-[#FDE68A]/40 border-amber-800/30">
             <p className="text-[11px] font-semibold text-[#FDE68A] uppercase tracking-wider mb-1">Japanese Label</p>
-            <p className="text-[18px] font-medium text-slate-50">{field.japanese}</p>
+            <p className="text-[18px] font-medium text-white">{field.japanese}</p>
           </div>
 
           {/* English meaning */}
@@ -307,7 +307,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
               <span className="text-base">💡</span>
               <p className="text-[11px] font-semibold text-[#A5B4FC] uppercase tracking-wider">What to Write</p>
             </div>
-            <p className="text-[16px] font-medium text-slate-50 leading-relaxed">{field.instruction}</p>
+            <p className="text-[16px] font-medium text-white leading-relaxed">{field.instruction}</p>
           </div>
 
           {/* Copy button */}
@@ -333,7 +333,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           {/* Write instruction */}
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700/50">
             <span className="text-sm">✏️</span>
-            <p className="text-[12px] text-slate-400">Write this in the field marked <span className="font-bold text-[#4F46E5]">#{fillFieldIdx + 1}</span> on the form</p>
+            <p className="text-[12px] text-slate-400">Write this in the field marked <span className="font-bold text-indigo-400">#{fillFieldIdx + 1}</span> on the form</p>
           </div>
         </div>
 
@@ -371,13 +371,13 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
     <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
-        <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Done</button>
-        <p className="text-sm font-bold text-slate-50">
+        <button onClick={onClose} className="text-sm text-indigo-400 font-medium">Done</button>
+        <p className="text-sm font-bold text-white">
           {result?.document_type ? `📄 ${result.document_type}` : 'Translation'}
         </p>
         <button
           onClick={copyTranslation}
-          className="text-sm text-[#4F46E5] font-medium"
+          className="text-sm text-indigo-400 font-medium"
         >
           Copy
         </button>
@@ -399,7 +399,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             <div>
               <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Translation</h3>
               <div className="bg-slate-800 rounded-xl p-4">
-                <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{result.translation}</p>
+                <p className="text-[15px] text-white leading-relaxed whitespace-pre-wrap">{result.translation}</p>
               </div>
             </div>
 
@@ -424,10 +424,10 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
                   {result.fields.map((f, i) => (
                     <div key={i} className="bg-slate-800 rounded-xl border border-slate-700 p-3">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <span className="text-[13px] font-medium text-slate-50">{f.english}</span>
+                        <span className="text-[13px] font-medium text-white">{f.english}</span>
                         <span className="text-[11px] text-[#9CA3AF] shrink-0">{f.japanese}</span>
                       </div>
-                      <p className="text-[12px] text-[#4F46E5] leading-relaxed">{f.instruction}</p>
+                      <p className="text-[12px] text-indigo-400 leading-relaxed">{f.instruction}</p>
                     </div>
                   ))}
                 </div>
@@ -462,7 +462,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           {onSendToChat && result && (
             <button
               onClick={() => onSendToChat(`📄 ${result.document_type}\n\n${result.translation}`)}
-              className="flex-1 rounded-xl border border-[#4F46E5] py-2.5 text-sm font-semibold text-[#4F46E5]"
+              className="flex-1 rounded-xl border border-indigo-400 py-2.5 text-sm font-semibold text-indigo-400"
             >
               Send to Chat
             </button>

@@ -115,10 +115,10 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
     return (
       <button onClick={() => setShowPad(true)}
         className="w-full rounded-xl border-2 border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] py-4 text-center hover:bg-[#4F46E5]/[0.05] transition-colors">
-        <svg className="h-6 w-6 text-[#4F46E5] mx-auto mb-1" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <svg className="h-6 w-6 text-indigo-400 mx-auto mb-1" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
         </svg>
-        <p className="text-sm font-medium text-[#4F46E5]">Sign this invoice</p>
+        <p className="text-sm font-medium text-indigo-400">Sign this invoice</p>
         <p className="text-[10px] text-[#999]">Add your signature to confirm</p>
       </button>
     );
@@ -127,7 +127,7 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
   return (
     <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-50">Sign Invoice</h3>
+        <h3 className="text-sm font-semibold text-white">Sign Invoice</h3>
         <button onClick={() => setShowPad(false)} className="text-xs text-[#999]">Cancel</button>
       </div>
 

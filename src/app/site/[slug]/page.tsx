@@ -58,7 +58,7 @@ export default function PublicSitePage() {
         <div className="text-center px-4">
           <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">404</h1>
           <p className="text-sm text-[#666] mb-4">This website doesn&apos;t exist or has been unpublished.</p>
-          <a href="https://www.bizpocket.io" className="text-sm text-[#4F46E5] font-medium hover:underline">
+          <a href="https://www.bizpocket.io" className="text-sm text-indigo-400 font-medium hover:underline">
             Create your own website with BizPocket →
           </a>
         </div>
@@ -77,7 +77,7 @@ export default function PublicSitePage() {
         />
         <div className="text-center py-3 border-t border-[#f3f4f6] bg-white">
           <a href="https://www.bizpocket.io?ref=site" target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#9ca3af] no-underline">
-            Built with <span className="text-[#4F46E5] font-semibold">BizPocket</span> — AI Business Autopilot
+            Built with <span className="text-indigo-400 font-semibold">BizPocket</span> — AI Business Autopilot
           </a>
         </div>
       </div>

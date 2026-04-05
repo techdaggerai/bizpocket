@@ -368,7 +368,7 @@ export default function ContactsPage() {
             onClick={() => setActiveTab(tab.value)}
             className={`rounded-[20px] px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.value
-                ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                ? 'bg-[rgba(79,70,229,0.08)] text-indigo-400'
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
             }`}
           >
@@ -383,7 +383,7 @@ export default function ContactsPage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search contacts..."
-        className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+        className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
       />
 
       {/* Contact Form Modal / Bottom Sheet */}
@@ -393,70 +393,70 @@ export default function ContactsPage() {
           <div className="relative w-full max-w-md sm:mx-4 bg-slate-800 rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b border-slate-700 bg-slate-800 rounded-t-2xl">
-              <h2 className="text-[15px] font-bold text-slate-50">
+              <h2 className="text-[15px] font-bold text-white">
                 {editingId ? 'Edit Contact' : 'New Contact'}
               </h2>
-              <button onClick={cancelForm} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 text-[#9CA3AF] hover:text-slate-50 transition-colors" aria-label="Close">
+              <button onClick={cancelForm} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-700 text-slate-400 hover:text-white transition-colors" aria-label="Close">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-3">
               <div>
-                <label className="text-sm font-medium text-slate-300 mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
+                <label className="text-sm font-medium text-slate-200 mb-1.5 block">Name <span className="text-[#DC2626]">*</span></label>
                 <input type="text" value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Contact name" required
-                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
               </div>
 
               {!isPocketChatMode && (
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-1.5 block">Company</label>
+                  <label className="text-sm font-medium text-slate-200 mb-1.5 block">Company</label>
                   <input type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} placeholder="Company name"
-                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-1.5 block">Phone</label>
+                  <label className="text-sm font-medium text-slate-200 mb-1.5 block">Phone</label>
                   <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="Phone number"
-                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-1.5 block">Email</label>
+                  <label className="text-sm font-medium text-slate-200 mb-1.5 block">Email</label>
                   <input type="email" value={form.email} onChange={(e) => updateField('email', e.target.value)} placeholder="Email address"
-                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-1.5 block">Country</label>
+                  <label className="text-sm font-medium text-slate-200 mb-1.5 block">Country</label>
                   <input type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} placeholder="Country"
-                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-300 mb-1.5 block">Type</label>
+                  <label className="text-sm font-medium text-slate-200 mb-1.5 block">Type</label>
                   <select value={form.contact_type} onChange={(e) => updateField('contact_type', e.target.value)}
-                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                    className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
                     {typeOptions.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-slate-300 mb-1.5 block">Language</label>
+                <label className="text-sm font-medium text-slate-200 mb-1.5 block">Language</label>
                 <select value={form.language} onChange={(e) => updateField('language', e.target.value)}
-                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
+                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]">
                   {CONTACT_LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
                 </select>
-                <p className="text-[11px] text-[var(--text-4)] text-slate-500 mt-1">AI will translate messages to this language</p>
+                <p className="text-[11px] text-slate-400 mt-1">AI will translate messages to this language</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-slate-300 mb-1.5 block">Notes</label>
+                <label className="text-sm font-medium text-slate-200 mb-1.5 block">Notes</label>
                 <textarea value={form.notes} onChange={(e) => updateField('notes', e.target.value)} placeholder="Additional notes" rows={2}
-                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-slate-50 placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
+                  className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-white placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none" />
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -465,7 +465,7 @@ export default function ContactsPage() {
                   {saving ? 'Saving...' : editingId ? 'Update' : 'Save Contact'}
                 </button>
                 <button type="button" onClick={cancelForm}
-                  className="rounded-btn border border-slate-700 px-4 py-2.5 text-sm text-slate-400">
+                  className="rounded-btn border border-slate-700 px-4 py-2.5 text-sm text-slate-200">
                   Cancel
                 </button>
               </div>
@@ -478,14 +478,14 @@ export default function ContactsPage() {
       {filtered.length === 0 ? (
         <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
           {search || activeTab !== 'all' ? (
-            <p className="text-sm text-[var(--text-3)] text-slate-400">No contacts match your filters.</p>
+            <p className="text-sm text-slate-200">No contacts match your filters.</p>
           ) : (
             <>
               <div className="mx-auto mb-3 h-14 w-14 rounded-full bg-slate-700 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
               </div>
-              <p className="text-sm font-medium text-slate-50">No contacts yet</p>
-              <p className="text-xs text-[var(--text-3)] text-slate-400 mt-1">Add someone to start chatting!</p>
+              <p className="text-sm font-medium text-white">No contacts yet</p>
+              <p className="text-xs text-slate-400 mt-1">Add someone to start chatting!</p>
               <button onClick={openAdd} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Contact
@@ -506,7 +506,7 @@ export default function ContactsPage() {
               {/* Name + badge + language */}
               <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailContact(c)}>
                 <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-medium text-slate-50 truncate">{c.name}</p>
+                  <p className="text-[14px] font-medium text-white truncate">{c.name}</p>
                   <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.category ?? c.contact_type] || BADGE_COLORS.friend}`}>
                     {c.category ?? c.contact_type}
                   </span>
@@ -522,7 +522,7 @@ export default function ContactsPage() {
               <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => router.push(`/chat?contact=${c.id}`)}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-indigo-400 hover:bg-[#4F46E5]/10 transition-colors"
                   title="Chat">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -530,7 +530,7 @@ export default function ContactsPage() {
                 </button>
                 <button
                   onClick={() => openEdit(c)}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#9CA3AF] hover:bg-slate-700 transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors"
                   title="Edit">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -544,7 +544,7 @@ export default function ContactsPage() {
                       Delete?
                     </button>
                     <button onClick={() => setDeleteConfirmId(null)}
-                      className="text-[11px] text-[var(--text-3)] text-slate-400 px-1">
+                      className="text-[11px] text-slate-400 px-1">
                       No
                     </button>
                   </div>
@@ -569,10 +569,10 @@ export default function ContactsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowQR(false)} />
           <div className="relative bg-slate-800 rounded-2xl p-6 w-full max-w-xs mx-4 text-center">
-            <button onClick={() => setShowQR(false)} className="absolute top-3 right-3 text-[#A3A3A3] hover:text-slate-50">
+            <button onClick={() => setShowQR(false)} className="absolute top-3 right-3 text-slate-400 hover:text-white">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
-            <h3 className="text-lg font-bold text-slate-50 mb-4">Your Invite QR</h3>
+            <h3 className="text-lg font-bold text-white mb-4">Your Invite QR</h3>
             {qrDataUrl ? (
               <img src={qrDataUrl} alt="Invite QR Code" className="mx-auto w-[280px] h-[280px] rounded-xl" />
             ) : (
@@ -580,10 +580,10 @@ export default function ContactsPage() {
                 <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
               </div>
             )}
-            <p className="mt-4 text-sm text-slate-400">Scan to chat with me on Evrywher</p>
+            <p className="mt-4 text-sm text-slate-200">Scan to chat with me on Evrywher</p>
             <canvas ref={qrCanvasRef} className="hidden" />
             <div className="flex gap-2 mt-5">
-              <button onClick={downloadQR} className="flex-1 rounded-lg border border-slate-700 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700 transition-colors">
+              <button onClick={downloadQR} className="flex-1 rounded-lg border border-slate-700 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-700 transition-colors">
                 Download
               </button>
               <button onClick={shareQR} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors">
@@ -601,8 +601,8 @@ export default function ContactsPage() {
           <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
             {/* Header */}
             <div className="p-5 border-b border-slate-700 flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-50">Contact Details</h2>
-              <button onClick={() => setDetailContact(null)} className="text-[#A3A3A3] hover:text-slate-50">
+              <h2 className="text-base font-bold text-white">Contact Details</h2>
+              <button onClick={() => setDetailContact(null)} className="text-slate-400 hover:text-white">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -612,7 +612,7 @@ export default function ContactsPage() {
               <div className="flex flex-col items-center gap-3">
                 <PocketAvatar name={detailContact.name} size={80} />
                 <div className="text-center">
-                  <p className="text-xl font-bold text-slate-50">{detailContact.name}</p>
+                  <p className="text-xl font-bold text-white">{detailContact.name}</p>
                   <span className={`inline-block mt-1 text-xs font-medium rounded-full px-3 py-0.5 capitalize ${BADGE_COLORS[detailContact.category ?? detailContact.contact_type] || BADGE_COLORS.friend}`}>
                     {detailContact.category ?? detailContact.contact_type}
                   </span>
@@ -623,32 +623,32 @@ export default function ContactsPage() {
               <div className="space-y-0.5">
                 {detailContact.company && (
                   <div className="flex items-center justify-between bg-slate-800 px-4 py-3 rounded-t-lg">
-                    <span className="text-sm text-slate-400">Company</span>
-                    <span className="text-sm font-medium text-slate-50">{detailContact.company}</span>
+                    <span className="text-sm text-slate-300">Company</span>
+                    <span className="text-sm font-medium text-white">{detailContact.company}</span>
                   </div>
                 )}
                 {detailContact.phone && (
                   <div className="flex items-center justify-between bg-slate-800 px-4 py-3">
-                    <span className="text-sm text-slate-400">Phone</span>
-                    <a href={`tel:${detailContact.phone}`} className="text-sm font-medium text-[#4F46E5]">{detailContact.phone}</a>
+                    <span className="text-sm text-slate-300">Phone</span>
+                    <a href={`tel:${detailContact.phone}`} className="text-sm font-medium text-indigo-400">{detailContact.phone}</a>
                   </div>
                 )}
                 {detailContact.email && (
                   <div className="flex items-center justify-between bg-slate-800 px-4 py-3">
-                    <span className="text-sm text-slate-400">Email</span>
-                    <a href={`mailto:${detailContact.email}`} className="text-sm font-medium text-[#4F46E5] truncate max-w-[200px]">{detailContact.email}</a>
+                    <span className="text-sm text-slate-300">Email</span>
+                    <a href={`mailto:${detailContact.email}`} className="text-sm font-medium text-indigo-400 truncate max-w-[200px]">{detailContact.email}</a>
                   </div>
                 )}
                 {detailContact.language && (
                   <div className="flex items-center justify-between bg-slate-800 px-4 py-3">
-                    <span className="text-sm text-slate-400">Language</span>
-                    <span className="text-sm font-medium text-slate-50">{detailContact.language}</span>
+                    <span className="text-sm text-slate-300">Language</span>
+                    <span className="text-sm font-medium text-white">{detailContact.language}</span>
                   </div>
                 )}
                 {detailContact.notes && (
                   <div className="bg-slate-800 px-4 py-3 rounded-b-lg">
-                    <span className="text-sm text-slate-400 block mb-1">Notes</span>
-                    <p className="text-sm text-slate-50">{detailContact.notes}</p>
+                    <span className="text-sm text-slate-300 block mb-1">Notes</span>
+                    <p className="text-sm text-white">{detailContact.notes}</p>
                   </div>
                 )}
               </div>
@@ -664,7 +664,7 @@ export default function ContactsPage() {
                 </button>
                 <button
                   onClick={() => { openEdit(detailContact); setDetailContact(null); }}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-700 py-2.5 text-sm font-medium text-slate-300 hover:bg-slate-700 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-slate-700 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-700 transition-colors"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                   Edit

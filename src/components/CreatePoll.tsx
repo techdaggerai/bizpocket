@@ -43,8 +43,8 @@ export default function CreatePoll({ onClose, onSubmit }: Props) {
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b border-slate-700 bg-slate-800 rounded-t-2xl">
           <button onClick={onClose} className="text-sm text-[#9CA3AF] font-medium">Cancel</button>
-          <p className="text-[15px] font-bold text-slate-50">📊 Create Poll</p>
-          <button onClick={handleSubmit} disabled={!valid} className="text-sm text-[#4F46E5] font-bold disabled:opacity-30">Create</button>
+          <p className="text-[15px] font-bold text-white">📊 Create Poll</p>
+          <button onClick={handleSubmit} disabled={!valid} className="text-sm text-indigo-400 font-bold disabled:opacity-30">Create</button>
         </div>
 
         <div className="p-5 space-y-4">
@@ -56,7 +56,7 @@ export default function CreatePoll({ onClose, onSubmit }: Props) {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="What do you want to ask?"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-[15px] text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-[15px] text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
               autoFocus
             />
           </div>
@@ -73,7 +73,7 @@ export default function CreatePoll({ onClose, onSubmit }: Props) {
                     value={opt}
                     onChange={(e) => updateOption(i, e.target.value)}
                     placeholder={`Option ${i + 1}`}
-                    className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
+                    className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
                   />
                   {options.length > 2 && (
                     <button onClick={() => removeOption(i)} className="p-1 text-[#9CA3AF] hover:text-[#DC2626]">
@@ -84,7 +84,7 @@ export default function CreatePoll({ onClose, onSubmit }: Props) {
               ))}
             </div>
             {options.length < 10 && (
-              <button onClick={addOption} className="mt-2 text-[13px] text-[#4F46E5] font-medium flex items-center gap-1">
+              <button onClick={addOption} className="mt-2 text-[13px] text-indigo-400 font-medium flex items-center gap-1">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Option
               </button>

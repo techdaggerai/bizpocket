@@ -77,8 +77,8 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
       <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
         <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-50">Invite to Evrywher</h2>
-          <button onClick={onClose} className="text-[#A3A3A3] hover:text-slate-50 transition-colors">
+          <h2 className="text-base font-bold text-white">Invite to Evrywher</h2>
+          <button onClick={onClose} className="text-[#A3A3A3] hover:text-white transition-colors">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -120,21 +120,21 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Name"
-              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone (optional)"
-              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
           </div>
 

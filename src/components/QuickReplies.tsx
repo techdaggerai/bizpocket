@@ -77,17 +77,17 @@ export default function QuickReplies({ isOpen, onClose, onSelect, inputValue }: 
   return (
     <div className="absolute bottom-full left-0 right-0 mb-1 max-h-[300px] overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg z-50">
       <div className="sticky top-0 bg-slate-800 border-b border-[var(--border)] px-3 py-2 flex items-center justify-between">
-        <span className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Quick Replies</span>
+        <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Quick Replies</span>
         <div className="flex gap-2">
-          <button onClick={() => setShowAdd(!showAdd)} className="text-[10px] text-[#4F46E5] font-medium">{showAdd ? 'Cancel' : '+ Add'}</button>
-          <button onClick={onClose} className="text-[10px] text-[#999]">Close</button>
+          <button onClick={() => setShowAdd(!showAdd)} className="text-[10px] text-indigo-400 font-medium">{showAdd ? 'Cancel' : '+ Add'}</button>
+          <button onClick={onClose} className="text-[10px] text-slate-400">Close</button>
         </div>
       </div>
 
       {showAdd && (
         <div className="p-3 border-b border-[var(--border)] space-y-2">
-          <input value={newShortcut} onChange={e => setNewShortcut(e.target.value)} placeholder="/shortcut" className="w-full rounded-md border border-slate-700 px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
-          <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Reply message..." rows={2} className="w-full rounded-md border border-slate-700 px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
+          <input value={newShortcut} onChange={e => setNewShortcut(e.target.value)} placeholder="/shortcut" className="w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder-slate-500 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" />
+          <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Reply message..." rows={2} className="w-full rounded-md border border-slate-600 bg-slate-800 text-slate-100 placeholder-slate-500 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:outline-none" />
           <button onClick={addReply} disabled={saving} className="w-full rounded-md bg-[#4F46E5] py-1.5 text-[10px] font-medium text-white disabled:opacity-50">{saving ? '...' : 'Save'}</button>
         </div>
       )}
@@ -99,11 +99,11 @@ export default function QuickReplies({ isOpen, onClose, onSelect, inputValue }: 
           tabIndex={0}
           onClick={() => { onSelect(r.message); onClose(); }}
           onKeyDown={(e) => { if (e.key === 'Enter') { onSelect(r.message); onClose(); } }}
-          className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-slate-800 border-b border-[#F5F5F5] last:border-0 text-left cursor-pointer"
+          className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-slate-800 border-b border-slate-700 last:border-0 text-left cursor-pointer"
         >
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-mono text-[#4F46E5]">{r.shortcut}</span>
-            <p className="text-xs text-[#333] truncate mt-0.5">{r.message}</p>
+            <span className="text-[10px] font-mono text-indigo-400">{r.shortcut}</span>
+            <p className="text-xs text-slate-300 truncate mt-0.5">{r.message}</p>
           </div>
           {!r.id.startsWith('default-') && (
             <button onClick={(e) => { e.stopPropagation(); deleteReply(r.id); }} className="text-[#DC2626] text-[10px] ml-2 shrink-0">x</button>

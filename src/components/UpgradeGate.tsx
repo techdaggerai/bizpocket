@@ -42,11 +42,11 @@ export default function UpgradeGate({ feature, requiredPlan, children }: Upgrade
           className="absolute inset-0 flex flex-col items-center justify-center bg-slate-800/60 rounded-[14px] cursor-pointer transition-all hover:bg-slate-800/70"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#4F46E5]/10 mb-2">
-            <svg className="h-6 w-6 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-slate-50">{feature}</p>
+          <p className="text-sm font-semibold text-white">{feature}</p>
           <p className="text-[10px] text-[#6B7280] mt-0.5">Upgrade to {requiredPlan} to unlock</p>
         </button>
       </div>
@@ -61,9 +61,9 @@ export default function UpgradeGate({ feature, requiredPlan, children }: Upgrade
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-slate-50 mb-1">Unlock {feature}</h3>
+            <h3 className="text-lg font-bold text-white mb-1">Unlock {feature}</h3>
             <p className="text-sm text-[#6B7280] mb-6">
-              This feature requires the <span className="font-semibold capitalize text-[#4F46E5]">{requiredPlan}</span> plan. Upgrade to access {feature} and more.
+              This feature requires the <span className="font-semibold capitalize text-indigo-400">{requiredPlan}</span> plan. Upgrade to access {feature} and more.
             </p>
             <div className="flex gap-2">
               <button

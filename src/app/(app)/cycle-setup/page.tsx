@@ -253,10 +253,10 @@ export default function CycleSetupPage() {
                 {msg.cycle && (
                   <div className="mt-4 rounded-xl border-2 border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
                       </svg>
-                      <span className="text-xs font-bold text-[#4F46E5] uppercase tracking-wider">{msg.cycle.cycle_name}</span>
+                      <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">{msg.cycle.cycle_name}</span>
                     </div>
 
                     {/* Visual pipeline */}

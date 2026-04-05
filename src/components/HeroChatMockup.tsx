@@ -101,7 +101,7 @@ export default function HeroChatMockup() {
   const BUBBLE_STYLES: Record<string, { bg: string; text: string; labelColor: string }> = {
     'user':      { bg: 'bg-[#4F46E5]', text: 'text-white', labelColor: 'text-white/50' },
     'user-tl':   { bg: 'bg-[#eef2ff]', text: 'text-[#312e81]', labelColor: 'text-[#6366f1]' },
-    'tanaka':    { bg: 'bg-slate-800', text: 'text-slate-50', labelColor: 'text-slate-500' },
+    'tanaka':    { bg: 'bg-slate-800', text: 'text-white', labelColor: 'text-slate-400' },
     'tanaka-tl': { bg: 'bg-[#ecfdf5]', text: 'text-[#064e3b]', labelColor: 'text-[#10b981]' },
   };
 
@@ -120,7 +120,7 @@ export default function HeroChatMockup() {
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#4F46E5] to-[#7c3aed] text-sm font-semibold text-white">TK</div>
           <div>
-            <p className="text-sm font-semibold text-slate-50">Tanaka CPA</p>
+            <p className="text-sm font-semibold text-amber-400">Tanaka CPA</p>
             <p className="text-[11px] text-[#22c55e]">● Online</p>
           </div>
         </div>
@@ -164,7 +164,7 @@ export default function HeroChatMockup() {
       <div className="flex items-center gap-2 border-t border-[#f3f4f6] px-4 py-2.5">
         <span className="rounded-lg border border-slate-700 px-2 py-1 text-[11px] text-slate-400">EN ▼</span>
         <div className="flex min-h-[36px] flex-1 items-center rounded-[10px] border border-slate-700 px-3.5 py-2 text-[13px]">
-          <span className="text-slate-500">Type a message...</span>
+          <span className="text-slate-300">Type a message...</span>
         </div>
         <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-[#4F46E5]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 8Q12 5 19 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" opacity="0.4"/><rect x="5" y="10" width="14" height="10" rx="2" stroke="white" strokeWidth="1.5" opacity="0.3"/><path d="M12 16V8" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"/><path d="M9 11l3-3 3 3" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>

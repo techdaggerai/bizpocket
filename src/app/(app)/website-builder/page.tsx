@@ -80,7 +80,7 @@ export default function WebsiteBuilderPage() {
   const [publishing, setPublishing] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
-  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-slate-400 focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
 
   // Generate AI color palettes
   async function generatePalettes() {
@@ -203,7 +203,7 @@ export default function WebsiteBuilderPage() {
       <div className="sticky top-14 z-10 bg-slate-800 border-b border-[var(--border)] px-4 py-3">
         <div className="flex items-center justify-between">
           {step < 6 && step > 1 && (
-            <button onClick={() => setStep(step - 1)} className="text-[12px] text-[#4F46E5] font-medium">Back</button>
+            <button onClick={() => setStep(step - 1)} className="text-[12px] text-indigo-400 font-medium">Back</button>
           )}
         </div>
         <div className="mt-2 h-1 bg-slate-700 rounded-full overflow-hidden">
@@ -217,42 +217,42 @@ export default function WebsiteBuilderPage() {
         {step === 1 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-50">Tell us about your business</h2>
-              <p className="text-[13px] text-[#666] mt-1">This info shapes your website. You can edit everything later.</p>
+              <h2 className="text-lg font-semibold text-white">Tell us about your business</h2>
+              <p className="text-[13px] text-slate-400 mt-1">This info shapes your website. You can edit everything later.</p>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Business name</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Business name</label>
                 <input value={businessName} onChange={e => setBusinessName(e.target.value)} className={inputClass} placeholder="Sweet Cakes by Sarah" />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">What do you do?</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">What do you do?</label>
                 <input value={businessType} onChange={e => setBusinessType(e.target.value)} className={inputClass} placeholder="Custom cakes & pastries" />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Tagline</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Tagline</label>
                 <input value={tagline} onChange={e => setTagline(e.target.value)} className={inputClass} placeholder="Handcrafted with love since 2020" />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">About your business</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">About your business</label>
                 <textarea value={aboutText} onChange={e => setAboutText(e.target.value)} rows={3} className={inputClass} placeholder="What makes your business special? Your story..." />
               </div>
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Services / Products</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Services / Products</label>
                 <textarea value={services} onChange={e => setServices(e.target.value)} rows={2} className={inputClass} placeholder="Wedding cakes, Birthday cakes, Cupcakes, Pastries" />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Phone</label>
+                  <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Phone</label>
                   <input value={phone} onChange={e => setPhone(e.target.value)} className={inputClass} placeholder="+81..." />
                 </div>
                 <div>
-                  <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Email</label>
+                  <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Email</label>
                   <input value={email} onChange={e => setEmail(e.target.value)} className={inputClass} />
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Address</label>
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Address</label>
                 <input value={address} onChange={e => setAddress(e.target.value)} className={inputClass} placeholder="Nagoya, Japan" />
               </div>
             </div>
@@ -270,8 +270,8 @@ export default function WebsiteBuilderPage() {
         {step === 2 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-50">Choose a style</h2>
-              <p className="text-[13px] text-[#666] mt-1">This sets the overall feel of your website.</p>
+              <h2 className="text-lg font-semibold text-white">Choose a style</h2>
+              <p className="text-[13px] text-slate-400 mt-1">This sets the overall feel of your website.</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {STYLES.map(s => (
@@ -288,8 +288,8 @@ export default function WebsiteBuilderPage() {
                     <div className="h-1.5 w-20 rounded-full bg-current opacity-10 mt-1" />
                   </div>
                   <div className="p-3">
-                    <p className="text-[13px] font-semibold text-slate-50">{s.label}</p>
-                    <p className="text-[10px] text-[#999]">{s.desc}</p>
+                    <p className="text-[13px] font-semibold text-white">{s.label}</p>
+                    <p className="text-[10px] text-slate-400">{s.desc}</p>
                   </div>
                 </button>
               ))}
@@ -307,8 +307,8 @@ export default function WebsiteBuilderPage() {
         {step === 3 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-50">Pick your colors</h2>
-              <p className="text-[13px] text-[#666] mt-1">AI suggested these based on your {businessType} business.</p>
+              <h2 className="text-lg font-semibold text-white">Pick your colors</h2>
+              <p className="text-[13px] text-slate-400 mt-1">AI suggested these based on your {businessType} business.</p>
             </div>
             {loadingPalettes ? (
               <div className="flex justify-center py-12">
@@ -325,16 +325,16 @@ export default function WebsiteBuilderPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[13px] font-medium text-slate-50">{p.name}</span>
+                      <span className="text-[13px] font-medium text-white">{p.name}</span>
                       {selectedPalette === i && (
-                        <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                        <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
                       )}
                     </div>
                     <div className="flex gap-2">
                       {[p.primary, p.secondary, p.accent, p.bg, p.text].map((c, j) => (
                         <div key={j} className="flex-1">
                           <div className="h-8 rounded-md border border-black/5" style={{ backgroundColor: c }} />
-                          <p className="text-[8px] text-[#999] mt-1 text-center">{c}</p>
+                          <p className="text-[8px] text-slate-400 mt-1 text-center">{c}</p>
                         </div>
                       ))}
                     </div>
@@ -367,8 +367,8 @@ export default function WebsiteBuilderPage() {
         {step === 4 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-50">Choose your sections</h2>
-              <p className="text-[13px] text-[#666] mt-1">Select what pages appear on your website.</p>
+              <h2 className="text-lg font-semibold text-white">Choose your sections</h2>
+              <p className="text-[13px] text-slate-400 mt-1">Select what pages appear on your website.</p>
             </div>
             <div className="space-y-2">
               {SECTIONS.map(s => {
@@ -388,7 +388,7 @@ export default function WebsiteBuilderPage() {
                     }`}
                   >
                     <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
-                      isSelected ? 'bg-[#4F46E5]' : 'border border-[#DDD]'
+                      isSelected ? 'bg-[#4F46E5]' : 'border border-slate-500'
                     }`}>
                       {isSelected && (
                         <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -397,10 +397,10 @@ export default function WebsiteBuilderPage() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[13px] font-medium text-slate-50">{s.label}</p>
-                      <p className="text-[10px] text-[#999]">{s.desc}</p>
+                      <p className="text-[13px] font-medium text-white">{s.label}</p>
+                      <p className="text-[10px] text-slate-400">{s.desc}</p>
                     </div>
-                    {isRequired && <span className="text-[9px] text-[#999]">Required</span>}
+                    {isRequired && <span className="text-[9px] text-slate-400">Required</span>}
                   </button>
                 );
               })}
@@ -418,15 +418,15 @@ export default function WebsiteBuilderPage() {
         {step === 5 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-50">Ready to build</h2>
-              <p className="text-[13px] text-[#666] mt-1">Review your choices, then let AI create your website.</p>
+              <h2 className="text-lg font-semibold text-white">Ready to build</h2>
+              <p className="text-[13px] text-slate-400 mt-1">Review your choices, then let AI create your website.</p>
             </div>
             <div className="rounded-xl border border-slate-700 p-4 space-y-3">
-              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Business</span><span className="font-medium">{businessName}</span></div>
-              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Type</span><span className="font-medium">{businessType}</span></div>
-              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Style</span><span className="font-medium capitalize">{selectedStyle}</span></div>
-              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Colors</span><span className="font-medium">{palettes[selectedPalette]?.name || 'Default'}</span></div>
-              <div className="flex justify-between text-[13px]"><span className="text-[#999]">Sections</span><span className="font-medium">{selectedSections.length} selected</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-slate-400">Business</span><span className="font-medium">{businessName}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-slate-400">Type</span><span className="font-medium">{businessType}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-slate-400">Style</span><span className="font-medium capitalize">{selectedStyle}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-slate-400">Colors</span><span className="font-medium">{palettes[selectedPalette]?.name || 'Default'}</span></div>
+              <div className="flex justify-between text-[13px]"><span className="text-slate-400">Sections</span><span className="font-medium">{selectedSections.length} selected</span></div>
             </div>
             <button
               onClick={generateWebsite}
@@ -450,10 +450,10 @@ export default function WebsiteBuilderPage() {
           <div className="-mx-4 -mt-4">
             {/* Preview header */}
             <div className="px-4 py-3 bg-slate-800 border-b border-[var(--border)] flex items-center justify-between">
-              <button onClick={() => setStep(5)} className="text-[12px] text-[#999]">Back</button>
-              <span className="text-[13px] font-medium text-slate-50">Preview</span>
+              <button onClick={() => setStep(5)} className="text-[12px] text-slate-400">Back</button>
+              <span className="text-[13px] font-medium text-white">Preview</span>
               <div className="flex gap-2">
-                <button onClick={() => { setGeneratedHTML(null); setStep(5); }} className="text-[12px] text-[#999]">Regenerate</button>
+                <button onClick={() => { setGeneratedHTML(null); setStep(5); }} className="text-[12px] text-slate-400">Regenerate</button>
               </div>
             </div>
 
@@ -465,7 +465,7 @@ export default function WebsiteBuilderPage() {
                   <div className="w-2 h-2 rounded-full bg-[#FEBC2E]" />
                   <div className="w-2 h-2 rounded-full bg-[#28C840]" />
                 </div>
-                <div className="flex-1 text-center text-[10px] text-[#BBB]">
+                <div className="flex-1 text-center text-[10px] text-slate-400">
                   {businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.bizpocket.io
                 </div>
               </div>
@@ -500,7 +500,7 @@ export default function WebsiteBuilderPage() {
                     URL.revokeObjectURL(url);
                     toast('Downloaded!', 'success');
                   }}
-                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-[#666]"
+                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-slate-400"
                 >
                   Download HTML
                 </button>
@@ -510,12 +510,12 @@ export default function WebsiteBuilderPage() {
                     await navigator.clipboard.writeText(generatedHTML);
                     toast('HTML copied!', 'success');
                   }}
-                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-[#666]"
+                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-slate-400"
                 >
                   Copy HTML
                 </button>
               </div>
-              <p className="text-[10px] text-[#999] text-center">You can move this to your own domain anytime</p>
+              <p className="text-[10px] text-slate-400 text-center">You can move this to your own domain anytime</p>
             </div>
           </div>
         )}
@@ -528,11 +528,11 @@ export default function WebsiteBuilderPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-slate-50 mb-2">Your website is live!</h2>
-            <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[14px] text-[#4F46E5] font-medium underline break-all">
+            <h2 className="text-xl font-semibold text-white mb-2">Your website is live!</h2>
+            <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[14px] text-indigo-400 font-medium underline break-all">
               {publishedUrl}
             </a>
-            <p className="text-[12px] text-[#999] mt-4">Share this link on Instagram, WhatsApp, or anywhere.</p>
+            <p className="text-[12px] text-slate-400 mt-4">Share this link on Instagram, WhatsApp, or anywhere.</p>
 
             <div className="mt-6 space-y-2">
               <button
@@ -550,13 +550,13 @@ export default function WebsiteBuilderPage() {
                     navigator.share({ title: businessName, url: publishedUrl });
                   }
                 }}
-                className="w-full rounded-xl border border-slate-700 py-3 text-[13px] font-medium text-[#666]"
+                className="w-full rounded-xl border border-slate-700 py-3 text-[13px] font-medium text-slate-400"
               >
                 Share
               </button>
               <button
                 onClick={() => { setStep(6); }}
-                className="w-full py-2 text-[12px] text-[#999]"
+                className="w-full py-2 text-[12px] text-slate-400"
               >
                 Edit website
               </button>

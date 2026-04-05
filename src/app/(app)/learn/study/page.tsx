@@ -252,14 +252,14 @@ export default function StudyPage() {
             <p className="text-[10px] text-[#991B1B]/60">Missed</p>
           </div>
           <div className="rounded-2xl bg-[#EEF2FF] p-3 text-center">
-            <p className="text-2xl font-bold text-[#4F46E5]">{pct}%</p>
-            <p className="text-[10px] text-[#4F46E5]/60">Accuracy</p>
+            <p className="text-2xl font-bold text-indigo-400">{pct}%</p>
+            <p className="text-[10px] text-indigo-400/60">Accuracy</p>
           </div>
         </div>
 
         <div className="mt-4 flex items-center gap-2 rounded-full bg-[#4F46E5]/10 px-4 py-2">
           <span className="text-sm">⭐</span>
-          <span className="text-sm font-bold text-[#4F46E5]">+{xp} XP earned</span>
+          <span className="text-sm font-bold text-indigo-400">+{xp} XP earned</span>
         </div>
 
         <div className="mt-6 flex gap-3 w-full max-w-xs">
@@ -348,7 +348,7 @@ export default function StudyPage() {
             {/* Revealed answer */}
             {cardState === 'answer' && (
               <div className="mt-6 border-t border-slate-700 pt-5">
-                <p className="text-xl font-bold text-[#4F46E5]">{currentCard.meaning}</p>
+                <p className="text-xl font-bold text-indigo-400">{currentCard.meaning}</p>
 
                 {currentCard.example_sentence && (
                   <div className="mt-4 rounded-xl bg-[var(--bg-2)] p-3 text-left">
@@ -358,7 +358,7 @@ export default function StudyPage() {
                     )}
                     <button
                       onClick={(e) => { e.stopPropagation(); speak(currentCard.example_sentence!); }}
-                      className="mt-2 flex items-center gap-1 text-[10px] text-[#4F46E5] font-medium"
+                      className="mt-2 flex items-center gap-1 text-[10px] text-indigo-400 font-medium"
                     >
                       <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
                       Listen to example
@@ -390,8 +390,8 @@ export default function StudyPage() {
               className="flex-1 rounded-2xl border-2 border-[#4F46E5]/15 bg-[#4F46E5]/5 py-3 text-center transition-all hover:bg-[#4F46E5]/10 active:scale-95"
             >
               <span className="text-lg">🤔</span>
-              <p className="text-xs font-bold text-[#4F46E5] mt-0.5">Good</p>
-              <p className="text-[9px] text-[#4F46E5]/50">{formatNextReview(SM2_INTERVALS.good[Math.min(currentCard.mastery_level, 4)])}</p>
+              <p className="text-xs font-bold text-indigo-400 mt-0.5">Good</p>
+              <p className="text-[9px] text-indigo-400/50">{formatNextReview(SM2_INTERVALS.good[Math.min(currentCard.mastery_level, 4)])}</p>
             </button>
             <button
               onClick={() => handleAnswer('easy')}

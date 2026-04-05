@@ -12,11 +12,7 @@ export default function PageHeader({ title, backPath, rightAction }: PageHeaderP
   const router = useRouter();
 
   const handleBack = () => {
-    if (backPath) {
-      router.push(backPath);
-    } else {
-      router.back();
-    }
+    router.back();
   };
 
   return (

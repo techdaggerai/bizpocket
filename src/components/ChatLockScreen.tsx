@@ -204,7 +204,7 @@ export default function ChatLockScreen({ onUnlock }: Props) {
       {digits.length >= 4 && digits.length < maxDigits && (
         <button
           onClick={submitPin}
-          className="mt-6 rounded-full bg-slate-800 text-[#4F46E5] px-8 py-2.5 text-[15px] font-semibold hover:bg-slate-800/90 transition-colors"
+          className="mt-6 rounded-full bg-slate-800 text-indigo-400 px-8 py-2.5 text-[15px] font-semibold hover:bg-slate-800/90 transition-colors"
         >
           Unlock
         </button>
@@ -279,7 +279,7 @@ export function ChatLockSetupModal({ onSave, onCancel }: SetupProps) {
     <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
       <div className="relative bg-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-xs mx-auto p-6 flex flex-col items-center">
-        <h2 className="text-[16px] font-bold text-slate-50 mb-1">
+        <h2 className="text-[16px] font-bold text-white mb-1">
           {step === 'enter' ? 'Set Chat Lock PIN' : 'Confirm PIN'}
         </h2>
         <p className="text-[13px] text-[#9CA3AF] mb-5">
@@ -313,7 +313,7 @@ export function ChatLockSetupModal({ onSave, onCancel }: SetupProps) {
               <button
                 key={key + idx}
                 onClick={() => isBack ? backspace() : pressDigit(key)}
-                className="w-[64px] h-[64px] rounded-full text-slate-50 text-xl font-semibold bg-slate-700 hover:bg-[#E5E7EB] active:scale-95 flex items-center justify-center transition-all"
+                className="w-[64px] h-[64px] rounded-full text-white text-xl font-semibold bg-slate-700 hover:bg-[#E5E7EB] active:scale-95 flex items-center justify-center transition-all"
               >
                 {key}
               </button>

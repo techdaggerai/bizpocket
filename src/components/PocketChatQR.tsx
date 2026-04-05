@@ -37,7 +37,7 @@ export default function PocketChatQR({ url, name, size = 200 }: Props) {
     <div className="text-center">
       <canvas ref={canvasRef} />
       <p className="text-[13px] text-slate-400 mt-2 mb-1">Scan to chat with {name}</p>
-      <p className="text-[11px] text-slate-500 font-mono mb-3">{url}</p>
+      <p className="text-[11px] text-slate-300 font-mono mb-3">{url}</p>
       <button onClick={downloadQR} className="px-4 py-2 rounded-lg bg-[#4F46E5] text-white text-xs font-semibold hover:bg-[#4338CA] transition-colors">Download QR code</button>
     </div>
   );

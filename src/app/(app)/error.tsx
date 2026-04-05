@@ -15,7 +15,7 @@ export default function AppError({
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <PocketChatMark size={56} />
-      <h2 className="mt-4 text-lg font-bold text-slate-50">
+      <h2 className="mt-4 text-lg font-bold text-white">
         {isAI ? 'Translation temporarily unavailable' : isConnection ? 'Connection lost' : 'Something went wrong'}
       </h2>
       <p className="mt-2 text-sm text-[#6B7280] max-w-sm">

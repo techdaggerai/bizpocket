@@ -15,7 +15,7 @@ import { useDelight } from '@/contexts/DelightContext';
 
 const statusColors: Record<InvoiceStatus, string> = {
   draft: 'bg-[#F4F4F5] text-[#71717A] border border-[#E4E4E7]',
-  sent: 'bg-[#EEF2FF] text-[#4F46E5] border border-[#4F46E5]/20',
+  sent: 'bg-[#EEF2FF] text-indigo-400 border border-[#4F46E5]/20',
   paid: 'bg-[#F0FDF4] text-[#16A34A] border border-[#16A34A]/20',
 };
 
@@ -341,11 +341,11 @@ export default function InvoiceDetailPage() {
   if (!invoice) {
     return (
       <div className="space-y-4 py-4">
-        <Link href="/invoices" className="text-sm text-[#4F46E5] hover:opacity-80">
+        <Link href="/invoices" className="text-sm text-indigo-400 hover:opacity-80">
           &larr; Back to Invoices
         </Link>
         <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
-          <p className="text-sm text-[#A3A3A3]">Invoice not found</p>
+          <p className="text-sm text-slate-400">Invoice not found</p>
         </div>
       </div>
     );
@@ -369,8 +369,8 @@ export default function InvoiceDetailPage() {
         {/* Header row */}
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-base font-semibold text-slate-50">{invoice.invoice_number}</p>
-            <p className="text-xs text-[#A3A3A3]">{formatDate(invoice.created_at)}</p>
+            <p className="text-base font-semibold text-white">{invoice.invoice_number}</p>
+            <p className="text-xs text-slate-400">{formatDate(invoice.created_at)}</p>
           </div>
           <span
             className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-medium ${statusColors[invoice.status]}`}
@@ -381,15 +381,15 @@ export default function InvoiceDetailPage() {
 
         {/* Customer info */}
         <div className="mt-4">
-          <p className="text-sm font-medium text-slate-50">{invoice.customer_name}</p>
+          <p className="text-sm font-medium text-white">{invoice.customer_name}</p>
           {invoice.customer_address && (
-            <p className="text-xs text-[#A3A3A3]">{invoice.customer_address}</p>
+            <p className="text-xs text-slate-400">{invoice.customer_address}</p>
           )}
         </div>
 
         {/* Amount */}
         <div className="mt-4">
-          <p className="font-mono text-2xl font-semibold text-slate-50">
+          <p className="font-mono text-2xl font-semibold text-white">
             {formatCurrency(invoice.total, invoice.currency)}
           </p>
         </div>
@@ -414,13 +414,13 @@ export default function InvoiceDetailPage() {
           )}
           <button
             onClick={copyPublicLink}
-            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-slate-700 transition-colors"
+            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
           >
             Copy Public Link
           </button>
           <button
             onClick={handleShare}
-            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-slate-700 transition-colors"
+            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
           >
             Share
           </button>
@@ -434,13 +434,13 @@ export default function InvoiceDetailPage() {
           )}
           <Link
             href={`/invoices/new?edit=${invoice.id}`}
-            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-slate-700 transition-colors"
+            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
           >
             Edit
           </Link>
           <button
             onClick={handleDuplicate}
-            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-50 hover:bg-slate-700 transition-colors"
+            className="rounded-[10px] border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 transition-colors"
           >
             Duplicate
           </button>
@@ -481,8 +481,8 @@ export default function InvoiceDetailPage() {
         {/* Chat Header */}
         <div className="p-4 border-b border-slate-700">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-50"><EvryWherMark size="sm" /></h2>
-            <span className="text-xs text-[#A3A3A3]">
+            <h2 className="text-base font-semibold text-white"><EvryWherMark size="sm" /></h2>
+            <span className="text-xs text-slate-400">
               {messages.length} message{messages.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -491,7 +491,7 @@ export default function InvoiceDetailPage() {
         {/* Messages Area */}
         <div className="p-4 max-h-[400px] overflow-y-auto space-y-3">
           {messages.length === 0 ? (
-            <p className="text-center text-xs text-[#A3A3A3] py-8">
+            <p className="text-center text-xs text-slate-400 py-8">
               No messages yet. Start a conversation.
             </p>
           ) : (
@@ -500,19 +500,19 @@ export default function InvoiceDetailPage() {
                 key={msg.id}
                 className={`flex flex-col ${msg.sender_type === 'owner' ? 'items-end' : 'items-start'}`}
               >
-                <p className="text-[10px] text-[#A3A3A3] mb-0.5 px-1">
+                <p className="text-[10px] text-slate-400 mb-0.5 px-1">
                   {msg.sender_name || (msg.sender_type === 'owner' ? 'You' : 'Customer')}
                 </p>
                 <div
                   className={`rounded-[12px] px-3.5 py-2.5 max-w-[80%] ${
                     msg.sender_type === 'owner'
                       ? 'bg-[#4F46E5] text-white ml-auto'
-                      : 'bg-[#F3F3F1] text-slate-50'
+                      : 'bg-[#F3F3F1] text-white'
                   }`}
                 >
                   <p className="text-sm leading-relaxed">{msg.message}</p>
                 </div>
-                <p className="text-[10px] text-[#A3A3A3] mt-0.5 px-1">
+                <p className="text-[10px] text-slate-400 mt-0.5 px-1">
                   {formatTime(msg.created_at)}
                 </p>
               </div>
@@ -534,7 +534,7 @@ export default function InvoiceDetailPage() {
               }
             }}
             placeholder="Type a message..."
-            className="flex-1 rounded-[10px] border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-50 placeholder-[#A3A3A3] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+            className="flex-1 rounded-[10px] border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-white placeholder-[#A3A3A3] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
           />
           <button
             onClick={handleSend}

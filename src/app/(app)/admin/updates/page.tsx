@@ -95,7 +95,7 @@ export default function AdminUpdatesPage() {
         <div className="text-center">
           <p className="text-4xl">🔒</p>
           <p className="mt-3 text-sm font-medium text-[var(--text-2)]">Admin access required</p>
-          <button onClick={() => router.back()} className="mt-4 text-sm text-[#4F46E5]">← Go back</button>
+          <button onClick={() => router.back()} className="mt-4 text-sm text-indigo-400">← Go back</button>
         </div>
       </div>
     );

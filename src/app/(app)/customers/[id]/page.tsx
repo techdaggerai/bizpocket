@@ -96,7 +96,7 @@ export default function CustomerDetailPage() {
     return (
       <div className="p-4 text-center">
         <p className="text-sm text-[var(--text-3)]">Customer not found</p>
-        <Link href="/customers" className="mt-2 inline-block text-sm text-[#4F46E5]">Back to customers</Link>
+        <Link href="/customers" className="mt-2 inline-block text-sm text-indigo-400">Back to customers</Link>
       </div>
     );
   }
@@ -127,7 +127,7 @@ export default function CustomerDetailPage() {
 
   const statusColors: Record<string, string> = {
     draft: 'bg-[var(--bg-3)] text-[var(--text-3)]',
-    sent: 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]',
+    sent: 'bg-[rgba(79,70,229,0.08)] text-indigo-400',
     paid: 'bg-[rgba(22,163,74,0.08)] text-[#16A34A]',
   };
 
@@ -156,7 +156,7 @@ export default function CustomerDetailPage() {
         <div className="mt-4 grid grid-cols-3 gap-2">
           <div className="rounded-lg bg-[var(--bg-2)] p-2.5 text-center">
             <p className="text-[10px] uppercase tracking-wider text-[var(--text-4)]">Total Business</p>
-            <p className="font-mono text-sm font-semibold text-[#4F46E5]">{formatCurrency(totalBusiness, currency)}</p>
+            <p className="font-mono text-sm font-semibold text-indigo-400">{formatCurrency(totalBusiness, currency)}</p>
           </div>
           <div className="rounded-lg bg-[var(--bg-2)] p-2.5 text-center">
             <p className="text-[10px] uppercase tracking-wider text-[var(--text-4)]">Last Invoice</p>
@@ -203,7 +203,7 @@ export default function CustomerDetailPage() {
             onClick={() => setTab(t.key)}
             className={`flex-shrink-0 rounded-btn px-3 py-1.5 text-xs font-medium transition-colors ${
               tab === t.key
-                ? 'bg-[rgba(79,70,229,0.08)] text-[#4F46E5]'
+                ? 'bg-[rgba(79,70,229,0.08)] text-indigo-400'
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
             }`}
           >
@@ -218,7 +218,7 @@ export default function CustomerDetailPage() {
           {invoices.length === 0 ? (
             <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No invoices for this customer yet.</p>
-              <Link href={`/invoices/new?customer=${customer.id}`} className="mt-2 inline-block text-sm text-[#4F46E5]">Create first invoice</Link>
+              <Link href={`/invoices/new?customer=${customer.id}`} className="mt-2 inline-block text-sm text-indigo-400">Create first invoice</Link>
             </div>
           ) : (
             invoices.map((inv) => (
@@ -268,7 +268,7 @@ export default function CustomerDetailPage() {
           {conversations.length === 0 ? (
             <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No chat history with this customer.</p>
-              <Link href={`/chat?contact=${customer.id}`} className="mt-2 inline-block text-sm text-[#4F46E5]">Start a conversation</Link>
+              <Link href={`/chat?contact=${customer.id}`} className="mt-2 inline-block text-sm text-indigo-400">Start a conversation</Link>
             </div>
           ) : (
             conversations.map((c) => (
@@ -316,7 +316,7 @@ export default function CustomerDetailPage() {
           {documents.length === 0 ? (
             <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No documents yet.</p>
-              <Link href="/documents" className="mt-2 inline-block text-sm text-[#4F46E5]">Go to Vault</Link>
+              <Link href="/documents" className="mt-2 inline-block text-sm text-indigo-400">Go to Vault</Link>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">

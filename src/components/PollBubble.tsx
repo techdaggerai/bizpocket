@@ -25,7 +25,7 @@ export default function PollBubble({ pollData, userId, onVote, isOwner }: Props)
 
   return (
     <div className={`rounded-[12px] px-4 py-3 min-w-[240px] max-w-[300px] ${isOwner ? 'bg-[#4F46E5]' : 'bg-[#F3F3F1]'}`}>
-      <p className={`text-[14px] font-semibold mb-3 ${isOwner ? 'text-white' : 'text-slate-50'}`}>
+      <p className={`text-[14px] font-semibold mb-3 ${isOwner ? 'text-white' : 'text-white'}`}>
         📊 {pollData.question}
       </p>
 

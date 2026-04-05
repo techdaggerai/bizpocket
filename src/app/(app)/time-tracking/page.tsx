@@ -111,13 +111,13 @@ export default function TimeTrackingPage() {
 
   const totalBillable = entries.filter(e => e.is_billable && !e.is_invoiced).reduce((s, e) => s + (e.total_amount || 0), 0);
   const totalMinutes = entries.filter(e => e.is_billable && !e.is_invoiced).reduce((s, e) => s + (e.duration_minutes || 0), 0);
-  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
 
   return (
     <div className="space-y-4">
       <PageHeader title="Time Tracking" backPath="/dashboard" />
       <div className="flex items-center justify-between px-4">
-        <div><h1 className="text-xl font-semibold text-slate-50">Time Tracking</h1><p className="text-xs text-[#999]">{totalMinutes} min unbilled &middot; {formatCurrency(totalBillable, currency)}</p></div>
+        <div><h1 className="text-xl font-semibold text-white">Time Tracking</h1><p className="text-xs text-[#999]">{totalMinutes} min unbilled &middot; {formatCurrency(totalBillable, currency)}</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ Log Time'}</button>
       </div>
 
@@ -125,7 +125,7 @@ export default function TimeTrackingPage() {
       <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Live Timer</span>
-          <span className="font-mono text-2xl font-semibold text-slate-50">{formatTimer(timerSeconds)}</span>
+          <span className="font-mono text-2xl font-semibold text-white">{formatTimer(timerSeconds)}</span>
         </div>
         {!timerRunning ? (
           <div className="space-y-2">
@@ -176,7 +176,7 @@ export default function TimeTrackingPage() {
       : <div className="space-y-1.5">{entries.map(e => (
           <div key={e.id} className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5">
             <div>
-              <p className="text-sm font-medium text-slate-50">{e.project_name || 'Work'}</p>
+              <p className="text-sm font-medium text-white">{e.project_name || 'Work'}</p>
               <p className="text-[10px] text-[#999]">{e.date} &middot; {e.duration_minutes} min{e.is_invoiced ? ' &middot; Invoiced' : ''}</p>
             </div>
             <div className="text-right">

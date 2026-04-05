@@ -195,7 +195,7 @@ export default function EvryWherOnboarding() {
             {/* Language preview pills */}
             <div className="flex flex-wrap justify-center gap-2 mb-10">
               {['🇬🇧 EN', '🇯🇵 JA', '🇵🇰 UR', '🇦🇪 AR', '🇨🇳 ZH', '🇪🇸 ES', '🇧🇷 PT', '🇰🇷 KO'].map(l => (
-                <span key={l} className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#EEF2FF] text-[#4F46E5]">{l}</span>
+                <span key={l} className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#EEF2FF] text-indigo-400">{l}</span>
               ))}
               <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-slate-700 text-[#6B7280]">+13 more</span>
             </div>
@@ -248,7 +248,7 @@ export default function EvryWherOnboarding() {
             </div>
             <button
               onClick={() => avatarInputRef.current?.click()}
-              className="text-[13px] text-[#4F46E5] font-medium mb-6 hover:underline"
+              className="text-[13px] text-indigo-400 font-medium mb-6 hover:underline"
             >
               {avatarUrl ? 'Change photo' : 'Add photo'}
             </button>
@@ -292,7 +292,7 @@ export default function EvryWherOnboarding() {
                         <button
                           key={l.code}
                           onClick={() => { setSelectedLang(l.code); setShowLangPicker(false); }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-slate-700 transition-colors ${selectedLang === l.code ? 'text-[#4F46E5] font-medium bg-[#EEF2FF]' : 'text-[var(--text-1)]'}`}
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-slate-700 transition-colors ${selectedLang === l.code ? 'text-indigo-400 font-medium bg-[#EEF2FF]' : 'text-[var(--text-1)]'}`}
                         >
                           <span className="text-lg">{l.flag}</span> {l.name}
                         </button>
@@ -382,7 +382,7 @@ export default function EvryWherOnboarding() {
               </button>
               <button
                 onClick={() => handleFinish('/contacts')}
-                className="w-full rounded-xl border border-[#4F46E5] py-4 text-[15px] font-semibold text-[#4F46E5] hover:bg-[#EEF2FF] transition-colors"
+                className="w-full rounded-xl border border-[#4F46E5] py-4 text-[15px] font-semibold text-indigo-400 hover:bg-[#EEF2FF] transition-colors"
               >
                 👥 Invite a friend
               </button>

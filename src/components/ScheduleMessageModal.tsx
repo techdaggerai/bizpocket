@@ -37,8 +37,8 @@ export default function ScheduleMessageModal({ message, onSchedule, onClose }: P
       <div className="relative w-full max-w-sm sm:mx-4 bg-slate-800 rounded-t-2xl sm:rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
           <button onClick={onClose} className="text-sm text-[#9CA3AF]">Cancel</button>
-          <p className="text-[15px] font-bold text-slate-50">⏰ Schedule Message</p>
-          <button onClick={handleSchedule} disabled={!isValid} className="text-sm text-[#4F46E5] font-bold disabled:opacity-30">Schedule</button>
+          <p className="text-[15px] font-bold text-white">⏰ Schedule Message</p>
+          <button onClick={handleSchedule} disabled={!isValid} className="text-sm text-indigo-400 font-bold disabled:opacity-30">Schedule</button>
         </div>
 
         <div className="p-5 space-y-4">
@@ -55,7 +55,7 @@ export default function ScheduleMessageModal({ message, onSchedule, onClose }: P
               value={date}
               min={now.toISOString().split('T')[0]}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-50 focus:border-[#4F46E5] focus:outline-none"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-white focus:border-[#4F46E5] focus:outline-none"
             />
           </div>
 
@@ -66,7 +66,7 @@ export default function ScheduleMessageModal({ message, onSchedule, onClose }: P
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-50 focus:border-[#4F46E5] focus:outline-none"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-white focus:border-[#4F46E5] focus:outline-none"
             />
           </div>
 

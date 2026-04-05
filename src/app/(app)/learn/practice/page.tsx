@@ -169,7 +169,7 @@ export default function PracticePage() {
                   <p className="text-xs text-[var(--text-4)]">{topic.titleJa}</p>
                   <div className="flex gap-1 mt-1.5 flex-wrap">
                     {topic.vocab.slice(0, 3).map(v => (
-                      <span key={v} className="rounded-md bg-[#4F46E5]/5 px-1.5 py-0.5 text-[9px] font-medium text-[#4F46E5]">{v}</span>
+                      <span key={v} className="rounded-md bg-[#4F46E5]/5 px-1.5 py-0.5 text-[9px] font-medium text-indigo-400">{v}</span>
                     ))}
                   </div>
                 </div>
@@ -216,7 +216,7 @@ export default function PracticePage() {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {/* Tip banner */}
         <div className="rounded-xl bg-[#EEF2FF] p-3 text-center">
-          <p className="text-[10px] text-[#4F46E5]">
+          <p className="text-[10px] text-indigo-400">
             Type in Japanese to practice, or in English to learn how to say it
           </p>
         </div>

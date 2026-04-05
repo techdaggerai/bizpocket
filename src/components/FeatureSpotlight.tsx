@@ -104,7 +104,7 @@ export default function FeatureSpotlight() {
         style={{ top: tooltipTop, left: tooltipLeft }}
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-sm font-bold text-[#4F46E5]">{active.title}</p>
+        <p className="text-sm font-bold text-indigo-400">{active.title}</p>
         <p className="mt-1 text-xs text-[var(--text-2)] leading-relaxed">{active.description}</p>
         <button
           onClick={dismiss}

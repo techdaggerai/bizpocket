@@ -22,7 +22,7 @@ interface AppUpdate {
 const TYPE_CONFIG: Record<string, { badge: string; color: string; bgColor: string }> = {
   feature:      { badge: '🆕 New Feature',   color: 'text-[#16A34A]', bgColor: 'bg-[#16A34A]/10' },
   bugfix:       { badge: '🐛 Bug Fix',       color: 'text-[#6B7280]', bgColor: 'bg-[#6B7280]/10' },
-  improvement:  { badge: '⚡ Improvement',    color: 'text-[#4F46E5]', bgColor: 'bg-[#4F46E5]/10' },
+  improvement:  { badge: '⚡ Improvement',    color: 'text-indigo-400', bgColor: 'bg-[#4F46E5]/10' },
   announcement: { badge: '📢 Announcement',  color: 'text-[#D97706]', bgColor: 'bg-[#D97706]/10' },
   tip:          { badge: '💡 Tip',            color: 'text-[#7C3AED]', bgColor: 'bg-[#7C3AED]/10' },
 };
@@ -140,7 +140,7 @@ export default function UpdateCenterPage() {
         </div>
         <button
           onClick={markAllRead}
-          className="text-xs font-medium text-[#4F46E5] hover:opacity-80 transition-opacity"
+          className="text-xs font-medium text-indigo-400 hover:opacity-80 transition-opacity"
         >
           ✅ Mark All Read
         </button>
@@ -213,7 +213,7 @@ export default function UpdateCenterPage() {
                         <div className="mt-3">
                           <button
                             onClick={() => setExpandedTutorial(showTutorial ? null : update.id)}
-                            className="text-xs font-medium text-[#4F46E5] hover:opacity-80"
+                            className="text-xs font-medium text-indigo-400 hover:opacity-80"
                           >
                             {showTutorial ? 'Hide tutorial ▲' : 'See how it works ▼'}
                           </button>
@@ -249,7 +249,7 @@ export default function UpdateCenterPage() {
                       {isUnread && (
                         <div className="mt-2 flex items-center gap-1">
                           <div className="h-1.5 w-1.5 rounded-full bg-[#4F46E5] animate-pulse" />
-                          <span className="text-[9px] text-[#4F46E5] font-medium">New</span>
+                          <span className="text-[9px] text-indigo-400 font-medium">New</span>
                         </div>
                       )}
                     </div>

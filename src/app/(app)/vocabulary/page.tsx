@@ -55,7 +55,7 @@ export default function VocabularyPage() {
         {/* Stats */}
         <div className="flex gap-3">
           <div className="flex-1 rounded-xl bg-[#EEF2FF] p-3 text-center">
-            <p className="text-xl font-bold text-[#4F46E5]">{words.length}</p>
+            <p className="text-xl font-bold text-indigo-400">{words.length}</p>
             <p className="text-[10px] text-[#6B7280]">Words Saved</p>
           </div>
           <div className="flex-1 rounded-xl bg-[#FEF3C7] p-3 text-center">
@@ -71,7 +71,7 @@ export default function VocabularyPage() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Search words..."
-            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
+            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
           />
         )}
 
@@ -93,7 +93,7 @@ export default function VocabularyPage() {
                 <div className="flex items-center gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[15px] font-bold text-slate-50">{w.word}</span>
+                      <span className="text-[15px] font-bold text-white">{w.word}</span>
                       {w.reading && <span className="text-[12px] text-[#6B7280]">({w.reading})</span>}
                     </div>
                     <p className="text-[13px] text-[#374151] mt-0.5">{w.meaning}</p>

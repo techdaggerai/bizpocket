@@ -262,7 +262,7 @@ export default function OpportunitiesPage() {
         {/* Action buttons */}
         <div className="space-y-2.5 pt-2">
           <Link href="/invite" className="block no-underline">
-            <Button variant="outline" size="lg" className="w-full border-amber-400 text-amber-600 hover:bg-amber-950/20">
+            <Button variant="outline" size="lg" className="w-full border-amber-400 text-amber-400 hover:bg-amber-950/20">
               Invite Friends (+15 Trust)
             </Button>
           </Link>

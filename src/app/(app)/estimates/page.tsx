@@ -12,7 +12,7 @@ import type { Customer } from '@/types/database';
 interface LineItem { description: string; quantity: number; unit_price: number; tax_rate: number; }
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-slate-700 text-slate-400', sent: 'bg-[#4F46E5]/10 text-[#4F46E5]',
+  draft: 'bg-slate-700 text-slate-300', sent: 'bg-[#4F46E5]/10 text-indigo-400',
   approved: 'bg-[#16A34A]/10 text-[#16A34A]', declined: 'bg-[#DC2626]/10 text-[#DC2626]',
   converted: 'bg-[#7C3AED]/10 text-[#7C3AED]',
 };
@@ -100,13 +100,13 @@ export default function EstimatesPage() {
     toast('Deleted', 'success'); fetchEstimates();
   }
 
-  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-slate-400 focus:border-[#4F46E5] focus:outline-none';
 
   return (
     <div className="space-y-4">
       <PageHeader title="Estimates" backPath="/dashboard" />
       <div className="flex items-center justify-between px-4">
-        <div><h1 className="text-xl font-bold text-slate-50">Estimates / Quotations</h1><p className="text-xs text-[#999]">Create quotes, send for approval, convert to invoices</p></div>
+        <div><h1 className="text-xl font-bold text-white">Estimates / Quotations</h1><p className="text-xs text-slate-400">Create quotes, send for approval, convert to invoices</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ New Estimate'}</button>
       </div>
 
@@ -119,8 +119,8 @@ export default function EstimatesPage() {
           </select>
           <input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Customer name" className={inputClass} />
           <div className="grid grid-cols-2 gap-2">
-            <div><label className="text-[10px] text-[#999]">Date</label><input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputClass} /></div>
-            <div><label className="text-[10px] text-[#999]">Valid until</label><input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className={inputClass} /></div>
+            <div><label className="text-[10px] text-slate-400">Date</label><input type="date" value={date} onChange={e => setDate(e.target.value)} className={inputClass} /></div>
+            <div><label className="text-[10px] text-slate-400">Valid until</label><input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className={inputClass} /></div>
           </div>
           {items.map((item, i) => (
             <div key={i} className="space-y-1.5">
@@ -133,17 +133,17 @@ export default function EstimatesPage() {
               <div className="flex gap-1 ml-0">
                 {[{ label: '10%', value: 0.10 }, { label: '8%', value: 0.08 }, { label: '0%', value: 0 }].map(r => (
                   <button key={r.value} type="button" onClick={() => { const n = [...items]; n[i].tax_rate = r.value; setItems(n); }}
-                    className={`px-2 py-0.5 text-[10px] rounded border ${item.tax_rate === r.value ? 'border-[#4F46E5] text-[#4F46E5] bg-[#4F46E5]/5' : 'border-slate-700 text-[#999]'}`}>
+                    className={`px-2 py-0.5 text-[10px] rounded border ${item.tax_rate === r.value ? 'border-[#4F46E5] text-indigo-400 bg-[#4F46E5]/5' : 'border-slate-700 text-slate-400'}`}>
                     Tax {r.label}
                   </button>
                 ))}
               </div>
             </div>
           ))}
-          <button onClick={() => setItems([...items, { description: '', quantity: 1, unit_price: 0, tax_rate: 0.10 }])} className="text-xs text-[#4F46E5] font-medium">+ Add item</button>
+          <button onClick={() => setItems([...items, { description: '', quantity: 1, unit_price: 0, tax_rate: 0.10 }])} className="text-xs text-indigo-400 font-medium">+ Add item</button>
           <div className="flex gap-2">
             {['none', 'percentage', 'fixed'].map(d => (
-              <button key={d} onClick={() => setDiscountType(d)} className={`flex-1 rounded-lg border py-1.5 text-[10px] font-medium ${discountType === d ? 'border-[#4F46E5] text-[#4F46E5]' : 'border-slate-700 text-[#999]'}`}>
+              <button key={d} onClick={() => setDiscountType(d)} className={`flex-1 rounded-lg border py-1.5 text-[10px] font-medium ${discountType === d ? 'border-[#4F46E5] text-indigo-400' : 'border-slate-700 text-slate-400'}`}>
                 {d === 'none' ? 'No discount' : d === 'percentage' ? '% Off' : '¥ Off'}
               </button>
             ))}
@@ -151,24 +151,24 @@ export default function EstimatesPage() {
           {discountType !== 'none' && <input type="number" value={discountValue} onChange={e => setDiscountValue(e.target.value)} placeholder={discountType === 'percentage' ? '% off' : '¥ off'} className={inputClass} />}
           <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notes" rows={2} className={inputClass} />
           <textarea value={terms} onChange={e => setTerms(e.target.value)} placeholder="Terms & Conditions (optional)" rows={2} className={inputClass} />
-          <div className="flex justify-between text-sm border-t pt-3"><span className="text-[#999]">Total</span><span className="font-semibold font-mono">{formatCurrency(total, currency)}</span></div>
+          <div className="flex justify-between text-sm border-t pt-3"><span className="text-slate-400">Total</span><span className="font-semibold font-mono">{formatCurrency(total, currency)}</span></div>
           <button onClick={handleSave} disabled={saving || !customerName.trim()} className="w-full rounded-lg bg-[#4F46E5] py-2.5 text-sm font-medium text-white disabled:opacity-50">{saving ? 'Saving...' : 'Create Estimate'}</button>
         </div>
       )}
 
       {loading ? <div className="flex justify-center py-12"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>
-      : estimates.length === 0 ? <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center"><p className="text-sm text-[#999]">No estimates yet</p></div>
+      : estimates.length === 0 ? <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center"><p className="text-sm text-slate-400">No estimates yet</p></div>
       : <div className="space-y-2">{estimates.map(est => (
           <div key={est.id} className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <p className="text-sm font-medium">{est.customer_name}</p>
-                <p className="text-[10px] text-[#999]">{est.estimate_number} · {formatDate(est.date)}</p>
+                <p className="text-[10px] text-slate-400">{est.estimate_number} · {formatDate(est.date)}</p>
                 {est.valid_until && (() => {
                   const daysLeft = Math.ceil((new Date(est.valid_until).getTime() - Date.now()) / 86400000);
                   return daysLeft <= 0 ? <span className="text-[9px] font-semibold text-[#DC2626] bg-[#DC2626]/10 px-1.5 py-0.5 rounded-full">Expired</span>
                     : daysLeft <= 3 ? <span className="text-[9px] font-semibold text-[#F59E0B] bg-[#F59E0B]/10 px-1.5 py-0.5 rounded-full">Expires in {daysLeft}d</span>
-                    : <span className="text-[9px] text-[#999]">Valid {daysLeft}d</span>;
+                    : <span className="text-[9px] text-slate-400">Valid {daysLeft}d</span>;
                 })()}
               </div>
               <div className="text-right"><p className="text-sm font-mono font-medium">{formatCurrency(est.total, currency)}</p><span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-medium ${statusColors[est.status] || ''}`}>{est.status}</span></div>
@@ -176,7 +176,7 @@ export default function EstimatesPage() {
             <div className="flex gap-1.5 mt-3">
               {est.status === 'draft' && <button onClick={() => sendEstimate(est)} className="flex-1 rounded-md bg-[#4F46E5] py-1.5 text-[10px] font-medium text-white">Send</button>}
               {['sent', 'approved'].includes(est.status) && !est.converted_invoice_id && <button onClick={() => convertToInvoice(est)} className="flex-1 rounded-md bg-[#16A34A] py-1.5 text-[10px] font-medium text-white">&rarr; Invoice</button>}
-              <button onClick={() => duplicateEstimate(est)} className="rounded-md border border-slate-700 px-3 py-1.5 text-[10px] text-[#666]">Duplicate</button>
+              <button onClick={() => duplicateEstimate(est)} className="rounded-md border border-slate-700 px-3 py-1.5 text-[10px] text-slate-400">Duplicate</button>
               <button onClick={() => deleteEstimate(est.id)} className="rounded-md border border-slate-700 px-3 py-1.5 text-[10px] text-[#DC2626]">Delete</button>
             </div>
           </div>

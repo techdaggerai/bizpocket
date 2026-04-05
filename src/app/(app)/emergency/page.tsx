@@ -91,7 +91,7 @@ export default function EmergencyPage() {
                     value={info[key]}
                     onChange={(e) => setInfo(prev => ({ ...prev, [key]: e.target.value }))}
                     placeholder={placeholder}
-                    className="w-full mt-0.5 rounded-lg border border-red-900/30 bg-slate-800 px-3 py-1.5 text-sm text-slate-50 placeholder-[#9CA3AF] focus:outline-none focus:border-[#DC2626]"
+                    className="w-full mt-0.5 rounded-lg border border-red-900/30 bg-slate-800 px-3 py-1.5 text-sm text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#DC2626]"
                   />
                 </div>
               ))}
@@ -161,8 +161,8 @@ export default function EmergencyPage() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill={isActive ? 'white' : '#9CA3AF'}><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] font-medium ${isActive ? 'text-white' : 'text-slate-50'}`}>{phrase.en}</p>
-                        <p className={`text-[15px] font-semibold mt-0.5 ${isActive ? 'text-white/90' : 'text-slate-300'}`}>{phrase.ja}</p>
+                        <p className={`text-[13px] font-medium ${isActive ? 'text-white' : 'text-white'}`}>{phrase.en}</p>
+                        <p className={`text-[15px] font-semibold mt-0.5 ${isActive ? 'text-white/90' : 'text-slate-200'}`}>{phrase.ja}</p>
                       </div>
                     </div>
                   </button>
@@ -188,7 +188,7 @@ export default function EmergencyPage() {
             >
               <span className="text-xl font-bold text-[#DC2626]">{num.number}</span>
               <div>
-                <p className="text-[11px] font-medium text-slate-300">{num.label}</p>
+                <p className="text-[11px] font-medium text-slate-200">{num.label}</p>
                 <p className="text-[10px] text-[#9CA3AF]">{num.labelJa}</p>
               </div>
             </a>

@@ -129,10 +129,10 @@ export default function UpgradePage() {
       {isOnTrial && (
         <div className="rounded-card border border-[#4F46E5]/20 bg-[#4F46E5]/5 p-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F46E5]/10">
-            <svg className="h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+            <svg className="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#4F46E5]">Pro Trial — {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left</p>
+            <p className="text-sm font-semibold text-indigo-400">Pro Trial — {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left</p>
             <p className="text-xs text-[#6B7280]">You have full Pro access. Upgrade before your trial ends.</p>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default function UpgradePage() {
                     <button
                       onClick={handlePortal}
                       disabled={loading === 'portal'}
-                      className="w-full rounded-btn border border-[#4F46E5]/20 bg-[rgba(79,70,229,0.08)] py-3 text-sm font-semibold text-[#4F46E5] transition-colors hover:bg-[rgba(79,70,229,0.12)] disabled:opacity-50"
+                      className="w-full rounded-btn border border-[#4F46E5]/20 bg-[rgba(79,70,229,0.08)] py-3 text-sm font-semibold text-indigo-400 transition-colors hover:bg-[rgba(79,70,229,0.12)] disabled:opacity-50"
                     >
                       {loading === 'portal' ? 'Loading...' : 'Manage Subscription'}
                     </button>
@@ -248,7 +248,7 @@ export default function UpgradePage() {
         </p>
         <a
           href="mailto:hello@bizpocket.io"
-          className="mt-4 inline-block rounded-btn border border-[#4F46E5] px-6 py-2.5 text-sm font-semibold text-[#4F46E5] transition-colors hover:bg-[rgba(79,70,229,0.08)]"
+          className="mt-4 inline-block rounded-btn border border-[#4F46E5] px-6 py-2.5 text-sm font-semibold text-indigo-400 transition-colors hover:bg-[rgba(79,70,229,0.08)]"
         >
           Contact Sales
         </a>

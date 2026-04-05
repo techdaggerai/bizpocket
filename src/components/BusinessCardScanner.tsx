@@ -128,7 +128,7 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
     setCard(prev => ({ ...prev, [key]: value }));
   }
 
-  const inputCls = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none";
+  const inputCls = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none";
 
   // ─── Camera ───
   if (step === 'camera') {
@@ -148,7 +148,7 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
             <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-8">
               <div className="bg-slate-800 rounded-2xl p-6 text-center max-w-sm">
                 <p className="text-sm text-[#DC2626] font-medium mb-3">{error}</p>
-                <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Go Back</button>
+                <button onClick={onClose} className="text-sm text-indigo-400 font-medium">Go Back</button>
               </div>
             </div>
           )}
@@ -189,8 +189,8 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
     <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
         <button onClick={onClose} className="text-sm text-[#9CA3AF] font-medium">Cancel</button>
-        <p className="text-sm font-bold text-slate-50">📇 Business Card</p>
-        <button onClick={handleSaveContact} className="text-sm text-[#4F46E5] font-bold">Save</button>
+        <p className="text-sm font-bold text-white">📇 Business Card</p>
+        <button onClick={handleSaveContact} className="text-sm text-indigo-400 font-bold">Save</button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

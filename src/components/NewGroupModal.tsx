@@ -213,7 +213,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
           {step === 'name' && (
             <button
               onClick={() => setStep('select')}
-              className="text-[#4F46E5] mr-1"
+              className="text-indigo-400 mr-1"
               aria-label="Back"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -222,7 +222,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
             </button>
           )}
           <div className="flex-1">
-            <h2 className="text-[15px] font-bold text-slate-50">
+            <h2 className="text-[15px] font-bold text-white">
               {step === 'select' ? 'New Group' : 'Name your group'}
             </h2>
             <p className="text-[11px] text-[#9CA3AF]">
@@ -233,7 +233,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
           </div>
           <button
             onClick={handleClose}
-            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-700 text-[#9CA3AF] hover:text-slate-50 transition-colors"
+            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-700 text-[#9CA3AF] hover:text-white transition-colors"
             aria-label="Close"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -252,7 +252,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search contacts…"
-                  className="flex-1 bg-transparent text-[14px] text-slate-50 placeholder-[#9CA3AF] focus:outline-none"
+                  className="flex-1 bg-transparent text-[14px] text-white placeholder-[#9CA3AF] focus:outline-none"
                   autoFocus
                 />
               </div>
@@ -298,7 +298,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                         )}
                       </div>
                       <div className="flex-1 min-w-0 text-left">
-                        <p className={`text-[14px] truncate ${isSelected ? 'font-semibold text-[#4F46E5]' : 'font-medium text-slate-50'}`}>
+                        <p className={`text-[14px] truncate ${isSelected ? 'font-semibold text-indigo-400' : 'font-medium text-white'}`}>
                           {contact.name}
                         </p>
                         {contact.company && (
@@ -354,7 +354,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
                 placeholder="e.g. Team Tokyo, Family, Work…"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-[15px] text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-[15px] text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
                 maxLength={60}
                 autoFocus
                 onKeyDown={e => e.key === 'Enter' && !creating && handleCreate()}

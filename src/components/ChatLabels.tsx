@@ -47,7 +47,7 @@ export default function ChatLabels({ conversationId, currentLabel, onUpdate, isO
           <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
           <span className="text-xs text-[#333]">{l.label}</span>
           {currentLabel === l.label && (
-            <svg className="h-3 w-3 text-[#4F46E5] ml-auto" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <svg className="h-3 w-3 text-indigo-400 ml-auto" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
           )}
         </button>
       ))}

@@ -164,11 +164,11 @@ export default function QuickQuizPage() {
         <h2 className="mt-4 text-xl font-bold text-[var(--text-1)]">
           {isPerfect ? 'Perfect!' : 'Quiz Done!'}
         </h2>
-        <p className="text-3xl font-bold text-[#4F46E5] mt-2">{score}/{words.length}</p>
+        <p className="text-3xl font-bold text-indigo-400 mt-2">{score}/{words.length}</p>
 
         <div className="mt-4 flex items-center gap-2 rounded-full bg-[#4F46E5]/10 px-4 py-2">
           <span className="text-sm">⭐</span>
-          <span className="text-sm font-bold text-[#4F46E5]">+{xp} XP</span>
+          <span className="text-sm font-bold text-indigo-400">+{xp} XP</span>
         </div>
 
         <div className="mt-6 flex gap-3">

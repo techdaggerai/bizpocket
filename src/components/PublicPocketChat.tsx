@@ -129,7 +129,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
           <button onClick={() => setChatOpen(false)} className="bg-slate-800/20 rounded-lg w-7 h-7 flex items-center justify-center text-white text-base">×</button>
         </div>
         <div className="p-5 space-y-3">
-          <p className="text-[13px] text-slate-400">Enter your name and language. Messages are automatically translated.</p>
+          <p className="text-[13px] text-slate-200">Enter your name and language. Messages are automatically translated.</p>
           <input type="text" placeholder="Your name" value={customerName} onChange={(e) => setCustomerName(e.target.value)}
             className="w-full px-3.5 py-2.5 rounded-[10px] border border-slate-700 text-sm outline-none focus:border-[#4F46E5]" />
           <select value={customerLanguage} onChange={(e) => setCustomerLanguage(e.target.value)}
@@ -141,7 +141,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
             className="w-full py-3 rounded-[10px] bg-[#4F46E5] text-white text-sm font-semibold disabled:bg-[#d1d5db] disabled:cursor-default">Start chatting</button>
         </div>
         <div className="border-t border-[#f3f4f6] py-2.5 text-center">
-          <a href="https://www.bizpocket.io?ref=pocketchat" target="_blank" rel="noopener noreferrer" className="text-[11px] text-slate-500 no-underline">
+          <a href="https://www.bizpocket.io?ref=pocketchat" target="_blank" rel="noopener noreferrer" className="text-[11px] text-slate-300 no-underline">
             Powered by <span className="text-[#4F46E5] font-semibold">BizPocket</span>
           </a>
         </div>
@@ -163,7 +163,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2.5">
-        {messages.length === 0 && <div className="text-center py-10"><p className="text-sm text-slate-400">Say hello! Your message will be translated automatically.</p></div>}
+        {messages.length === 0 && <div className="text-center py-10"><p className="text-sm text-slate-200">Say hello! Your message will be translated automatically.</p></div>}
         {messages.map((msg) => {
           const isMe = msg.sender_id === customerId.current;
           const display = getDisplayText(msg, customerLanguage);
@@ -175,7 +175,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
                   {showOriginal === msg.id ? msg.original_text || msg.content : display.text}
                 </p>
                 {display.isTranslated && (
-                  <p className={`text-[10px] mt-1 ${isMe ? 'text-white/60' : 'text-slate-500'}`}>
+                  <p className={`text-[10px] mt-1 ${isMe ? 'text-white/60' : 'text-slate-300'}`}>
                     {showOriginal === msg.id ? `Original · ${LANGUAGES[display.originalLanguage || '']?.flag || ''}` : 'Translated · tap to see original'}
                   </p>
                 )}
@@ -198,7 +198,7 @@ export default function PublicPocketChat({ conversationId, ownerId, ownerName, o
       </div>
 
       <div className="border-t border-[#f3f4f6] py-2 text-center shrink-0">
-        <a href="https://www.bizpocket.io?ref=pocketchat" target="_blank" rel="noopener noreferrer" className="text-[11px] text-slate-500 no-underline">
+        <a href="https://www.bizpocket.io?ref=pocketchat" target="_blank" rel="noopener noreferrer" className="text-[11px] text-slate-300 no-underline">
           Powered by <span className="text-[#4F46E5] font-semibold">BizPocket</span> — AI Business Autopilot
         </a>
       </div>

@@ -15,7 +15,7 @@ interface SearchResult {
 }
 
 const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
-  invoice: { icon: 'INV', color: 'bg-[#4F46E5]/10 text-[#4F46E5]' },
+  invoice: { icon: 'INV', color: 'bg-[#4F46E5]/10 text-indigo-400' },
   customer: { icon: 'CUS', color: 'bg-[#16A34A]/10 text-[#16A34A]' },
   expense: { icon: 'EXP', color: 'bg-[#DC2626]/10 text-[#DC2626]' },
   cash_flow: { icon: 'CF', color: 'bg-[#F59E0B]/10 text-[#F59E0B]' },

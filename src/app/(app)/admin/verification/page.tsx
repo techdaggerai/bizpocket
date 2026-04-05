@@ -114,7 +114,7 @@ export default function AdminVerificationPage() {
       {verifications.length === 0 ? (
         <div className="text-center py-12">
           <span className="text-4xl">{'\u2705'}</span>
-          <p className="text-sm text-[var(--text-2)] text-slate-300 mt-3">No pending verifications</p>
+          <p className="text-sm text-slate-200 mt-3">No pending verifications</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -127,12 +127,12 @@ export default function AdminVerificationPage() {
               >
                 <span className="text-lg">{'\u23F3'}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-slate-50 truncate">{v.user_name}</p>
-                  <p className="text-[10px] text-[var(--text-3)] text-slate-400">
+                  <p className="text-sm font-semibold text-white truncate">{v.user_name}</p>
+                  <p className="text-[10px] text-slate-400">
                     {v.document_type?.replace('_', ' ')} {'\u00B7'} {new Date(v.created_at).toLocaleDateString()}
                   </p>
                 </div>
-                <svg className={`w-4 h-4 text-[var(--text-3)] text-slate-400 transition-transform ${expandedId === v.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className={`w-4 h-4 text-slate-400 transition-transform ${expandedId === v.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -143,7 +143,7 @@ export default function AdminVerificationPage() {
                   {/* Images side by side */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-[10px] text-[var(--text-3)] text-slate-400 mb-1">ID Document</p>
+                      <p className="text-[10px] text-slate-400 mb-1">ID Document</p>
                       {v.id_image_url ? (
                         <img src={v.id_image_url} alt="ID" className="w-full h-40 object-contain rounded-lg border border-slate-700 bg-slate-800" />
                       ) : (
@@ -153,7 +153,7 @@ export default function AdminVerificationPage() {
                       )}
                     </div>
                     <div>
-                      <p className="text-[10px] text-[var(--text-3)] text-slate-400 mb-1">Selfie with ID</p>
+                      <p className="text-[10px] text-slate-400 mb-1">Selfie with ID</p>
                       {v.selfie_image_url ? (
                         <img src={v.selfie_image_url} alt="Selfie" className="w-full h-40 object-contain rounded-lg border border-slate-700 bg-slate-800" />
                       ) : (
@@ -164,7 +164,7 @@ export default function AdminVerificationPage() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-[var(--text-2)] text-slate-300">
+                  <p className="text-xs text-slate-200">
                     {v.user_email} {'\u00B7'} {v.document_type?.replace('_', ' ')}
                   </p>
 

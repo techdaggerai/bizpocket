@@ -245,8 +245,8 @@ export default function FormFillPage() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-slate-50">AI Form Fill<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
-              <p className="text-xs text-slate-300 hidden sm:block">Upload any form — AI guides you through it</p>
+              <h1 className="text-lg font-semibold text-white">AI Form Fill<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
+              <p className="text-xs text-slate-200 hidden sm:block">Upload any form — AI guides you through it</p>
             </div>
           </div>
 
@@ -254,7 +254,7 @@ export default function FormFillPage() {
           <div className="relative">
             <button
               onClick={() => setShowLangPicker(!showLangPicker)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-amber-300 text-sm text-slate-300 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-amber-300 text-sm text-slate-200 transition-colors"
             >
               <Globe className="w-4 h-4 text-amber-500" />
               <span className="hidden sm:inline">{selectedLang.flag} {selectedLang.label}</span>
@@ -309,11 +309,11 @@ export default function FormFillPage() {
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-colors ${isDragging ? 'bg-amber-500' : 'bg-amber-100'}`}>
                 <Upload className={`w-8 h-8 transition-colors ${isDragging ? 'text-white' : 'text-amber-500'}`} />
               </div>
-              <p className="text-lg font-semibold text-slate-50 mb-1">{isDragging ? 'Drop your form here' : 'Upload a form'}</p>
-              <p className="text-sm text-slate-300 text-center">Drag & drop or click to browse<br />Supports JPG, PNG, PDF — any language</p>
+              <p className="text-lg font-semibold text-white mb-1">{isDragging ? 'Drop your form here' : 'Upload a form'}</p>
+              <p className="text-sm text-slate-200 text-center">Drag & drop or click to browse<br />Supports JPG, PNG, PDF — any language</p>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 {['Japanese Forms', 'English', 'Arabic', 'Tax Docs', 'Applications', 'Contracts'].map(tag => (
-                  <span key={tag} className="text-xs px-3 py-1 bg-slate-700 text-slate-300 rounded-full">{tag}</span>
+                  <span key={tag} className="text-xs px-3 py-1 bg-slate-700 text-slate-200 rounded-full">{tag}</span>
                 ))}
               </div>
             </div>
@@ -329,8 +329,8 @@ export default function FormFillPage() {
                     <item.icon className={`w-5 h-5 ${item.color}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-50">{item.label}</p>
-                    <p className="text-xs text-slate-300 mt-0.5">{item.desc}</p>
+                    <p className="text-sm font-medium text-white">{item.label}</p>
+                    <p className="text-xs text-slate-200 mt-0.5">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -347,8 +347,8 @@ export default function FormFillPage() {
               </div>
               <div className="absolute inset-0 rounded-full border-4 border-amber-300 border-t-transparent animate-spin" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-50 mb-2">Reading your form…</h2>
-            <p className="text-sm text-slate-300 max-w-xs">Claude is identifying all fields and translating them to {language}</p>
+            <h2 className="text-xl font-semibold text-white mb-2">Reading your form…</h2>
+            <p className="text-sm text-slate-200 max-w-xs">Claude is identifying all fields and translating them to {language}</p>
             {file && (
               <div className="mt-6 flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-4 py-2 rounded-full">
                 <FileText className="w-3.5 h-3.5" />
@@ -365,14 +365,14 @@ export default function FormFillPage() {
               <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div className="h-full bg-amber-400 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
-              <span className="text-xs text-slate-300 flex-shrink-0 font-medium">{currentIndex + 1} / {fields.length}</span>
+              <span className="text-xs text-slate-200 flex-shrink-0 font-medium">{currentIndex + 1} / {fields.length}</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {previewUrl && (
                 <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
-                    <span className="text-xs font-medium text-slate-300">Original Form</span>
+                    <span className="text-xs font-medium text-slate-200">Original Form</span>
                     <button onClick={() => setShowPreview(!showPreview)} className="text-xs text-indigo-600 flex items-center gap-1">
                       <ZoomIn className="w-3.5 h-3.5" />
                       {showPreview ? 'Shrink' : 'Expand'}
@@ -387,14 +387,14 @@ export default function FormFillPage() {
               <div className={`bg-slate-800 rounded-2xl border border-slate-700 flex flex-col ${!previewUrl ? 'lg:col-span-2' : ''}`}>
                 <div className="px-5 py-4 border-b border-slate-700">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${currentField.required ? 'bg-red-50 text-red-600' : 'bg-slate-700 text-slate-300'}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${currentField.required ? 'bg-red-50 text-red-600' : 'bg-slate-700 text-slate-200'}`}>
                       {currentField.required ? 'Required' : 'Optional'}
                     </span>
                     <span className="text-xs text-slate-400">
                       {currentField.originalLabel !== currentField.label && `Original: ${currentField.originalLabel}`}
                     </span>
                   </div>
-                  <h2 className="text-base font-semibold text-slate-50 mt-1">{currentField.label}</h2>
+                  <h2 className="text-base font-semibold text-white mt-1">{currentField.label}</h2>
                 </div>
 
                 <div className="px-5 py-4 flex-1">
@@ -421,7 +421,7 @@ export default function FormFillPage() {
                         <div className="flex gap-3">
                           {['Yes', 'No'].map(opt => (
                             <button key={opt} onClick={() => setCurrentValue(opt)}
-                              className={`flex-1 py-3 rounded-xl border-2 text-sm font-medium transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-slate-700 text-slate-300 hover:border-slate-500'}`}>
+                              className={`flex-1 py-3 rounded-xl border-2 text-sm font-medium transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-slate-700 text-slate-200 hover:border-slate-500'}`}>
                               {opt}
                             </button>
                           ))}
@@ -455,7 +455,7 @@ export default function FormFillPage() {
 
                 <div className="px-5 py-4 border-t border-slate-700 flex items-center gap-3">
                   <button onClick={handleSkip} disabled={currentField.required}
-                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <SkipForward className="w-4 h-4" /> Skip
                   </button>
                   <button onClick={handleNext} disabled={isLoadingQ || (currentField.required && !currentValue.trim())}
@@ -493,11 +493,11 @@ export default function FormFillPage() {
                     <FileCheck className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-50">Form Complete</p>
-                    <p className="text-xs text-slate-300">{filledCount} of {fields.length} fields filled</p>
+                    <p className="text-sm font-semibold text-white">Form Complete</p>
+                    <p className="text-xs text-slate-200">{filledCount} of {fields.length} fields filled</p>
                   </div>
                 </div>
-                <button onClick={reset} className="text-xs text-slate-400 hover:text-slate-300 flex items-center gap-1">
+                <button onClick={reset} className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
                   <RefreshCw className="w-3.5 h-3.5" /> New form
                 </button>
               </div>
@@ -510,7 +510,7 @@ export default function FormFillPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-slate-400 mb-0.5">{f.label}{f.required && <span className="text-red-400 ml-1">*</span>}</p>
-                      <p className={`text-sm break-words ${f.value ? 'text-slate-50' : 'text-slate-400 italic'}`}>{f.value || 'Not filled'}</p>
+                      <p className={`text-sm break-words ${f.value ? 'text-white' : 'text-slate-400 italic'}`}>{f.value || 'Not filled'}</p>
                     </div>
                     <button onClick={() => editField(i)} className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-indigo-600 transition-all p-1">
                       <Edit2 className="w-4 h-4" />
@@ -529,7 +529,7 @@ export default function FormFillPage() {
                 {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : savedToVault ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                 {savedToVault ? 'Saved to Vault!' : 'Save to Vault'}
               </button>
-              <button onClick={reset} className="flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 border border-slate-700 text-slate-300 hover:border-slate-500 text-sm font-medium rounded-xl transition-colors">
+              <button onClick={reset} className="flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 border border-slate-700 text-slate-200 hover:border-slate-500 text-sm font-medium rounded-xl transition-colors">
                 <RefreshCw className="w-4 h-4" /> New Form
               </button>
             </div>

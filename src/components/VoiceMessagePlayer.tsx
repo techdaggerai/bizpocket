@@ -53,7 +53,7 @@ export default function VoiceMessagePlayer({ url, duration, isOwner }: Props) {
       <button
         onClick={togglePlay}
         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
-          isOwner ? 'bg-slate-800/20 text-white hover:bg-slate-800/30' : 'bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20'
+          isOwner ? 'bg-slate-800/20 text-white hover:bg-slate-800/30' : 'bg-[#4F46E5]/10 text-indigo-400 hover:bg-[#4F46E5]/20'
         }`}
       >
         {playing ? (

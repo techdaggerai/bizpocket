@@ -270,7 +270,7 @@ export default function VerificationPage() {
         {idPreview ? (
           <div className="space-y-2">
             <img src={idPreview} alt="ID preview" className="w-full h-48 object-contain rounded-xl border border-slate-700 bg-slate-800" />
-            <button onClick={() => idInputRef.current?.click()} className="text-xs text-[#4F46E5] font-semibold">Retake / Change</button>
+            <button onClick={() => idInputRef.current?.click()} className="text-xs text-indigo-400 font-semibold">Retake / Change</button>
           </div>
         ) : (
           <button
@@ -305,7 +305,7 @@ export default function VerificationPage() {
         {selfiePreview ? (
           <div className="space-y-2">
             <img src={selfiePreview} alt="Selfie preview" className="w-full h-64 object-contain rounded-xl border border-slate-700 bg-slate-800" />
-            <button onClick={() => selfieInputRef.current?.click()} className="text-xs text-[#4F46E5] font-semibold">Retake</button>
+            <button onClick={() => selfieInputRef.current?.click()} className="text-xs text-indigo-400 font-semibold">Retake</button>
           </div>
         ) : (
           <button
@@ -350,7 +350,7 @@ export default function VerificationPage() {
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
           {'\u23F3'} Pending Review
         </span>
-        <button onClick={() => router.push('/profile/preview')} className="mt-8 text-sm font-semibold text-[#4F46E5]">
+        <button onClick={() => router.push('/profile/preview')} className="mt-8 text-sm font-semibold text-indigo-400">
           Back to Profile {'\u2192'}
         </button>
       </div>

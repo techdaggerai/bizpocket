@@ -216,8 +216,8 @@ export default function DashboardPage() {
             <h1 className="text-2xl text-[var(--pm-text-primary)]" style={{ fontFamily: 'var(--font-display), sans-serif', fontWeight: 600 }}>
               {greeting}{firstName ? `, ${firstName}` : ''} {emoji}
             </h1>
-            {showJa && <p className="text-sm text-slate-400 mt-0.5">{jaGreeting}</p>}
-            <p className="text-sm text-slate-400 mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            {showJa && <p className="text-sm text-slate-200 mt-0.5">{jaGreeting}</p>}
+            <p className="text-sm text-slate-200 mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
         );
       })()}
@@ -288,7 +288,7 @@ export default function DashboardPage() {
               {/* Quick action chips */}
               <div className="flex flex-wrap gap-2">
                 {quickActions.map((a, i) => (
-                  <Link key={i} href={a.href} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[var(--pm-surface-2)] text-xs font-medium text-[var(--pm-text-secondary)] hover:bg-[var(--pm-surface-3)] transition-colors no-underline ${i === 0 && tier === 'starter' ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
+                  <Link key={i} href={a.href} className={`flex items-center justify-center gap-1 min-w-[80px] px-3 py-2 rounded-full bg-[var(--pm-surface-2)] text-xs font-medium text-slate-200 hover:bg-[var(--pm-surface-3)] transition-colors no-underline ${i === 0 && tier === 'starter' ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
                     <span>{a.emoji}</span><span>{a.label}</span>
                   </Link>
                 ))}
@@ -362,16 +362,16 @@ export default function DashboardPage() {
       )}
 
       {/* Public Order Link */}
-      <div className="rounded-xl bg-[#eef2ff] border border-[#c7d2fe] p-4">
+      <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-[13px] font-semibold text-[#4338ca]">Your public order page</p>
-            <p className="text-sm text-slate-300 font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
-            <p className="text-xs text-slate-400 mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
+            <p className="text-[13px] font-semibold text-indigo-400">Your public order page</p>
+            <p className="text-sm text-slate-200 font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
+            <p className="text-xs text-slate-200 mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShowQR(!showQR)}
-              className="bg-slate-800 text-[#4F46E5] text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-indigo-800 whitespace-nowrap hover:bg-indigo-950/50 transition-colors">
+              className="bg-slate-700 text-indigo-400 text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-slate-600 whitespace-nowrap hover:bg-slate-600 transition-colors">
               {showQR ? 'Hide QR' : 'Show QR'}
             </button>
             <button onClick={() => { navigator.clipboard.writeText(`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`); toast('Link copied!', 'success'); }}
@@ -381,7 +381,7 @@ export default function DashboardPage() {
           </div>
         </div>
         {showQR && (
-          <div className="mt-4 pt-4 border-t border-[#c7d2fe]">
+          <div className="mt-4 pt-4 border-t border-slate-700">
             <PocketChatQR url={`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`} name={organization.name || 'business'} size={200} />
           </div>
         )}
@@ -417,51 +417,51 @@ export default function DashboardPage() {
       <div className="grid grid-cols-4 gap-2">
         <Link href="/invoices/new" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#4F46E5]/30 hover:bg-[#4F46E5]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4F46E5]/[0.08]">
-            <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>
+            <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>
           </div>
-          <span className="text-[11px] font-medium text-[#333]">Invoice</span>
+          <span className="text-[11px] font-medium text-slate-200">Invoice</span>
         </Link>
         <Link href="/cash-flow?new=1" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#16A34A]/30 hover:bg-[#16A34A]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#16A34A]/[0.08]">
             <svg className="h-4 w-4 text-[#16A34A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="14" width="3.5" height="6" rx="1"/><rect x="10" y="8" width="3.5" height="12" rx="1"/><rect x="16" y="4" width="3.5" height="16" rx="1"/></svg>
           </div>
-          <span className="text-[11px] font-medium text-[#333]">Cash Flow</span>
+          <span className="text-[11px] font-medium text-slate-200">Cash Flow</span>
         </Link>
         <Link href="/chat" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#7C3AED]/30 hover:bg-[#7C3AED]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#7C3AED]/[0.08]">
             <svg className="h-4 w-4 text-[#7C3AED]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"/></svg>
           </div>
-          <span className="text-[11px] font-medium text-[#333]">Chat</span>
+          <span className="text-[11px] font-medium text-slate-200">Chat</span>
         </Link>
         <Link href="/detect" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#0EA5E9]/30 hover:bg-[#0EA5E9]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0EA5E9]/[0.08]">
             <svg className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="11" cy="11" r="4"/><path d="M15 15l4 4"/></svg>
           </div>
-          <span className="text-[11px] font-medium text-[#333]">AI Detect</span>
+          <span className="text-[11px] font-medium text-slate-200">AI Detect</span>
         </Link>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Balance</p>
-          <p className="mt-2 font-mono text-xl font-bold text-slate-50">{formatCurrency(balance, currency)}</p>
-          <p className="mt-1 text-[10px] text-[#999]">Net this month</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Balance</p>
+          <p className="mt-2 font-mono text-xl font-bold text-white">{formatCurrency(balance, currency)}</p>
+          <p className="mt-1 text-[10px] text-slate-400">Net this month</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Unpaid</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Unpaid</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#DC2626]">{formatCurrency(unpaidTotal, currency)}</p>
-          <p className="mt-1 text-[10px] text-[#999]">{invoices.length} invoice{invoices.length !== 1 ? 's' : ''} pending</p>
+          <p className="mt-1 text-[10px] text-slate-400">{invoices.length} invoice{invoices.length !== 1 ? 's' : ''} pending</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Income</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Income</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
-          <p className="mt-1 text-[10px] text-[#999]">This month</p>
+          <p className="mt-1 text-[10px] text-slate-400">This month</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Expenses</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Expenses</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
-          <p className="mt-1 text-[10px] text-[#999]">This month</p>
+          <p className="mt-1 text-[10px] text-slate-400">This month</p>
         </div>
       </div>
 
@@ -475,9 +475,9 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-[#F59E0B]/20 border-l-4 border-l-[#F59E0B] bg-gradient-to-br from-[#F59E0B]/[0.03] to-[#EA580C]/[0.05] p-5">
           <div className="flex items-center gap-2 mb-3">
             <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" /></svg>
-            <span className="text-xs font-semibold text-[#F59E0B]">AI Briefing</span>
+            <span className="text-xs font-semibold text-amber-400">AI Briefing</span>
           </div>
-          <p className="whitespace-pre-line text-[13px] leading-relaxed text-[#333]">{stripMarkdown(briefing)}</p>
+          <p className="whitespace-pre-line text-[13px] leading-relaxed text-slate-200">{stripMarkdown(briefing)}</p>
         </div>
       ) : null}
 
@@ -488,24 +488,24 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg>
-              <h2 className="text-sm font-semibold text-slate-50">{activeCycle.name}</h2>
+              <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg>
+              <h2 className="text-sm font-semibold text-white">{activeCycle.name}</h2>
             </div>
-            <span className="rounded-full bg-[#4F46E5]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-[#4F46E5]">{cycleItemCount} items</span>
+            <span className="rounded-full bg-[#4F46E5]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-indigo-400">{cycleItemCount} items</span>
           </div>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 -mx-1 px-1">
             {cycleStages.map((stage, i) => (
               <div key={i} className="flex items-center shrink-0">
                 <div className="rounded-lg px-4 py-3 text-center min-w-[90px] border" style={{ borderColor: stage.color + '40', backgroundColor: stage.color + '08' }}>
                   <p className="text-xs font-bold" style={{ color: stage.color }}>{stage.stage_order}</p>
-                  <p className="text-[11px] font-medium text-[#666] whitespace-nowrap">{stage.name}</p>
+                  <p className="text-[11px] font-medium text-slate-400 whitespace-nowrap">{stage.name}</p>
                 </div>
-                {i < cycleStages.length - 1 && <svg className="h-4 w-4 text-[#CCC] shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>}
+                {i < cycleStages.length - 1 && <svg className="h-4 w-4 text-slate-400 shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>}
               </div>
             ))}
           </div>
           <div className="mt-3 flex gap-2">
-            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-slate-700 py-2.5 text-center text-[11px] font-medium text-[#666] hover:bg-slate-700">Edit Cycle</Link>
+            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-slate-700 py-2.5 text-center text-[11px] font-medium text-slate-400 hover:bg-slate-700">Edit Cycle</Link>
             <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#0A0A0A] py-2.5 text-center text-[11px] font-medium text-white hover:bg-[#333]">Ops Radar &rarr;</Link>
           </div>
         </div>
@@ -513,13 +513,13 @@ export default function DashboardPage() {
         <Link href="/cycle-setup" className="block rounded-xl border border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-5 transition-all hover:bg-[#4F46E5]/[0.04]">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4F46E5]/10">
-              <svg className="h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+              <svg className="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-slate-50">Set up your business cycle</p>
-              <p className="text-[11px] text-[#999]">AI creates your custom pipeline in 2 minutes</p>
+              <p className="text-sm font-semibold text-white">Set up your business cycle</p>
+              <p className="text-[11px] text-slate-400">AI creates your custom pipeline in 2 minutes</p>
             </div>
-            <svg className="h-4 w-4 text-[#CCC]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
           </div>
         </Link>
       )}
@@ -532,8 +532,8 @@ export default function DashboardPage() {
               <svg className="h-5 w-5 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-slate-50">Unlock the full autopilot</p>
-              <p className="text-xs text-[#999]">Unlimited invoices, AI Briefing, 21 languages</p>
+              <p className="text-sm font-semibold text-white">Unlock the full autopilot</p>
+              <p className="text-xs text-slate-400">Unlimited invoices, AI Briefing, 21 languages</p>
             </div>
             <span className="rounded-full border border-[#F59E0B] px-3 py-1.5 text-xs font-bold text-[#F59E0B]">Go Pro &rarr;</span>
           </div>
@@ -544,8 +544,8 @@ export default function DashboardPage() {
       {upcomingEvents.length > 0 && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Upcoming</h2>
-            <Link href="/planner" className="text-[11px] text-[#4F46E5] font-medium">View all</Link>
+            <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Upcoming</h2>
+            <Link href="/planner" className="text-[11px] text-indigo-400 font-medium">View all</Link>
           </div>
           <div className="space-y-1.5">
             {upcomingEvents.map((evt) => {
@@ -557,10 +557,10 @@ export default function DashboardPage() {
                 <div key={evt.id} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
                   <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotColors[evt.event_type] || 'bg-[#999]'}`} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-medium text-slate-50 truncate">{evt.title}</p>
-                    <p className="text-[10px] text-[#999]">{label}{evt.event_time ? ` ${evt.event_time.slice(0, 5)}` : ''}</p>
+                    <p className="text-[13px] font-medium text-white truncate">{evt.title}</p>
+                    <p className="text-[10px] text-slate-400">{label}{evt.event_time ? ` ${evt.event_time.slice(0, 5)}` : ''}</p>
                   </div>
-                  {evt.amount && <span className="font-mono text-[13px] font-medium text-[#333]">{formatCurrency(evt.amount, evt.currency || currency)}</span>}
+                  {evt.amount && <span className="font-mono text-[13px] font-medium text-slate-200">{formatCurrency(evt.amount, evt.currency || currency)}</span>}
                 </div>
               );
             })}
@@ -571,13 +571,13 @@ export default function DashboardPage() {
       {/* Recent Activity */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Recent Activity</h2>
-          <Link href="/cash-flow" className="text-[11px] text-[#4F46E5] font-medium">View all</Link>
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Recent Activity</h2>
+          <Link href="/cash-flow" className="text-[11px] text-indigo-400 font-medium">View all</Link>
         </div>
         {recentFlows.length === 0 ? (
           <div className="rounded-xl border border-slate-700 bg-slate-800 p-6 text-center">
-            <p className="text-sm text-[#999]">No transactions yet.</p>
-            <Link href="/cash-flow?new=1" className="mt-1 inline-block text-xs font-medium text-[#4F46E5]">Add your first entry &rarr;</Link>
+            <p className="text-sm text-slate-400">No transactions yet.</p>
+            <Link href="/cash-flow?new=1" className="mt-1 inline-block text-xs font-medium text-indigo-400">Add your first entry &rarr;</Link>
           </div>
         ) : (
           <div className="space-y-1.5">
@@ -590,8 +590,8 @@ export default function DashboardPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[13px] font-medium text-slate-50">{f.category}</p>
-                    <p className="text-[10px] text-[#999]">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
+                    <p className="text-[13px] font-medium text-white">{f.category}</p>
+                    <p className="text-[10px] text-slate-400">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
                   </div>
                 </div>
                 <span className={`font-mono text-[13px] font-semibold ${f.flow_type === 'IN' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
@@ -605,16 +605,17 @@ export default function DashboardPage() {
 
       {/* World Clock */}
       <div>
-        <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">World Clock</h2>
+        <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">World Clock</h2>
         <div className="grid grid-cols-6 gap-1.5">
           {DEFAULT_CLOCKS.map((c) => {
             const formatted = new Intl.DateTimeFormat('en-US', { timeZone: c.tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(now);
             const [time, period] = formatted.split(' ');
             return (
               <div key={c.tz} className="rounded-lg border border-slate-700 bg-slate-800 py-2 text-center">
-                <p className="text-[9px] font-semibold text-[#BBB]">{c.city.slice(0, 2).toUpperCase()}</p>
-                <p className="font-mono text-sm font-bold text-slate-50">{time}</p>
-                <p className="text-[8px] text-[#CCC]">{period}</p>
+                <p className="text-[9px] font-semibold text-slate-200 hidden sm:block">{c.city}</p>
+                <p className="text-[9px] font-semibold text-slate-200 sm:hidden">{c.city.slice(0, 2).toUpperCase()}</p>
+                <p className="font-mono text-sm font-bold text-white">{time}</p>
+                <p className="text-[8px] text-slate-400">{period}</p>
               </div>
             );
           })}

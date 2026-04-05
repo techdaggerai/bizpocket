@@ -156,7 +156,7 @@ export default function SocialMediaPage() {
             <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#7C3AED]">Hashtags</h3>
-                <button onClick={() => copyText(result.hashtags.map(h => '#' + h).join(' '), 'hashtags')} className="text-[10px] font-medium text-[#4F46E5]">{copiedField === 'hashtags' ? 'Copied!' : 'Copy'}</button>
+                <button onClick={() => copyText(result.hashtags.map(h => '#' + h).join(' '), 'hashtags')} className="text-[10px] font-medium text-indigo-400">{copiedField === 'hashtags' ? 'Copied!' : 'Copy'}</button>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {result.hashtags.map((tag, i) => (<span key={i} className="rounded-full bg-[#7C3AED]/10 px-2.5 py-1 text-xs text-[#7C3AED]">#{tag}</span>))}
@@ -171,7 +171,7 @@ export default function SocialMediaPage() {
                 {result.alt_captions.map((alt, i) => (
                   <div key={i} className="flex items-start justify-between gap-2 rounded-lg bg-[var(--bg-2)] p-2.5">
                     <p className="text-xs text-[var(--text-2)] flex-1">{alt}</p>
-                    <button onClick={() => copyText(alt, `alt${i}`)} className="shrink-0 text-[10px] text-[#4F46E5]">{copiedField === `alt${i}` ? '\u2713' : 'Copy'}</button>
+                    <button onClick={() => copyText(alt, `alt${i}`)} className="shrink-0 text-[10px] text-indigo-400">{copiedField === `alt${i}` ? '\u2713' : 'Copy'}</button>
                   </div>
                 ))}
               </div>

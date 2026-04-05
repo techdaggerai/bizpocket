@@ -66,10 +66,10 @@
   --pm-surface-3: #475569;
   --pm-surface-4: #64748B;
 
-  /* TEXT — always dark */
-  --pm-text-primary: #F8FAFC;
-  --pm-text-secondary: #94A3B8;
-  --pm-text-tertiary: #64748B;
+  /* TEXT — always dark, brightened for readability */
+  --pm-text-primary: #FFFFFF;
+  --pm-text-secondary: #CBD5E1;
+  --pm-text-tertiary: #94A3B8;
   --pm-text-inverse: #0F172A;
   --pm-text-link: #818CF8;
 
@@ -148,9 +148,9 @@
   --pm-surface-2: #334155;
   --pm-surface-3: #475569;
   --pm-surface-4: #64748B;
-  --pm-text-primary: #F8FAFC;
-  --pm-text-secondary: #94A3B8;
-  --pm-text-tertiary: #64748B;
+  --pm-text-primary: #FFFFFF;
+  --pm-text-secondary: #CBD5E1;
+  --pm-text-tertiary: #94A3B8;
   --pm-text-link: #818CF8;
   --glass-bg: rgba(15,23,42,0.82);
   --glass-border: rgba(255,255,255,0.12);

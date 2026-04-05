@@ -176,8 +176,8 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
     <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
-        <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Close</button>
-        <p className="text-sm font-bold text-slate-50">Voice Translator</p>
+        <button onClick={onClose} className="text-sm text-indigo-400 font-medium">Close</button>
+        <p className="text-sm font-bold text-white">Voice Translator</p>
         <div className="w-10" />
       </div>
 
@@ -193,7 +193,7 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
               <div className="fixed inset-0 z-40" onClick={() => setShowFromPicker(false)} />
               <div className="absolute top-full mt-1 left-0 z-50 w-44 max-h-60 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
                 {LANGUAGES.map(l => (
-                  <button key={l.code} onClick={() => { setFromLang(l.code); setShowFromPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${fromLang === l.code ? 'text-[#4F46E5] font-semibold' : 'text-slate-300'}`}>
+                  <button key={l.code} onClick={() => { setFromLang(l.code); setShowFromPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${fromLang === l.code ? 'text-indigo-400 font-semibold' : 'text-slate-300'}`}>
                     <span>{l.flag}</span> {l.label}
                   </button>
                 ))}
@@ -202,7 +202,7 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
           )}
         </div>
 
-        <button onClick={swap} className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors">
+        <button onClick={swap} className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-[#9CA3AF] hover:text-indigo-400 transition-colors">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
         </button>
 
@@ -233,7 +233,7 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
           <div>
             <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">{fromInfo.flag} {fromInfo.label}</p>
             <div className="bg-slate-800 rounded-xl p-4">
-              <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{originalText}</p>
+              <p className="text-[15px] text-white leading-relaxed whitespace-pre-wrap">{originalText}</p>
             </div>
           </div>
         )}
@@ -250,7 +250,7 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
           <div>
             <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">{toInfo.flag} {toInfo.label}</p>
             <div className="bg-indigo-950/30 rounded-xl p-4 border border-[#C7D2FE]/30 border-indigo-800/30">
-              <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{translatedText}</p>
+              <p className="text-[15px] text-white leading-relaxed whitespace-pre-wrap">{translatedText}</p>
             </div>
           </div>
         )}
@@ -292,7 +292,7 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
           {onSendToChat && (
             <button
               onClick={() => { onSendToChat(translatedText); onClose(); }}
-              className="flex-1 rounded-xl border border-[#4F46E5] py-3 text-sm font-semibold text-[#4F46E5] active:bg-[#4F46E5]/5"
+              className="flex-1 rounded-xl border border-indigo-400 py-3 text-sm font-semibold text-indigo-400 active:bg-[#4F46E5]/5"
             >
               Send to Chat
             </button>

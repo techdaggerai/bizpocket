@@ -106,8 +106,8 @@ export default function AdminPage() {
     <div className="space-y-6">
       <PageHeader title="Admin" backPath="/dashboard" />
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-50">Admin Dashboard</h1>
-        <button onClick={fetchAll} className="text-sm text-[#4F46E5] font-medium hover:underline">Refresh</button>
+        <h1 className="text-xl font-bold text-white">Admin Dashboard</h1>
+        <button onClick={fetchAll} className="text-sm text-indigo-400 font-medium hover:underline">Refresh</button>
       </div>
 
       {/* ROW 1 — Metric Cards */}
@@ -128,7 +128,7 @@ export default function AdminPage() {
       {/* ROW 2 — Recent Signups */}
       <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden">
         <div className="px-5 py-3 border-b border-[var(--border)]">
-          <h2 className="text-base font-semibold text-slate-50">Recent Signups</h2>
+          <h2 className="text-base font-semibold text-white">Recent Signups</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -146,10 +146,10 @@ export default function AdminPage() {
                 const org = Array.isArray(s.organization) ? s.organization[0] : s.organization;
                 return (
                   <tr key={i} className="border-b border-slate-700 hover:bg-slate-700">
-                    <td className="px-5 py-2.5 text-slate-50 font-medium">{s.name || '—'}</td>
+                    <td className="px-5 py-2.5 text-white font-medium">{s.name || '—'}</td>
                     <td className="px-5 py-2.5 text-[#6B7280]">{s.email}</td>
                     <td className="px-5 py-2.5">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${org?.plan === 'pro' || org?.plan === 'business' ? 'bg-[#EDE9FE] text-[#4F46E5]' : 'bg-[#F0FDF4] text-[#166534]'}`}>
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${org?.plan === 'pro' || org?.plan === 'business' ? 'bg-[#EDE9FE] text-indigo-400' : 'bg-[#F0FDF4] text-[#166534]'}`}>
                         {org?.plan || 'free'}
                       </span>
                     </td>
@@ -166,7 +166,7 @@ export default function AdminPage() {
       {/* ROW 3 — Source Breakdown + Active Users */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
-          <h2 className="text-base font-semibold text-slate-50 mb-4">Signup Source</h2>
+          <h2 className="text-base font-semibold text-white mb-4">Signup Source</h2>
           <div className="space-y-3">
             {[
               { label: 'BizPocket', count: sourceCounts.bizpocket, color: '#4F46E5' },
@@ -177,7 +177,7 @@ export default function AdminPage() {
               return (
                 <div key={s.label}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-slate-300">{s.label}</span>
+                    <span className="text-sm font-medium text-slate-200">{s.label}</span>
                     <span className="text-sm text-[#6B7280]">{s.count} ({pct}%)</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-700">
@@ -190,8 +190,8 @@ export default function AdminPage() {
         </div>
 
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
-          <h2 className="text-base font-semibold text-slate-50 mb-4">Active Users (7 days)</h2>
-          <p className="text-4xl font-bold text-[#4F46E5]">{activeUsers7d}</p>
+          <h2 className="text-base font-semibold text-white mb-4">Active Users (7 days)</h2>
+          <p className="text-4xl font-bold text-indigo-400">{activeUsers7d}</p>
           <p className="text-sm text-[#6B7280] mt-1">Users with messages in last 7 days</p>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function AdminPage() {
       {/* ROW 4 — Recent Feedback */}
       <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden">
         <div className="px-5 py-3 border-b border-[var(--border)]">
-          <h2 className="text-base font-semibold text-slate-50">Recent Feedback</h2>
+          <h2 className="text-base font-semibold text-white">Recent Feedback</h2>
         </div>
         {feedback.length === 0 ? (
           <div className="px-5 py-8 text-center text-sm text-[#9CA3AF]">No feedback yet</div>
@@ -211,10 +211,10 @@ export default function AdminPage() {
                 <div key={f.id} className="px-5 py-3 hover:bg-slate-700">
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-50">{prof?.name || 'Anonymous'}</span>
+                      <span className="text-sm font-medium text-white">{prof?.name || 'Anonymous'}</span>
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                         f.type === 'bug' ? 'bg-[#FEF2F2] text-[#DC2626]' :
-                        f.type === 'feature' ? 'bg-[#EDE9FE] text-[#4F46E5]' :
+                        f.type === 'feature' ? 'bg-[#EDE9FE] text-indigo-400' :
                         'bg-slate-700 text-slate-400'
                       }`}>
                         {f.type}
@@ -222,7 +222,7 @@ export default function AdminPage() {
                     </div>
                     <span className="text-xs text-[#9CA3AF]">{new Date(f.created_at).toLocaleDateString()}</span>
                   </div>
-                  <p className="text-sm text-slate-300">{f.message}</p>
+                  <p className="text-sm text-slate-200">{f.message}</p>
                 </div>
               );
             })}

@@ -62,7 +62,7 @@ export default function MessageActionSheet({
               className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors active:bg-slate-700 active:bg-slate-700 ${
                 (a as { destructive?: boolean }).destructive
                   ? 'text-[#DC2626]'
-                  : 'text-slate-50'
+                  : 'text-white'
               }`}
             >
               <span className="text-lg w-6 text-center">{a.icon}</span>

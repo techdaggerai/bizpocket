@@ -237,7 +237,7 @@ export default function NotificationSoundPicker() {
 
             {/* Labels */}
             <div className="flex-1 min-w-0">
-              <p className={`text-[14px] font-semibold ${isSelected ? 'text-[#4F46E5]' : 'text-[var(--text-1)]'}`}>
+              <p className={`text-[14px] font-semibold ${isSelected ? 'text-indigo-400' : 'text-[var(--text-1)]'}`}>
                 {sound.name}
               </p>
               <p className="text-[12px] text-[var(--text-3)]">{sound.description}</p>

@@ -102,7 +102,7 @@ export default function OpsRadarPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#4F46E5]/10">
-          <svg className="h-8 w-8 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <svg className="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6Z" />
           </svg>
         </div>
@@ -124,7 +124,7 @@ export default function OpsRadarPage() {
           <p className="text-xs text-[var(--text-3)]">{cycleName}</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/items" className="text-xs text-[#4F46E5] font-medium hover:underline">Manage Items</Link>
+          <Link href="/items" className="text-xs text-indigo-400 font-medium hover:underline">Manage Items</Link>
           <Link href="/cycle-setup" className="text-xs text-[var(--text-3)] font-medium hover:underline">Edit Cycle</Link>
         </div>
       </div>
@@ -161,7 +161,7 @@ export default function OpsRadarPage() {
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Pipeline Value</p>
-          <p className="text-lg font-bold font-mono text-[#4F46E5]">{formatCurrency(totalPipelineValue, currency)}</p>
+          <p className="text-lg font-bold font-mono text-indigo-400">{formatCurrency(totalPipelineValue, currency)}</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Total Costs</p>
@@ -311,7 +311,7 @@ export default function OpsRadarPage() {
 
       {/* Summary */}
       <div className="rounded-xl border border-slate-700 bg-gradient-to-br from-[#4F46E5]/5 to-[#7C3AED]/5 p-4">
-        <h2 className="text-xs font-medium uppercase tracking-widest text-[#4F46E5] mb-3">Summary</h2>
+        <h2 className="text-xs font-medium uppercase tracking-widest text-indigo-400 mb-3">Summary</h2>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span className="text-[var(--text-3)]">Active in pipeline</span><span className="font-semibold text-[var(--text-1)]">{activeItems.length} items</span></div>
           <div className="flex justify-between"><span className="text-[var(--text-3)]">Completed</span><span className="font-semibold text-[var(--text-1)]">{completedItems.length} items</span></div>

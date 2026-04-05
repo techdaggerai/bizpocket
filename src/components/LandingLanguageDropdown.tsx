@@ -22,7 +22,7 @@ export default function LandingLanguageDropdown() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 rounded-full border border-slate-700 px-2.5 py-1.5 text-[12px] font-medium text-slate-400 hover:border-indigo-500 hover:text-indigo-500 hover:text-indigo-300 transition-colors"
+        className="flex items-center gap-1.5 rounded-full border border-slate-700 px-2.5 py-1.5 text-[12px] font-medium text-slate-200 hover:border-indigo-500 hover:text-indigo-500 hover:text-indigo-300 transition-colors"
         aria-label="Change language"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
@@ -43,7 +43,7 @@ export default function LandingLanguageDropdown() {
               <span className="text-base">{lang.flag}</span>
               <span>{lang.label}</span>
               {locale === lang.code && (
-                <svg className="ml-auto h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+                <svg className="ml-auto h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
               )}
             </button>
           ))}

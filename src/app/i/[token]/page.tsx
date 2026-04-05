@@ -203,7 +203,7 @@ export default function PublicInvoicePage() {
 
   const statusColor: Record<string, string> = {
     draft: 'bg-[#F3F3F1] text-[#737373]',
-    sent: 'bg-[#EEF2FF] text-[#4F46E5]',
+    sent: 'bg-[#EEF2FF] text-indigo-400',
     paid: 'bg-[#ECFDF5] text-[#059669]',
   }
 
@@ -598,7 +598,7 @@ export default function PublicInvoicePage() {
         {/* Footer */}
         <div className="text-center mt-10 pt-4 border-t border-[#f3f4f6]">
           <a href="https://www.bizpocket.io?ref=invoice" target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#9ca3af] no-underline">
-            Sent with <span className="text-[#4F46E5] font-semibold">BizPocket</span> — AI Business Autopilot
+            Sent with <span className="text-indigo-400 font-semibold">BizPocket</span> — AI Business Autopilot
           </a>
         </div>
       </div>

@@ -240,16 +240,16 @@ export default function PlannerPage() {
         <div className="rounded-card border border-slate-700 bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
-            <span className="text-xs font-medium text-[#4F46E5]">AI Planner Summary</span>
+            <span className="text-xs font-medium text-indigo-400">AI Planner Summary</span>
           </div>
         </div>
       ) : aiSummary ? (
         <div className="rounded-card border border-slate-700 bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
           <div className="flex items-center gap-2 mb-2">
-            <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
             </svg>
-            <span className="text-xs font-medium text-[#4F46E5]">AI Planner Summary</span>
+            <span className="text-xs font-medium text-indigo-400">AI Planner Summary</span>
           </div>
           <p className="whitespace-pre-line text-sm leading-relaxed text-[var(--text-2)]">{aiSummary}</p>
         </div>

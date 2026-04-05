@@ -250,8 +250,8 @@ export default function LearnPage() {
         <Link href="/learn/study?mode=new" className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] border border-[#C7D2FE]/50 px-3 py-3">
           <span className="text-lg">📖</span>
           <div>
-            <p className="text-xs font-bold text-[#4F46E5]">Learn New</p>
-            <p className="text-[10px] text-[#4F46E5]/60">Pick a topic</p>
+            <p className="text-xs font-bold text-indigo-400">Learn New</p>
+            <p className="text-[10px] text-indigo-400/60">Pick a topic</p>
           </div>
         </Link>
       </div>

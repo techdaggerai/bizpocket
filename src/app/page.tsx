@@ -74,13 +74,13 @@ function LandingPageInner() {
             <span className="text-[15px] font-semibold tracking-tight text-white" style={{ fontFamily: 'var(--font-outfit)' }}>BizPocket</span>
           </Link>
           <div className="hidden sm:flex items-center gap-8">
-            <a href="#features" className="text-[13px] text-slate-300 hover:text-white transition-colors">{t('nav_features')}</a>
-            <a href="#pricing" className="text-[13px] text-slate-300 hover:text-white transition-colors">{t('nav_pricing')}</a>
+            <a href="#features" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors">{t('nav_features')}</a>
+            <a href="#pricing" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors">{t('nav_pricing')}</a>
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-3">
               <LandingLanguageDropdown />
-              <Link href="/login" className="text-[13px] text-slate-300 hover:text-white transition-colors">{t('nav_login')}</Link>
+              <Link href="/login" className="text-[15px] font-medium text-slate-300 hover:text-white transition-colors">{t('nav_login')}</Link>
             </div>
             <Link href="/signup" className="rounded-[20px] bg-indigo-600 px-5 py-2.5 text-[13px] font-medium text-white hover:bg-indigo-700 transition-colors">
               {t('nav_signup')}
@@ -380,7 +380,7 @@ function LandingPageInner() {
               </div>
               <div className="mx-auto max-w-[300px]">
                 <div className="rounded-2xl bg-slate-800 border border-slate-700 p-5 shadow-lg">
-                  <p className="text-[10px] font-bold text-[#4F46E5] uppercase tracking-wider mb-3">From your invoice</p>
+                  <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-3">From your invoice</p>
                   <div className="space-y-3">
                     {[
                       { jp: '売上', reading: 'うりあげ', en: 'Sales revenue' },
@@ -393,12 +393,12 @@ function LandingPageInner() {
                           <span className="text-base font-bold text-slate-50">{w.jp}</span>
                           <span className="text-xs text-[#9ca3af] ml-1">({w.reading})</span>
                         </div>
-                        <span className="text-xs font-medium text-[#4F46E5]">{w.en}</span>
+                        <span className="text-xs font-medium text-indigo-400">{w.en}</span>
                       </div>
                     ))}
                   </div>
                   <div className="mt-4 rounded-lg bg-indigo-500/20 p-2 text-center">
-                    <p className="text-[9px] text-[#4F46E5] font-medium">30 topic packs · Spaced repetition · AI practice</p>
+                    <p className="text-[9px] text-indigo-400 font-medium">30 topic packs · Spaced repetition · AI practice</p>
                   </div>
                 </div>
               </div>
@@ -424,7 +424,7 @@ function LandingPageInner() {
                 <span key={i} className="rounded-full border border-indigo-500/30 bg-slate-800 px-3.5 py-1.5 text-xs font-semibold text-indigo-300">{f}</span>
               ))}
             </div>
-            <a href="/pocketchat" className="inline-block rounded-[10px] border-2 border-[#4F46E5] px-8 py-3 text-[15px] font-semibold text-[#4F46E5] hover:bg-[#4F46E5] hover:text-white transition-colors">
+            <a href="/pocketchat" className="inline-block rounded-[10px] border-2 border-[#4F46E5] px-8 py-3 text-[15px] font-semibold text-indigo-400 hover:bg-[#4F46E5] hover:text-white transition-colors">
               Explore <EvryWherMark size="sm" /> &rarr;
             </a>
           </div>
@@ -454,10 +454,10 @@ function LandingPageInner() {
                 {p.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#4F46E5] text-white text-xs font-semibold px-4 py-1 rounded-full whitespace-nowrap">Most popular</div>}
                 <p className="text-sm font-semibold mb-1" style={{ color: p.color }}>{p.name}</p>
                 <p className="text-[32px] font-bold text-slate-50 mb-1">{p.price}</p>
-                <p className="text-xs text-[#6b7280] mb-5">{p.sub}</p>
+                <p className="text-xs text-slate-400 mb-5">{p.sub}</p>
                 <div className="space-y-2 flex-1 mb-6">
                   {p.features.map((f, j) => (
-                    <div key={j} className="flex items-start gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" className="shrink-0 mt-0.5"><path d="M22 4L12 14.01l-3-3" /></svg><span className={`text-[13px] text-slate-300 ${j === 0 && i > 0 ? 'font-semibold' : ''}`}>{f}</span></div>
+                    <div key={j} className="flex items-start gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.color} strokeWidth="2" className="shrink-0 mt-0.5"><path d="M22 4L12 14.01l-3-3" /></svg><span className={`text-[13px] text-slate-200 ${j === 0 && i > 0 ? 'font-semibold' : ''}`}>{f}</span></div>
                   ))}
                 </div>
                 <Link href={p.href} className="block text-center py-3 rounded-[10px] text-sm font-semibold" style={{ background: p.ctaBg, color: p.ctaColor, border: p.ctaBorder }}>{p.cta}</Link>
@@ -556,7 +556,7 @@ function LandingPageInner() {
               <span className="text-[#d1d5db]">&middot;</span>
               <a href="/terms" className="text-[12px] text-[#6b7280] hover:text-white">Terms</a>
             </div>
-            <p className="text-[11px] text-[#9ca3af]">&copy; 2026 MS Dynamics LLC · TechDagger Studio · Made in Japan 🇯🇵</p>
+            <p className="text-[11px] text-[#9ca3af]">&copy; 2026 MS Dynamics LLC · TechDagger Studio</p>
           </div>
         </div>
       </footer>

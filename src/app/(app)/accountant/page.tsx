@@ -132,7 +132,7 @@ export default function AccountantPage() {
       <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4">
         {months.map(m => (
           <button key={m} onClick={() => { setMonth(m); setReport(null); }}
-            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${month === m ? 'bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20' : 'border border-slate-700 text-[var(--text-4)]'}`}>
+            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${month === m ? 'bg-[#4F46E5]/10 text-indigo-400 border border-[#4F46E5]/20' : 'border border-slate-700 text-[var(--text-4)]'}`}>
             {m}
           </button>
         ))}
@@ -141,7 +141,7 @@ export default function AccountantPage() {
       <div className="flex border-b border-slate-700 overflow-x-auto">
         {tabs.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[#999] hover:text-[#333]'}`}>
+            className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-indigo-400' : 'text-[#999] hover:text-[#333]'}`}>
             {t === 'report' ? 'AI Report' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
@@ -173,16 +173,16 @@ export default function AccountantPage() {
               </div>
 
               <div className="rounded-xl border border-[#F59E0B]/20 bg-[#F59E0B]/5 p-4">
-                <h3 className="text-xs font-semibold text-[#92400E] mb-2">Tax Estimate (消費税)</h3>
+                <h3 className="text-xs font-semibold text-amber-400 mb-2">Tax Estimate (消費税)</h3>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-[#92400E]/70">Standard rate (10%)</span>
-                  <span className="font-mono text-[#92400E]">{formatCurrency(estimatedTax10, currency)}</span>
+                  <span className="text-slate-200">Standard rate (10%)</span>
+                  <span className="font-mono text-amber-400">{formatCurrency(estimatedTax10, currency)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-[#92400E]/70">Reduced rate (8%)</span>
-                  <span className="font-mono text-[#92400E]">{formatCurrency(estimatedTax8, currency)}</span>
+                  <span className="text-slate-200">Reduced rate (8%)</span>
+                  <span className="font-mono text-amber-400">{formatCurrency(estimatedTax8, currency)}</span>
                 </div>
-                <p className="text-[9px] text-[#92400E]/50 mt-2">*Estimated from total income. Consult your tax advisor for exact figures.</p>
+                <p className="text-[9px] text-slate-400 mt-2">*Estimated from total income. Consult your tax advisor for exact figures.</p>
               </div>
 
               {Object.keys(expByCategory).length > 0 && (
@@ -282,8 +282,8 @@ export default function AccountantPage() {
                 <div className="rounded-xl border border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
-                      <span className="text-xs font-semibold text-[#4F46E5]">AI Monthly Report — {month}</span>
+                      <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+                      <span className="text-xs font-semibold text-indigo-400">AI Monthly Report — {month}</span>
                     </div>
                     <button onClick={async () => { await navigator.clipboard.writeText(report); toast('Report copied!', 'success'); }}
                       className="rounded-md bg-[#4F46E5] px-2 py-1 text-[10px] font-semibold text-white">Copy</button>
@@ -292,7 +292,7 @@ export default function AccountantPage() {
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-8 text-center">
-                  <svg className="h-8 w-8 text-[#4F46E5] mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
+                  <svg className="h-8 w-8 text-indigo-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
                   <p className="text-sm font-medium text-[var(--text-1)] mb-1">Generate AI Report</p>
                   <p className="text-xs text-[var(--text-3)] mb-4">AI analyzes your {month} financials and generates a professional report for your accountant</p>
                   <button onClick={generateReport} disabled={reportLoading}
