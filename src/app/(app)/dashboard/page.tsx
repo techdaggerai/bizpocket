@@ -225,13 +225,18 @@ export default function DashboardPage() {
         </Link>
       )}
       {hasGlobalProfile === true && (
-        <Link href="/profile/preview" className="flex items-center gap-3 rounded-xl border border-[#C7D2FE] bg-[#EEF2FF] p-3.5 transition-colors hover:bg-[#E0E7FF]">
-          <span className="text-xl">{'\u{1F30D}'}</span>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-[#4338CA]">View Global Profile</p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4338CA" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-        </Link>
+        <div className="flex gap-2.5">
+          <Link href="/profile/preview" className="flex-1 flex items-center gap-3 rounded-xl border border-[#C7D2FE] dark:border-indigo-800 bg-[#EEF2FF] dark:bg-indigo-950/30 p-3.5 transition-colors hover:bg-[#E0E7FF] dark:hover:bg-indigo-950/50">
+            <span className="text-lg">{'\u{1F30D}'}</span>
+            <p className="text-sm font-medium text-[#4338CA] dark:text-indigo-300">Profile</p>
+            <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+          </Link>
+          <Link href="/opportunities" className="flex-1 flex items-center gap-3 rounded-xl border border-[#FDE68A] dark:border-amber-800 bg-[#FFFBEB] dark:bg-amber-950/30 p-3.5 transition-colors hover:bg-[#FEF3C7] dark:hover:bg-amber-950/50">
+            <span className="text-lg">{'\u{1F91D}'}</span>
+            <p className="text-sm font-medium text-[#92400E] dark:text-amber-300">Matches</p>
+            <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+          </Link>
+        </div>
       )}
 
       {/* 4 Quick Shortcuts */}
