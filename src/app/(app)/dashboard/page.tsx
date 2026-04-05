@@ -95,6 +95,8 @@ export default function DashboardPage() {
   const [cycleItemCount, setCycleItemCount] = useState(0);
   const [globalProfile, setGlobalProfile] = useState<any>(null);
   const [actionsToday, setActionsToday] = useState(0);
+  const [smartSuggestion, setSmartSuggestion] = useState<any>(null);
+  const [smartTiles, setSmartTiles] = useState<any[] | null>(null);
 
   const DEFAULT_CLOCKS = [
     { flag: '\u{1F1EF}\u{1F1F5}', city: 'Tokyo', tz: 'Asia/Tokyo' },
@@ -157,6 +159,14 @@ export default function DashboardPage() {
     fetch('/api/profile/me').then(r => r.json()).then(d => { setHasGlobalProfile(!!d.profile); if (d.profile) setGlobalProfile(d.profile); }).catch(() => setHasGlobalProfile(false));
     // Check for tier upgrade celebration
     checkTier();
+    // Fetch smart actions for GrowthCompanion + tiles
+    fetch('/api/smart-actions', { method: 'POST' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.suggestion) setSmartSuggestion(d.suggestion);
+        if (d.tiles) setSmartTiles(d.tiles);
+      })
+      .catch(() => {});
     // Count today's actions for energy meter
     const todayStr = new Date().toISOString().slice(0, 10);
     Promise.all([
@@ -278,28 +288,20 @@ export default function DashboardPage() {
         );
       })()}
 
-      {/* Smart Actions */}
-      {globalProfile && (() => {
-        const tier = (globalProfile.tier || 'starter') as Tier;
-        const tiles = tier === 'starter'
-          ? [{ emoji: '\u{1F9FE}', label: 'Invoice', sub: '+3', href: '/invoices/new', highlight: true }, { emoji: '\u{1F91D}', label: 'Matches', sub: '', href: '/opportunities' }, { emoji: '\u{1F4F7}', label: 'Camera', sub: '+2', href: '/detect' }, { emoji: '\u{1F4F1}', label: 'Add Phone', sub: '+2', href: '/settings/business-setup' }]
-          : tier === 'growing'
-          ? [{ emoji: '\u{1F91D}', label: 'Opportunities', sub: '', href: '/opportunities', highlight: true }, { emoji: '\u{1F9FE}', label: 'Invoice Status', sub: '', href: '/invoices/new' }, { emoji: '\u{1F3F7}\uFE0F', label: 'Add Tax', sub: '+3', href: '/settings/business-setup' }, { emoji: '\u{1F4E4}', label: 'Invite', sub: '', href: '/invite' }]
-          : [{ emoji: '\u{1F91D}', label: 'Deals', sub: '', href: '/opportunities', highlight: true }, { emoji: '\u{1F9FE}', label: 'Revenue', sub: '', href: '/cash-flow' }, { emoji: '\u{1F4E4}', label: 'Network', sub: '', href: '/invite' }, { emoji: '\u{1F6E1}\uFE0F', label: 'Verify', sub: '', href: '/verification' }];
-        return (
-          <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
-            {tiles.map((t, i) => (
-              <Link key={i} href={t.href} className="no-underline shrink-0" style={{ width: 120 }}>
-                <GlassCard elevated className={`text-center py-3 px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
-                  <span className="text-lg">{t.emoji}</span>
-                  <p className="text-[12px] font-semibold text-[var(--pm-text-primary)] mt-1">{t.label}</p>
-                  {t.sub && <p className="text-[10px] text-[var(--pm-text-tertiary)]">{t.sub}</p>}
-                </GlassCard>
-              </Link>
-            ))}
-          </div>
-        );
-      })()}
+      {/* Smart Actions — API-driven tiles */}
+      {smartTiles && smartTiles.length > 0 && (
+        <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+          {smartTiles.map((t: any, i: number) => (
+            <Link key={i} href={t.route} className="no-underline shrink-0" style={{ width: 120 }}>
+              <GlassCard elevated className={`text-center py-3 px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
+                <span className="text-lg">{t.icon}</span>
+                <p className="text-[12px] font-semibold text-[var(--pm-text-primary)] mt-1">{t.label}</p>
+                {t.points && <p className="text-[10px] text-[var(--pm-text-tertiary)]">+{t.points}</p>}
+              </GlassCard>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* Live Corridors */}
       {globalProfile?.operating_corridors?.length > 0 && (
@@ -608,31 +610,25 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* GrowthCompanion */}
-      {globalProfile && (() => {
-        const tier = (globalProfile.tier || 'starter') as Tier;
-        const showCompanion = tier === 'starter' || (tier === 'growing' && actionsToday >= 3) || tier === 'established';
-        if (!showCompanion) return null;
-
-        const suggestion = tier === 'starter'
-          ? { title: 'Send your first invoice', description: 'Invoicing builds trust fast. Send one to earn +3 Trust Score.', points: 3, action: 'Create Invoice', corridor: globalProfile.operating_corridors?.[0] ? { fromFlag: globalProfile.operating_corridors[0].flag_from, toFlag: globalProfile.operating_corridors[0].flag_to } : undefined }
-          : tier === 'growing'
-          ? { title: 'You\'re building momentum!', description: `${actionsToday} actions today. Add your tax info to unlock +3 Trust.`, points: 3, action: 'Add Tax Info' }
-          : { title: 'Close a deal', description: 'You have strong connections. Follow up on your latest matches.', points: 5, action: 'View Matches' };
-
-        return (
-          <GrowthCompanion
-            suggestion={suggestion}
-            tier={tier}
-            onAction={() => {
-              if (tier === 'starter') window.location.href = '/invoices/new';
-              else if (tier === 'growing') window.location.href = '/settings/business-setup';
-              else window.location.href = '/opportunities';
-            }}
-            onDismiss={() => {}}
-          />
-        );
-      })()}
+      {/* GrowthCompanion — API-driven suggestion */}
+      {smartSuggestion && globalProfile && (
+        <GrowthCompanion
+          suggestion={{
+            title: smartSuggestion.title,
+            description: smartSuggestion.description,
+            points: smartSuggestion.points,
+            action: smartSuggestion.action,
+            corridor: smartSuggestion.corridor,
+          }}
+          tier={(globalProfile.tier || 'starter') as Tier}
+          onAction={() => {
+            if (smartSuggestion.route) {
+              window.location.href = smartSuggestion.route;
+            }
+          }}
+          onDismiss={() => setSmartSuggestion(null)}
+        />
+      )}
     </div>
   );
 }
