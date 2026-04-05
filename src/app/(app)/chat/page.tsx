@@ -19,6 +19,7 @@ import LinkPreview from '@/components/LinkPreview';
 import EvryWherMark from '@/components/EvryWherMark';
 import ChatLabels from '@/components/ChatLabels';
 import CameraTranslate from '@/components/CameraTranslate';
+import MessageActionSheet from '@/components/MessageActionSheet';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -471,14 +472,46 @@ export default function PocketChatPage() {
   }
 
   function handleLongPressStart(e: React.TouchEvent, msgId: string, isOwner: boolean, text: string) {
-    const touch = e.touches[0];
     longPressTimer.current = setTimeout(() => {
-      openActionMenu(msgId, touch.clientX, touch.clientY - 60, isOwner, text);
-    }, 400);
+      // Haptic feedback
+      if (navigator.vibrate) navigator.vibrate(50);
+      openActionMenu(msgId, 0, 0, isOwner, text);
+    }, 500);
   }
 
   function handleLongPressEnd() {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  }
+
+  // Swipe-to-reply state
+  const swipeRef = useRef<{ msgId: string; startX: number; isOwner: boolean; text: string; senderName: string } | null>(null);
+  const [swipeDelta, setSwipeDelta] = useState<{ msgId: string; dx: number } | null>(null);
+
+  function handleSwipeStart(e: React.TouchEvent, msgId: string, isOwner: boolean, text: string, senderName: string) {
+    swipeRef.current = { msgId, startX: e.touches[0].clientX, isOwner, text, senderName };
+  }
+
+  function handleSwipeMove(e: React.TouchEvent) {
+    if (!swipeRef.current) return;
+    const dx = Math.max(0, e.touches[0].clientX - swipeRef.current.startX);
+    if (dx > 10) setSwipeDelta({ msgId: swipeRef.current.msgId, dx: Math.min(dx, 80) });
+  }
+
+  function handleSwipeEnd() {
+    if (!swipeRef.current) return;
+    const dx = swipeDelta?.msgId === swipeRef.current.msgId ? swipeDelta.dx : 0;
+    if (dx > 60) {
+      // Trigger reply
+      if (navigator.vibrate) navigator.vibrate(30);
+      setReplyTo({
+        id: swipeRef.current.msgId,
+        sender: swipeRef.current.senderName,
+        text: swipeRef.current.text.slice(0, 100),
+      });
+      inputRef.current?.focus();
+    }
+    swipeRef.current = null;
+    setSwipeDelta(null);
   }
 
   async function handleCopyText() {
@@ -1725,7 +1758,21 @@ export default function PocketChatPage() {
                     <div className="flex-1 h-px bg-[#E5E5E5]" />
                   </div>
                 )}
-                <div className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot || (isGroup && !isOwner) ? 'gap-2' : ''}`}>
+                <div
+                  className={`flex ${isOwner ? 'justify-end' : 'justify-start'} ${isBot || (isGroup && !isOwner) ? 'gap-2' : ''} relative`}
+                  style={swipeDelta?.msgId === msg.id ? { transform: `translateX(${swipeDelta.dx}px)`, transition: 'none' } : { transition: 'transform 0.2s ease' }}
+                  onTouchStart={(e) => handleSwipeStart(e, msg.id, isOwner, displayText, msg.sender_name || '')}
+                  onTouchMove={handleSwipeMove}
+                  onTouchEnd={handleSwipeEnd}
+                >
+                {/* Swipe reply indicator */}
+                {swipeDelta?.msgId === msg.id && swipeDelta.dx > 20 && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pl-2" style={{ opacity: Math.min(1, swipeDelta.dx / 60) }}>
+                    <div className="h-8 w-8 rounded-full bg-[#4F46E5]/10 flex items-center justify-center">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round"><path d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
+                    </div>
+                  </div>
+                )}
                 {isBot && (
                   <div className="h-8 w-8 shrink-0 flex items-center justify-center">
                     {botConfig?.avatar_url ? (
@@ -1927,91 +1974,23 @@ export default function PocketChatPage() {
           <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
         </div>
 
-        {/* Message action menu */}
-        {actionMenu && (
-          <>
-            <div className="fixed inset-0 z-50" onClick={() => setActionMenu(null)} />
-            <div
-              className="fixed z-50 w-44 rounded-xl border border-[#E5E5E5] bg-white shadow-lg py-1 animate-in fade-in zoom-in-95 duration-150"
-              style={{ top: actionMenu.y, left: actionMenu.x }}
-            >
-              <button onClick={handleReplyTo} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>
-                Reply
-              </button>
-              <button onClick={handleCopyText} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                Copy text
-              </button>
-              {actionMenu.isOwner && (
-                <button onClick={handleEditMsg} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                  <svg className="h-4 w-4 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" /></svg>
-                  Edit
-                </button>
-              )}
-              <button onClick={handleStarMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" /></svg>
-                {(() => { const m = messages.find(m => m.id === actionMenu.msgId); return m?.is_starred ? 'Unstar' : 'Star'; })()}
-              </button>
-              <button onClick={() => { setReactionMsgId(actionMenu.msgId); setActionMenu(null); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
-                <span className="text-base">😊</span>
-                React
-              </button>
-              {/* Translate to… */}
-              <div className="relative">
-                <button
-                  onClick={() => setTranslatePickerMsgId(p => p === actionMenu.msgId ? null : actionMenu.msgId)}
-                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]"
-                >
-                  <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>
-                  Translate to…
-                  <svg className="h-3 w-3 ml-auto text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-                {translatePickerMsgId === actionMenu.msgId && (
-                  <div className="absolute left-full top-0 z-60 w-44 max-h-56 overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white shadow-xl py-1 ml-1">
-                    {[
-                      { code: 'en', name: 'English', flag: '🇬🇧' },
-                      { code: 'ja', name: '日本語', flag: '🇯🇵' },
-                      { code: 'ar', name: 'العربية', flag: '🇦🇪' },
-                      { code: 'ko', name: '한국어', flag: '🇰🇷' },
-                      { code: 'zh', name: '中文', flag: '🇨🇳' },
-                      { code: 'es', name: 'Español', flag: '🇪🇸' },
-                      { code: 'pt', name: 'Português', flag: '🇧🇷' },
-                      { code: 'fr', name: 'Français', flag: '🇫🇷' },
-                      { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-                      { code: 'ur', name: 'اردو', flag: '🇵🇰' },
-                      { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
-                      { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-                      { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
-                      { code: 'tl', name: 'Filipino', flag: '🇵🇭' },
-                      { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
-                      { code: 'th', name: 'ไทย', flag: '🇹🇭' },
-                      { code: 'fa', name: 'فارسی', flag: '🇮🇷' },
-                      { code: 'ps', name: 'پښتو', flag: '🇦🇫' },
-                      { code: 'ne', name: 'नेपाली', flag: '🇳🇵' },
-                      { code: 'si', name: 'සිංහල', flag: '🇱🇰' },
-                      { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
-                    ].map(lang => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslateMessage(actionMenu.msgId, actionMenu.text, lang.code)}
-                        className="flex w-full items-center gap-2 px-3.5 py-2 text-sm text-[#374151] hover:bg-[#F3F4F6]"
-                      >
-                        <span>{lang.flag}</span> {lang.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {actionMenu.isOwner && (
-                <button onClick={handleDeleteMessage} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#DC2626] hover:bg-[#FEF2F2]">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-                  Delete
-                </button>
-              )}
-            </div>
-          </>
-        )}
+        {/* Message action sheet (mobile-native bottom sheet) */}
+        <MessageActionSheet
+          isOpen={!!actionMenu}
+          msgId={actionMenu?.msgId || ''}
+          isOwner={actionMenu?.isOwner || false}
+          text={actionMenu?.text || ''}
+          senderName={(() => { const m = messages.find(m => m.id === actionMenu?.msgId); return m?.sender_name || ''; })()}
+          isStarred={(() => { const m = messages.find(m => m.id === actionMenu?.msgId); return !!m?.is_starred; })()}
+          onClose={() => { setActionMenu(null); setTranslatePickerMsgId(null); }}
+          onReply={handleReplyTo}
+          onCopy={handleCopyText}
+          onStar={handleStarMessage}
+          onEdit={handleEditMsg}
+          onDelete={handleDeleteMessage}
+          onReact={() => { setReactionMsgId(actionMenu?.msgId || ''); setActionMenu(null); }}
+          onTranslate={() => { setTranslatePickerMsgId(actionMenu?.msgId || null); setActionMenu(null); }}
+        />
 
         {/* Reaction picker */}
         {reactionMsgId && (
