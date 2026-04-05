@@ -18,6 +18,7 @@ import GifPicker from '@/components/GifPicker';
 import LinkPreview from '@/components/LinkPreview';
 import EvryWherMark from '@/components/EvryWherMark';
 import ChatLabels from '@/components/ChatLabels';
+import CameraTranslate from '@/components/CameraTranslate';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -196,6 +197,7 @@ export default function PocketChatPage() {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [showCameraTranslate, setShowCameraTranslate] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
   const [broadcastContacts, setBroadcastContacts] = useState<string[]>([]);
@@ -1395,18 +1397,18 @@ export default function PocketChatPage() {
             )}
           </div>
           {activeConvo.is_bot_chat ? (
-            /* Bot chat: AI Guide pill */
+            /* Bot chat: Scan & Translate pill */
             <button
-              onClick={() => router.push('/chat/live-guide')}
+              onClick={() => setShowCameraTranslate(true)}
               className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-[#F59E0B] shrink-0 transition-colors hover:bg-[#F59E0B] hover:text-white"
               style={{ border: '1.5px solid #F59E0B' }}
-              title="AI Guide — point camera at any screen"
+              title="Scan & Translate — point camera at any text"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                 <circle cx="12" cy="13" r="4" />
               </svg>
-              AI Guide
+              Scan
             </button>
           ) : (
             /* Human contact: Phone + Video call buttons — 44px tap targets */
@@ -1883,6 +1885,18 @@ export default function PocketChatPage() {
           </div>
         )}
 
+        {/* Camera Translate */}
+        {showCameraTranslate && (
+          <CameraTranslate
+            userLanguage={profile?.language || 'en'}
+            onClose={() => setShowCameraTranslate(false)}
+            onSendToChat={(text) => {
+              setNewMessage(text);
+              setShowCameraTranslate(false);
+            }}
+          />
+        )}
+
         {/* Upload progress */}
         {uploading && (
           <div className="px-4 py-2 border-t border-[#E5E5E5] bg-[#F9F9F8]">
@@ -2217,6 +2231,10 @@ export default function PocketChatPage() {
                         <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
                           <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                           Location
+                        </button>
+                        <button onClick={() => { setShowAttachMenu(false); setShowCameraTranslate(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
+                          Scan & Translate
                         </button>
                       </div>
                     </>
