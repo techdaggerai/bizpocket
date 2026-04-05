@@ -35,14 +35,18 @@ export default function AnimatedPocketChatLogo({ size = 36, isTranslating = fals
     return () => clearInterval(interval);
   }, [isTranslating]);
 
+  // Enforce minimum size of 32 for readability
+  const clampedSize = Math.max(32, size);
   const g = greetings[index];
-  const scale = size / 88;
-  const leftSize = Math.max(10, Math.round(10 * scale));
-  const rightSize = Math.max(9, Math.round(9.5 * scale));
+  const scale = clampedSize / 88;
+  // Minimum font sizes tuned so Hi/やあ are readable at 32px
+  const leftSize = Math.max(11, Math.round(10 * scale));
+  const rightSize = Math.max(10, Math.round(9.5 * scale));
 
   return (
-    <svg width={size} height={size} viewBox="0 0 88 88" fill="none"
-      style={{ filter: isTranslating ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' : 'none', transition: 'filter 0.3s ease' }}>
+    <svg width={clampedSize} height={clampedSize} viewBox="0 0 88 88" fill="none"
+      overflow="visible"
+      style={{ filter: isTranslating ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.4))' : 'none', transition: 'filter 0.3s ease', overflow: 'visible', flexShrink: 0 }}>
       <rect width="88" height="88" rx="20" fill="#4F46E5"/>
       <rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15"/>
       <path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
