@@ -1,16 +1,22 @@
 import type { Viewport } from 'next';
 import { headers } from 'next/headers';
-import { DM_Sans, DM_Mono } from 'next/font/google';
+import { Outfit, DM_Sans, DM_Mono } from 'next/font/google';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import SplashScreen from '@/components/SplashScreen';
 import OfflineBanner from '@/components/OfflineBanner';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-display',
+});
+
 const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-dm-sans',
+  variable: '--font-body',
 });
 
 const dmMono = DM_Mono({
@@ -59,7 +65,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600&family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&family=Noto+Sans+Sinhala:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${dmSans.variable} ${dmMono.variable} font-sans bg-[var(--bg)] text-[var(--text-1)] antialiased`}>
+      <body className={`${outfit.variable} ${dmSans.variable} ${dmMono.variable} font-sans bg-[var(--bg)] text-[var(--text-1)] antialiased`}>
         {/* Prevent dark mode flash on load */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
