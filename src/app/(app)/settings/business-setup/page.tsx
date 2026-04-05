@@ -83,6 +83,22 @@ export default function BusinessSetupPage() {
       toast(error.message, 'error');
     } else {
       toast('Business profile saved', 'success');
+      // ─── Trust events: compare old vs new values ──────
+      const org = organization as any
+      const oldTax = (org.tax_number as string) || ''
+      const oldPhone = (org.phone as string) || ''
+      const oldAddress = (org.address as string) || ''
+      const trustEvents: string[] = []
+      if (!oldTax && form.tax_number) trustEvents.push('tax_info_added')
+      if (!oldPhone && form.phone) trustEvents.push('phone_added')
+      if (!oldAddress && form.address) trustEvents.push('address_added')
+      for (const evt of trustEvents) {
+        fetch('/api/trust/log-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event_type: evt }),
+        }).catch(() => {})
+      }
       router.push('/settings');
     }
   }

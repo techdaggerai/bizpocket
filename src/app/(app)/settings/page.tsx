@@ -275,6 +275,12 @@ export default function SettingsPage() {
 
       setAvatarUrl(publicUrl);
       toast('Avatar updated!', 'success');
+      // ─── Trust event: photo_uploaded (one-time, deduped server-side)
+      fetch('/api/trust/log-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_type: 'photo_uploaded' }),
+      }).catch(() => {})
     } catch (err: unknown) {
       console.error('[Avatar upload]', err);
       toast('Upload failed. Please try again.', 'error');

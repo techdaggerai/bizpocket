@@ -276,6 +276,14 @@ export default function NewInvoicePage() {
     if (Object.keys(orgUpdates).length > 0) await supabase.from('organizations').update(orgUpdates).eq('id', organization.id);
     if (fromTime === 'unbilled' && invoice && importedTimeEntryIds.length > 0 && status !== 'draft') await supabase.from('time_entries').update({ is_invoiced: true, invoice_id: invoice.id }).in('id', importedTimeEntryIds);
     if (fromEstimate && invoice) await supabase.from('estimates').update({ status: 'converted' }).eq('id', fromEstimate).eq('organization_id', organization.id);
+    // ─── Trust event: first_invoice ─────────────────────
+    if (!editId && invoice) {
+      fetch('/api/trust/log-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_type: 'first_invoice' }),
+      }).catch(() => {}) // fire-and-forget, dedup handled server-side
+    }
     setSaving(false); toast(status === 'draft' ? 'Invoice saved as draft' : 'Invoice sent', 'success'); router.push('/invoices');
   }
 

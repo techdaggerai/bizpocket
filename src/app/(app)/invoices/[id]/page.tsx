@@ -161,6 +161,26 @@ export default function InvoiceDetailPage() {
     } else {
       toast(`Marked as ${status}`, 'success');
       setInvoice((prev) => (prev ? { ...prev, status, ...updateData } : prev));
+      // ─── Trust events for paid invoices ─────────────────
+      if (status === 'paid') {
+        // Server handles first_paid vs repeat dedup:
+        // Try first_paid_invoice first (one-time, server deduplicates),
+        // then always log invoice_paid for repeat credit
+        fetch('/api/trust/log-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event_type: 'first_paid_invoice' }),
+        }).then(r => r.json()).then(res => {
+          // If first_paid was skipped (already awarded), log regular invoice_paid
+          if (res.skipped) {
+            fetch('/api/trust/log-event', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ event_type: 'invoice_paid' }),
+            }).catch(() => {})
+          }
+        }).catch(() => {})
+      }
     }
   }
 

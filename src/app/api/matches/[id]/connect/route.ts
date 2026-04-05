@@ -6,6 +6,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { logTrustEvent } from '@/lib/trust-score'
 
 export async function POST(
   request: Request,
@@ -148,6 +149,12 @@ export async function POST(
     if (updateError) {
       console.error('[Match Connect] Update error:', updateError)
     }
+
+    // ─── Trust event: connection_made (repeatable) ──────
+    logTrustEvent(supabase, user.id, 'connection_made', {
+      match_id: matchId,
+      matched_user_id: match.matched_user_id,
+    }).catch(err => console.error('[Match Connect] Trust event error:', err))
 
     return NextResponse.json({
       conversation_id: conversation.id,
