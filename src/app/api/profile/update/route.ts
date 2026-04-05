@@ -6,7 +6,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { classifyUser } from '@/lib/agents/onboarding-classifier'
+import { recalculateTrust } from '@/lib/trust-score'
 import { getTierByName, type Tier } from '@/lib/tier-system'
 
 // Fields users can directly edit
@@ -95,25 +95,22 @@ export async function PUT(request: Request) {
     updates.tagline = updates.tagline.slice(0, 57) + '...'
   }
 
-  // Fix #5: Recalculate trust/tier first, then do a single atomic update
-  let classification
+  // Recalculate trust/tier via the single source of truth engine
+  let trustResult
   try {
-    classification = await classifyUser(
-      user.id,
-      globalProfile.organization_id,
-      supabase
-    )
+    trustResult = await recalculateTrust(user.id, supabase)
   } catch (err: any) {
-    console.error('[ProfileUpdate] Classification failed:', err)
+    console.error('[ProfileUpdate] Trust recalculation failed:', err)
     return NextResponse.json(
-      { error: `Classification failed: ${err.message}` },
+      { error: `Trust recalculation failed: ${err.message}` },
       { status: 500 }
     )
   }
 
-  // Merge content updates + trust/tier into a single write
-  updates.trust_score = classification.trustScore
-  updates.tier = classification.tier
+  // Merge content updates + trust/tier/badge into a single write
+  updates.trust_score = trustResult.trustScore
+  updates.tier = trustResult.tier
+  updates.badge_tier = trustResult.badgeTier
   updates.updated_at = new Date().toISOString()
 
   const { error: updateError } = await supabase
@@ -144,10 +141,10 @@ export async function PUT(request: Request) {
     profile: updatedProfile,
     tierInfo,
     classification: {
-      trustScore: classification.trustScore,
-      tier: classification.tier,
-      nextActions: classification.nextActions,
-      nextMilestone: classification.nextMilestone,
+      trustScore: trustResult.trustScore,
+      tier: trustResult.tier,
+      nextActions: trustResult.nextActions,
+      nextMilestone: trustResult.nextMilestone,
     },
   })
 }
