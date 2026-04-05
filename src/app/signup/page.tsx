@@ -92,13 +92,25 @@ function SignupInner() {
               language: language,
             });
 
-            // If referred by another org, create mutual contacts
+            // If referred, create mutual contacts + referral record
             if (refOrgId) {
+              // ref can be an org ID (legacy) or a share_token (new invite links)
+              // Try share_token lookup first
+              let actualOrgId = refOrgId;
+              const { data: gpLookup } = await supabase
+                .from('global_profiles')
+                .select('organization_id')
+                .eq('share_token', refOrgId)
+                .single();
+              if (gpLookup) {
+                actualOrgId = gpLookup.organization_id;
+              }
+
               // Get inviter's owner profile
               const { data: inviterProfile } = await supabase
                 .from('profiles')
                 .select('name, full_name, email, language')
-                .eq('organization_id', refOrgId)
+                .eq('organization_id', actualOrgId)
                 .eq('role', 'owner')
                 .single();
 
@@ -114,12 +126,38 @@ function SignupInner() {
 
                 // Add new user as contact for the inviter
                 await supabase.from('contacts').insert({
-                  organization_id: refOrgId,
+                  organization_id: actualOrgId,
                   name: name || user.email?.split('@')[0] || 'Contact',
                   email: user.email,
                   contact_type: 'friend',
                   language: language,
                 });
+
+                // Create referral record for trust reward
+                // Look up inviter user_id from their org
+                const { data: inviterOwner } = await supabase
+                  .from('profiles')
+                  .select('user_id')
+                  .eq('organization_id', actualOrgId)
+                  .eq('role', 'owner')
+                  .single();
+
+                if (inviterOwner && inviterOwner.user_id !== user.id) {
+                  // Check for existing referral to prevent duplicates
+                  const { data: existingRef } = await supabase
+                    .from('referrals')
+                    .select('id')
+                    .eq('invitee_id', user.id)
+                    .single();
+
+                  if (!existingRef) {
+                    await supabase.from('referrals').insert({
+                      inviter_id: inviterOwner.user_id,
+                      invitee_id: user.id,
+                      trust_awarded: false,
+                    });
+                  }
+                }
               }
             }
           }

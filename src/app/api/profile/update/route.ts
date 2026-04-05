@@ -8,6 +8,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { recalculateTrust } from '@/lib/trust-score'
 import { getTierByName, type Tier } from '@/lib/tier-system'
+import { checkAndAwardReferralTrust } from '@/lib/referral-rewards'
 
 // Fields users can directly edit
 const EDITABLE_FIELDS = [
@@ -124,6 +125,13 @@ export async function PUT(request: Request) {
       { error: `Update failed: ${updateError.message}` },
       { status: 500 }
     )
+  }
+
+  // Check referral rewards when publishing
+  if (updates.is_published === true) {
+    await checkAndAwardReferralTrust(user.id, supabase).catch((err: any) => {
+      console.error('[ProfileUpdate] Referral reward error:', err)
+    })
   }
 
   // Return updated profile

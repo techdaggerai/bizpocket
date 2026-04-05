@@ -270,6 +270,21 @@ export default function OpportunitiesPage() {
         </button>
       </div>
 
+      {/* Invite CTA */}
+      <Link
+        href="/invite"
+        className="flex items-center gap-4 bg-gradient-to-r from-[#EEF2FF] to-[#FEF3C7] dark:from-indigo-950/30 dark:to-amber-950/30 rounded-2xl border border-[#C7D2FE] dark:border-indigo-800 p-4 no-underline hover:opacity-90 transition-opacity"
+      >
+        <span className="text-2xl">{'\u{1F4E4}'}</span>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-[var(--text-1)] dark:text-white">Grow Your Network</p>
+          <p className="text-xs text-[var(--text-2)] dark:text-gray-300">Invite contacts and both earn +15 Trust</p>
+        </div>
+        <svg className="w-5 h-5 text-[var(--text-3)] dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+        </svg>
+      </Link>
+
       <style jsx>{`
         @keyframes bounce {
           0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
