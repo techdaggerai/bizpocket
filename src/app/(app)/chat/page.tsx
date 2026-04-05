@@ -24,6 +24,7 @@ import VoiceTranslator from '@/components/VoiceTranslator';
 import PhotoEditor from '@/components/PhotoEditor';
 import CreatePoll from '@/components/CreatePoll';
 import PollBubble from '@/components/PollBubble';
+import ScheduleMessageModal from '@/components/ScheduleMessageModal';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -60,6 +61,7 @@ interface Conversation {
   is_pinned?: boolean;
   pinned_at?: string | null;
   is_archived?: boolean;
+  folder?: string | null;
   muted_until?: string | null;
   disappearing_timer?: string;
   label?: string | null;
@@ -217,6 +219,8 @@ export default function PocketChatPage() {
   const summaryCheckRef = useRef<number>(0);
   const [showCreatePoll, setShowCreatePoll] = useState(false);
   const [showPhotoEditor, setShowPhotoEditor] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [chatFolder, setChatFolder] = useState('all');
   const [photoEditorFile, setPhotoEditorFile] = useState<{ url: string; file: File } | null>(null);
   const [culturalCoach, setCulturalCoach] = useState<{
     tip: string; suggested_revision: string; cultural_note: string;
@@ -1242,6 +1246,25 @@ export default function PocketChatPage() {
     setSharedMedia(media);
   }
 
+  // Schedule message
+  async function handleScheduleMessage(sendAt: Date) {
+    if (!newMessage.trim() || !activeConvoId || !organization?.id) return;
+    setShowScheduleModal(false);
+    const text = newMessage.trim();
+    await supabase.from('scheduled_messages').insert({
+      conversation_id: activeConvoId,
+      org_id: organization.id,
+      user_id: user?.id,
+      sender_name: profile?.full_name || profile?.name || 'You',
+      content: text,
+      language: chatLang,
+      send_at: sendAt.toISOString(),
+      status: 'pending',
+    });
+    setNewMessage('');
+    toast(`Message scheduled for ${sendAt.toLocaleString()}`, 'success');
+  }
+
   // Photo editor send
   async function handlePhotoEditorSend(blob: Blob, caption: string) {
     setShowPhotoEditor(false);
@@ -1408,7 +1431,13 @@ export default function PocketChatPage() {
     return true;
   });
 
-  const sortedConversations = [...filteredConversations]
+  const folderFiltered = chatFolder === 'all'
+    ? filteredConversations
+    : chatFolder === 'groups'
+      ? filteredConversations.filter(c => c.is_group)
+      : filteredConversations.filter(c => (c.folder || 'personal') === chatFolder);
+
+  const sortedConversations = [...folderFiltered]
     .filter(c => !c.is_archived)
     .sort((a, b) => {
       // Pinned first
@@ -2257,6 +2286,15 @@ export default function PocketChatPage() {
           </div>
         )}
 
+        {/* Schedule Message Modal */}
+        {showScheduleModal && newMessage.trim() && (
+          <ScheduleMessageModal
+            message={newMessage.trim()}
+            onSchedule={handleScheduleMessage}
+            onClose={() => setShowScheduleModal(false)}
+          />
+        )}
+
         {/* Photo Editor */}
         {showPhotoEditor && photoEditorFile && (
           <PhotoEditor
@@ -2744,9 +2782,16 @@ export default function PocketChatPage() {
                 {newMessage.trim() ? (
                   <button
                     onClick={trySendMessage}
+                    onContextMenu={(e) => { e.preventDefault(); setShowScheduleModal(true); }}
+                    onTouchStart={(e) => {
+                      const timer = setTimeout(() => { if (navigator.vibrate) navigator.vibrate(30); setShowScheduleModal(true); }, 600);
+                      const cleanup = () => { clearTimeout(timer); e.target.removeEventListener('touchend', cleanup); e.target.removeEventListener('touchmove', cleanup); };
+                      e.target.addEventListener('touchend', cleanup, { once: true });
+                      e.target.addEventListener('touchmove', cleanup, { once: true });
+                    }}
                     disabled={sending}
                     className="h-[42px] w-[42px] shrink-0 flex items-center justify-center bg-[#4F46E5] text-white rounded-full hover:bg-[#4338CA] transition-colors disabled:opacity-60"
-                    aria-label="Send"
+                    aria-label="Send (hold to schedule)"
                   >
                     <PocketSendIcon size={20} />
                   </button>
@@ -2822,8 +2867,30 @@ export default function PocketChatPage() {
         </button>
       </div>
 
+      {/* Folder tabs */}
+      <div className="px-4 pt-2 pb-0 flex flex-nowrap gap-1.5 overflow-x-auto">
+        {[
+          { key: 'all', label: 'All' },
+          { key: 'personal', label: 'Personal' },
+          { key: 'work', label: 'Work' },
+          { key: 'groups', label: 'Groups' },
+        ].map(f => (
+          <button
+            key={f.key}
+            onClick={() => setChatFolder(f.key)}
+            className={`px-3 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
+              chatFolder === f.key
+                ? 'bg-[#4F46E5] text-white'
+                : 'bg-[#F3F4F6] dark:bg-gray-800 text-[#6B7280] dark:text-gray-400'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {/* Filter tabs */}
-      <div className="px-4 pt-3 pb-0 flex flex-nowrap gap-6 overflow-x-auto border-b border-[#F0F0F0]">
+      <div className="px-4 pt-2 pb-0 flex flex-nowrap gap-6 overflow-x-auto border-b border-[#F0F0F0] dark:border-gray-800">
         {filters.map((f) => (
           <button
             key={f.key}
