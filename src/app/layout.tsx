@@ -5,6 +5,7 @@ import './globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
 import SplashScreen from '@/components/SplashScreen';
 import OfflineBanner from '@/components/OfflineBanner';
+import PWAInstallBanner from '@/components/PWAInstallBanner';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -74,6 +75,7 @@ export default function RootLayout({
           <SplashScreen>
             {children}
           </SplashScreen>
+          <PWAInstallBanner />
         </ToastProvider>
       </body>
     </html>
