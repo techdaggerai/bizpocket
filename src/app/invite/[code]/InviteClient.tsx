@@ -1,95 +1,103 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import TierBadge from '@/components/profile/TierBadge'
-import type { Tier } from '@/lib/tier-system'
+import Link from 'next/link';
+import GlassCard from '@/components/ui/GlassCard';
+import PocketAvatar from '@/components/ui/PocketAvatar';
+import Button from '@/components/ui/Button';
+import TierBadge from '@/components/profile/TierBadge';
+import CorridorBadge from '@/components/profile/CorridorBadge';
+import type { Tier } from '@/lib/tier-system';
 
 interface Props {
-  inviter: any
-  code: string
+  inviter: any;
+  code: string;
 }
 
 export default function InviteClient({ inviter, code }: Props) {
-  const tier = (inviter.tier || 'starter') as Tier
-  const initial = inviter.display_name?.charAt(0)?.toUpperCase() || '?'
-  const corridors = inviter.operating_corridors || []
-  const services = (inviter.services || []).slice(0, 3)
+  const tier = (inviter.tier || 'starter') as Tier;
+  const corridors = inviter.operating_corridors || [];
+  const services = (inviter.services || []).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-[var(--pm-surface-1)] flex flex-col items-center justify-center px-6 py-12">
       {/* Evrywher header */}
       <div className="flex items-center gap-2 mb-8">
         <span className="text-2xl">{'\u{1F30D}'}</span>
-        <span className="text-xl font-bold text-[#4F46E5]">Evrywher</span>
+        <span
+          className="text-xl font-bold text-indigo-600"
+          style={{ fontFamily: 'var(--font-display), system-ui' }}
+        >
+          Evrywher
+        </span>
       </div>
 
       {/* Invite card */}
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-[#E5E5E5] p-6 space-y-5 shadow-sm">
-        <p className="text-center text-sm text-[#555]">You've been invited by</p>
+      <div className="w-full max-w-sm">
+        <GlassCard>
+          <div className="space-y-5">
+            <p className="text-center text-sm text-[var(--pm-text-secondary)]">You've been invited by</p>
 
-        {/* Inviter profile */}
-        <div className="flex flex-col items-center text-center">
-          {inviter.avatar_url ? (
-            <img src={inviter.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-[#E5E5E5] mb-3" />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-3xl font-bold text-[#4F46E5] mb-3">
-              {initial}
+            {/* Inviter profile */}
+            <div className="flex flex-col items-center text-center">
+              <PocketAvatar
+                src={inviter.avatar_url}
+                name={inviter.display_name || 'BP'}
+                size="xl"
+                tier={tier}
+              />
+              <h2 className="text-xl font-bold text-[var(--pm-text-primary)] mt-3">{inviter.display_name}</h2>
+              {inviter.title && <p className="text-sm text-[var(--pm-text-secondary)] mt-0.5">{inviter.title}</p>}
+              {inviter.company_name && <p className="text-xs text-[var(--pm-text-tertiary)] mt-0.5">{inviter.company_name}</p>}
+              <div className="mt-2">
+                <TierBadge tier={tier} trustScore={inviter.trust_score} size="sm" />
+              </div>
             </div>
-          )}
-          <h2 className="text-xl font-bold text-[#0A0A0A]">{inviter.display_name}</h2>
-          {inviter.title && <p className="text-sm text-[#555] mt-0.5">{inviter.title}</p>}
-          {inviter.company_name && <p className="text-xs text-[#999] mt-0.5">{inviter.company_name}</p>}
-          <div className="mt-2">
-            <TierBadge tier={tier} trustScore={inviter.trust_score} size="sm" />
-          </div>
-        </div>
 
-        {/* Corridors */}
-        {corridors.length > 0 && (
-          <div className="flex justify-center gap-2 flex-wrap">
-            {corridors.map((c: any, i: number) => (
-              <span key={i} className="text-xs bg-[#F9FAFB] border border-[#E5E5E5] rounded-full px-2.5 py-1">
-                {c.flag_from} {'\u2194'} {c.flag_to}
-              </span>
-            ))}
-          </div>
-        )}
+            {/* Corridors */}
+            {corridors.length > 0 && (
+              <div className="flex justify-center gap-2 flex-wrap">
+                {corridors.map((c: any, i: number) => (
+                  <CorridorBadge key={i} fromFlag={c.flag_from} toFlag={c.flag_to} from={c.from} to={c.to} variant="card" pulseStrength="gentle" />
+                ))}
+              </div>
+            )}
 
-        {/* Services */}
-        {services.length > 0 && (
-          <div className="flex justify-center gap-1.5 flex-wrap">
-            {services.map((s: string, i: number) => (
-              <span key={i} className="text-[10px] bg-[#EEF2FF] text-[#4338CA] px-2 py-0.5 rounded-full border border-[#C7D2FE]">
-                {s}
-              </span>
-            ))}
-          </div>
-        )}
+            {/* Services */}
+            {services.length > 0 && (
+              <div className="flex justify-center gap-1.5 flex-wrap">
+                {services.map((s: string, i: number) => (
+                  <span key={i} className="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
 
-        {/* Trust reward */}
-        <div className="bg-gradient-to-r from-[#EEF2FF] to-[#FEF3C7] rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-xl flex-shrink-0">{'\u{1F6E1}\uFE0F'}</span>
-            <p className="text-sm text-[#333]">
-              <span className="font-semibold">You both earn +15 Trust Score</span> when you publish your profile.
-            </p>
-          </div>
-        </div>
+            {/* Trust reward */}
+            <GlassCard tier="starter" glow>
+              <div className="flex items-start gap-3">
+                <span className="text-xl shrink-0">{'\u{1F6E1}\uFE0F'}</span>
+                <p className="text-sm text-[var(--pm-text-primary)]">
+                  <span className="font-semibold text-amber-600 dark:text-amber-400">You both earn +15 Trust Score</span> when you publish your profile.
+                </p>
+              </div>
+            </GlassCard>
 
-        {/* CTA */}
-        <Link
-          href={`/signup?ref=${code}`}
-          className="block w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold text-center py-4 rounded-xl transition-colors no-underline"
-        >
-          Join Evrywher {'\u2192'}
-        </Link>
+            {/* CTA */}
+            <Link href={`/signup?ref=${code}`} className="block no-underline">
+              <Button variant="primary" size="xl" className="w-full">
+                Join Evrywher {'\u2192'}
+              </Button>
+            </Link>
+          </div>
+        </GlassCard>
       </div>
 
       {/* Footer */}
       <div className="mt-8 text-center">
-        <p className="text-xs text-[#999]">Already have an account?</p>
-        <Link href="/login" className="text-xs text-[#4F46E5] font-semibold no-underline hover:underline">Log in</Link>
+        <p className="text-xs text-[var(--pm-text-tertiary)]">Already have an account?</p>
+        <Link href="/login" className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold no-underline hover:underline">Log in</Link>
       </div>
     </div>
-  )
+  );
 }
