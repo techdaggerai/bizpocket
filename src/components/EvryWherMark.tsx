@@ -25,7 +25,7 @@ export default function EvryWherMark({ size = 'md', className = '' }: Props) {
   const s = SIZES[size];
   return (
     <span className={`inline-flex items-baseline ${className}`} style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600 }}>
-      <span className={`${s} text-[#4F46E5] dark:text-[#818CF8]`}>Evry</span>
+      <span className={`${s} text-[#4F46E5]`}>Evry</span>
       <span className={`${s} text-[#F59E0B]`}>wher</span>
     </span>
   );

@@ -173,27 +173,27 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
   const toInfo = LANGUAGES.find(l => l.code === toLang) || LANGUAGES[1];
 
   return (
-    <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col">
+    <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5] dark:border-gray-800 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
         <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Close</button>
-        <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">Voice Translator</p>
+        <p className="text-sm font-bold text-slate-50">Voice Translator</p>
         <div className="w-10" />
       </div>
 
       {/* Language selector */}
       <div className="flex items-center justify-center gap-4 py-5 shrink-0">
         <div className="relative">
-          <button onClick={() => setShowFromPicker(!showFromPicker)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#EEF2FF] dark:bg-gray-800 text-[13px] font-semibold text-[#4F46E5] dark:text-[#818CF8]">
+          <button onClick={() => setShowFromPicker(!showFromPicker)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 text-[13px] font-semibold text-[#818CF8]">
             <span className="text-base">{fromInfo.flag}</span> {fromInfo.label}
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           {showFromPicker && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowFromPicker(false)} />
-              <div className="absolute top-full mt-1 left-0 z-50 w-44 max-h-60 overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white dark:bg-gray-800 shadow-lg py-1">
+              <div className="absolute top-full mt-1 left-0 z-50 w-44 max-h-60 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
                 {LANGUAGES.map(l => (
-                  <button key={l.code} onClick={() => { setFromLang(l.code); setShowFromPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[#F3F4F6] dark:hover:bg-gray-700 ${fromLang === l.code ? 'text-[#4F46E5] font-semibold' : 'text-[#374151] dark:text-gray-300'}`}>
+                  <button key={l.code} onClick={() => { setFromLang(l.code); setShowFromPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${fromLang === l.code ? 'text-[#4F46E5] font-semibold' : 'text-slate-300'}`}>
                     <span>{l.flag}</span> {l.label}
                   </button>
                 ))}
@@ -202,21 +202,21 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
           )}
         </div>
 
-        <button onClick={swap} className="h-9 w-9 rounded-full bg-[#F3F4F6] dark:bg-gray-800 flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors">
+        <button onClick={swap} className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
         </button>
 
         <div className="relative">
-          <button onClick={() => setShowToPicker(!showToPicker)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FEF3C7] dark:bg-gray-800 text-[13px] font-semibold text-[#92400E] dark:text-[#FDE68A]">
+          <button onClick={() => setShowToPicker(!showToPicker)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 text-[13px] font-semibold text-[#FDE68A]">
             <span className="text-base">{toInfo.flag}</span> {toInfo.label}
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           {showToPicker && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowToPicker(false)} />
-              <div className="absolute top-full mt-1 right-0 z-50 w-44 max-h-60 overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white dark:bg-gray-800 shadow-lg py-1">
+              <div className="absolute top-full mt-1 right-0 z-50 w-44 max-h-60 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
                 {LANGUAGES.map(l => (
-                  <button key={l.code} onClick={() => { setToLang(l.code); setShowToPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-[#F3F4F6] dark:hover:bg-gray-700 ${toLang === l.code ? 'text-[#F59E0B] font-semibold' : 'text-[#374151] dark:text-gray-300'}`}>
+                  <button key={l.code} onClick={() => { setToLang(l.code); setShowToPicker(false); }} className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] hover:bg-slate-700 ${toLang === l.code ? 'text-[#F59E0B] font-semibold' : 'text-slate-300'}`}>
                     <span>{l.flag}</span> {l.label}
                   </button>
                 ))}
@@ -232,8 +232,8 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
         {originalText && (
           <div>
             <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">{fromInfo.flag} {fromInfo.label}</p>
-            <div className="bg-[#F3F4F6] dark:bg-gray-800 rounded-xl p-4">
-              <p className="text-[15px] text-[#0A0A0A] dark:text-white leading-relaxed whitespace-pre-wrap">{originalText}</p>
+            <div className="bg-slate-800 rounded-xl p-4">
+              <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{originalText}</p>
             </div>
           </div>
         )}
@@ -249,8 +249,8 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
         {translatedText && (
           <div>
             <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">{toInfo.flag} {toInfo.label}</p>
-            <div className="bg-[#EEF2FF] dark:bg-indigo-950/30 rounded-xl p-4 border border-[#C7D2FE]/30 dark:border-indigo-800/30">
-              <p className="text-[15px] text-[#0A0A0A] dark:text-white leading-relaxed whitespace-pre-wrap">{translatedText}</p>
+            <div className="bg-indigo-950/30 rounded-xl p-4 border border-[#C7D2FE]/30 border-indigo-800/30">
+              <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{translatedText}</p>
             </div>
           </div>
         )}
@@ -265,18 +265,18 @@ export default function VoiceTranslator({ userLanguage, contactLanguage, onClose
 
         {/* Error */}
         {error && (
-          <div className="rounded-xl bg-[#FEF2F2] dark:bg-red-950/30 border border-[#FECACA]/50 px-4 py-3">
-            <p className="text-[13px] text-[#DC2626] dark:text-red-400">{error}</p>
+          <div className="rounded-xl bg-red-950/30 border border-[#FECACA]/50 px-4 py-3">
+            <p className="text-[13px] text-red-400">{error}</p>
           </div>
         )}
 
         {/* Idle hint */}
         {phase === 'idle' && !originalText && !error && (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <div className="h-16 w-16 rounded-full bg-[#EEF2FF] dark:bg-gray-800 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full bg-slate-800 flex items-center justify-center">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </div>
-            <p className="text-sm font-medium text-[#374151] dark:text-gray-300">Hold the button and speak</p>
+            <p className="text-sm font-medium text-slate-300">Hold the button and speak</p>
             <p className="text-xs text-[#9CA3AF]">Your words will be translated and spoken aloud</p>
           </div>
         )}

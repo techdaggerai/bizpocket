@@ -122,7 +122,7 @@ export default function ItemsPage() {
     fetchData();
   }
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
 
   if (loading) {
     return <div className="flex min-h-[60vh] items-center justify-center"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>;
@@ -146,7 +146,7 @@ export default function ItemsPage() {
           <p className="text-xs text-[var(--text-3)]">{items.filter(i => i.status === 'active').length} active &middot; {items.filter(i => i.status === 'completed').length} completed</p>
         </div>
         <div className="flex gap-2">
-          <Link href="/ops-radar" className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Ops Radar</Link>
+          <Link href="/ops-radar" className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Ops Radar</Link>
           <button
             onClick={() => setShowAddForm(true)}
             className="rounded-lg bg-[#4F46E5] px-3 py-2 text-xs font-semibold text-white hover:bg-[#4338CA] transition-colors"
@@ -178,7 +178,7 @@ export default function ItemsPage() {
             <button type="submit" disabled={saving} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-sm font-semibold text-white disabled:opacity-50">
               {saving ? 'Adding...' : 'Add to Pipeline'}
             </button>
-            <button type="button" onClick={() => setShowAddForm(false)} className="rounded-lg border border-[#E5E5E5] px-4 py-2.5 text-sm text-[var(--text-3)]">Cancel</button>
+            <button type="button" onClick={() => setShowAddForm(false)} className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm text-[var(--text-3)]">Cancel</button>
           </div>
         </form>
       )}
@@ -202,7 +202,7 @@ export default function ItemsPage() {
                   : 0;
 
                 return (
-                  <div key={item.id} className="rounded-lg border border-[#E5E5E5] bg-white p-3">
+                  <div key={item.id} className="rounded-lg border border-slate-700 bg-slate-800 p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-[var(--text-1)] truncate">{item.name}</p>

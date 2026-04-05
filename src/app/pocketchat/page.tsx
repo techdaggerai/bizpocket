@@ -42,22 +42,22 @@ function useFadeIn() {
 function FaqSection() {
   const [open, setOpen] = useState<number | null>(null);
   return (
-    <section className="px-6 py-20 bg-white">
+    <section className="px-6 py-20 bg-slate-800">
       <div className="mx-auto max-w-[720px]">
         <div className="mb-10 text-center">
           <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Got questions?</p>
-          <h2 className="text-[clamp(24px,4vw,34px)] font-bold text-[#111827]">Frequently asked</h2>
+          <h2 className="text-[clamp(24px,4vw,34px)] font-bold text-slate-50">Frequently asked</h2>
         </div>
         <div className="space-y-2">
           {FAQ_ITEMS.map((item, i) => (
-            <div key={i} className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f9fafb]">
+            <div key={i} className="overflow-hidden rounded-xl border border-slate-700 bg-slate-800">
               <button onClick={() => setOpen(open === i ? null : i)} className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left" aria-expanded={open === i}>
-                <span className="text-[15px] font-semibold text-[#111827]">{item.q}</span>
+                <span className="text-[15px] font-semibold text-slate-50">{item.q}</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 transition-transform duration-200" style={{ transform: open === i ? 'rotate(180deg)' : 'rotate(0deg)' }}><path d="m6 9 6 6 6-6" /></svg>
               </button>
               {open === i && (
-                <div className="border-t border-[#e5e7eb] px-6 py-4">
-                  <p className="text-[14px] leading-relaxed text-[#374151]">{item.a}</p>
+                <div className="border-t border-slate-700 px-6 py-4">
+                  <p className="text-[14px] leading-relaxed text-slate-300">{item.a}</p>
                 </div>
               )}
             </div>
@@ -97,29 +97,29 @@ export default function PocketChatLanding() {
   const s1 = useFadeIn(), s2 = useFadeIn(), s3 = useFadeIn(), s4 = useFadeIn(), s5 = useFadeIn(), s6 = useFadeIn(), s7 = useFadeIn(), s8 = useFadeIn(), s9 = useFadeIn();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 dark:text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-slate-900 text-white" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
 
       {/* ═══ NAVBAR ════════════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-black/[0.04] dark:border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="mx-auto flex max-w-[1100px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <AnimatedPocketChatLogo size={32} isTranslating={true} />
+            <span className="evrywher-logo-glow"><AnimatedPocketChatLogo size={32} isTranslating={true} /></span>
             <EvryWherMark size="md" />
           </div>
           <div className="hidden sm:flex items-center gap-6">
-            <a href="#features" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Features</a>
-            <a href="#learn" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Learn</a>
-            <a href="#pricing" className="text-[13px] text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Pricing</a>
+            <a href="#features" className="text-[13px] text-gray-300 hover:text-white transition-colors">Features</a>
+            <a href="#learn" className="text-[13px] text-gray-300 hover:text-white transition-colors">Learn</a>
+            <a href="#pricing" className="text-[13px] text-gray-300 hover:text-white transition-colors">Pricing</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">Log in</Link>
+            <Link href="/login" className="text-sm text-gray-300 hover:text-white transition-colors">Log in</Link>
             <Link href="/signup?mode=pocketchat" className="rounded-[20px] bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors">Start Free</Link>
           </div>
         </div>
       </nav>
 
       {/* ═══ 1. HERO ══════════════════════════════════════════════════════ */}
-      <section className="pt-24 pb-16 bg-gradient-to-b from-indigo-50 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
+      <section className="pt-24 pb-16 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-900">
         <div className="mx-auto max-w-[1100px] px-6">
           {/* Brand */}
           <div className="text-center pt-8 pb-6">
@@ -133,28 +133,28 @@ export default function PocketChatLanding() {
             <div className="mx-auto w-full max-w-[420px] lg:mx-0 order-2 lg:order-1" aria-hidden="true">
               <HeroChatMockup />
             </div>
-            <div className="text-center lg:text-left order-1 lg:order-2 rounded-[20px] bg-white/[0.78] dark:bg-white/[0.06] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
-              <span className="mb-5 inline-block rounded-full bg-indigo-50 dark:bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-600 dark:text-indigo-300">TRANSLATE · CHAT · LEARN</span>
-              <h1 className="mb-4 text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-tight text-gray-900 dark:text-white" style={{ fontFamily: 'var(--font-outfit)' }}>
-                Break Every<br />Language <span className="text-indigo-600 dark:text-indigo-400">Barrier</span>
+            <div className="text-center lg:text-left order-1 lg:order-2 rounded-[20px] bg-slate-800/[0.78] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
+              <span className="mb-5 inline-block rounded-full bg-indigo-500/20 px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-300">TRANSLATE · CHAT · LEARN</span>
+              <h1 className="mb-4 text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-tight text-white" style={{ fontFamily: 'var(--font-outfit)' }}>
+                Break Every<br />Language <span className="text-indigo-400">Barrier</span>
               </h1>
-              <p className="mx-auto mb-6 max-w-[480px] text-[16px] leading-relaxed text-gray-600 dark:text-gray-300 lg:mx-0" style={{ fontFamily: 'var(--font-dm-sans)' }}>
+              <p className="mx-auto mb-6 max-w-[480px] text-[16px] leading-relaxed text-gray-300 lg:mx-0" style={{ fontFamily: 'var(--font-dm-sans)' }}>
                 Translate. Chat. Learn. All from your real life in Japan. The only app where every translation becomes a lesson.
               </p>
               <div className="mb-6 flex flex-wrap justify-center gap-3 lg:justify-start">
                 <Link href="/signup?mode=pocketchat" className="rounded-[20px] bg-indigo-600 px-8 h-14 inline-flex items-center text-[15px] font-semibold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition-all hover:-translate-y-0.5">Get Started Free</Link>
-                <a href="#features" className="rounded-[20px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/10 px-8 h-14 inline-flex items-center text-[15px] font-semibold text-gray-700 dark:text-gray-200 hover:border-gray-300 dark:hover:border-white/20 transition-colors">See Features</a>
+                <a href="#features" className="rounded-[20px] border border-white/10 bg-white/10 px-8 h-14 inline-flex items-center text-[15px] font-semibold text-gray-200 hover:border-white/20 transition-colors">See Features</a>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">No download needed. No credit card. Works on any phone.</p>
+              <p className="text-xs text-gray-400">No download needed. No credit card. Works on any phone.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <WaveDivider color="#f9fafb" />
+      <WaveDivider color="#1e293b" />
 
       {/* ═══ 2. CAMERA TRANSLATION — "See It. Scan It." ═══════════════════ */}
-      <section id="features" className="bg-[#f9fafb] px-6 py-20">
+      <section id="features" className="bg-slate-800 px-6 py-20">
         <div ref={s1.ref} className={`mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${s1.className}`}>
           {/* Phone mockup */}
           <div className="mx-auto max-w-[320px]">
@@ -175,15 +175,15 @@ export default function PocketChatLanding() {
           {/* Content */}
           <div>
             <span className="inline-block rounded-full bg-[#4F46E5]/10 px-3 py-1 text-xs font-bold text-[#4F46E5] mb-4">CAMERA TRANSLATION</span>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827] leading-tight mb-4">See It. Scan It.<br />Understand It.</h2>
-            <p className="text-[15px] text-[#374151] leading-relaxed mb-6">
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50 leading-tight mb-4">See It. Scan It.<br />Understand It.</h2>
+            <p className="text-[15px] text-slate-300 leading-relaxed mb-6">
               Walk into any bank in Japan. Point your camera. Know exactly what every field means — and what to write. Works on signs, menus, forms, receipts, letters.
             </p>
             <div className="space-y-2">
               {['Camera scan to instant translation', 'Form field guide — tells you what to write', 'Cultural context, not just words', 'Works on signs, menus, receipts, documents', 'Scan history — reference forever'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <svg className="h-4 w-4 shrink-0 text-[#16A34A]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-                  <span className="text-sm text-[#374151]">{f}</span>
+                  <span className="text-sm text-slate-300">{f}</span>
                 </div>
               ))}
             </div>
@@ -191,22 +191,22 @@ export default function PocketChatLanding() {
         </div>
       </section>
 
-      <WaveDivider color="white" flip />
+      <WaveDivider color="#1e293b" flip />
 
       {/* ═══ 3. CHAT — "Chat in Any Language" ═════════════════════════════ */}
-      <section className="px-6 py-20 bg-white">
+      <section className="px-6 py-20 bg-slate-800">
         <div ref={s2.ref} className={`mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${s2.className}`}>
           <div className="order-2 lg:order-1">
             <span className="inline-block rounded-full bg-[#F59E0B]/10 px-3 py-1 text-xs font-bold text-[#92400E] mb-4">AI CHAT</span>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827] leading-tight mb-4">Chat in Any Language</h2>
-            <p className="text-[15px] text-[#374151] leading-relaxed mb-6">
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50 leading-tight mb-4">Chat in Any Language</h2>
+            <p className="text-[15px] text-slate-300 leading-relaxed mb-6">
               Your landlord texts in Japanese. You reply in English. The AI handles everything in between — including the politeness your message needs.
             </p>
             <div className="space-y-2">
               {['AI cultural translation — not just words, but tone and context', '21 languages, zero delay', 'Group chat — everyone sees their own language', 'Voice messages with automatic translation', 'Cultural Coach warns before you say something wrong'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <svg className="h-4 w-4 shrink-0 text-[#16A34A]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-                  <span className="text-sm text-[#374151]">{f}</span>
+                  <span className="text-sm text-slate-300">{f}</span>
                 </div>
               ))}
             </div>
@@ -217,10 +217,10 @@ export default function PocketChatLanding() {
         </div>
       </section>
 
-      <WaveDivider color="#f9fafb" />
+      <WaveDivider color="#1e293b" />
 
       {/* ═══ 4. VOICE — "Speak and Be Understood" ═════════════════════════ */}
-      <section className="bg-[#f9fafb] px-6 py-20">
+      <section className="bg-slate-800 px-6 py-20">
         <div ref={s3.ref} className={`mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${s3.className}`}>
           <div className="mx-auto max-w-[320px]">
             <div className="rounded-[32px] border-[6px] border-[#1a1a2e] bg-white p-4 shadow-2xl">
@@ -237,15 +237,15 @@ export default function PocketChatLanding() {
           </div>
           <div>
             <span className="inline-block rounded-full bg-[#16A34A]/10 px-3 py-1 text-xs font-bold text-[#166534] mb-4">VOICE TRANSLATION</span>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827] leading-tight mb-4">Speak and<br />Be Understood</h2>
-            <p className="text-[15px] text-[#374151] leading-relaxed mb-6">
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50 leading-tight mb-4">Speak and<br />Be Understood</h2>
+            <p className="text-[15px] text-slate-300 leading-relaxed mb-6">
               At the doctor&apos;s office? Speak English. Your phone speaks Japanese. Like having a personal interpreter — for $6.99/month.
             </p>
             <div className="space-y-2">
               {['Speak in your language, AI plays audio in theirs', 'Pass the phone back and forth for real conversation', 'Natural voice — not robotic', 'Works for medical, legal, and business situations'].map((f, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <svg className="h-4 w-4 shrink-0 text-[#16A34A]" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-                  <span className="text-sm text-[#374151]">{f}</span>
+                  <span className="text-sm text-slate-300">{f}</span>
                 </div>
               ))}
             </div>
@@ -253,14 +253,14 @@ export default function PocketChatLanding() {
         </div>
       </section>
 
-      <WaveDivider color="white" flip />
+      <WaveDivider color="#1e293b" flip />
 
       {/* ═══ 5. LANGUAGE LEARNING — THE DUOLINGO KILLER ═══════════════════ */}
-      <section id="learn" className="px-6 py-24 bg-white">
+      <section id="learn" className="px-6 py-24 bg-slate-800">
         <div ref={s4.ref} className={`mx-auto max-w-[1100px] ${s4.className}`}>
           <div className="text-center mb-12">
             <span className="inline-block rounded-full bg-[#7C3AED]/10 px-3 py-1 text-xs font-bold text-[#7C3AED] mb-4">LANGUAGE LEARNING</span>
-            <h2 className="text-[clamp(28px,5vw,44px)] font-bold text-[#111827] leading-tight">
+            <h2 className="text-[clamp(28px,5vw,44px)] font-bold text-slate-50 leading-tight">
               Duolingo teaches you<br />&ldquo;the cat is on the table.&rdquo;
             </h2>
             <p className="mt-4 text-[clamp(20px,3vw,28px)] font-bold text-[#4F46E5]">
@@ -270,31 +270,31 @@ export default function PocketChatLanding() {
 
           {/* THEM vs US comparison cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[700px] mx-auto mb-12">
-            {/* THEM — gray, dull */}
-            <div className="rounded-2xl border-2 border-gray-200 bg-gray-50 p-6 text-center opacity-60">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">THEM</p>
+            {/* THEM — muted but readable */}
+            <div className="rounded-2xl border-2 border-slate-600 bg-slate-800 p-6 text-center">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">THEM</p>
               <div className="text-4xl mb-2">🐱</div>
-              <p className="text-lg font-medium text-gray-500">The cat is on the table</p>
-              <div className="mt-4 flex justify-center gap-1">{[1,2,3].map(i=><div key={i} className="h-4 w-4 rounded-full bg-gray-300"/>)}</div>
-              <p className="mt-2 text-xs text-gray-400">+5 XP</p>
-              <p className="mt-3 text-[10px] text-gray-400 italic">Random sentence. No context. No relevance.</p>
+              <p className="text-lg font-medium text-slate-300">The cat is on the table</p>
+              <div className="mt-4 flex justify-center gap-1">{[1,2,3].map(i=><div key={i} className="h-4 w-4 rounded-full bg-slate-600"/>)}</div>
+              <p className="mt-2 text-xs text-slate-500">+5 XP</p>
+              <p className="mt-3 text-[10px] text-slate-400 italic">Random sentence. No context. No relevance.</p>
             </div>
             {/* US — vibrant, real */}
-            <div className="rounded-2xl border-2 border-[#4F46E5] bg-white p-6 text-center shadow-lg shadow-indigo-500/10">
+            <div className="rounded-2xl border-2 border-indigo-500 bg-slate-800 p-6 text-center shadow-lg shadow-indigo-500/20">
               <p className="text-xs font-bold uppercase tracking-wider text-[#4F46E5] mb-3">EVRYWHER</p>
               <div className="text-4xl mb-2">🏦</div>
-              <p className="text-2xl font-bold text-[#111827]">振込</p>
-              <p className="text-sm text-[#6b7280]">furikomi</p>
+              <p className="text-2xl font-bold text-slate-50">振込</p>
+              <p className="text-sm text-slate-400">furikomi</p>
               <p className="text-base font-semibold text-[#4F46E5] mt-1">bank transfer</p>
-              <div className="mt-3 rounded-lg bg-indigo-50 px-3 py-1.5 inline-block">
-                <p className="text-[10px] text-[#4F46E5] font-medium">from your bank form scan at Mizuho Bank</p>
+              <div className="mt-3 rounded-lg bg-indigo-500/10 px-3 py-1.5 inline-block">
+                <p className="text-[10px] text-indigo-300 font-medium">from your bank form scan at Mizuho Bank</p>
               </div>
               <p className="mt-3 text-[10px] text-[#16A34A] font-semibold">+10 XP · Real context</p>
             </div>
           </div>
 
           <div className="text-center mb-10">
-            <p className="text-[17px] text-[#374151] max-w-[600px] mx-auto leading-relaxed">
+            <p className="text-[17px] text-slate-300 max-w-[600px] mx-auto leading-relaxed">
               Every translation becomes a lesson. Every lesson comes from <strong>YOUR</strong> real life. Not a textbook.
             </p>
           </div>
@@ -309,10 +309,10 @@ export default function PocketChatLanding() {
               { icon: '🎯', title: 'Spaced repetition', desc: 'Words you struggle with come back more often' },
               { icon: '🔥', title: 'Streak + XP', desc: 'Subtle gamification that keeps you coming back' },
             ].map((f, i) => (
-              <div key={i} className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-4">
+              <div key={i} className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                 <span className="text-xl">{f.icon}</span>
-                <p className="text-sm font-semibold text-[#111827] mt-2">{f.title}</p>
-                <p className="text-xs text-[#6b7280] mt-1">{f.desc}</p>
+                <p className="text-sm font-semibold text-slate-50 mt-2">{f.title}</p>
+                <p className="text-xs text-slate-400 mt-1">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -402,25 +402,25 @@ export default function PocketChatLanding() {
         </div>
       </section>
 
-      <WaveDivider color="white" flip />
+      <WaveDivider color="#1e293b" flip />
 
       {/* ═══ 8. BUSINESS CARD SCANNER — quick section ════════════════════ */}
-      <section className="px-6 py-16 bg-white">
+      <section className="px-6 py-16 bg-slate-800">
         <div ref={s7.ref} className={`mx-auto max-w-[800px] text-center ${s7.className}`}>
           <span className="text-4xl">📇</span>
-          <h2 className="mt-4 text-[clamp(22px,3vw,30px)] font-bold text-[#111827]">Scan Any Business Card</h2>
-          <p className="mt-3 text-[15px] text-[#374151] max-w-[560px] mx-auto">
+          <h2 className="mt-4 text-[clamp(22px,3vw,30px)] font-bold text-slate-50">Scan Any Business Card</h2>
+          <p className="mt-3 text-[15px] text-slate-300 max-w-[560px] mx-auto">
             Someone hands you their meishi. You can&apos;t read it. Until now. Scan any Japanese business card — name, title, company, phone — all extracted and saved as a contact in seconds.
           </p>
         </div>
       </section>
 
       {/* ═══ 9. PRICING ══════════════════════════════════════════════════ */}
-      <section id="pricing" className="bg-[#f9fafb] px-6 py-20">
+      <section id="pricing" className="bg-slate-800 px-6 py-20">
         <div ref={s8.ref} className={`mx-auto max-w-[1100px] ${s8.className}`}>
           <div className="text-center mb-12">
             <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Simple pricing</p>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827]">Your first 10 translations are free. Every day. Forever.</h2>
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50">Your first 10 translations are free. Every day. Forever.</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[900px] mx-auto">
             {[
@@ -428,7 +428,7 @@ export default function PocketChatLanding() {
               { name: 'Pro', price: '$6.99', period: '/month', features: ['Unlimited translations', 'Voice-to-voice translation', 'AI conversation practice', 'All 30 topic packs', 'Cultural Coach', 'Business Card Scanner', 'Includes BizPocket Pro'], highlight: true },
               { name: 'Business', price: '$19.99', period: '/month', features: ['Everything in Pro', 'Team vocabulary sharing', 'Up to 5 team members', 'Priority support', 'Custom AI bot', 'Includes BizPocket Business'], highlight: false },
             ].map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-6 ${plan.highlight ? 'bg-[#4F46E5] text-white shadow-xl shadow-indigo-500/20 scale-[1.02]' : 'bg-white border border-[#e5e7eb]'}`}>
+              <div key={i} className={`rounded-2xl p-6 ${plan.highlight ? 'bg-[#4F46E5] text-white shadow-xl shadow-indigo-500/20 scale-[1.02]' : 'bg-white border border-slate-200'}`}>
                 <p className={`text-sm font-bold ${plan.highlight ? 'text-indigo-200' : 'text-[#4F46E5]'}`}>{plan.name}</p>
                 <p className="mt-2"><span className="text-3xl font-bold">{plan.price}</span><span className={`text-sm ${plan.highlight ? 'text-indigo-200' : 'text-[#6b7280]'}`}>{plan.period}</span></p>
                 <div className="mt-5 space-y-2">
@@ -449,24 +449,24 @@ export default function PocketChatLanding() {
       </section>
 
       {/* ═══ 10. FOUNDER STORY ═══════════════════════════════════════════ */}
-      <section className="px-6 py-20 bg-white">
+      <section className="px-6 py-20 bg-slate-800">
         <div ref={s9.ref} className={`mx-auto max-w-[680px] text-center ${s9.className}`}>
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#4F46E5] to-[#7C3AED] text-3xl text-white font-bold">B</div>
           <p className="text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5] mb-3">From a Fellow Foreigner</p>
-          <p className="text-[17px] leading-relaxed text-[#374151] italic">
+          <p className="text-[17px] leading-relaxed text-slate-300 italic">
             &ldquo;I built Evrywher because after years in Japan, I still couldn&apos;t read my own bank statement. I went to language school. They taught me &lsquo;the cat is on the table.&rsquo; I needed &lsquo;account number&rsquo; and &lsquo;transfer fee.&rsquo; So I built an app that learns from your actual life — not a textbook.&rdquo;
           </p>
-          <p className="mt-4 text-sm font-semibold text-[#111827]">Dr. Bilal</p>
-          <p className="text-xs text-[#6b7280]">Founder, Evrywher · Tokyo, Japan</p>
+          <p className="mt-4 text-sm font-semibold text-slate-50">Dr. Bilal</p>
+          <p className="text-xs text-slate-400">Founder, Evrywher · Tokyo, Japan</p>
         </div>
       </section>
 
       {/* ═══ 11. TESTIMONIALS ════════════════════════════════════════════ */}
-      <section className="bg-[#f9fafb] px-6 py-20">
+      <section className="bg-slate-800 px-6 py-20">
         <div className="mx-auto max-w-[1100px]">
           <div className="mb-12 text-center">
             <p className="mb-3 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Real people. Real conversations.</p>
-            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-[#111827]">Trusted by expats worldwide</h2>
+            <h2 className="text-[clamp(26px,4vw,36px)] font-bold text-slate-50">Trusted by expats worldwide</h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             {[
@@ -474,7 +474,7 @@ export default function PocketChatLanding() {
               { quote: "My Pakistani family and Japanese in-laws can actually talk now", name: 'Ahmed', location: 'Osaka', flag: '🇵🇰', avatar: 'A', color: '#F59E0B' },
               { quote: "The language learning from my real conversations is a game changer", name: 'Sarah', location: 'Nagoya', flag: '🇬🇧', avatar: 'S', color: '#4F46E5' },
             ].map((t, i) => (
-              <div key={i} className="flex flex-col gap-4 rounded-2xl border border-[#e5e7eb] bg-white p-6">
+              <div key={i} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex gap-0.5">{[...Array(5)].map((_, s) => <svg key={s} width="16" height="16" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}</div>
                 <p className="flex-1 text-[15px] leading-relaxed text-[#374151]">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3">
@@ -490,19 +490,73 @@ export default function PocketChatLanding() {
       {/* ═══ 12. FAQ ═════════════════════════════════════════════════════ */}
       <FaqSection />
 
+      {/* ═══ DOWNLOAD THE APP ════════════════════════════════════════ */}
+      <section className="py-20 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+          {/* Phone mockup */}
+          <div className="flex-1 flex justify-center">
+            <div className="relative w-[280px] h-[560px] bg-slate-800 rounded-[3rem] border-4 border-slate-700 shadow-2xl overflow-hidden p-3">
+              <div className="w-full h-full bg-slate-800 rounded-[2.25rem] overflow-hidden flex items-center justify-center">
+                <div className="text-center p-6">
+                  <div className="flex justify-center"><AnimatedPocketChatLogo size={64} isTranslating={true} /></div>
+                  <div className="mt-4 flex justify-center"><EvryWherMark size="md" /></div>
+                  <p className="text-slate-400 text-sm mt-2">Translate. Learn. Connect.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Content */}
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Take Evrywher With You
+            </h2>
+            <p className="text-lg text-slate-300 mb-8 max-w-md">
+              Translate conversations, scan documents, and learn Japanese — all from your phone.
+              Works everywhere you go.
+            </p>
+            {/* App Store badges */}
+            <div className="flex gap-4 justify-center md:justify-start mb-6">
+              <div className="flex items-center gap-3 bg-black text-white rounded-xl px-5 py-3 opacity-75 cursor-default">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <div className="text-left">
+                  <p className="text-[10px] uppercase tracking-wide opacity-70">Coming Soon on</p>
+                  <p className="text-sm font-semibold">App Store</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-black text-white rounded-xl px-5 py-3 opacity-75 cursor-default">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M3.18 23.79c.27.44.76.71 1.28.68.2-.01.39-.06.56-.15l17.25-9.78c.49-.28.79-.8.79-1.36s-.3-1.08-.79-1.36L5.02.04C4.85-.05 4.66-.1 4.46-.11c-.52-.03-1.01.24-1.28.68-.17.27-.26.59-.26.92V22.87c0 .33.09.65.26.92zM5.62 2.19L14.41 12l-8.79 9.81V2.19z"/></svg>
+                <div className="text-left">
+                  <p className="text-[10px] uppercase tracking-wide opacity-70">Coming Soon on</p>
+                  <p className="text-sm font-semibold">Google Play</p>
+                </div>
+              </div>
+            </div>
+            {/* PWA install */}
+            <div className="flex items-center gap-2 justify-center md:justify-start text-sm text-slate-400 mb-4">
+              <span className="w-12 h-px bg-slate-600" />
+              <span>or install now</span>
+              <span className="w-12 h-px bg-slate-600" />
+            </div>
+            <Link href="/download" className="inline-flex items-center gap-2 text-indigo-400 font-medium hover:underline">
+              Install as Web App →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ 13. FINAL CTA ══════════════════════════════════════════════ */}
-      <section className="px-6 py-24 text-center bg-gradient-to-b from-white to-indigo-50/30">
+      <section className="px-6 py-24 text-center bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="mx-auto max-w-[560px]">
           <p className="mb-4 text-[13px] font-semibold uppercase tracking-widest text-[#4F46E5]">Translation. Communication. Education. One app.</p>
-          <h2 className="mb-4 text-[clamp(28px,5vw,44px)] font-black leading-tight text-[#111827]">
+          <h2 className="mb-4 text-[clamp(28px,5vw,44px)] font-black leading-tight text-slate-50">
             Start translating.<br />Start <span className="text-[#4F46E5]">learning</span>.
           </h2>
-          <p className="mb-2 text-[16px] text-[#6b7280]">Your first 10 translations are free. Every day. Forever.</p>
+          <p className="mb-2 text-[16px] text-slate-400">Your first 10 translations are free. Every day. Forever.</p>
           <p className="mb-10 text-[14px] text-[#9ca3af]">No download. No credit card. Open on your phone and go.</p>
           <Link href="/signup?mode=pocketchat" className="inline-block rounded-xl bg-[#4F46E5] px-12 py-4 text-[17px] font-bold text-white shadow-lg shadow-[#4F46E5]/30 hover:bg-[#4338ca] transition-all hover:-translate-y-0.5 active:translate-y-0">
             Get Started Free &rarr;
           </Link>
-          <p className="mt-6 text-[13px] font-medium text-[#6B7280]">
+          <p className="mt-6 text-[13px] font-medium text-slate-400">
             You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.
           </p>
         </div>

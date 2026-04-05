@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
+import { getBrandModeClient } from '@/lib/brand';
 
 interface BotConfig {
   bot_name: string;
@@ -141,8 +142,7 @@ export function usePocketBot() {
   const botName = botConfig?.bot_name || 'Evrywher AI';
 
   // Evrywher users: if botConfig exists, treat as setup complete regardless of DB value
-  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
   const isSetupComplete = (isPocketChatMode && botConfig) ? true : (botConfig?.is_setup_complete ?? false);
 
   return {

@@ -43,7 +43,7 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
     <div className={`mt-1.5 ${isOwner ? 'ml-auto' : ''}`} style={{ maxWidth: '85%' }}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#EEF2FF] dark:bg-indigo-950/20 text-[11px] font-medium text-[#4F46E5] dark:text-[#A5B4FC] hover:bg-[#E0E7FF] transition-colors"
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/20 text-[11px] font-medium text-[#A5B4FC] hover:bg-[#E0E7FF] transition-colors"
       >
         <span>📚</span>
         Learn from this message
@@ -51,7 +51,7 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
       </button>
 
       {expanded && (
-        <div className="mt-1.5 bg-white dark:bg-gray-800 rounded-xl border border-[#E5E5E5] dark:border-gray-700 p-3 space-y-3 animate-slide-up">
+        <div className="mt-1.5 bg-slate-800 rounded-xl border border-slate-700 p-3 space-y-3 animate-slide-up">
           {/* Key words */}
           <div>
             <p className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1.5">🔤 Key Words</p>
@@ -59,14 +59,14 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
               {learning.key_words.map((w, i) => (
                 <div key={i} className="flex items-center gap-2 py-1">
                   <div className="flex-1 min-w-0">
-                    <span className="text-[14px] font-semibold text-[#0A0A0A] dark:text-white">{w.word}</span>
-                    {w.reading && <span className="text-[12px] text-[#6B7280] dark:text-gray-400 ml-1">({w.reading})</span>}
+                    <span className="text-[14px] font-semibold text-slate-50">{w.word}</span>
+                    {w.reading && <span className="text-[12px] text-slate-400 ml-1">({w.reading})</span>}
                     <span className="text-[12px] text-[#9CA3AF] ml-1.5">— {w.meaning}</span>
                   </div>
                   <button
                     onClick={() => speak(w.word, i)}
                     className={`shrink-0 h-7 w-7 rounded-full flex items-center justify-center transition-colors ${
-                      speakingIdx === i ? 'bg-[#4F46E5] text-white' : 'bg-[#F3F4F6] dark:bg-gray-700 text-[#9CA3AF]'
+                      speakingIdx === i ? 'bg-[#4F46E5] text-white' : 'bg-slate-700 text-[#9CA3AF]'
                     }`}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
@@ -80,7 +80,7 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
           {learning.grammar_note && (
             <div>
               <p className="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1">💡 Grammar Note</p>
-              <p className="text-[12px] text-[#374151] dark:text-gray-300 leading-relaxed">{learning.grammar_note}</p>
+              <p className="text-[12px] text-slate-300 leading-relaxed">{learning.grammar_note}</p>
             </div>
           )}
 
@@ -111,7 +111,7 @@ export default function LearnFromMessage({ learning, onSaveWords, isOwner }: Pro
             )}
             <button
               onClick={() => setExpanded(false)}
-              className="rounded-lg border border-[#E5E5E5] dark:border-gray-700 px-3 py-2 text-[12px] text-[#9CA3AF]"
+              className="rounded-lg border border-slate-700 px-3 py-2 text-[12px] text-[#9CA3AF]"
             >
               Dismiss
             </button>

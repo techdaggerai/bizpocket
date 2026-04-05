@@ -95,7 +95,7 @@ export default function BusinessCardMessage({
     <div className={`flex ${self ? 'justify-end' : 'justify-start'}`}>
       <div className="w-[85%] max-w-[340px] space-y-1">
         {!self && raw.sender_name && (
-          <p className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">{raw.sender_name}</p>
+          <p className="text-[10px] text-slate-300 ml-1">{raw.sender_name}</p>
         )}
 
         <div className={verifiedClass}>
@@ -113,7 +113,7 @@ export default function BusinessCardMessage({
               {/* Corridor header (backward compat) */}
               {corridors.length > 0 && countries.length === 0 && (
                 <div className="text-center">
-                  <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                  <span className="text-xs text-indigo-600 text-indigo-400">
                     {corridors.map((c: any) => `${c.flag_from} \u2194 ${c.flag_to}`).join(' \u00B7 ')}
                   </span>
                 </div>
@@ -147,7 +147,7 @@ export default function BusinessCardMessage({
               )}
 
               {/* 4. Trust box */}
-              <div className="bg-indigo-50/80 dark:bg-indigo-950/30 rounded-lg p-3 space-y-2">
+              <div className="bg-indigo-50/80 bg-indigo-950/30 rounded-lg p-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs">{'\u{1F6E1}\uFE0F'}</span>
                   <span className="text-xs text-[var(--pm-text-secondary)]">Trust:</span>
@@ -191,13 +191,13 @@ export default function BusinessCardMessage({
                 <div className="flex gap-2">
                   <button
                     onClick={handleRequestQuote}
-                    className="flex-1 h-9 rounded-[20px] text-xs font-semibold text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 active:scale-[0.97] transition-all duration-200"
+                    className="flex-1 h-9 rounded-[20px] text-xs font-semibold text-indigo-600 text-indigo-400 border-2 border-indigo-200 border-indigo-800 hover:bg-indigo-50 hover:bg-indigo-950/30 active:scale-[0.97] transition-all duration-200"
                   >
                     Request Quote
                   </button>
                   <button
                     onClick={handleSendInvoice}
-                    className="flex-1 h-9 rounded-[20px] text-xs font-semibold text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 active:scale-[0.97] transition-all duration-200"
+                    className="flex-1 h-9 rounded-[20px] text-xs font-semibold text-indigo-600 text-indigo-400 border-2 border-indigo-200 border-indigo-800 hover:bg-indigo-50 hover:bg-indigo-950/30 active:scale-[0.97] transition-all duration-200"
                   >
                     Send Invoice
                   </button>
@@ -211,7 +211,7 @@ export default function BusinessCardMessage({
                     value={quoteText}
                     onChange={(e) => setQuoteText(e.target.value)}
                     placeholder="What do you need a quote for?"
-                    className="w-full text-xs border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full text-xs border border-slate-700 rounded-lg px-3 py-2 bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     autoFocus
                   />
                   <button
@@ -239,7 +239,7 @@ export default function BusinessCardMessage({
         </div>
 
         {/* Timestamp */}
-        <p className={`text-[11px] text-gray-400 ${self ? 'text-right' : 'text-left'}`}>
+        <p className={`text-[11px] text-slate-400 ${self ? 'text-right' : 'text-left'}`}>
           {timestamp}{self && ' \u2713\u2713'}
         </p>
       </div>

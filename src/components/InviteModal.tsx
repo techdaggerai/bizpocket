@@ -74,11 +74,11 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
+      <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-4 border-b border-[#E5E5E5] flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#0A0A0A]">Invite to Evrywher</h2>
-          <button onClick={onClose} className="text-[#A3A3A3] hover:text-[#0A0A0A] transition-colors">
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+          <h2 className="text-base font-bold text-slate-50">Invite to Evrywher</h2>
+          <button onClick={onClose} className="text-[#A3A3A3] hover:text-slate-50 transition-colors">
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -90,7 +90,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
           <div>
             <p className="text-xs font-medium text-[#6B7280] mb-2">Share invite link</p>
             <div className="flex gap-2">
-              <div className="flex-1 rounded-[10px] border border-[#E5E5E5] bg-[#F9FAFB] px-3 py-2.5 text-xs text-[#6B7280] truncate">
+              <div className="flex-1 rounded-[10px] border border-slate-700 bg-slate-800 px-3 py-2.5 text-xs text-[#6B7280] truncate">
                 {inviteLink}
               </div>
               <button
@@ -120,21 +120,21 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Name"
-              className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
-              className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone (optional)"
-              className="w-full border border-[#E5E5E5] rounded-[10px] px-3.5 py-2.5 text-sm text-[#0A0A0A] placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+              className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-sm text-slate-50 placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
           <div className="flex gap-2">
             <button
               onClick={handleShare}
-              className="flex-1 flex items-center justify-center gap-2 rounded-[10px] border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 rounded-[10px] border border-slate-700 py-2.5 text-xs font-medium text-[#6B7280] hover:bg-slate-800 transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />

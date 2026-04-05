@@ -69,7 +69,7 @@ export default function CorridorBadge({
   if (variant === 'card') {
     return (
       <div
-        className="inline-flex items-center gap-2.5 rounded-full border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/50 px-3.5 py-2"
+        className="inline-flex items-center gap-2.5 rounded-full border border-dashed border-slate-700 bg-slate-800/50 px-3.5 py-2"
         aria-label={resolvedLabel || `${resolvedFromFlag} to ${resolvedToFlag} corridor`}
       >
         <span className="text-lg">{resolvedFromFlag}</span>
@@ -79,7 +79,7 @@ export default function CorridorBadge({
           <span className="text-xs font-medium text-[var(--pm-text-secondary)] ml-0.5">{resolvedLabel}</span>
         )}
         {type && (
-          <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-semibold text-indigo-600 text-indigo-400 bg-indigo-50 bg-indigo-950/40 px-2 py-0.5 rounded-full">
             {TYPE_LABEL[type]}
           </span>
         )}
@@ -112,7 +112,7 @@ export default function CorridorBadge({
         </span>
       )}
       {type && (
-        <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 rounded-full">
+        <span className="text-[11px] font-semibold text-indigo-600 text-indigo-400 bg-indigo-50 bg-indigo-950/40 px-2.5 py-1 rounded-full">
           {TYPE_LABEL[type]}
         </span>
       )}

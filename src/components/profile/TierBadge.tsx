@@ -15,9 +15,9 @@ interface TierBadgeProps {
 }
 
 const TIER_DATA: Record<Tier, { emoji: string; label: string; color: string; textColor: string; maxScore: number }> = {
-  starter: { emoji: '\u{1F331}', label: 'New Business', color: 'amber', textColor: 'text-amber-600 dark:text-amber-400', maxScore: 40 },
-  growing: { emoji: '\u{1F33F}', label: 'Growing Business', color: 'blue', textColor: 'text-blue-600 dark:text-blue-400', maxScore: 75 },
-  established: { emoji: '\u{1F333}', label: 'Established Business', color: 'emerald', textColor: 'text-emerald-600 dark:text-emerald-400', maxScore: 100 },
+  starter: { emoji: '\u{1F331}', label: 'New Business', color: 'amber', textColor: 'text-amber-600 text-amber-400', maxScore: 40 },
+  growing: { emoji: '\u{1F33F}', label: 'Growing Business', color: 'blue', textColor: 'text-blue-600 text-blue-400', maxScore: 75 },
+  established: { emoji: '\u{1F333}', label: 'Established Business', color: 'emerald', textColor: 'text-emerald-600 text-emerald-400', maxScore: 100 },
 };
 
 const BADGE_ICON: Record<BadgeTier, string> = {
@@ -147,7 +147,7 @@ function TrustFill({ score, maxScore, tier, animated }: { score: number; maxScor
   };
 
   return (
-    <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+    <div className="h-2 rounded-full bg-slate-700 overflow-hidden">
       <div
         className={`h-full rounded-full bg-gradient-to-r ${gradients[tier]} transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]`}
         style={{ width: `${width}%` }}

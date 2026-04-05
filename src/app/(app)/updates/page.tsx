@@ -124,7 +124,7 @@ export default function UpdateCenterPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-1)]">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)] transition-colors">
             <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -178,7 +178,7 @@ export default function UpdateCenterPage() {
                       className={`rounded-2xl border p-4 transition-all ${
                         isUnread
                           ? 'border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] shadow-sm'
-                          : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900'
+                          : 'border-slate-700 bg-slate-800'
                       }`}
                     >
                       {/* Type badge + time */}

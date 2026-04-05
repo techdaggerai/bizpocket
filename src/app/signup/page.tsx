@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
+import { getBrandMode } from '@/lib/brand';
 
 export default function SignupPage() {
   return (
@@ -21,8 +22,7 @@ function SignupInner() {
   const plan = searchParams.get('plan') || 'free';
   const mode = searchParams.get('mode');
   const refOrgId = searchParams.get('ref');
-  const isPocketChat = mode === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const isPocketChat = mode === 'pocketchat' || getBrandMode() === 'evrywher';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');

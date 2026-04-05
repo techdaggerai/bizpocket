@@ -23,7 +23,7 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
   return (
     <>
       <div
-        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-300 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-800 transition-opacity duration-300 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
         style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
       >
         <div className="animate-pulse">
@@ -32,7 +32,7 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
         <div className="mt-4">
           <EvryWherMark size="lg" />
         </div>
-        <p className="mt-2 text-sm font-medium text-[#6B7280]">You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.</p>
+        <p className="mt-2 text-sm font-medium text-slate-400">You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.</p>
       </div>
       <div className="invisible">{children}</div>
     </>

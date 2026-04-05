@@ -206,10 +206,10 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
       {/* Sheet */}
-      <div className="relative bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col shadow-2xl">
+      <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col shadow-2xl">
 
         {/* ── Header ── */}
-        <div className="px-4 py-4 border-b border-[#E5E5E5] flex items-center gap-3">
+        <div className="px-4 py-4 border-b border-slate-700 flex items-center gap-3">
           {step === 'name' && (
             <button
               onClick={() => setStep('select')}
@@ -222,7 +222,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
             </button>
           )}
           <div className="flex-1">
-            <h2 className="text-[15px] font-bold text-[#0A0A0A]">
+            <h2 className="text-[15px] font-bold text-slate-50">
               {step === 'select' ? 'New Group' : 'Name your group'}
             </h2>
             <p className="text-[11px] text-[#9CA3AF]">
@@ -233,7 +233,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
           </div>
           <button
             onClick={handleClose}
-            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-[#F3F4F6] text-[#9CA3AF] hover:text-[#0A0A0A] transition-colors"
+            className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-slate-700 text-[#9CA3AF] hover:text-slate-50 transition-colors"
             aria-label="Close"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -244,15 +244,15 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
         {step === 'select' && (
           <>
             {/* Search */}
-            <div className="px-4 py-3 border-b border-[#F3F4F6]">
-              <div className="flex items-center gap-2 rounded-xl bg-[#F3F4F6] px-3 py-2">
+            <div className="px-4 py-3 border-b border-[#334155]">
+              <div className="flex items-center gap-2 rounded-xl bg-slate-700 px-3 py-2">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search contacts…"
-                  className="flex-1 bg-transparent text-[14px] text-[#0A0A0A] placeholder-[#9CA3AF] focus:outline-none"
+                  className="flex-1 bg-transparent text-[14px] text-slate-50 placeholder-[#9CA3AF] focus:outline-none"
                   autoFocus
                 />
               </div>
@@ -260,7 +260,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
 
             {/* Selected chips */}
             {selected.length > 0 && (
-              <div className="px-4 py-2 flex flex-wrap gap-1.5 border-b border-[#F3F4F6]">
+              <div className="px-4 py-2 flex flex-wrap gap-1.5 border-b border-[#334155]">
                 {selected.map(c => (
                   <button
                     key={c.id}
@@ -287,7 +287,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                     <button
                       key={contact.id}
                       onClick={() => toggleSelect(contact)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] transition-colors ${isSelected ? 'bg-[#F5F3FF]' : ''}`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-800 transition-colors ${isSelected ? 'bg-[#F5F3FF]' : ''}`}
                     >
                       <div className="relative shrink-0">
                         <PocketAvatar name={contact.name} size={40} />
@@ -298,7 +298,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                         )}
                       </div>
                       <div className="flex-1 min-w-0 text-left">
-                        <p className={`text-[14px] truncate ${isSelected ? 'font-semibold text-[#4F46E5]' : 'font-medium text-[#0A0A0A]'}`}>
+                        <p className={`text-[14px] truncate ${isSelected ? 'font-semibold text-[#4F46E5]' : 'font-medium text-slate-50'}`}>
                           {contact.name}
                         </p>
                         {contact.company && (
@@ -308,7 +308,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                       <div className={`h-5 w-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-all ${
                         isSelected
                           ? 'border-[#4F46E5] bg-[#4F46E5]'
-                          : 'border-[#D1D5DB] bg-white'
+                          : 'border-[#475569] bg-slate-800'
                       }`}>
                         {isSelected && (
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
@@ -321,7 +321,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-[#E5E5E5]">
+            <div className="p-4 border-t border-slate-700">
               <button
                 onClick={goToName}
                 disabled={selected.length < 2}
@@ -354,7 +354,7 @@ export default function NewGroupModal({ isOpen, contacts, organizationId, onCrea
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
                 placeholder="e.g. Team Tokyo, Family, Work…"
-                className="w-full rounded-xl border border-[#E5E5E5] bg-[#F9FAFB] px-4 py-3 text-[15px] text-[#0A0A0A] placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-[15px] text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
                 maxLength={60}
                 autoFocus
                 onKeyDown={e => e.key === 'Enter' && !creating && handleCreate()}

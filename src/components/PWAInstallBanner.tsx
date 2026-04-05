@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { getBrandMode } from '@/lib/brand';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -34,10 +35,10 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-t-2xl p-5 pb-8 space-y-5 animate-slide-up">
+      <div className="relative w-full max-w-md bg-slate-800 rounded-t-2xl p-5 pb-8 space-y-5 animate-slide-up">
         <div className="flex items-center justify-between">
-          <h3 className="text-[15px] font-bold text-[#0A0A0A] dark:text-white">Add to Home Screen</h3>
-          <button onClick={onClose} className="p-1 text-[#9CA3AF] hover:text-[#374151] dark:hover:text-white">
+          <h3 className="text-[15px] font-bold text-slate-50">Add to Home Screen</h3>
+          <button onClick={onClose} className="p-1 text-[#9CA3AF] hover:text-slate-300 hover:text-white">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -46,8 +47,8 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
         <div className="flex items-start gap-3">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#4F46E5] text-white text-xs font-bold">1</div>
           <div>
-            <p className="text-sm font-medium text-[#0A0A0A] dark:text-white">Tap the Share button</p>
-            <p className="text-xs text-[#6B7280] dark:text-gray-400 mt-0.5">
+            <p className="text-sm font-medium text-slate-50">Tap the Share button</p>
+            <p className="text-xs text-slate-400 mt-0.5">
               In Safari, tap the{' '}
               <svg className="inline-block -mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
               {' '}icon at the bottom of the screen
@@ -59,10 +60,10 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
         <div className="flex items-start gap-3">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#4F46E5] text-white text-xs font-bold">2</div>
           <div>
-            <p className="text-sm font-medium text-[#0A0A0A] dark:text-white">Scroll down and tap &quot;Add to Home Screen&quot;</p>
-            <p className="text-xs text-[#6B7280] dark:text-gray-400 mt-0.5">
+            <p className="text-sm font-medium text-slate-50">Scroll down and tap &quot;Add to Home Screen&quot;</p>
+            <p className="text-xs text-slate-400 mt-0.5">
               Look for the{' '}
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#F3F4F6] dark:bg-gray-700 rounded text-[10px] font-medium">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-slate-700 rounded text-[10px] font-medium">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
                 Add to Home Screen
               </span>
@@ -75,8 +76,8 @@ function IOSInstructions({ onClose }: { onClose: () => void }) {
         <div className="flex items-start gap-3">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#4F46E5] text-white text-xs font-bold">3</div>
           <div>
-            <p className="text-sm font-medium text-[#0A0A0A] dark:text-white">Tap &quot;Add&quot; — done!</p>
-            <p className="text-xs text-[#6B7280] dark:text-gray-400 mt-0.5">The app icon will appear on your home screen</p>
+            <p className="text-sm font-medium text-slate-50">Tap &quot;Add&quot; — done!</p>
+            <p className="text-xs text-slate-400 mt-0.5">The app icon will appear on your home screen</p>
           </div>
         </div>
       </div>
@@ -89,12 +90,7 @@ export default function PWAInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
   const [showIOSSheet, setShowIOSSheet] = useState(false);
-  const [isPocketChat] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const host = window.location.hostname;
-    return host.includes('evrywher') || host.includes('evrywyre') ||
-      host.includes('pocketchat') || host.includes('evrywhere');
-  });
+  const [isPocketChat] = useState(() => getBrandMode() === 'evrywher');
 
   // Listen for Android install prompt
   useEffect(() => {
@@ -163,14 +159,14 @@ export default function PWAInstallBanner() {
             {isIOS ? (
               <button
                 onClick={() => { setShowIOSSheet(true); dismiss(); }}
-                className="shrink-0 rounded-lg bg-white px-3.5 py-2 text-[12px] font-bold text-[#4F46E5] hover:bg-white/90 transition-colors"
+                className="shrink-0 rounded-lg bg-slate-800 px-3.5 py-2 text-[12px] font-bold text-[#4F46E5] hover:bg-slate-800/90 transition-colors"
               >
                 Show Me How
               </button>
             ) : (
               <button
                 onClick={handleAndroidInstall}
-                className="shrink-0 rounded-lg bg-white px-3.5 py-2 text-[12px] font-bold text-[#4F46E5] hover:bg-white/90 transition-colors"
+                className="shrink-0 rounded-lg bg-slate-800 px-3.5 py-2 text-[12px] font-bold text-[#4F46E5] hover:bg-slate-800/90 transition-colors"
               >
                 Install
               </button>

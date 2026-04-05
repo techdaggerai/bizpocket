@@ -27,7 +27,7 @@ export function PocketMark({ variant = 'xl', className = '' }: { variant?: LogoS
 export function LogoWordmark({ className = '' }: { className?: string }) {
   return (
     <span className={`font-sans text-md font-bold ${className}`}>
-      <span className="text-[#0A0A0A]">Biz</span>
+      <span className="text-slate-50">Biz</span>
       <span className="text-[#4F46E5]">Pocket</span>
     </span>
   );

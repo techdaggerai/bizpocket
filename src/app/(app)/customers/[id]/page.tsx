@@ -136,7 +136,7 @@ export default function CustomerDetailPage() {
       <PageHeader title="Customer" backPath="/customers" />
 
       {/* Profile Card */}
-      <div className="rounded-card border border-[#E5E5E5] bg-white p-5">
+      <div className="rounded-card border border-slate-700 bg-slate-800 p-5">
         <div className="flex items-start gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#4F46E5] text-lg font-bold text-white">
             {initials}
@@ -178,14 +178,14 @@ export default function CustomerDetailPage() {
           </Link>
           <Link
             href={`/chat?contact=${customer.id}`}
-            className="flex-1 rounded-btn border border-[#E5E5E5] py-2 text-center text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)]"
+            className="flex-1 rounded-btn border border-slate-700 py-2 text-center text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)]"
           >
             Start Chat
           </Link>
           {customer.phone && (
             <a
               href={`tel:${customer.phone}`}
-              className="flex items-center justify-center rounded-btn border border-[#E5E5E5] px-3 py-2 text-[var(--text-3)] hover:bg-[var(--bg-2)]"
+              className="flex items-center justify-center rounded-btn border border-slate-700 px-3 py-2 text-[var(--text-3)] hover:bg-[var(--bg-2)]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
@@ -216,7 +216,7 @@ export default function CustomerDetailPage() {
       {tab === 'invoices' && (
         <div className="space-y-2">
           {invoices.length === 0 ? (
-            <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
+            <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No invoices for this customer yet.</p>
               <Link href={`/invoices/new?customer=${customer.id}`} className="mt-2 inline-block text-sm text-[#4F46E5]">Create first invoice</Link>
             </div>
@@ -225,7 +225,7 @@ export default function CustomerDetailPage() {
               <Link
                 key={inv.id}
                 href={`/invoices/${inv.id}`}
-                className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3 transition-colors hover:border-[#4F46E5]"
+                className="flex items-center justify-between rounded-card border border-slate-700 bg-slate-800 px-4 py-3 transition-colors hover:border-[#4F46E5]"
               >
                 <div>
                   <p className="text-sm font-medium text-[var(--text-1)]">{inv.invoice_number}</p>
@@ -246,12 +246,12 @@ export default function CustomerDetailPage() {
       {tab === 'payments' && (
         <div className="space-y-2">
           {payments.length === 0 ? (
-            <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
+            <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No payments recorded from this customer.</p>
             </div>
           ) : (
             payments.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3">
+              <div key={p.id} className="flex items-center justify-between rounded-card border border-slate-700 bg-slate-800 px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-[var(--text-1)]">{p.category}</p>
                   <p className="text-xs text-[var(--text-4)]">{formatDate(p.date)}{p.description ? ` · ${p.description}` : ''}</p>
@@ -266,7 +266,7 @@ export default function CustomerDetailPage() {
       {tab === 'chat' && (
         <div className="space-y-2">
           {conversations.length === 0 ? (
-            <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
+            <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No chat history with this customer.</p>
               <Link href={`/chat?contact=${customer.id}`} className="mt-2 inline-block text-sm text-[#4F46E5]">Start a conversation</Link>
             </div>
@@ -275,7 +275,7 @@ export default function CustomerDetailPage() {
               <Link
                 key={c.id}
                 href={`/chat?conversation=${c.id}`}
-                className="flex items-center justify-between rounded-card border border-[#E5E5E5] bg-white px-4 py-3 transition-colors hover:border-[#4F46E5]"
+                className="flex items-center justify-between rounded-card border border-slate-700 bg-slate-800 px-4 py-3 transition-colors hover:border-[#4F46E5]"
               >
                 <div>
                   <p className="text-sm font-medium text-[var(--text-1)]">{c.title || 'Conversation'}</p>
@@ -293,7 +293,7 @@ export default function CustomerDetailPage() {
       )}
 
       {tab === 'notes' && (
-        <div className="rounded-card border border-[#E5E5E5] bg-white p-4">
+        <div className="rounded-card border border-slate-700 bg-slate-800 p-4">
           <h3 className="mb-3 text-sm font-medium text-[var(--text-1)]">Customer Notes</h3>
           <NoteEditor
             note={customer.notes}
@@ -314,7 +314,7 @@ export default function CustomerDetailPage() {
       {tab === 'documents' && (
         <div className="space-y-2">
           {documents.length === 0 ? (
-            <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
+            <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
               <p className="text-sm text-[var(--text-3)]">No documents yet.</p>
               <Link href="/documents" className="mt-2 inline-block text-sm text-[#4F46E5]">Go to Vault</Link>
             </div>
@@ -326,7 +326,7 @@ export default function CustomerDetailPage() {
                   href={doc.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-card border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#4F46E5]"
+                  className="rounded-card border border-slate-700 bg-slate-800 p-3 transition-colors hover:border-[#4F46E5]"
                 >
                   <div className="mb-1.5 flex h-16 items-center justify-center rounded-lg bg-[var(--bg-2)]">
                     {doc.file_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (

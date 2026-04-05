@@ -104,7 +104,7 @@ export default function AdminUpdatesPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-1)]">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
         <button onClick={() => router.back()} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)]">
           <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -115,7 +115,7 @@ export default function AdminUpdatesPage() {
 
       <div className="mx-auto max-w-lg px-4 pb-24 pt-4">
         {/* Publish form */}
-        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
           <h2 className="text-sm font-bold text-[var(--text-1)] mb-3">New Update</h2>
 
           {/* Type */}
@@ -141,7 +141,7 @@ export default function AdminUpdatesPage() {
             placeholder="Update title"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] mb-2"
+            className="w-full rounded-xl border border-slate-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] mb-2"
           />
 
           {/* Body */}
@@ -150,7 +150,7 @@ export default function AdminUpdatesPage() {
             value={body}
             onChange={e => setBody(e.target.value)}
             rows={3}
-            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] resize-none mb-2"
+            className="w-full rounded-xl border border-slate-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] resize-none mb-2"
           />
 
           {/* Version + Deep Link */}
@@ -160,14 +160,14 @@ export default function AdminUpdatesPage() {
               placeholder="Version (e.g. 2.1.0)"
               value={version}
               onChange={e => setVersion(e.target.value)}
-              className="w-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-4)]"
+              className="w-1/2 rounded-xl border border-slate-700 bg-[var(--bg-1)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-4)]"
             />
             <input
               type="text"
               placeholder="Deep link (e.g. /detect)"
               value={deepLink}
               onChange={e => setDeepLink(e.target.value)}
-              className="w-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-4)]"
+              className="w-1/2 rounded-xl border border-slate-700 bg-[var(--bg-1)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-4)]"
             />
           </div>
 
@@ -196,8 +196,8 @@ export default function AdminUpdatesPage() {
                 key={u.id}
                 className={`flex items-start justify-between rounded-xl border p-3 ${
                   u.is_active
-                    ? 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900'
-                    : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 opacity-60'
+                    ? 'border-slate-700 bg-slate-800'
+                    : 'border-slate-700 bg-slate-800/50 opacity-60'
                 }`}
               >
                 <div className="min-w-0 flex-1">

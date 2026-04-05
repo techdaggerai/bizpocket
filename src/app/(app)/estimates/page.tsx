@@ -12,9 +12,9 @@ import type { Customer } from '@/types/database';
 interface LineItem { description: string; quantity: number; unit_price: number; tax_rate: number; }
 
 const statusColors: Record<string, string> = {
-  draft: 'bg-[#F5F5F5] text-[#666]', sent: 'bg-[#EEF2FF] text-[#4F46E5]',
-  approved: 'bg-[#F0FDF4] text-[#16A34A]', declined: 'bg-[#FEF2F2] text-[#DC2626]',
-  converted: 'bg-[#F5F3FF] text-[#7C3AED]',
+  draft: 'bg-slate-700 text-slate-400', sent: 'bg-[#4F46E5]/10 text-[#4F46E5]',
+  approved: 'bg-[#16A34A]/10 text-[#16A34A]', declined: 'bg-[#DC2626]/10 text-[#DC2626]',
+  converted: 'bg-[#7C3AED]/10 text-[#7C3AED]',
 };
 
 export default function EstimatesPage() {
@@ -100,18 +100,18 @@ export default function EstimatesPage() {
     toast('Deleted', 'success'); fetchEstimates();
   }
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
 
   return (
     <div className="space-y-4">
       <PageHeader title="Estimates" backPath="/dashboard" />
       <div className="flex items-center justify-between px-4">
-        <div><h1 className="text-xl font-bold text-[#0A0A0A]">Estimates / Quotations</h1><p className="text-xs text-[#999]">Create quotes, send for approval, convert to invoices</p></div>
+        <div><h1 className="text-xl font-bold text-slate-50">Estimates / Quotations</h1><p className="text-xs text-[#999]">Create quotes, send for approval, convert to invoices</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ New Estimate'}</button>
       </div>
 
       {showForm && (
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 space-y-3">
           <h3 className="text-sm font-semibold">New Estimate</h3>
           <select value={selectedCustomerId} onChange={e => { setSelectedCustomerId(e.target.value); const c = customers.find(c => c.id === e.target.value); if (c) setCustomerName(c.name); }} className={inputClass}>
             <option value="">Select customer...</option>
@@ -133,7 +133,7 @@ export default function EstimatesPage() {
               <div className="flex gap-1 ml-0">
                 {[{ label: '10%', value: 0.10 }, { label: '8%', value: 0.08 }, { label: '0%', value: 0 }].map(r => (
                   <button key={r.value} type="button" onClick={() => { const n = [...items]; n[i].tax_rate = r.value; setItems(n); }}
-                    className={`px-2 py-0.5 text-[10px] rounded border ${item.tax_rate === r.value ? 'border-[#4F46E5] text-[#4F46E5] bg-[#4F46E5]/5' : 'border-[#E5E5E5] text-[#999]'}`}>
+                    className={`px-2 py-0.5 text-[10px] rounded border ${item.tax_rate === r.value ? 'border-[#4F46E5] text-[#4F46E5] bg-[#4F46E5]/5' : 'border-slate-700 text-[#999]'}`}>
                     Tax {r.label}
                   </button>
                 ))}
@@ -143,7 +143,7 @@ export default function EstimatesPage() {
           <button onClick={() => setItems([...items, { description: '', quantity: 1, unit_price: 0, tax_rate: 0.10 }])} className="text-xs text-[#4F46E5] font-medium">+ Add item</button>
           <div className="flex gap-2">
             {['none', 'percentage', 'fixed'].map(d => (
-              <button key={d} onClick={() => setDiscountType(d)} className={`flex-1 rounded-lg border py-1.5 text-[10px] font-medium ${discountType === d ? 'border-[#4F46E5] text-[#4F46E5]' : 'border-[#E5E5E5] text-[#999]'}`}>
+              <button key={d} onClick={() => setDiscountType(d)} className={`flex-1 rounded-lg border py-1.5 text-[10px] font-medium ${discountType === d ? 'border-[#4F46E5] text-[#4F46E5]' : 'border-slate-700 text-[#999]'}`}>
                 {d === 'none' ? 'No discount' : d === 'percentage' ? '% Off' : '¥ Off'}
               </button>
             ))}
@@ -157,9 +157,9 @@ export default function EstimatesPage() {
       )}
 
       {loading ? <div className="flex justify-center py-12"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>
-      : estimates.length === 0 ? <div className="rounded-xl border border-dashed border-[#E5E5E5] p-8 text-center"><p className="text-sm text-[#999]">No estimates yet</p></div>
+      : estimates.length === 0 ? <div className="rounded-xl border border-dashed border-slate-700 p-8 text-center"><p className="text-sm text-[#999]">No estimates yet</p></div>
       : <div className="space-y-2">{estimates.map(est => (
-          <div key={est.id} className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div key={est.id} className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <p className="text-sm font-medium">{est.customer_name}</p>
@@ -176,8 +176,8 @@ export default function EstimatesPage() {
             <div className="flex gap-1.5 mt-3">
               {est.status === 'draft' && <button onClick={() => sendEstimate(est)} className="flex-1 rounded-md bg-[#4F46E5] py-1.5 text-[10px] font-medium text-white">Send</button>}
               {['sent', 'approved'].includes(est.status) && !est.converted_invoice_id && <button onClick={() => convertToInvoice(est)} className="flex-1 rounded-md bg-[#16A34A] py-1.5 text-[10px] font-medium text-white">&rarr; Invoice</button>}
-              <button onClick={() => duplicateEstimate(est)} className="rounded-md border border-[#E5E5E5] px-3 py-1.5 text-[10px] text-[#666]">Duplicate</button>
-              <button onClick={() => deleteEstimate(est.id)} className="rounded-md border border-[#E5E5E5] px-3 py-1.5 text-[10px] text-[#DC2626]">Delete</button>
+              <button onClick={() => duplicateEstimate(est)} className="rounded-md border border-slate-700 px-3 py-1.5 text-[10px] text-[#666]">Duplicate</button>
+              <button onClick={() => deleteEstimate(est.id)} className="rounded-md border border-slate-700 px-3 py-1.5 text-[10px] text-[#DC2626]">Delete</button>
             </div>
           </div>
         ))}</div>}

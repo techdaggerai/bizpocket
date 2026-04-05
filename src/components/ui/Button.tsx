@@ -30,10 +30,10 @@ const iconSize: Record<Size, number> = {
 };
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600',
-  secondary: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-950 dark:text-indigo-300 dark:hover:bg-indigo-900',
-  outline: 'border-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400',
-  ghost: 'text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950',
+  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 bg-indigo-500 hover:bg-indigo-600',
+  secondary: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100 bg-indigo-950 text-indigo-300 hover:bg-indigo-900',
+  outline: 'border-2 border-indigo-600 text-indigo-600 border-indigo-400 text-indigo-400',
+  ghost: 'text-indigo-600 hover:bg-indigo-50 text-indigo-400 hover:bg-indigo-950',
   tier: '',
 };
 
@@ -103,7 +103,7 @@ export function InviteButton({ onClick, children }: { onClick?: () => void; chil
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center justify-center rounded-[20px] border-2 border-amber-500 text-amber-500 text-[13px] font-medium py-[7px] px-[14px] transition-all duration-200 active:scale-[0.97] hover:bg-amber-50 dark:hover:bg-amber-950"
+      className="inline-flex items-center justify-center rounded-[20px] border-2 border-amber-500 text-amber-500 text-[13px] font-medium py-[7px] px-[14px] transition-all duration-200 active:scale-[0.97] hover:bg-amber-50 hover:bg-amber-950"
     >
       {children}
     </button>
@@ -114,7 +114,7 @@ export function NewChatButton({ onClick, children }: { onClick?: () => void; chi
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center justify-center rounded-[20px] border-2 border-indigo-600 text-indigo-600 text-[13px] font-medium py-[7px] px-[14px] transition-all duration-200 active:scale-[0.97] hover:bg-indigo-50 dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-950"
+      className="inline-flex items-center justify-center rounded-[20px] border-2 border-indigo-600 text-indigo-600 text-[13px] font-medium py-[7px] px-[14px] transition-all duration-200 active:scale-[0.97] hover:bg-indigo-50 border-indigo-400 text-indigo-400 hover:bg-indigo-950"
     >
       {children}
     </button>

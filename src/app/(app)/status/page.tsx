@@ -56,7 +56,7 @@ function StatusRing({ count, viewed, size = 52 }: { count: number; viewed: boole
   const circumference = 2 * Math.PI * r;
   const gap = count > 1 ? 3 : 0;
   const segmentLength = (circumference - gap * count) / count;
-  const color = viewed ? '#D1D5DB' : '#4F46E5';
+  const color = viewed ? '#475569' : '#4F46E5';
 
   return (
     <svg width={size} height={size} style={{ position: 'absolute', top: 0, left: 0 }}>
@@ -139,9 +139,9 @@ function StatusViewer({
       {/* Progress bars */}
       <div className="flex gap-1 p-3 pt-safe">
         {statuses.map((_, i) => (
-          <div key={i} className="h-0.5 flex-1 rounded-full bg-white/30 overflow-hidden">
+          <div key={i} className="h-0.5 flex-1 rounded-full bg-slate-800/30 overflow-hidden">
             <div
-              className="h-full rounded-full bg-white transition-none"
+              className="h-full rounded-full bg-slate-800 transition-none"
               style={{ width: i < idx ? '100%' : i === idx ? `${progress}%` : '0%' }}
             />
           </div>
@@ -271,11 +271,11 @@ function ComposeModal({
   const name = profile.full_name || profile.name || 'Me';
 
   return (
-    <div className="fixed inset-0 z-[90] flex flex-col bg-white">
+    <div className="fixed inset-0 z-[90] flex flex-col bg-slate-800">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0F0F0]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
         <button onClick={onClose} className="text-[#4F46E5] font-medium text-[14px]">Cancel</button>
-        <p className="text-[15px] font-bold text-[#0A0A0A]">New Status</p>
+        <p className="text-[15px] font-bold text-slate-50">New Status</p>
         <button
           onClick={handlePublish}
           disabled={publishing || (type === 'text' ? !content.trim() : !imageUrl)}
@@ -286,7 +286,7 @@ function ComposeModal({
       </div>
 
       {/* Type selector */}
-      <div className="flex border-b border-[#F0F0F0]">
+      <div className="flex border-b border-[var(--border)]">
         {(['text', 'image'] as const).map(t => (
           <button
             key={t}
@@ -342,7 +342,7 @@ function ComposeModal({
       </div>
 
       {/* Controls */}
-      <div className="border-t border-[#F0F0F0] p-4 space-y-3">
+      <div className="border-t border-[var(--border)] p-4 space-y-3">
         {/* Background colors (text only) */}
         {type === 'text' && (
           <div>
@@ -367,7 +367,7 @@ function ComposeModal({
             onChange={e => setContent(e.target.value)}
             placeholder="Add a caption (optional)"
             maxLength={100}
-            className="w-full rounded-xl border border-[#E5E5E5] bg-[#F9FAFB] px-3 py-2.5 text-[14px] text-[#0A0A0A] placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
+            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3 py-2.5 text-[14px] text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
           />
         )}
         {/* Change image button */}
@@ -462,7 +462,7 @@ export default function StatusPage() {
           </div>
         </div>
       ) : (
-        <div className="divide-y divide-[#F5F5F5]">
+        <div className="divide-y divide-slate-700">
 
           {/* My Status */}
           <div className="px-4 py-2">
@@ -494,7 +494,7 @@ export default function StatusPage() {
                 </div>
               </button>
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#0A0A0A] dark:text-white">{myName}</p>
+                <p className="text-[14px] font-semibold text-slate-50">{myName}</p>
                 <p className="text-[12px] text-[#9CA3AF]">
                   {hasMyStatus ? `${myStatuses.length} status${myStatuses.length !== 1 ? 'es' : ''} · ${timeLeft(myStatuses[0].expires_at)}` : 'Tap to add status'}
                 </p>
@@ -521,7 +521,7 @@ export default function StatusPage() {
                     <button
                       key={latest.user_id}
                       onClick={() => setViewer({ statuses: group.statuses, index: 0 })}
-                      className="w-full flex items-center gap-3 py-2 hover:bg-[#F9FAFB] dark:hover:bg-gray-800 rounded-xl px-2 transition-colors text-left"
+                      className="w-full flex items-center gap-3 py-2 hover:bg-slate-800 rounded-xl px-2 transition-colors text-left"
                     >
                       <div className="relative h-[52px] w-[52px] shrink-0">
                         <StatusRing count={group.statuses.length} viewed={viewed} size={52} />
@@ -535,7 +535,7 @@ export default function StatusPage() {
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[14px] truncate ${viewed ? 'font-medium text-[#374151] dark:text-gray-300' : 'font-bold text-[#0A0A0A] dark:text-white'}`}>
+                        <p className={`text-[14px] truncate ${viewed ? 'font-medium text-[#374151]' : 'font-bold text-slate-50'}`}>
                           {group.name}
                         </p>
                         <p className="text-[12px] text-[#9CA3AF] truncate">
@@ -560,8 +560,8 @@ export default function StatusPage() {
               <div className="h-16 w-16 rounded-full bg-[#EEF2FF] flex items-center justify-center">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
               </div>
-              <p className="text-[15px] font-semibold text-[#0A0A0A] dark:text-white">No updates yet</p>
-              <p className="text-[13px] text-[#9CA3AF] dark:text-gray-400 leading-relaxed">
+              <p className="text-[15px] font-semibold text-slate-50">No updates yet</p>
+              <p className="text-[13px] text-[#9CA3AF] leading-relaxed">
                 When your contacts post statuses, you&apos;ll see them here. Post your own to get started.
               </p>
               <button

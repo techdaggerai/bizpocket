@@ -62,7 +62,7 @@ export default function GrowthChecklist({ nextActions, nextMilestone, completedA
       {/* Checklist */}
       {nextActions.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)] dark:text-gray-400">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Grow Your Trust
           </p>
           {nextActions.map((a, i) => {
@@ -74,15 +74,15 @@ export default function GrowthChecklist({ nextActions, nextMilestone, completedA
                 key={i}
                 onClick={() => route && router.push(route)}
                 disabled={isCompleted || !route}
-                className="flex items-center gap-3 w-full text-left rounded-xl px-3.5 py-3 bg-[#F9FAFB] dark:bg-gray-800 hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors disabled:opacity-70 disabled:cursor-default border border-transparent hover:border-[#E5E5E5] dark:hover:border-gray-600"
+                className="flex items-center gap-3 w-full text-left rounded-xl px-3.5 py-3 bg-slate-800 hover:bg-slate-700 transition-colors disabled:opacity-70 disabled:cursor-default border border-transparent hover:border-slate-700 hover:border-slate-700"
               >
                 <span className="text-base flex-shrink-0">
                   {isCompleted ? '\u2705' : a.icon}
                 </span>
-                <span className={`flex-1 text-sm ${isCompleted ? 'line-through text-[var(--text-3)] dark:text-gray-500' : 'text-[var(--text-1)] dark:text-gray-200'}`}>
+                <span className={`flex-1 text-sm ${isCompleted ? 'line-through text-slate-300' : 'text-slate-200'}`}>
                   {a.action}
                 </span>
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isCompleted ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300' : 'bg-[#4F46E5]/10 text-[#4F46E5] dark:bg-indigo-950/40 dark:text-indigo-300'}`}>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isCompleted ? 'bg-green-100 text-green-700 bg-green-950/40 text-green-300' : 'bg-[#4F46E5]/10 text-[#4F46E5] bg-indigo-950/40 text-indigo-300'}`}>
                   +{a.points}
                 </span>
               </button>
@@ -93,22 +93,22 @@ export default function GrowthChecklist({ nextActions, nextMilestone, completedA
 
       {/* Next Milestone */}
       {nextMilestone && (
-        <div className="bg-gradient-to-r from-[#EEF2FF] to-[#F0FDF4] dark:from-indigo-950/30 dark:to-emerald-950/30 rounded-xl border border-[#C7D2FE] dark:border-indigo-800 p-4 space-y-3">
+        <div className="bg-gradient-to-r from-[#EEF2FF] to-[#F0FDF4] from-indigo-950/30 to-emerald-950/30 rounded-xl border border-indigo-800 p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)] dark:text-gray-400">Next Milestone</p>
-            <span className="text-sm font-semibold text-[var(--text-1)] dark:text-white">{nextMilestone.nextTier}</span>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Next Milestone</p>
+            <span className="text-sm font-semibold text-white">{nextMilestone.nextTier}</span>
           </div>
-          <p className="text-xs text-[var(--text-2)] dark:text-gray-300">{nextMilestone.requirement}</p>
+          <p className="text-xs text-slate-400">{nextMilestone.requirement}</p>
           <div className="space-y-1">
-            <div className="h-2 rounded-full bg-white/60 dark:bg-gray-800 overflow-hidden">
+            <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
               <div
                 className="h-full rounded-full bg-[#4F46E5] transition-all duration-700 ease-out"
                 style={{ width: `${milestoneProgress}%` }}
               />
             </div>
             <div className="flex justify-between">
-              <span className="text-[10px] text-[var(--text-3)] dark:text-gray-500">{nextMilestone.progress}</span>
-              <span className="text-[10px] text-[var(--text-3)] dark:text-gray-500">{Math.round(milestoneProgress)}%</span>
+              <span className="text-[10px] text-slate-300">{nextMilestone.progress}</span>
+              <span className="text-[10px] text-slate-300">{Math.round(milestoneProgress)}%</span>
             </div>
           </div>
         </div>

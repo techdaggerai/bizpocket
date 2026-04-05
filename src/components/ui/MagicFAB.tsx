@@ -56,7 +56,7 @@ export default function MagicFAB({
       {/* Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/20 dark:bg-black/40 transition-opacity duration-200"
+          className="fixed inset-0 z-50 bg-black/20 bg-black/40 transition-opacity duration-200"
           onClick={close}
           aria-hidden="true"
         />
@@ -79,7 +79,7 @@ export default function MagicFAB({
                 'animate-[fabPetalExpand_350ms_var(--ease-intent)_both]',
                 isInvoiceStarter
                   ? 'bg-amber-500 text-white ring-2 ring-amber-300 animate-[fabPetalExpand_350ms_var(--ease-intent)_both,fabGlow_3s_ease-in-out_infinite]'
-                  : 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400',
+                  : 'bg-slate-800 text-indigo-600 text-indigo-400',
               ].join(' ')}
               style={{
                 ...petalPosition(p.angle),

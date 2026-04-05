@@ -216,8 +216,8 @@ export default function DashboardPage() {
             <h1 className="text-2xl text-[var(--pm-text-primary)]" style={{ fontFamily: 'var(--font-display), sans-serif', fontWeight: 600 }}>
               {greeting}{firstName ? `, ${firstName}` : ''} {emoji}
             </h1>
-            {showJa && <p className="text-sm text-[var(--pm-text-tertiary)] mt-0.5">{jaGreeting}</p>}
-            <p className="text-sm text-[var(--pm-text-tertiary)] mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            {showJa && <p className="text-sm text-slate-400 mt-0.5">{jaGreeting}</p>}
+            <p className="text-sm text-slate-400 mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
         );
       })()}
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         const pct = Math.min(100, (trustScore / maxScore) * 100);
         const energyLevel = actionsToday < 3 ? 'low' : actionsToday < 7 ? 'medium' : 'high';
         const energyLabel = energyLevel === 'low' ? 'Take it easy' : energyLevel === 'medium' ? 'Building momentum' : 'On fire! \u26A1';
-        const energyColor = energyLevel === 'low' ? 'bg-gray-300' : energyLevel === 'medium' ? 'bg-amber-500' : 'bg-emerald-500';
+        const energyColor = energyLevel === 'low' ? 'bg-slate-600' : energyLevel === 'medium' ? 'bg-amber-500' : 'bg-emerald-500';
         const energyPct = Math.min(100, (actionsToday / 10) * 100);
         const corridors = globalProfile.operating_corridors || [];
         const nextTierLabel = tier === 'starter' ? '\u{1F33F} Growing' : tier === 'growing' ? '\u{1F333} Established' : null;
@@ -249,7 +249,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-4">
                 <div className="relative" style={{ width: 56, height: 56 }}>
                   <svg width="56" height="56">
-                    <circle cx="28" cy="28" r="24" fill="none" stroke="currentColor" strokeWidth="3" className="text-gray-200 dark:text-gray-700" />
+                    <circle cx="28" cy="28" r="24" fill="none" stroke="currentColor" strokeWidth="3" className="text-slate-700" />
                     <circle cx="28" cy="28" r="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
                       strokeDasharray={2 * Math.PI * 24} strokeDashoffset={2 * Math.PI * 24 * (1 - pct / 100)}
                       className={tier === 'starter' ? 'text-amber-500' : tier === 'growing' ? 'text-blue-500' : 'text-emerald-500'}
@@ -273,7 +273,7 @@ export default function DashboardPage() {
                   <span className="text-[11px] text-[var(--pm-text-secondary)]">{energyLabel}</span>
                   <span className="text-[10px] text-[var(--pm-text-tertiary)]">{actionsToday} action{actionsToday !== 1 ? 's' : ''} today</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
                   <div className={`h-full rounded-full ${energyColor} transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]`} style={{ width: `${energyPct}%` }} />
                 </div>
               </div>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
               )}
 
               {/* Quick action chips */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {quickActions.map((a, i) => (
                   <Link key={i} href={a.href} className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[var(--pm-surface-2)] text-xs font-medium text-[var(--pm-text-secondary)] hover:bg-[var(--pm-surface-3)] transition-colors no-underline ${i === 0 && tier === 'starter' ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
                     <span>{a.emoji}</span><span>{a.label}</span>
@@ -366,12 +366,12 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <p className="text-[13px] font-semibold text-[#4338ca]">Your public order page</p>
-            <p className="text-sm text-[#374151] font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
-            <p className="text-xs text-[#6b7280] mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
+            <p className="text-sm text-slate-300 font-mono mt-1">bizpocket.io/order/{(organization as Record<string, unknown>).slug || organization.id}</p>
+            <p className="text-xs text-slate-400 mt-1">Put this in your Instagram bio, WhatsApp status, or business card</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShowQR(!showQR)}
-              className="bg-white text-[#4F46E5] text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-[#c7d2fe] whitespace-nowrap hover:bg-[#eef2ff] transition-colors">
+              className="bg-slate-800 text-[#4F46E5] text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-indigo-800 whitespace-nowrap hover:bg-indigo-950/50 transition-colors">
               {showQR ? 'Hide QR' : 'Show QR'}
             </button>
             <button onClick={() => { navigator.clipboard.writeText(`https://www.bizpocket.io/order/${(organization as Record<string, unknown>).slug || organization.id}`); toast('Link copied!', 'success'); }}
@@ -400,14 +400,14 @@ export default function DashboardPage() {
       )}
       {hasGlobalProfile === true && (
         <div className="flex gap-2.5">
-          <Link href="/profile/preview" className="flex-1 flex items-center gap-3 rounded-xl border border-[#C7D2FE] dark:border-indigo-800 bg-[#EEF2FF] dark:bg-indigo-950/30 p-3.5 transition-colors hover:bg-[#E0E7FF] dark:hover:bg-indigo-950/50">
+          <Link href="/profile/preview" className="flex-1 flex items-center gap-3 rounded-xl border border-indigo-800 bg-indigo-950/30 p-3.5 transition-colors hover:bg-indigo-950/50">
             <span className="text-lg">{'\u{1F30D}'}</span>
-            <p className="text-sm font-medium text-[#4338CA] dark:text-indigo-300">Profile</p>
+            <p className="text-sm font-medium text-indigo-300">Profile</p>
             <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
           </Link>
-          <Link href="/opportunities" className="flex-1 flex items-center gap-3 rounded-xl border border-[#FDE68A] dark:border-amber-800 bg-[#FFFBEB] dark:bg-amber-950/30 p-3.5 transition-colors hover:bg-[#FEF3C7] dark:hover:bg-amber-950/50">
+          <Link href="/opportunities" className="flex-1 flex items-center gap-3 rounded-xl border border-amber-800 bg-amber-950/30 p-3.5 transition-colors hover:bg-amber-950/50">
             <span className="text-lg">{'\u{1F91D}'}</span>
-            <p className="text-sm font-medium text-[#92400E] dark:text-amber-300">Matches</p>
+            <p className="text-sm font-medium text-amber-300">Matches</p>
             <svg className="ml-auto" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
           </Link>
         </div>
@@ -415,25 +415,25 @@ export default function DashboardPage() {
 
       {/* 4 Quick Shortcuts */}
       <div className="grid grid-cols-4 gap-2">
-        <Link href="/invoices/new" className="flex flex-col items-center gap-1.5 rounded-xl border border-[#E5E5E5] bg-white p-3 transition-all hover:border-[#4F46E5]/30 hover:bg-[#4F46E5]/[0.02]">
+        <Link href="/invoices/new" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#4F46E5]/30 hover:bg-[#4F46E5]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4F46E5]/[0.08]">
             <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/></svg>
           </div>
           <span className="text-[11px] font-medium text-[#333]">Invoice</span>
         </Link>
-        <Link href="/cash-flow?new=1" className="flex flex-col items-center gap-1.5 rounded-xl border border-[#E5E5E5] bg-white p-3 transition-all hover:border-[#16A34A]/30 hover:bg-[#16A34A]/[0.02]">
+        <Link href="/cash-flow?new=1" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#16A34A]/30 hover:bg-[#16A34A]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#16A34A]/[0.08]">
             <svg className="h-4 w-4 text-[#16A34A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="4" y="14" width="3.5" height="6" rx="1"/><rect x="10" y="8" width="3.5" height="12" rx="1"/><rect x="16" y="4" width="3.5" height="16" rx="1"/></svg>
           </div>
           <span className="text-[11px] font-medium text-[#333]">Cash Flow</span>
         </Link>
-        <Link href="/chat" className="flex flex-col items-center gap-1.5 rounded-xl border border-[#E5E5E5] bg-white p-3 transition-all hover:border-[#7C3AED]/30 hover:bg-[#7C3AED]/[0.02]">
+        <Link href="/chat" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#7C3AED]/30 hover:bg-[#7C3AED]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#7C3AED]/[0.08]">
             <svg className="h-4 w-4 text-[#7C3AED]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 12c0 4.97-4.03 9-9 9-1.5 0-2.9-.37-4.14-1.02L3 21l1.02-4.86A8.94 8.94 0 013 12c0-4.97 4.03-9 9-9s9 4.03 9 9z"/></svg>
           </div>
           <span className="text-[11px] font-medium text-[#333]">Chat</span>
         </Link>
-        <Link href="/detect" className="flex flex-col items-center gap-1.5 rounded-xl border border-[#E5E5E5] bg-white p-3 transition-all hover:border-[#0EA5E9]/30 hover:bg-[#0EA5E9]/[0.02]">
+        <Link href="/detect" className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 p-3 transition-all hover:border-[#0EA5E9]/30 hover:bg-[#0EA5E9]/[0.02]">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0EA5E9]/[0.08]">
             <svg className="h-4 w-4 text-[#0EA5E9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="11" cy="11" r="4"/><path d="M15 15l4 4"/></svg>
           </div>
@@ -443,22 +443,22 @@ export default function DashboardPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Balance</p>
-          <p className="mt-2 font-mono text-xl font-bold text-[#0A0A0A]">{formatCurrency(balance, currency)}</p>
+          <p className="mt-2 font-mono text-xl font-bold text-slate-50">{formatCurrency(balance, currency)}</p>
           <p className="mt-1 text-[10px] text-[#999]">Net this month</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Unpaid</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#DC2626]">{formatCurrency(unpaidTotal, currency)}</p>
           <p className="mt-1 text-[10px] text-[#999]">{invoices.length} invoice{invoices.length !== 1 ? 's' : ''} pending</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Income</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
           <p className="mt-1 text-[10px] text-[#999]">This month</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#BBB]">Expenses</p>
           <p className="mt-2 font-mono text-xl font-bold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
           <p className="mt-1 text-[10px] text-[#999]">This month</p>
@@ -485,11 +485,11 @@ export default function DashboardPage() {
 
       {/* Business Cycle */}
       {activeCycle ? (
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-5">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-2.25-2.25v-2.25z" /></svg>
-              <h2 className="text-sm font-semibold text-[#0A0A0A]">{activeCycle.name}</h2>
+              <h2 className="text-sm font-semibold text-slate-50">{activeCycle.name}</h2>
             </div>
             <span className="rounded-full bg-[#4F46E5]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold text-[#4F46E5]">{cycleItemCount} items</span>
           </div>
@@ -505,7 +505,7 @@ export default function DashboardPage() {
             ))}
           </div>
           <div className="mt-3 flex gap-2">
-            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-center text-[11px] font-medium text-[#666] hover:bg-[#FAFAFA]">Edit Cycle</Link>
+            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-slate-700 py-2.5 text-center text-[11px] font-medium text-[#666] hover:bg-slate-700">Edit Cycle</Link>
             <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#0A0A0A] py-2.5 text-center text-[11px] font-medium text-white hover:bg-[#333]">Ops Radar &rarr;</Link>
           </div>
         </div>
@@ -516,7 +516,7 @@ export default function DashboardPage() {
               <svg className="h-5 w-5 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#0A0A0A]">Set up your business cycle</p>
+              <p className="text-sm font-semibold text-slate-50">Set up your business cycle</p>
               <p className="text-[11px] text-[#999]">AI creates your custom pipeline in 2 minutes</p>
             </div>
             <svg className="h-4 w-4 text-[#CCC]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
@@ -526,13 +526,13 @@ export default function DashboardPage() {
 
       {/* Upgrade Banner */}
       {(organization.plan === 'free' || !organization.plan) && (
-        <Link href="/settings/upgrade" className="block rounded-xl border border-[#E5E5E5] bg-white p-4 transition-all hover:shadow-md hover:-translate-y-0.5">
+        <Link href="/settings/upgrade" className="block rounded-xl border border-slate-700 bg-slate-800 p-4 transition-all hover:shadow-md hover:-translate-y-0.5">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F59E0B]/10">
               <svg className="h-5 w-5 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" /></svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#0A0A0A]">Unlock the full autopilot</p>
+              <p className="text-sm font-semibold text-slate-50">Unlock the full autopilot</p>
               <p className="text-xs text-[#999]">Unlimited invoices, AI Briefing, 21 languages</p>
             </div>
             <span className="rounded-full border border-[#F59E0B] px-3 py-1.5 text-xs font-bold text-[#F59E0B]">Go Pro &rarr;</span>
@@ -554,10 +554,10 @@ export default function DashboardPage() {
               const isTmr = evt.event_date === new Date(Date.now() + 86400000).toISOString().slice(0, 10);
               const label = isEvtToday ? 'Today' : isTmr ? 'Tomorrow' : new Date(evt.event_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
               return (
-                <div key={evt.id} className="flex items-center gap-3 rounded-xl border border-[#E5E5E5] bg-white px-4 py-3">
+                <div key={evt.id} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
                   <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotColors[evt.event_type] || 'bg-[#999]'}`} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-medium text-[#0A0A0A] truncate">{evt.title}</p>
+                    <p className="text-[13px] font-medium text-slate-50 truncate">{evt.title}</p>
                     <p className="text-[10px] text-[#999]">{label}{evt.event_time ? ` ${evt.event_time.slice(0, 5)}` : ''}</p>
                   </div>
                   {evt.amount && <span className="font-mono text-[13px] font-medium text-[#333]">{formatCurrency(evt.amount, evt.currency || currency)}</span>}
@@ -575,14 +575,14 @@ export default function DashboardPage() {
           <Link href="/cash-flow" className="text-[11px] text-[#4F46E5] font-medium">View all</Link>
         </div>
         {recentFlows.length === 0 ? (
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-6 text-center">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6 text-center">
             <p className="text-sm text-[#999]">No transactions yet.</p>
             <Link href="/cash-flow?new=1" className="mt-1 inline-block text-xs font-medium text-[#4F46E5]">Add your first entry &rarr;</Link>
           </div>
         ) : (
           <div className="space-y-1.5">
             {recentFlows.map((f) => (
-              <div key={f.id} className="flex items-center justify-between rounded-xl border border-[#E5E5E5] bg-white px-4 py-3">
+              <div key={f.id} className="flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800 px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-8 w-8 items-center justify-center rounded-full ${f.flow_type === 'IN' ? 'bg-[#16A34A]/10' : 'bg-[#DC2626]/10'}`}>
                     <svg className={`h-4 w-4 ${f.flow_type === 'IN' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -590,7 +590,7 @@ export default function DashboardPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-[13px] font-medium text-[#0A0A0A]">{f.category}</p>
+                    <p className="text-[13px] font-medium text-slate-50">{f.category}</p>
                     <p className="text-[10px] text-[#999]">{formatDateShort(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
                   </div>
                 </div>
@@ -611,9 +611,9 @@ export default function DashboardPage() {
             const formatted = new Intl.DateTimeFormat('en-US', { timeZone: c.tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(now);
             const [time, period] = formatted.split(' ');
             return (
-              <div key={c.tz} className="rounded-lg border border-[#E5E5E5] bg-white py-2 text-center">
+              <div key={c.tz} className="rounded-lg border border-slate-700 bg-slate-800 py-2 text-center">
                 <p className="text-[9px] font-semibold text-[#BBB]">{c.city.slice(0, 2).toUpperCase()}</p>
-                <p className="font-mono text-sm font-bold text-[#0A0A0A]">{time}</p>
+                <p className="font-mono text-sm font-bold text-slate-50">{time}</p>
                 <p className="text-[8px] text-[#CCC]">{period}</p>
               </div>
             );

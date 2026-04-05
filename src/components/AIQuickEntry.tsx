@@ -134,7 +134,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[#4F46E5]/20 bg-white p-4">
+    <div className="rounded-xl border border-[#4F46E5]/20 bg-slate-800 p-4">
       {!pendingEntry ? (
         <>
           <div className="flex items-center justify-between mb-3">
@@ -142,7 +142,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
               <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              <span className="text-[13px] font-medium text-[#0A0A0A]">Quick entry</span>
+              <span className="text-[13px] font-medium text-slate-50">Quick entry</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-[#999] text-xs">Close</button>
           </div>
@@ -164,7 +164,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && processText(input)}
               placeholder="e.g., 'Paid ¥5000 for flour at Costco'"
-              className="flex-1 rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm placeholder-[#BBB] focus:border-[#4F46E5] focus:outline-none"
+              className="flex-1 rounded-lg border border-slate-700 px-3 py-2 text-sm placeholder-[#BBB] focus:border-[#4F46E5] focus:outline-none"
             />
             <button
               onClick={() => processText(input)}
@@ -176,7 +176,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
           </div>
           <div className="flex gap-1.5 mt-2 overflow-x-auto">
             {['Paid rent', 'Bought supplies', 'Got payment from client', 'Fuel cost'].map((s) => (
-              <button key={s} onClick={() => setInput(s)} className="shrink-0 rounded-full border border-[#E5E5E5] px-2.5 py-1 text-[10px] text-[#666] hover:bg-[#F5F5F5]">
+              <button key={s} onClick={() => setInput(s)} className="shrink-0 rounded-full border border-slate-700 px-2.5 py-1 text-[10px] text-[#666] hover:bg-[#F5F5F5]">
                 {s}
               </button>
             ))}
@@ -213,7 +213,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
             )}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setPendingEntry(null)} className="flex-1 rounded-lg border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#666]">
+            <button onClick={() => setPendingEntry(null)} className="flex-1 rounded-lg border border-slate-700 py-2.5 text-xs font-medium text-[#666]">
               Cancel
             </button>
             <button onClick={confirmEntry} disabled={processing} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-xs font-medium text-white disabled:opacity-50">

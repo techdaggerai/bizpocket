@@ -151,7 +151,7 @@ export default function EvryWherOnboarding() {
             style={{
               width: i === step ? 20 : 6,
               height: 6,
-              backgroundColor: i === step ? '#4F46E5' : '#D1D5DB',
+              backgroundColor: i === step ? '#4F46E5' : '#475569',
             }}
           />
         ))}
@@ -197,7 +197,7 @@ export default function EvryWherOnboarding() {
               {['🇬🇧 EN', '🇯🇵 JA', '🇵🇰 UR', '🇦🇪 AR', '🇨🇳 ZH', '🇪🇸 ES', '🇧🇷 PT', '🇰🇷 KO'].map(l => (
                 <span key={l} className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#EEF2FF] text-[#4F46E5]">{l}</span>
               ))}
-              <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-[#F3F4F6] text-[#6B7280]">+13 more</span>
+              <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-slate-700 text-[#6B7280]">+13 more</span>
             </div>
 
             <StepDots />
@@ -266,7 +266,7 @@ export default function EvryWherOnboarding() {
                 value={displayName}
                 onChange={e => setDisplayName(e.target.value)}
                 placeholder="How should people address you?"
-                className="w-full rounded-xl border border-[#E5E5E5] bg-[#F9FAFB] px-4 py-3 text-[15px] text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
+                className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-[15px] text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] transition-colors"
                 onKeyDown={e => e.key === 'Enter' && displayName.trim() && handleSaveProfile()}
               />
             </div>
@@ -279,7 +279,7 @@ export default function EvryWherOnboarding() {
               <div className="relative">
                 <button
                   onClick={() => setShowLangPicker(!showLangPicker)}
-                  className="w-full flex items-center justify-between rounded-xl border border-[#E5E5E5] bg-[#F9FAFB] px-4 py-3 text-[15px] text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none hover:border-[#4F46E5] transition-colors"
+                  className="w-full flex items-center justify-between rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-[15px] text-[var(--text-1)] focus:border-[#4F46E5] focus:outline-none hover:border-[#4F46E5] transition-colors"
                 >
                   <span>{currentLang.flag} {currentLang.name}</span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
@@ -287,12 +287,12 @@ export default function EvryWherOnboarding() {
                 {showLangPicker && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowLangPicker(false)} />
-                    <div className="absolute left-0 right-0 top-14 z-50 max-h-52 overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white shadow-xl">
+                    <div className="absolute left-0 right-0 top-14 z-50 max-h-52 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-xl">
                       {LANGUAGES.map(l => (
                         <button
                           key={l.code}
                           onClick={() => { setSelectedLang(l.code); setShowLangPicker(false); }}
-                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-[#F3F4F6] transition-colors ${selectedLang === l.code ? 'text-[#4F46E5] font-medium bg-[#EEF2FF]' : 'text-[var(--text-1)]'}`}
+                          className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-[14px] hover:bg-slate-700 transition-colors ${selectedLang === l.code ? 'text-[#4F46E5] font-medium bg-[#EEF2FF]' : 'text-[var(--text-1)]'}`}
                         >
                           <span className="text-lg">{l.flag}</span> {l.name}
                         </button>
@@ -356,7 +356,7 @@ export default function EvryWherOnboarding() {
               ))}
               {visiblePreviews < BOT_PREVIEWS.length && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl px-4 py-2.5 bg-[#F3F4F6]">
+                  <div className="rounded-2xl px-4 py-2.5 bg-slate-700">
                     <div className="flex gap-1 items-center h-3">
                       {[0, 1, 2].map(i => (
                         <span

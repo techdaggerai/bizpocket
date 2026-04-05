@@ -134,7 +134,7 @@ export default function OpsRadarPage() {
         <button
           onClick={() => setSelectedStage(null)}
           className={`shrink-0 rounded-lg px-3 py-2 text-center transition-all ${
-            !selectedStage ? 'bg-[#4F46E5] text-white' : 'bg-white border border-[#E5E5E5] text-[var(--text-2)] hover:bg-[var(--bg-2)]'
+            !selectedStage ? 'bg-[#4F46E5] text-white' : 'bg-slate-800 border border-slate-700 text-[var(--text-2)] hover:bg-[var(--bg-2)]'
           }`}
         >
           <p className="text-lg font-bold">{activeItems.length}</p>
@@ -147,7 +147,7 @@ export default function OpsRadarPage() {
             className={`shrink-0 rounded-lg px-3 py-2 text-center min-w-[60px] transition-all ${
               selectedStage === stage.id
                 ? 'text-white'
-                : 'bg-white border border-[#E5E5E5] text-[var(--text-2)] hover:bg-[var(--bg-2)]'
+                : 'bg-slate-800 border border-slate-700 text-[var(--text-2)] hover:bg-[var(--bg-2)]'
             }`}
             style={selectedStage === stage.id ? { backgroundColor: stage.color } : {}}
           >
@@ -159,19 +159,19 @@ export default function OpsRadarPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Pipeline Value</p>
           <p className="text-lg font-bold font-mono text-[#4F46E5]">{formatCurrency(totalPipelineValue, currency)}</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Total Costs</p>
           <p className="text-lg font-bold font-mono text-[#DC2626]">{formatCurrency(totalCosts, currency)}</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Completed Profit</p>
           <p className="text-lg font-bold font-mono text-[#16A34A]">{formatCurrency(completedProfit, currency)}</p>
         </div>
-        <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+        <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
           <p className="text-[10px] text-[var(--text-4)] uppercase tracking-wider">Avg Days/Item</p>
           <p className="text-lg font-bold font-mono text-[var(--text-1)]">{avgDaysPerItem || '\u2014'}</p>
         </div>
@@ -202,7 +202,7 @@ export default function OpsRadarPage() {
         </div>
 
         {filteredItems.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-[#E5E5E5] bg-white p-8 text-center">
+          <div className="rounded-xl border border-dashed border-slate-700 bg-slate-800 p-8 text-center">
             <p className="text-sm text-[var(--text-3)]">No items in pipeline yet</p>
             <p className="text-[10px] text-[var(--text-4)] mt-1">Add your first item to start tracking</p>
             <Link href="/items" className="mt-3 inline-block rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-semibold text-white">+ Add Item</Link>
@@ -217,7 +217,7 @@ export default function OpsRadarPage() {
                 : 0;
 
               return (
-                <div key={item.id} className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                <div key={item.id} className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[var(--text-1)] truncate">{item.name}</p>
@@ -269,7 +269,7 @@ export default function OpsRadarPage() {
           <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)] mb-3">Stakeholders</h2>
           <div className="grid grid-cols-2 gap-2">
             {stakeholders.map((sh) => (
-              <div key={sh.id} className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+              <div key={sh.id} className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                 <p className="text-sm font-semibold text-[var(--text-1)]">{sh.name}</p>
                 <span className="text-[9px] uppercase text-[var(--text-4)] tracking-wider">{sh.type}</span>
                 <div className="mt-2 flex justify-between text-[10px]">
@@ -290,9 +290,9 @@ export default function OpsRadarPage() {
       {stageAvgDays.some(s => s.count > 0) && (
         <div>
           <h2 className="text-xs font-medium uppercase tracking-widest text-[var(--text-4)] mb-3">Stage Performance</h2>
-          <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden">
             {stageAvgDays.map((s, i) => (
-              <div key={s.stage.id} className={`flex items-center justify-between px-3 py-2.5 ${i > 0 ? 'border-t border-[#F5F5F5]' : ''}`}>
+              <div key={s.stage.id} className={`flex items-center justify-between px-3 py-2.5 ${i > 0 ? 'border-t border-slate-700' : ''}`}>
                 <div className="flex items-center gap-2">
                   <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.stage.color }} />
                   <span className="text-xs text-[var(--text-1)]">{s.stage.name}</span>
@@ -310,7 +310,7 @@ export default function OpsRadarPage() {
       )}
 
       {/* Summary */}
-      <div className="rounded-xl border border-[#E5E5E5] bg-gradient-to-br from-[#4F46E5]/5 to-[#7C3AED]/5 p-4">
+      <div className="rounded-xl border border-slate-700 bg-gradient-to-br from-[#4F46E5]/5 to-[#7C3AED]/5 p-4">
         <h2 className="text-xs font-medium uppercase tracking-widest text-[#4F46E5] mb-3">Summary</h2>
         <div className="space-y-1.5 text-xs">
           <div className="flex justify-between"><span className="text-[var(--text-3)]">Active in pipeline</span><span className="font-semibold text-[var(--text-1)]">{activeItems.length} items</span></div>

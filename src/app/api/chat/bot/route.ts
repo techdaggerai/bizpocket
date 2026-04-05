@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { checkUsageLimit, incrementUsage } from '@/lib/usage'
+import { getBrandFromHost } from '@/lib/brand'
 
 const BIZPOCKET_SYSTEM_PROMPT = `You are a BizPocket AI Business Assistant — a smart, friendly AI that helps business owners manage their operations through chat.
 
@@ -190,7 +191,7 @@ export async function POST(request: Request) {
     .single()
 
   const host = request.headers.get('host') || ''
-  const isPocketChatOrg = org?.signup_source === 'pocketchat' || host.includes('evrywher') || host.includes('evrywyre') || host.includes('pocketchat') || host.includes('evrywhere')
+  const isPocketChatOrg = org?.signup_source === 'pocketchat' || getBrandFromHost(host) === 'evrywher'
 
   // Fetch bot config for language preference
   const { data: botConfig } = await supabase

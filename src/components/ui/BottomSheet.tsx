@@ -98,8 +98,8 @@ export default function BottomSheet({
         className={[
           'absolute bottom-0 left-0 right-0',
           'rounded-t-[24px] overflow-hidden',
-          'bg-white/80 dark:bg-slate-900/80 backdrop-blur-[20px]',
-          'border-t border-white/60 dark:border-white/10',
+          'bg-slate-900/80 backdrop-blur-[20px]',
+          'border-t border-white/10',
           'flex flex-col',
           'transition-transform duration-300 [transition-timing-function:var(--ease-out)]',
           animating ? 'translate-y-0' : 'translate-y-full',
@@ -111,7 +111,7 @@ export default function BottomSheet({
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+          <div className="w-10 h-1 rounded-full bg-slate-600" />
         </div>
 
         {/* Title */}

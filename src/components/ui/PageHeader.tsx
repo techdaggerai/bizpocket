@@ -61,7 +61,7 @@ export default function PageHeader({
     >
       <button
         onClick={goBack}
-        className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-1 rounded-full active:bg-black/5 dark:active:bg-white/5 transition-colors"
+        className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-1 rounded-full active:bg-black/5 active:bg-slate-800/5 transition-colors"
         aria-label="Go back"
       >
         <ChevronLeft size={24} className="text-[var(--pm-text-primary)]" />

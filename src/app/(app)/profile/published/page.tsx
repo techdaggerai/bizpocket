@@ -141,7 +141,7 @@ export default function ProfilePublishedPage() {
         <div className="flex items-start gap-3">
           <span className="text-xl shrink-0">{'\u{1F6E1}\uFE0F'}</span>
           <p className="text-sm text-[var(--pm-text-primary)]">
-            <span className="font-semibold text-amber-600 dark:text-amber-400">+15 Trust</span> when someone you invite publishes their profile.
+            <span className="font-semibold text-amber-400">+15 Trust</span> when someone you invite publishes their profile.
           </p>
         </div>
       </GlassCard>

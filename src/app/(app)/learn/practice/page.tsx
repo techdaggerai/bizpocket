@@ -144,7 +144,7 @@ export default function PracticePage() {
   if (!started && !selectedTopic) {
     return (
       <div className="pb-24">
-        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+        <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
           <button onClick={() => router.push('/learn')} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)]">
             <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -161,7 +161,7 @@ export default function PracticePage() {
               <button
                 key={topic.id}
                 onClick={() => startConversation(topic)}
-                className="w-full flex items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 text-left transition-colors hover:border-[#4F46E5]/20"
+                className="w-full flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-800 p-4 text-left transition-colors hover:border-[#4F46E5]/20"
               >
                 <span className="text-2xl">{topic.icon}</span>
                 <div className="flex-1 min-w-0">
@@ -195,7 +195,7 @@ export default function PracticePage() {
   return (
     <div className="flex flex-col h-[100dvh] bg-[var(--bg-1)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button onClick={endSession} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)]">
             <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -215,7 +215,7 @@ export default function PracticePage() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {/* Tip banner */}
-        <div className="rounded-xl bg-[#EEF2FF] dark:bg-indigo-950/20 p-3 text-center">
+        <div className="rounded-xl bg-[#EEF2FF] p-3 text-center">
           <p className="text-[10px] text-[#4F46E5]">
             Type in Japanese to practice, or in English to learn how to say it
           </p>
@@ -226,7 +226,7 @@ export default function PracticePage() {
             <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
               msg.role === 'user'
                 ? 'bg-[#4F46E5] text-white rounded-br-md'
-                : 'bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-[var(--text-1)] rounded-bl-md'
+                : 'bg-slate-800 border border-slate-700 text-[var(--text-1)] rounded-bl-md'
             }`}>
               <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
             </div>
@@ -235,7 +235,7 @@ export default function PracticePage() {
 
         {sending && (
           <div className="flex justify-start">
-            <div className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-4 py-3 rounded-bl-md">
+            <div className="rounded-2xl bg-slate-800 border border-slate-700 px-4 py-3 rounded-bl-md">
               <div className="flex gap-1">
                 <div className="h-2 w-2 rounded-full bg-[#4F46E5] animate-bounce" style={{ animationDelay: '0ms' }} />
                 <div className="h-2 w-2 rounded-full bg-[#4F46E5] animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -248,7 +248,7 @@ export default function PracticePage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 safe-bottom">
+      <div className="border-t border-slate-700 bg-slate-800 px-4 py-3 safe-bottom">
         <div className="flex gap-2">
           <input
             type="text"
@@ -256,7 +256,7 @@ export default function PracticePage() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
             placeholder="Type in Japanese or English..."
-            className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-4 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
+            className="flex-1 rounded-xl border border-slate-700 bg-[var(--bg-1)] px-4 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none"
             disabled={sending}
           />
           <button

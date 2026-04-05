@@ -123,8 +123,8 @@ export default function AccountantPage() {
           <p className="text-xs text-[var(--text-3)]">{isAccountant ? 'Read-only access' : 'Monthly financial overview'}</p>
         </div>
         <div className="flex gap-1.5">
-          <button onClick={exportCSV} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Export CSV</button>
-          <button onClick={shareWithAccountant} className="rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Share</button>
+          <button onClick={exportCSV} className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Export CSV</button>
+          <button onClick={shareWithAccountant} className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] font-medium text-[var(--text-3)] hover:bg-[var(--bg-2)] transition-colors">Share</button>
           <button onClick={generateReport} disabled={reportLoading} className="rounded-lg bg-[#F59E0B] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#EA580C] disabled:opacity-50 transition-colors">{reportLoading ? 'Generating...' : 'AI Report'}</button>
         </div>
       </div>
@@ -132,13 +132,13 @@ export default function AccountantPage() {
       <div className="flex gap-1.5 overflow-x-auto hide-scrollbar pb-1 -mx-4 px-4">
         {months.map(m => (
           <button key={m} onClick={() => { setMonth(m); setReport(null); }}
-            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${month === m ? 'bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20' : 'border border-[#E5E5E5] text-[var(--text-4)]'}`}>
+            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${month === m ? 'bg-[#4F46E5]/10 text-[#4F46E5] border border-[#4F46E5]/20' : 'border border-slate-700 text-[var(--text-4)]'}`}>
             {m}
           </button>
         ))}
       </div>
 
-      <div className="flex border-b border-[#E5E5E5] overflow-x-auto">
+      <div className="flex border-b border-slate-700 overflow-x-auto">
         {tabs.map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-[#4F46E5]' : 'text-[#999] hover:text-[#333]'}`}>
@@ -154,19 +154,19 @@ export default function AccountantPage() {
           {tab === 'overview' && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                   <p className="text-[10px] text-[#A3A3A3] uppercase">Total Income</p>
                   <p className="text-lg font-mono font-bold text-[#16A34A]">{formatCurrency(totalIn, currency)}</p>
                 </div>
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                   <p className="text-[10px] text-[#A3A3A3] uppercase">Total Expenses</p>
                   <p className="text-lg font-mono font-bold text-[#DC2626]">{formatCurrency(totalOut, currency)}</p>
                 </div>
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                   <p className="text-[10px] text-[#A3A3A3] uppercase">Net Profit/Loss</p>
                   <p className={`text-lg font-mono font-bold ${net >= 0 ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>{formatCurrency(net, currency)}</p>
                 </div>
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-3">
                   <p className="text-[10px] text-[#A3A3A3] uppercase">Transactions</p>
                   <p className="text-lg font-mono font-bold text-[var(--text-1)]">{flows.length}</p>
                 </div>
@@ -186,7 +186,7 @@ export default function AccountantPage() {
               </div>
 
               {Object.keys(expByCategory).length > 0 && (
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Expense Breakdown</h3>
                   {Object.entries(expByCategory).sort((a, b) => b[1] - a[1]).map(([cat, amt]) => (
                     <div key={cat} className="flex items-center justify-between py-1.5 border-b border-[#F5F5F5] last:border-0">
@@ -202,7 +202,7 @@ export default function AccountantPage() {
                 </div>
               )}
 
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Invoice Summary</h3>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div><p className="text-[10px] text-[#A3A3A3]">Issued</p><p className="text-sm font-bold text-[var(--text-1)]">{monthInvoices.length}</p></div>
@@ -224,7 +224,7 @@ export default function AccountantPage() {
               {flows.length === 0 ? (
                 <p className="p-8 text-center text-sm text-[var(--text-4)]">No entries for {month}</p>
               ) : flows.map(f => (
-                <div key={f.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                <div key={f.id} className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5">
                   <div>
                     <p className="text-sm text-[var(--text-1)]">{f.category}</p>
                     <p className="text-[10px] text-[var(--text-4)]">{formatDate(f.date)}{f.from_to ? ` · ${f.from_to}` : ''}</p>
@@ -242,7 +242,7 @@ export default function AccountantPage() {
               {invoices.length === 0 ? (
                 <p className="p-8 text-center text-sm text-[var(--text-4)]">No invoices</p>
               ) : invoices.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                <div key={inv.id} className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5">
                   <div>
                     <p className="text-sm text-[var(--text-1)]">{inv.customer_name}</p>
                     <p className="text-[10px] text-[var(--text-4)]">{inv.invoice_number} · {formatDate(inv.created_at)}</p>
@@ -258,14 +258,14 @@ export default function AccountantPage() {
 
           {tab === 'expenses' && (
             <div className="space-y-3">
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 text-center">
+              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 text-center">
                 <p className="text-[10px] text-[#A3A3A3] uppercase">Total Expenses</p>
                 <p className="text-xl font-mono font-bold text-[#DC2626]">{formatCurrency(expenseTotal, currency)}</p>
               </div>
               {expenses.length === 0 ? (
                 <p className="p-8 text-center text-sm text-[var(--text-4)]">No expenses for {month}</p>
               ) : expenses.map(exp => (
-                <div key={exp.id} className="flex items-center justify-between rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5">
+                <div key={exp.id} className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5">
                   <div>
                     <p className="text-sm text-[var(--text-1)]">{exp.category}</p>
                     <p className="text-[10px] text-[var(--text-4)]">{formatDate(exp.date)}</p>

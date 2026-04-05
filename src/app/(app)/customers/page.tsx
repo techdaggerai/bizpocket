@@ -196,14 +196,14 @@ export default function CustomersPage() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search by name or company..."
-        className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+        className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
       />
 
       {/* Inline Form */}
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="rounded-card border border-[#E5E5E5] bg-white p-4 space-y-3"
+          className="rounded-card border border-slate-700 bg-slate-800 p-4 space-y-3"
         >
           <h2 className="text-sm font-semibold text-[var(--text-1)]">
             {editingId ? 'Edit Customer' : 'New Customer'}
@@ -219,7 +219,7 @@ export default function CustomersPage() {
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="Customer name"
               required
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+              className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
             />
           </div>
 
@@ -230,7 +230,7 @@ export default function CustomersPage() {
               value={form.company}
               onChange={(e) => updateField('company', e.target.value)}
               placeholder="Company name"
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+              className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
             />
           </div>
 
@@ -242,7 +242,7 @@ export default function CustomersPage() {
                 value={form.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="Phone number"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+                className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
               />
             </div>
             <div>
@@ -252,7 +252,7 @@ export default function CustomersPage() {
                 value={form.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="Email address"
-                className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+                className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
               />
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function CustomersPage() {
               value={form.address}
               onChange={(e) => updateField('address', e.target.value)}
               placeholder="Full address"
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+              className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
             />
           </div>
 
@@ -275,7 +275,7 @@ export default function CustomersPage() {
               value={form.fax}
               onChange={(e) => updateField('fax', e.target.value)}
               placeholder="Fax number"
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+              className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
             />
           </div>
 
@@ -286,7 +286,7 @@ export default function CustomersPage() {
               onChange={(e) => updateField('notes', e.target.value)}
               placeholder="Additional notes"
               rows={2}
-              className="w-full rounded-input border border-[#E5E5E5] bg-white px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none"
+              className="w-full rounded-input border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] resize-none"
             />
           </div>
 
@@ -301,7 +301,7 @@ export default function CustomersPage() {
             <button
               type="button"
               onClick={cancelForm}
-              className="rounded-btn border border-[#E5E5E5] px-4 py-2 text-sm text-[var(--text-2)]"
+              className="rounded-btn border border-slate-700 px-4 py-2 text-sm text-[var(--text-2)]"
             >
               Cancel
             </button>
@@ -311,7 +311,7 @@ export default function CustomersPage() {
 
       {/* Customer List */}
       {filtered.length === 0 ? (
-        <div className="rounded-card border border-[#E5E5E5] bg-white p-8 text-center">
+        <div className="rounded-card border border-slate-700 bg-slate-800 p-8 text-center">
           <p className="text-sm text-[var(--text-3)]">
             {search
               ? 'No customers match your search.'
@@ -323,7 +323,7 @@ export default function CustomersPage() {
           {filtered.map((c) => (
             <div
               key={c.id}
-              className="rounded-card border border-[#E5E5E5] bg-white p-4"
+              className="rounded-card border border-slate-700 bg-slate-800 p-4"
             >
               <div className="flex items-start justify-between">
                 <div className="min-w-0 flex-1">
@@ -380,7 +380,7 @@ export default function CustomersPage() {
                   )}
                 </div>
               </div>
-              <div className="mt-2 pt-2 border-t border-[#F0F0F0]">
+              <div className="mt-2 pt-2 border-t border-[var(--border)]">
                 <NoteEditor
                   note={c.notes}
                   onSave={async (note) => {

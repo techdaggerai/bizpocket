@@ -242,7 +242,7 @@ export default function CycleSetupPage() {
                     className={`max-w-[85%] rounded-2xl px-4 py-3 ${
                       msg.role === 'user'
                         ? 'rounded-br-md bg-[#4F46E5] text-white'
-                        : 'rounded-bl-md border border-[#E5E5E5] bg-white text-[var(--text-1)]'
+                        : 'rounded-bl-md border border-slate-700 bg-slate-800 text-[var(--text-1)]'
                     }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">{msg.content}</p>
@@ -307,7 +307,7 @@ export default function CycleSetupPage() {
                           setInput('I want to change some stages. ');
                           inputRef.current?.focus();
                         }}
-                        className="rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)]"
+                        className="rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)]"
                       >
                         Adjust
                       </button>
@@ -320,7 +320,7 @@ export default function CycleSetupPage() {
             {/* Loading indicator */}
             {loading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-md border border-[#E5E5E5] bg-white px-4 py-3">
+                <div className="rounded-2xl rounded-bl-md border border-slate-700 bg-slate-800 px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-[#4F46E5] animate-bounce" />
                     <div className="h-2 w-2 rounded-full bg-[#4F46E5] animate-bounce" style={{ animationDelay: '0.1s' }} />
@@ -337,7 +337,7 @@ export default function CycleSetupPage() {
 
       {/* Input Bar */}
       {started && (
-        <div className="border-t border-[#E5E5E5] bg-white px-4 py-3">
+        <div className="border-t border-slate-700 bg-slate-800 px-4 py-3">
           <form onSubmit={sendMessage} className="flex gap-2">
             <input
               ref={inputRef}
@@ -346,7 +346,7 @@ export default function CycleSetupPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Describe your business..."
               disabled={loading}
-              className="flex-1 rounded-xl border border-[#E5E5E5] bg-[var(--bg-2)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] disabled:opacity-50"
+              className="flex-1 rounded-xl border border-slate-700 bg-[var(--bg-2)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5] disabled:opacity-50"
             />
             <button
               type="submit"

@@ -17,7 +17,7 @@ export default function InvoiceShowcase() {
   const hasStyle = !!t.bg;
 
   return (
-    <div className="bg-[#f9fafb] rounded-[20px] p-6">
+    <div className="bg-slate-800 rounded-[20px] p-6">
       <div className="rounded-[14px] overflow-hidden" style={{ background: hasStyle ? t.bg : '#fff', border: t.border || '1px solid #e5e7eb', borderLeft: t.borderLeft, transition: 'all 0.3s ease' }}>
         <div className="flex justify-between items-start" style={{ padding: t.compact ? '14px 16px 10px' : '20px 20px 14px', borderBottom: '1px solid ' + (t.dark ? '#334155' : '#f3f4f6') }}>
           <div>
@@ -63,7 +63,7 @@ export default function InvoiceShowcase() {
       <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
         {TEMPLATES.map((tpl) => (
           <button key={tpl.name} onClick={() => tpl.bg && setActive(tpl.name)}
-            className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors ${active === tpl.name ? 'bg-[#4F46E5] text-white' : tpl.bg ? 'bg-white text-[#6b7280] border border-[#e5e7eb] hover:border-[#4F46E5] cursor-pointer' : 'bg-white text-[#d1d5db] border border-[#f3f4f6] cursor-default'}`}>
+            className={`text-[11px] px-2.5 py-1 rounded-full font-medium transition-colors ${active === tpl.name ? 'bg-[#4F46E5] text-white' : tpl.bg ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-[#4F46E5] cursor-pointer' : 'bg-slate-800 text-[#d1d5db] border border-slate-700 cursor-default'}`}>
             {tpl.name}
           </button>
         ))}

@@ -172,7 +172,7 @@ export default function QuickQuizPage() {
         </div>
 
         <div className="mt-6 flex gap-3">
-          <button onClick={() => router.push('/learn')} className="rounded-xl border border-gray-200 dark:border-gray-700 px-5 py-3 text-sm font-medium text-[var(--text-2)]">
+          <button onClick={() => router.push('/learn')} className="rounded-xl border border-slate-700 px-5 py-3 text-sm font-medium text-[var(--text-2)]">
             Done
           </button>
           <button
@@ -209,14 +209,14 @@ export default function QuickQuizPage() {
           <span className="text-xs font-bold text-[var(--text-3)]">Quick Quiz</span>
           <div className="flex gap-1">
             {words.map((_, i) => (
-              <div key={i} className={`h-2 w-8 rounded-full ${i < currentIdx ? 'bg-[#16A34A]' : i === currentIdx ? 'bg-[#4F46E5]' : 'bg-gray-200 dark:bg-gray-700'}`} />
+              <div key={i} className={`h-2 w-8 rounded-full ${i < currentIdx ? 'bg-[#16A34A]' : i === currentIdx ? 'bg-[#4F46E5]' : 'bg-slate-700'}`} />
             ))}
           </div>
         </div>
         {/* Timer circle */}
         <div className="relative h-10 w-10">
           <svg className="h-10 w-10 -rotate-90" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-100 dark:text-gray-800" />
+            <circle cx="18" cy="18" r="16" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-800" />
             <circle cx="18" cy="18" r="16" fill="none" stroke={timerColor} strokeWidth="2.5" strokeLinecap="round"
               strokeDasharray={`${timerPct * 100} 100`} className="transition-all duration-1000" />
           </svg>
@@ -228,7 +228,7 @@ export default function QuickQuizPage() {
 
       {/* Card */}
       <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="w-full max-w-sm rounded-3xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 p-8 text-center shadow-lg">
+        <div className="w-full max-w-sm rounded-3xl border-2 border-slate-700 bg-gray-900 p-8 text-center shadow-lg">
           <p className="text-[10px] text-[var(--text-4)] mb-1">What does this mean?</p>
           <p className="text-[42px] font-bold text-[var(--text-1)]">{word.word}</p>
           {word.reading && <p className="mt-1 text-sm text-[var(--text-3)]">({word.reading})</p>}
@@ -241,7 +241,7 @@ export default function QuickQuizPage() {
             onKeyDown={e => { if (e.key === 'Enter') { if (!revealed) revealAnswer(); else nextWord(); } }}
             placeholder="Type the meaning..."
             disabled={revealed}
-            className="mt-6 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-4 py-3 text-center text-base font-medium text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-70"
+            className="mt-6 w-full rounded-xl border border-slate-700 bg-[var(--bg-1)] px-4 py-3 text-center text-base font-medium text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-70"
             autoFocus
           />
 

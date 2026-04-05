@@ -123,7 +123,7 @@ export default function TierUpgradeOverlay({ from, to, onDismiss }: TierUpgradeO
 
       {/* Content card */}
       <div
-        className="relative z-10 mx-4 w-full max-w-[340px] rounded-[24px] bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-8 text-center transition-all duration-500"
+        className="relative z-10 mx-4 w-full max-w-[340px] rounded-[24px] bg-slate-800/95 backdrop-blur-xl p-8 text-center transition-all duration-500"
         style={{
           boxShadow: 'var(--glass-shadow)',
           opacity: phase >= 1 ? 1 : 0,
@@ -163,7 +163,7 @@ export default function TierUpgradeOverlay({ from, to, onDismiss }: TierUpgradeO
             }}
           >
             <h2
-              className="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              className="text-2xl font-bold text-white mb-1"
               style={{ fontFamily: 'var(--font-display), Outfit, sans-serif' }}
             >
               You&apos;ve Grown!
@@ -180,7 +180,7 @@ export default function TierUpgradeOverlay({ from, to, onDismiss }: TierUpgradeO
               {unlocks.map((item, i) => (
                 <div
                   key={i}
-                  className="text-[14px] text-gray-700 dark:text-gray-200 transition-all duration-300"
+                  className="text-[14px] text-slate-200 transition-all duration-300"
                   style={{
                     opacity: phase >= 3 ? 1 : 0,
                     transform: phase >= 3 ? 'translateX(0)' : 'translateX(-12px)',
@@ -211,7 +211,7 @@ export default function TierUpgradeOverlay({ from, to, onDismiss }: TierUpgradeO
             </button>
             <button
               onClick={onDismiss}
-              className="w-full rounded-[16px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-6 py-3 text-[15px] font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors"
+              className="w-full rounded-[16px] border border-white/10 bg-white/5 px-6 py-3 text-[15px] font-semibold text-slate-200 hover:bg-slate-800/10 transition-colors"
             >
               Continue &rarr;
             </button>

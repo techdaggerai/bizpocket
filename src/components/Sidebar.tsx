@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
+import { getBrandModeClient } from '@/lib/brand';
 
 const FULL_NAV = [
   {
@@ -44,6 +45,7 @@ const FULL_NAV = [
       { href: '/accountant', label: 'Accountant', icon: 'M2 4h20v16H2zM17 4v16M5 8h5M5 11h4M5 14h6' },
       { href: '/form-fill', label: 'Form Fill', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M9 13h6M9 17h4' },
       { href: '/chat/live-guide', label: 'Live Guide', icon: 'M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2zM12 13a4 4 0 100-8 4 4 0 000 8z' },
+      { href: '/download', label: 'Get the App', icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' },
     ],
   },
 ];
@@ -55,6 +57,7 @@ const POCKETCHAT_NAV = [
       { href: '/chat', label: 'Evrywher', icon: '__pocketchat__' },
       { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
       { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
+      { href: '/download', label: 'Get the App', icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' },
       { href: '/settings', label: 'Settings', icon: 'M12 8a4 4 0 100-8M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82' },
     ],
   },
@@ -67,18 +70,17 @@ export default function Sidebar() {
   const { organization, user } = useAuth();
   const isAdmin = user?.email && ADMIN_EMAILS.includes(user.email);
   const plan = organization?.plan || 'free';
-  const isPocketChatOnly = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const isPocketChatOnly = getBrandModeClient(organization?.signup_source) === 'evrywher';
   const NAV_SECTIONS = isPocketChatOnly ? POCKETCHAT_NAV : FULL_NAV;
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[#F0F0F0] lg:bg-white lg:h-screen lg:fixed lg:top-0 lg:left-0 lg:z-40 lg:overflow-y-auto">
+    <aside className="hidden lg:flex lg:flex-col lg:w-[220px] lg:shrink-0 lg:border-r lg:border-[var(--border)] lg:bg-[var(--card-bg)] lg:h-screen lg:fixed lg:top-0 lg:left-0 lg:z-40 lg:overflow-y-auto">
       {/* Logo */}
-      <div className="px-4 py-4 border-b border-[#F0F0F0]">
+      <div className="px-4 py-4 border-b border-[var(--border)]">
         <Link href={isPocketChatOnly ? '/chat' : '/dashboard'} className="flex items-center gap-2">
           {isPocketChatOnly ? (
             <>
-              <PocketChatMark size={32} />
+              <span className="evrywher-logo-glow"><PocketChatMark size={32} /></span>
               <EvryWherMark size="md" />
             </>
           ) : (
@@ -110,14 +112,14 @@ export default function Sidebar() {
                     className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
                       isActive
                         ? isAI ? 'bg-[#F59E0B]/[0.06] text-[#F59E0B]' : 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
-                        : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
+                        : 'text-[var(--text-3)] hover:bg-[var(--bg-2)] hover:text-[var(--text-1)]'
                     }`}
                   >
                     {item.icon === '__pocketchat__' ? (
-                      <PocketChatMark size={28} />
+                      <span className={isActive ? 'evrywher-logo-glow' : ''}><PocketChatMark size={28} /></span>
                     ) : (
                       <svg
-                        className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[#999]'}`}
+                        className={`h-[18px] w-[18px] shrink-0 ${isActive ? (isAI ? 'text-[#F59E0B]' : 'text-[#4F46E5]') : 'text-[var(--text-4)]'}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -138,17 +140,17 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom — Admin + Settings + Upgrade */}
-      <div className="px-2 py-3 border-t border-[#F0F0F0] space-y-1">
+      <div className="px-2 py-3 border-t border-[var(--border)] space-y-1">
         {isAdmin && !isPocketChatOnly && (
           <Link
             href="/admin"
             className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
               pathname === '/admin'
                 ? 'bg-[#F43F5E]/[0.06] text-[#F43F5E]'
-                : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
+                : 'text-[var(--text-3)] hover:bg-[var(--bg-2)] hover:text-[var(--text-1)]'
             }`}
           >
-            <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="h-[18px] w-[18px] text-[var(--text-4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 4.5v15m7.5-7.5h-15" />
               <circle cx="12" cy="12" r="10" />
             </svg>
@@ -161,10 +163,10 @@ export default function Sidebar() {
             className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
               pathname === '/settings' || pathname?.startsWith('/settings/')
                 ? 'bg-[#4F46E5]/[0.06] text-[#4F46E5]'
-                : 'text-[#666] hover:bg-[#FAFAFA] hover:text-[#0A0A0A]'
+                : 'text-[var(--text-3)] hover:bg-[var(--bg-2)] hover:text-[var(--text-1)]'
             }`}
           >
-            <svg className="h-[18px] w-[18px] text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg className="h-[18px] w-[18px] text-[var(--text-4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
               <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>

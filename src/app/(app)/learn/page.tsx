@@ -206,9 +206,9 @@ export default function LearnPage() {
           <span className="text-sm font-medium">Daily Goal</span>
           <span className="text-sm font-bold">{todayStats.wordsToday}/{dailyGoal} words</span>
         </div>
-        <div className="h-2 rounded-full bg-white/20">
+        <div className="h-2 rounded-full bg-slate-800/20">
           <div
-            className="h-full rounded-full bg-white transition-all duration-500"
+            className="h-full rounded-full bg-slate-800 transition-all duration-500"
             style={{ width: `${dailyProgress * 100}%` }}
           />
         </div>
@@ -225,33 +225,33 @@ export default function LearnPage() {
       {/* Study Modes */}
       <div className="grid grid-cols-2 gap-2 mx-4 mt-4">
         {todayStats.reviewDue > 0 && (
-          <Link href="/learn/study?mode=review" className="flex items-center gap-2 rounded-xl bg-[#FEF3C7] dark:bg-amber-950/20 border border-[#FDE68A]/50 dark:border-amber-800/30 px-3 py-3">
+          <Link href="/learn/study?mode=review" className="flex items-center gap-2 rounded-xl bg-[#FEF3C7] border border-[#FDE68A]/50 px-3 py-3">
             <span className="text-lg">🎯</span>
             <div>
-              <p className="text-xs font-bold text-[#92400E] dark:text-amber-300">Flash Review</p>
-              <p className="text-[10px] text-[#92400E]/60 dark:text-amber-400/60">{todayStats.reviewDue} due</p>
+              <p className="text-xs font-bold text-[#92400E]">Flash Review</p>
+              <p className="text-[10px] text-[#92400E]/60">{todayStats.reviewDue} due</p>
             </div>
           </Link>
         )}
-        <Link href="/learn/practice" className="flex items-center gap-2 rounded-xl bg-[#EDE9FE] dark:bg-purple-950/20 border border-[#DDD6FE]/50 dark:border-purple-800/30 px-3 py-3">
+        <Link href="/learn/practice" className="flex items-center gap-2 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE]/50 px-3 py-3">
           <span className="text-lg">💬</span>
           <div>
-            <p className="text-xs font-bold text-[#7C3AED] dark:text-purple-300">AI Practice</p>
-            <p className="text-[10px] text-[#7C3AED]/60 dark:text-purple-400/60">Conversation</p>
+            <p className="text-xs font-bold text-[#7C3AED]">AI Practice</p>
+            <p className="text-[10px] text-[#7C3AED]/60">Conversation</p>
           </div>
         </Link>
-        <Link href="/learn/quiz" className="flex items-center gap-2 rounded-xl bg-[#FEE2E2] dark:bg-red-950/20 border border-[#FECACA]/50 dark:border-red-800/30 px-3 py-3">
+        <Link href="/learn/quiz" className="flex items-center gap-2 rounded-xl bg-[#FEE2E2] border border-[#FECACA]/50 px-3 py-3">
           <span className="text-lg">⚡</span>
           <div>
-            <p className="text-xs font-bold text-[#DC2626] dark:text-red-300">Quick Quiz</p>
-            <p className="text-[10px] text-[#DC2626]/60 dark:text-red-400/60">30s challenge</p>
+            <p className="text-xs font-bold text-[#DC2626]">Quick Quiz</p>
+            <p className="text-[10px] text-[#DC2626]/60">30s challenge</p>
           </div>
         </Link>
-        <Link href="/learn/study?mode=new" className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] dark:bg-indigo-950/20 border border-[#C7D2FE]/50 dark:border-indigo-800/30 px-3 py-3">
+        <Link href="/learn/study?mode=new" className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] border border-[#C7D2FE]/50 px-3 py-3">
           <span className="text-lg">📖</span>
           <div>
-            <p className="text-xs font-bold text-[#4F46E5] dark:text-indigo-300">Learn New</p>
-            <p className="text-[10px] text-[#4F46E5]/60 dark:text-indigo-400/60">Pick a topic</p>
+            <p className="text-xs font-bold text-[#4F46E5]">Learn New</p>
+            <p className="text-[10px] text-[#4F46E5]/60">Pick a topic</p>
           </div>
         </Link>
       </div>
@@ -269,7 +269,7 @@ export default function LearnPage() {
                 <Link
                   key={group.source}
                   href={`/learn/study?mode=review&source=${group.source}`}
-                  className="flex items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 transition-colors hover:border-[#4F46E5]/20"
+                  className="flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-800 p-4 transition-colors hover:border-[#4F46E5]/20"
                 >
                   <span className="text-2xl">{info.icon}</span>
                   <div className="flex-1 min-w-0">
@@ -329,7 +329,7 @@ export default function LearnPage() {
                     <Link
                       key={topic.id}
                       href={`/learn/topic/${topic.slug}`}
-                      className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 text-center transition-colors hover:border-[#4F46E5]/20"
+                      className="rounded-2xl border border-slate-700 bg-slate-800 p-3 text-center transition-colors hover:border-[#4F46E5]/20"
                     >
                       <span className="text-2xl">{topic.icon}</span>
                       <p className="text-[11px] font-semibold text-[var(--text-1)] mt-1 leading-tight">
@@ -339,7 +339,7 @@ export default function LearnPage() {
                         {total} words
                       </p>
                       {/* Progress bar */}
-                      <div className="mt-1.5 h-1 rounded-full bg-gray-100 dark:bg-gray-700">
+                      <div className="mt-1.5 h-1 rounded-full bg-slate-700">
                         <div
                           className="h-full rounded-full bg-[#4F46E5] transition-all"
                           style={{ width: `${pct * 100}%` }}
@@ -361,7 +361,7 @@ export default function LearnPage() {
       <div className="mx-4 mt-4">
         <Link
           href="/vocabulary"
-          className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4"
+          className="flex items-center justify-between rounded-2xl border border-slate-700 bg-slate-800 p-4"
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">📚</span>

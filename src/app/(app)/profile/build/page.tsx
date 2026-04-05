@@ -88,7 +88,7 @@ export default function ProfileBuildPage() {
         </div>
 
         {/* Progress bar */}
-        <div className="w-full max-w-xs h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+        <div className="w-full max-w-xs h-1.5 rounded-full bg-slate-700 overflow-hidden">
           <div
             className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 transition-[width] duration-500 [transition-timing-function:var(--ease-out)]"
             style={{ width: `${progress}%` }}
@@ -137,8 +137,8 @@ export default function ProfileBuildPage() {
 
       {/* Error */}
       {error && (
-        <GlassCard className="mb-4 border-red-200 dark:border-red-800">
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <GlassCard className="mb-4 border-red-800">
+          <p className="text-sm text-red-400">{error}</p>
         </GlassCard>
       )}
 

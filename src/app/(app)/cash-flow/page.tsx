@@ -298,7 +298,7 @@ export default function CashFlowPage() {
                 <button type="button" onClick={addCustomCategory}
                   className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Add</button>
                 <button type="button" onClick={() => setShowAddCategory(false)}
-                  className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs text-[#666]">Cancel</button>
+                  className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-[#666]">Cancel</button>
               </div>
             )}
           </div>
@@ -334,7 +334,7 @@ export default function CashFlowPage() {
                     <button type="button" onClick={addCustomFromTo}
                       className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Save</button>
                     <button type="button" onClick={() => setShowAddFromTo(false)}
-                      className="rounded-lg border border-[#E5E5E5] px-3 py-2 text-xs text-[#666]">Cancel</button>
+                      className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-[#666]">Cancel</button>
                   </>
                 )}
               </div>
@@ -396,7 +396,7 @@ export default function CashFlowPage() {
                   form.is_recurring ? 'bg-[var(--accent)]' : 'bg-[var(--bg-3)]'
                 }`}
               >
-                <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-slate-800 shadow transition-transform ${
                   form.is_recurring ? 'translate-x-[22px]' : 'translate-x-0.5'
                 }`} />
               </div>

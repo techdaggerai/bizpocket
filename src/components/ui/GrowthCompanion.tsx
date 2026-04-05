@@ -69,9 +69,9 @@ export default function GrowthCompanion({
       className={[
         'fixed bottom-[148px] right-4 z-40',
         'w-[300px] rounded-[20px]',
-        'bg-white/[0.85] dark:bg-slate-900/[0.85]',
+        'bg-slate-800/[0.85] bg-slate-900/[0.85]',
         'backdrop-blur-[24px]',
-        'border border-white/60 dark:border-white/10',
+        'border border-white/60 border-white/10',
         'p-4 space-y-3',
         'animate-[companionAppear_500ms_var(--ease-spring)_both]',
       ].join(' ')}
@@ -91,7 +91,7 @@ export default function GrowthCompanion({
         </div>
         <button
           onClick={() => { setExpanded(false); onDismiss(); }}
-          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/5 hover:bg-slate-800/5 transition-colors"
           aria-label="Dismiss suggestion"
         >
           <X size={14} className="text-[var(--pm-text-tertiary)]" />
@@ -126,7 +126,7 @@ export default function GrowthCompanion({
           {suggestion.action}
         </button>
         <span
-          className="text-sm font-bold text-emerald-600 dark:text-emerald-400"
+          className="text-sm font-bold text-emerald-600 text-emerald-400"
           style={{ fontFamily: 'var(--font-display), sans-serif' }}
         >
           +{suggestion.points}

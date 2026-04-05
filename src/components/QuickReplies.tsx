@@ -75,8 +75,8 @@ export default function QuickReplies({ isOpen, onClose, onSelect, inputValue }: 
   if (!isOpen) return null;
 
   return (
-    <div className="absolute bottom-full left-0 right-0 mb-1 max-h-[300px] overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white shadow-lg z-50">
-      <div className="sticky top-0 bg-white border-b border-[#F0F0F0] px-3 py-2 flex items-center justify-between">
+    <div className="absolute bottom-full left-0 right-0 mb-1 max-h-[300px] overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg z-50">
+      <div className="sticky top-0 bg-slate-800 border-b border-[var(--border)] px-3 py-2 flex items-center justify-between">
         <span className="text-[11px] font-medium text-[#999] uppercase tracking-wider">Quick Replies</span>
         <div className="flex gap-2">
           <button onClick={() => setShowAdd(!showAdd)} className="text-[10px] text-[#4F46E5] font-medium">{showAdd ? 'Cancel' : '+ Add'}</button>
@@ -85,9 +85,9 @@ export default function QuickReplies({ isOpen, onClose, onSelect, inputValue }: 
       </div>
 
       {showAdd && (
-        <div className="p-3 border-b border-[#F0F0F0] space-y-2">
-          <input value={newShortcut} onChange={e => setNewShortcut(e.target.value)} placeholder="/shortcut" className="w-full rounded-md border border-[#E5E5E5] px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
-          <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Reply message..." rows={2} className="w-full rounded-md border border-[#E5E5E5] px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
+        <div className="p-3 border-b border-[var(--border)] space-y-2">
+          <input value={newShortcut} onChange={e => setNewShortcut(e.target.value)} placeholder="/shortcut" className="w-full rounded-md border border-slate-700 px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
+          <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder="Reply message..." rows={2} className="w-full rounded-md border border-slate-700 px-2.5 py-1.5 text-xs focus:border-[#4F46E5] focus:outline-none" />
           <button onClick={addReply} disabled={saving} className="w-full rounded-md bg-[#4F46E5] py-1.5 text-[10px] font-medium text-white disabled:opacity-50">{saving ? '...' : 'Save'}</button>
         </div>
       )}
@@ -99,7 +99,7 @@ export default function QuickReplies({ isOpen, onClose, onSelect, inputValue }: 
           tabIndex={0}
           onClick={() => { onSelect(r.message); onClose(); }}
           onKeyDown={(e) => { if (e.key === 'Enter') { onSelect(r.message); onClose(); } }}
-          className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-[#FAFAFA] border-b border-[#F5F5F5] last:border-0 text-left cursor-pointer"
+          className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-slate-800 border-b border-[#F5F5F5] last:border-0 text-left cursor-pointer"
         >
           <div className="flex-1 min-w-0">
             <span className="text-[10px] font-mono text-[#4F46E5]">{r.shortcut}</span>

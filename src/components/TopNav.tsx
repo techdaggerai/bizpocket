@@ -7,6 +7,7 @@ import { PocketMark, PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
 import NotificationBell from './NotificationBell';
 import UpdateBell from './UpdateBell';
+import { getBrandModeClient, BRAND } from '@/lib/brand';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -17,8 +18,8 @@ export default function TopNav() {
   const [showMenu, setShowMenu] = useState(false);
 
   const currentPlan = organization?.plan || 'free';
-  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const brandMode = getBrandModeClient(organization?.signup_source);
+  const isPocketChatMode = brandMode === 'evrywher';
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -26,7 +27,7 @@ export default function TopNav() {
   }
 
   return (
-    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:static lg:px-0 lg:py-0">
+    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 shadow-sm px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:static lg:px-0 lg:py-0">
       {/* Mobile: centered wordmark */}
       <div className="absolute left-1/2 -translate-x-1/2 lg:hidden">
         <Link href={isPocketChatMode ? '/chat' : '/dashboard'} className="flex items-center gap-2">
@@ -65,8 +66,8 @@ export default function TopNav() {
           {showMenu && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-10 z-50 w-56 rounded-xl border border-[#E5E5E5] bg-white p-2 shadow-lg">
-                <div className="px-3 py-2 border-b border-[#F0F0F0] mb-1">
+              <div className="absolute right-0 top-10 z-50 w-56 rounded-xl border border-[var(--border)] bg-[var(--card-bg)] p-2 shadow-lg">
+                <div className="px-3 py-2 border-b border-[var(--border)] mb-1">
                   <p className="text-sm font-semibold text-[var(--text-1)] truncate">{profile?.full_name || profile?.name || ''}</p>
                   <p className="text-[10px] text-[var(--text-4)] truncate">{organization?.name || ''}</p>
                   <span className="mt-1 inline-block rounded-full bg-[#4F46E5]/10 px-2 py-0.5 text-[10px] font-semibold text-[#4F46E5] capitalize">{currentPlan} plan</span>
@@ -94,7 +95,7 @@ export default function TopNav() {
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
                   Settings
                 </Link>
-                <div className="border-t border-[#F0F0F0] mt-1 pt-1">
+                <div className="border-t border-[var(--border)] mt-1 pt-1">
                   <button onClick={handleSignOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors">
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
                     Sign Out

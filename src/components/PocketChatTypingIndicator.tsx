@@ -66,7 +66,7 @@ export default function PocketChatTypingIndicator({ contactName, compact = false
 
       <div className="flex flex-col" style={{ gap: t.colGap }}>
         <div className="flex items-center" style={{ gap: t.gap * 2 }}>
-          <span className={`${t.composing} text-[#374151] font-semibold`}>{contactName} is composing</span>
+          <span className={`${t.composing} text-slate-300 font-semibold`}>{contactName} is composing</span>
           <div className="flex items-center" style={{ gap: t.dotGap }}>
             {[0, 1, 2].map(d => (
               <div key={d} className="rounded-full"
@@ -76,7 +76,7 @@ export default function PocketChatTypingIndicator({ contactName, compact = false
         </div>
         <div className="flex items-center" style={{ gap: t.gap * 2 }}>
           <span className={`${t.greeting} text-[#F59E0B] font-semibold ${t.greetMin}`} style={{ opacity: fade ? 1 : 0, transition: 'opacity 0.4s ease-in-out' }}>{lang.label}</span>
-          <div className={`${t.barTrack} ${t.bar} rounded-sm bg-[#f3f4f6] overflow-hidden`}>
+          <div className={`${t.barTrack} ${t.bar} rounded-sm bg-slate-800 overflow-hidden`}>
             <div className={`${t.barFill} ${t.bar} rounded-sm bg-[#F59E0B]`} style={{ animation: 'pcProgress 3s ease-in-out infinite' }} />
           </div>
         </div>

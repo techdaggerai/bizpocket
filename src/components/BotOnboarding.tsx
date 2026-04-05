@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
+import { getBrandModeClient } from '@/lib/brand';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 
@@ -19,8 +20,7 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const [botIcon] = useState('1');
   const [saving, setSaving] = useState(false);
 
-  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
 
   async function handleFinish() {
     setSaving(true);
@@ -145,7 +145,7 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
           onChange={(e) => setBotName(e.target.value)}
           placeholder="e.g., Pocket, Atlas, Jarvis"
           maxLength={20}
-          className="w-full max-w-xs rounded-xl border-2 border-[#E5E5E5] bg-white px-4 py-3.5 text-center text-lg font-semibold text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none transition-colors"
+          className="w-full max-w-xs rounded-xl border-2 border-slate-700 bg-slate-800 px-4 py-3.5 text-center text-lg font-semibold text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none transition-colors"
         />
         <p className="text-[10px] text-[var(--text-4)] mt-2 mb-6">You can change this anytime in settings</p>
         <button

@@ -93,7 +93,7 @@ export default function AnimatedTagline() {
 
   return (
     <div className="mt-2 space-y-1">
-      <p className="text-[18px] text-[#1F2937] dark:text-[#E0E0E0]" style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 500, minHeight: '1.5em' }}>
+      <p className="text-[18px] text-[#E0E0E0]" style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 500, minHeight: '1.5em' }}>
         {engRendered}
         {typing === 'eng' && <span className="animate-pulse text-[#F59E0B]">|</span>}
       </p>

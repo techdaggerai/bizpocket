@@ -86,7 +86,7 @@ export default function LearningOnboarding() {
   const progress = step / totalSteps;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-900">
+    <div className="fixed inset-0 z-50 flex flex-col bg-slate-800">
       {/* Progress bar */}
       <div className="px-4 pt-4">
         <div className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function LearningOnboarding() {
               </svg>
             </button>
           )}
-          <div className="flex-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="flex-1 h-1.5 rounded-full bg-slate-700">
             <div className="h-full rounded-full bg-[#4F46E5] transition-all duration-500" style={{ width: `${progress * 100}%` }} />
           </div>
           <span className="text-xs text-[var(--text-4)]">{step}/{totalSteps}</span>
@@ -123,7 +123,7 @@ export default function LearningOnboarding() {
                   className={`w-full flex items-center gap-3 rounded-2xl p-4 text-left transition-all ${
                     lang === l.code
                       ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'
-                      : 'border-2 border-gray-100 dark:border-gray-800'
+                      : 'border-2 border-slate-700'
                   }`}
                 >
                   <span className="text-2xl">{l.flag}</span>
@@ -161,7 +161,7 @@ export default function LearningOnboarding() {
                   className={`w-full flex items-center gap-4 rounded-2xl p-4 text-left transition-all ${
                     level === l.value
                       ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'
-                      : 'border-2 border-gray-100 dark:border-gray-800'
+                      : 'border-2 border-slate-700'
                   }`}
                 >
                   <span className="text-3xl">{l.icon}</span>
@@ -199,7 +199,7 @@ export default function LearningOnboarding() {
                     className={`flex items-center gap-2 rounded-2xl p-3 text-left transition-all ${
                       selected
                         ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'
-                        : 'border-2 border-gray-100 dark:border-gray-800'
+                        : 'border-2 border-slate-700'
                     }`}
                   >
                     <span className="text-xl">{i.icon}</span>
@@ -236,7 +236,7 @@ export default function LearningOnboarding() {
                   className={`w-full flex items-center gap-4 rounded-2xl p-5 text-left transition-all ${
                     dailyGoal === g.words
                       ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'
-                      : 'border-2 border-gray-100 dark:border-gray-800'
+                      : 'border-2 border-slate-700'
                   }`}
                 >
                   <span className="text-3xl">{g.icon}</span>

@@ -122,7 +122,7 @@ We both get +15 Trust Score when you publish.`;
         {/* No profile warning */}
         {!shareToken && (
           <GlassCard tier="starter" glow>
-            <p className="text-sm text-amber-700 dark:text-amber-300">
+            <p className="text-sm text-amber-300">
               Build and publish your Global Profile first to get your invite link.
             </p>
             <Button variant="primary" size="sm" onClick={() => router.push('/profile/build')} className="mt-2">

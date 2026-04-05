@@ -34,15 +34,15 @@ export default function ChatLabels({ conversationId, currentLabel, onUpdate, isO
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-full right-0 mt-1 w-48 rounded-xl border border-[#E5E5E5] bg-white shadow-lg z-50 overflow-hidden">
-      <div className="px-3 py-2 border-b border-[#F0F0F0]">
+    <div className="absolute top-full right-0 mt-1 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-lg z-50 overflow-hidden">
+      <div className="px-3 py-2 border-b border-[var(--border)]">
         <span className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Label conversation</span>
       </div>
       {LABELS.map(l => (
         <button
           key={l.key}
           onClick={() => setLabel(l.label, l.color)}
-          className={`w-full flex items-center gap-2 px-3 py-2 hover:bg-[#FAFAFA] text-left ${currentLabel === l.label ? 'bg-[#FAFAFA]' : ''}`}
+          className={`w-full flex items-center gap-2 px-3 py-2 hover:bg-slate-800 text-left ${currentLabel === l.label ? 'bg-slate-800' : ''}`}
         >
           <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
           <span className="text-xs text-[#333]">{l.label}</span>
@@ -52,7 +52,7 @@ export default function ChatLabels({ conversationId, currentLabel, onUpdate, isO
         </button>
       ))}
       {currentLabel && (
-        <button onClick={() => setLabel(null, null)} className="w-full px-3 py-2 text-[10px] text-[#DC2626] border-t border-[#F0F0F0] hover:bg-[#FAFAFA]">
+        <button onClick={() => setLabel(null, null)} className="w-full px-3 py-2 text-[10px] text-[#DC2626] border-t border-[var(--border)] hover:bg-slate-800">
           Remove label
         </button>
       )}

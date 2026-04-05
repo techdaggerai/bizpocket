@@ -239,12 +239,12 @@ export default function GlobalSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { setOpen(true); loadData(); }}
           placeholder="Search invoices, customers, expenses..."
-          className="w-full rounded-xl border border-[#E5E5E5] bg-white py-2.5 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
+          className="w-full rounded-xl border border-slate-700 bg-slate-800 py-2.5 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]"
         />
       </div>
 
       {open && query.trim() && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[400px] overflow-y-auto rounded-xl border border-[#E5E5E5] bg-white shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[400px] overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-lg">
           {results.length === 0 ? (
             <div className="p-6 text-center">
               <p className="text-sm text-[var(--text-4)]">No results for &quot;{query}&quot;</p>

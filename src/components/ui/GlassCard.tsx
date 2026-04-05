@@ -51,7 +51,7 @@ export default function GlassCard({
     ref.current.style.setProperty('--glass-angle', `${getGlassAngle()}deg`);
   }, [adaptiveRefraction]);
 
-  const borderClass = tier ? tierBorderClass[tier] : 'border-white/[0.65] dark:border-white/[0.12]';
+  const borderClass = tier ? tierBorderClass[tier] : 'border-white/[0.65] border-white/[0.12]';
   const glowShadow = tier && glow ? tierGlowStyle[tier] : undefined;
 
   return (
@@ -64,9 +64,9 @@ export default function GlassCard({
       onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
       className={[
         'rounded-[20px] p-5 border',
-        'bg-white/[0.78] dark:bg-slate-900/[0.82]',
+        'bg-slate-800/[0.78] bg-slate-900/[0.82]',
         'backdrop-blur-[24px]',
-        'supports-[not(backdrop-filter:blur(1px))]:bg-white/[0.95] supports-[not(backdrop-filter:blur(1px))]:dark:bg-slate-900/[0.95]',
+        'supports-[not(backdrop-filter:blur(1px))]:bg-slate-900/[0.95]',
         'transition-all duration-[400ms] [transition-timing-function:var(--ease-spring)]',
         borderClass,
         elevated ? 'hover:-translate-y-0.5' : '',

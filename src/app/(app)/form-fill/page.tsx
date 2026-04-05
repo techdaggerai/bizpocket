@@ -235,18 +235,18 @@ export default function FormFillPage() {
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-900">
       <PageHeader title="Form Fill" backPath="/dashboard" />
       {/* ── Header ── */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+      <div className="bg-slate-800 border-b border-slate-700 px-4 sm:px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-gray-900">AI Form Fill<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
-              <p className="text-xs text-gray-500 hidden sm:block">Upload any form — AI guides you through it</p>
+              <h1 className="text-lg font-semibold text-slate-50">AI Form Fill<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
+              <p className="text-xs text-slate-300 hidden sm:block">Upload any form — AI guides you through it</p>
             </div>
           </div>
 
@@ -254,19 +254,19 @@ export default function FormFillPage() {
           <div className="relative">
             <button
               onClick={() => setShowLangPicker(!showLangPicker)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-amber-300 text-sm text-gray-600 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:border-amber-300 text-sm text-slate-300 transition-colors"
             >
               <Globe className="w-4 h-4 text-amber-500" />
               <span className="hidden sm:inline">{selectedLang.flag} {selectedLang.label}</span>
               <span className="sm:hidden">{selectedLang.flag}</span>
             </button>
             {showLangPicker && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl border border-gray-200 shadow-lg z-50 py-1 max-h-64 overflow-y-auto">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800 rounded-xl border border-slate-700 shadow-lg z-50 py-1 max-h-64 overflow-y-auto">
                 {LANGUAGES.map(l => (
                   <button
                     key={l.code}
                     onClick={() => { setLanguage(l.code); setShowLangPicker(false) }}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 text-left transition-colors ${language === l.code ? 'text-amber-600 font-medium bg-amber-50' : 'text-gray-700'}`}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-slate-700 text-left transition-colors ${language === l.code ? 'text-amber-600 font-medium bg-amber-50' : 'text-slate-200'}`}
                   >
                     <span>{l.flag}</span>
                     <span>{l.label}</span>
@@ -302,18 +302,18 @@ export default function FormFillPage() {
               className={`relative rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 flex flex-col items-center justify-center py-16 px-8
                 ${isDragging
                   ? 'border-amber-400 bg-amber-50 scale-[1.01]'
-                  : 'border-gray-200 bg-white hover:border-amber-300 hover:bg-amber-50/40'
+                  : 'border-slate-700 bg-slate-800 hover:border-amber-300 hover:bg-amber-50/40'
                 }`}
             >
               <input ref={fileInputRef} type="file" className="hidden" accept="image/*,.pdf" onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-colors ${isDragging ? 'bg-amber-500' : 'bg-amber-100'}`}>
                 <Upload className={`w-8 h-8 transition-colors ${isDragging ? 'text-white' : 'text-amber-500'}`} />
               </div>
-              <p className="text-lg font-semibold text-gray-900 mb-1">{isDragging ? 'Drop your form here' : 'Upload a form'}</p>
-              <p className="text-sm text-gray-500 text-center">Drag & drop or click to browse<br />Supports JPG, PNG, PDF — any language</p>
+              <p className="text-lg font-semibold text-slate-50 mb-1">{isDragging ? 'Drop your form here' : 'Upload a form'}</p>
+              <p className="text-sm text-slate-300 text-center">Drag & drop or click to browse<br />Supports JPG, PNG, PDF — any language</p>
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 {['Japanese Forms', 'English', 'Arabic', 'Tax Docs', 'Applications', 'Contracts'].map(tag => (
-                  <span key={tag} className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full">{tag}</span>
+                  <span key={tag} className="text-xs px-3 py-1 bg-slate-700 text-slate-300 rounded-full">{tag}</span>
                 ))}
               </div>
             </div>
@@ -324,13 +324,13 @@ export default function FormFillPage() {
                 { icon: Sparkles, label: 'AI Reads It', desc: 'Claude identifies every field', color: 'text-amber-500', bg: 'bg-amber-50' },
                 { icon: FileCheck, label: 'Fill & Export', desc: 'Guided field by field', color: 'text-green-500', bg: 'bg-green-50' },
               ].map(item => (
-                <div key={item.label} className="bg-white rounded-xl border border-gray-200 p-4 flex items-start gap-3">
+                <div key={item.label} className="bg-slate-800 rounded-xl border border-slate-700 p-4 flex items-start gap-3">
                   <div className={`w-9 h-9 rounded-lg ${item.bg} flex items-center justify-center flex-shrink-0`}>
                     <item.icon className={`w-5 h-5 ${item.color}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{item.label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                    <p className="text-sm font-medium text-slate-50">{item.label}</p>
+                    <p className="text-xs text-slate-300 mt-0.5">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -340,17 +340,17 @@ export default function FormFillPage() {
 
         {/* STAGE: ANALYZING */}
         {stage === 'analyzing' && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-12 flex flex-col items-center justify-center text-center">
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 p-12 flex flex-col items-center justify-center text-center">
             <div className="relative mb-6">
               <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center">
                 <Sparkles className="w-10 h-10 text-amber-500" />
               </div>
               <div className="absolute inset-0 rounded-full border-4 border-amber-300 border-t-transparent animate-spin" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Reading your form…</h2>
-            <p className="text-sm text-gray-500 max-w-xs">Claude is identifying all fields and translating them to {language}</p>
+            <h2 className="text-xl font-semibold text-slate-50 mb-2">Reading your form…</h2>
+            <p className="text-sm text-slate-300 max-w-xs">Claude is identifying all fields and translating them to {language}</p>
             {file && (
-              <div className="mt-6 flex items-center gap-2 text-xs text-gray-400 bg-gray-50 px-4 py-2 rounded-full">
+              <div className="mt-6 flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-4 py-2 rounded-full">
                 <FileText className="w-3.5 h-3.5" />
                 <span>{file.name}</span>
               </div>
@@ -362,17 +362,17 @@ export default function FormFillPage() {
         {stage === 'filling' && currentField && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div className="h-full bg-amber-400 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
-              <span className="text-xs text-gray-500 flex-shrink-0 font-medium">{currentIndex + 1} / {fields.length}</span>
+              <span className="text-xs text-slate-300 flex-shrink-0 font-medium">{currentIndex + 1} / {fields.length}</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {previewUrl && (
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                    <span className="text-xs font-medium text-gray-500">Original Form</span>
+                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
+                    <span className="text-xs font-medium text-slate-300">Original Form</span>
                     <button onClick={() => setShowPreview(!showPreview)} className="text-xs text-indigo-600 flex items-center gap-1">
                       <ZoomIn className="w-3.5 h-3.5" />
                       {showPreview ? 'Shrink' : 'Expand'}
@@ -384,17 +384,17 @@ export default function FormFillPage() {
                 </div>
               )}
 
-              <div className={`bg-white rounded-2xl border border-gray-200 flex flex-col ${!previewUrl ? 'lg:col-span-2' : ''}`}>
-                <div className="px-5 py-4 border-b border-gray-100">
+              <div className={`bg-slate-800 rounded-2xl border border-slate-700 flex flex-col ${!previewUrl ? 'lg:col-span-2' : ''}`}>
+                <div className="px-5 py-4 border-b border-slate-700">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${currentField.required ? 'bg-red-50 text-red-600' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${currentField.required ? 'bg-red-50 text-red-600' : 'bg-slate-700 text-slate-300'}`}>
                       {currentField.required ? 'Required' : 'Optional'}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-slate-400">
                       {currentField.originalLabel !== currentField.label && `Original: ${currentField.originalLabel}`}
                     </span>
                   </div>
-                  <h2 className="text-base font-semibold text-gray-900 mt-1">{currentField.label}</h2>
+                  <h2 className="text-base font-semibold text-slate-50 mt-1">{currentField.label}</h2>
                 </div>
 
                 <div className="px-5 py-4 flex-1">
@@ -410,7 +410,7 @@ export default function FormFillPage() {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-800 leading-relaxed">{aiQuestion}</p>
+                        <p className="text-sm text-slate-200 leading-relaxed">{aiQuestion}</p>
                       )}
                     </div>
                   </div>
@@ -421,7 +421,7 @@ export default function FormFillPage() {
                         <div className="flex gap-3">
                           {['Yes', 'No'].map(opt => (
                             <button key={opt} onClick={() => setCurrentValue(opt)}
-                              className={`flex-1 py-3 rounded-xl border-2 text-sm font-medium transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                              className={`flex-1 py-3 rounded-xl border-2 text-sm font-medium transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-slate-700 text-slate-300 hover:border-slate-500'}`}>
                               {opt}
                             </button>
                           ))}
@@ -430,32 +430,32 @@ export default function FormFillPage() {
                         <div className="space-y-2">
                           {currentField.options.map(opt => (
                             <button key={opt} onClick={() => setCurrentValue(opt)}
-                              className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700 font-medium' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}>
+                              className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm transition-all ${currentValue === opt ? 'border-amber-400 bg-amber-50 text-amber-700 font-medium' : 'border-slate-700 text-slate-200 hover:border-slate-500'}`}>
                               {opt}
                             </button>
                           ))}
                         </div>
                       ) : currentField.type === 'date' ? (
                         <input ref={inputRef as React.RefObject<HTMLInputElement>} type="date" value={currentValue} onChange={e => setCurrentValue(e.target.value)} onKeyDown={handleKeyDown}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-gray-800" />
+                          className="w-full px-4 py-3 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-slate-200" />
                       ) : currentField.type === 'address' ? (
                         <textarea ref={inputRef as React.RefObject<HTMLTextAreaElement>} value={currentValue} onChange={e => setCurrentValue(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) handleNext() }}
                           placeholder={currentField.hint} rows={3}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-gray-800 resize-none" />
+                          className="w-full px-4 py-3 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-slate-200 resize-none" />
                       ) : (
                         <input ref={inputRef as React.RefObject<HTMLInputElement>}
                           type={currentField.type === 'email' ? 'email' : currentField.type === 'phone' ? 'tel' : currentField.type === 'number' ? 'number' : 'text'}
                           value={currentValue} onChange={e => setCurrentValue(e.target.value)} onKeyDown={handleKeyDown} placeholder={currentField.hint}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-gray-800" />
+                          className="w-full px-4 py-3 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 text-sm text-slate-200" />
                       )}
-                      {currentField.hint && <p className="text-xs text-gray-400 mt-2 px-1">{currentField.hint}</p>}
+                      {currentField.hint && <p className="text-xs text-slate-400 mt-2 px-1">{currentField.hint}</p>}
                     </>
                   )}
                 </div>
 
-                <div className="px-5 py-4 border-t border-gray-100 flex items-center gap-3">
+                <div className="px-5 py-4 border-t border-slate-700 flex items-center gap-3">
                   <button onClick={handleSkip} disabled={currentField.required}
-                    className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <SkipForward className="w-4 h-4" /> Skip
                   </button>
                   <button onClick={handleNext} disabled={isLoadingQ || (currentField.required && !currentValue.trim())}
@@ -466,13 +466,13 @@ export default function FormFillPage() {
               </div>
             </div>
 
-            <div className="hidden sm:block bg-white rounded-xl border border-gray-200 px-5 py-3">
+            <div className="hidden sm:block bg-slate-800 rounded-xl border border-slate-700 px-5 py-3">
               <div className="flex flex-wrap gap-2">
                 {fields.map((f, i) => (
                   <div key={f.id} className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
                     i < currentIndex ? 'bg-green-100 text-green-700'
                     : i === currentIndex ? 'bg-amber-100 text-amber-700 font-medium ring-1 ring-amber-300'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-slate-700 text-slate-400'
                   }`}>
                     {i < currentIndex && <Check className="w-3 h-3 inline mr-1" />}
                     {f.label}
@@ -486,33 +486,33 @@ export default function FormFillPage() {
         {/* STAGE: REVIEW */}
         {stage === 'review' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
               <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100 px-5 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
                     <FileCheck className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Form Complete</p>
-                    <p className="text-xs text-gray-500">{filledCount} of {fields.length} fields filled</p>
+                    <p className="text-sm font-semibold text-slate-50">Form Complete</p>
+                    <p className="text-xs text-slate-300">{filledCount} of {fields.length} fields filled</p>
                   </div>
                 </div>
-                <button onClick={reset} className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1">
+                <button onClick={reset} className="text-xs text-slate-400 hover:text-slate-300 flex items-center gap-1">
                   <RefreshCw className="w-3.5 h-3.5" /> New form
                 </button>
               </div>
 
               <div className="divide-y divide-gray-100">
                 {filledFields.map((f, i) => (
-                  <div key={f.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-gray-50 group">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${f.value ? 'bg-green-100' : 'bg-gray-100'}`}>
-                      {f.value ? <Check className="w-3 h-3 text-green-600" /> : <span className="text-gray-400 text-xs">—</span>}
+                  <div key={f.id} className="flex items-start gap-3 px-5 py-3.5 hover:bg-slate-800 group">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${f.value ? 'bg-green-100' : 'bg-slate-700'}`}>
+                      {f.value ? <Check className="w-3 h-3 text-green-600" /> : <span className="text-slate-400 text-xs">—</span>}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-400 mb-0.5">{f.label}{f.required && <span className="text-red-400 ml-1">*</span>}</p>
-                      <p className={`text-sm break-words ${f.value ? 'text-gray-900' : 'text-gray-300 italic'}`}>{f.value || 'Not filled'}</p>
+                      <p className="text-xs text-slate-400 mb-0.5">{f.label}{f.required && <span className="text-red-400 ml-1">*</span>}</p>
+                      <p className={`text-sm break-words ${f.value ? 'text-slate-50' : 'text-slate-400 italic'}`}>{f.value || 'Not filled'}</p>
                     </div>
-                    <button onClick={() => editField(i)} className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-indigo-600 transition-all p-1">
+                    <button onClick={() => editField(i)} className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-indigo-600 transition-all p-1">
                       <Edit2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -525,11 +525,11 @@ export default function FormFillPage() {
                 <Download className="w-4 h-4" /> Download Filled Form
               </button>
               <button onClick={saveToVault} disabled={isSaving || savedToVault}
-                className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium rounded-xl transition-colors border ${savedToVault ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-700'}`}>
+                className={`flex-1 flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium rounded-xl transition-colors border ${savedToVault ? 'bg-green-50 border-green-200 text-green-700' : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-indigo-300 hover:text-indigo-700'}`}>
                 {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : savedToVault ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                 {savedToVault ? 'Saved to Vault!' : 'Save to Vault'}
               </button>
-              <button onClick={reset} className="flex items-center justify-center gap-2 px-5 py-3 bg-white border border-gray-200 text-gray-600 hover:border-gray-300 text-sm font-medium rounded-xl transition-colors">
+              <button onClick={reset} className="flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 border border-slate-700 text-slate-300 hover:border-slate-500 text-sm font-medium rounded-xl transition-colors">
                 <RefreshCw className="w-4 h-4" /> New Form
               </button>
             </div>

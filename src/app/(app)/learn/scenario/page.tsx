@@ -200,15 +200,15 @@ export default function ScenarioPage() {
         <p className="mt-1 text-sm text-[var(--text-4)]">{lesson.title}</p>
 
         <div className="mt-6 grid grid-cols-3 gap-3 w-full max-w-xs">
-          <div className="rounded-2xl bg-[#EEF2FF] dark:bg-indigo-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#EEF2FF] p-3 text-center">
             <p className="text-xl font-bold text-[#4F46E5]">{lesson.scenes.length}</p>
             <p className="text-[10px] text-[var(--text-4)]">Scenes</p>
           </div>
-          <div className="rounded-2xl bg-[#D1FAE5] dark:bg-green-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#D1FAE5] p-3 text-center">
             <p className="text-xl font-bold text-[#065F46]">{totalWords}</p>
             <p className="text-[10px] text-[var(--text-4)]">Words</p>
           </div>
-          <div className="rounded-2xl bg-[#FEF3C7] dark:bg-amber-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#FEF3C7] p-3 text-center">
             <p className="text-xl font-bold text-[#92400E]">{quizScore}/{lesson.quiz.length}</p>
             <p className="text-[10px] text-[var(--text-4)]">Quiz</p>
           </div>
@@ -237,14 +237,14 @@ export default function ScenarioPage() {
         {/* Progress */}
         <div className="flex items-center gap-3 mb-6">
           <span className="text-xs font-bold text-[#4F46E5]">QUIZ</span>
-          <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="flex-1 h-2 rounded-full bg-slate-700">
             <div className="h-full rounded-full bg-[#4F46E5] transition-all" style={{ width: `${((quizIdx + 1) / lesson.quiz.length) * 100}%` }} />
           </div>
           <span className="text-xs font-medium text-[var(--text-4)]">{quizIdx + 1}/{lesson.quiz.length}</span>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="w-full max-w-sm rounded-3xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 p-8 text-center">
+          <div className="w-full max-w-sm rounded-3xl border-2 border-slate-700 bg-slate-800 p-8 text-center">
             <p className="text-xs font-semibold text-[#4F46E5] uppercase tracking-wider mb-4">Type the answer</p>
             <p className="text-base font-medium text-[var(--text-1)]">{q.question}</p>
             {q.hint && <p className="mt-2 text-xs text-[var(--text-4)] italic">Hint: {q.hint}</p>}
@@ -256,7 +256,7 @@ export default function ScenarioPage() {
               onKeyDown={e => { if (e.key === 'Enter' && !quizRevealed) checkQuizAnswer(); }}
               placeholder="Type in Japanese..."
               disabled={quizRevealed}
-              className="mt-4 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-4 py-3 text-center text-lg font-medium text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-70"
+              className="mt-4 w-full rounded-xl border border-slate-700 bg-[var(--bg-1)] px-4 py-3 text-center text-lg font-medium text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-70"
               autoFocus
             />
 
@@ -292,7 +292,7 @@ export default function ScenarioPage() {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/learn')} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)]">
             <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -306,7 +306,7 @@ export default function ScenarioPage() {
         </div>
         <div className="flex gap-1">
           {lesson.scenes.map((_, i) => (
-            <div key={i} className={`h-1.5 w-6 rounded-full ${i <= currentScene ? 'bg-[#4F46E5]' : 'bg-gray-200 dark:bg-gray-700'}`} />
+            <div key={i} className={`h-1.5 w-6 rounded-full ${i <= currentScene ? 'bg-[#4F46E5]' : 'bg-slate-700'}`} />
           ))}
         </div>
       </div>
@@ -319,7 +319,7 @@ export default function ScenarioPage() {
         </div>
 
         {/* Dialogue */}
-        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+        <div className="rounded-2xl border border-slate-700 bg-slate-800 p-4">
           <p className="text-[10px] font-semibold text-[var(--text-4)] uppercase tracking-wider mb-2">{scene.dialogue.speaker}</p>
           <p className="text-lg font-medium text-[var(--text-1)] leading-relaxed">{scene.dialogue.japanese}</p>
           <p className="text-xs text-[var(--text-3)] mt-1">{scene.dialogue.reading}</p>
@@ -355,14 +355,14 @@ export default function ScenarioPage() {
 
         {/* Cultural note */}
         {scene.cultural_note && (
-          <div className="rounded-xl bg-[#FEF3C7] dark:bg-amber-950/20 border border-[#FDE68A]/50 dark:border-amber-800/30 p-3">
-            <p className="text-xs font-bold text-[#92400E] dark:text-amber-300 mb-1">🎌 Cultural Note</p>
-            <p className="text-xs text-[#92400E]/80 dark:text-amber-300/80">{scene.cultural_note}</p>
+          <div className="rounded-xl bg-[#FEF3C7] border border-[#FDE68A]/50 p-3">
+            <p className="text-xs font-bold text-[#92400E] mb-1">🎌 Cultural Note</p>
+            <p className="text-xs text-[#92400E]/80">{scene.cultural_note}</p>
           </div>
         )}
 
         {/* Practice prompt */}
-        <div className="rounded-2xl border-2 border-[#4F46E5]/20 bg-white dark:bg-gray-900 p-4">
+        <div className="rounded-2xl border-2 border-[#4F46E5]/20 bg-slate-800 p-4">
           <p className="text-xs font-bold text-[#4F46E5] uppercase tracking-wider mb-2">Your Turn</p>
           <p className="text-sm font-medium text-[var(--text-1)]">{scene.practice_prompt}</p>
 
@@ -374,7 +374,7 @@ export default function ScenarioPage() {
               onKeyDown={e => { if (e.key === 'Enter' && !answered) checkPracticeAnswer(); }}
               placeholder="Type in Japanese..."
               disabled={answered}
-              className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-60"
+              className="flex-1 rounded-xl border border-slate-700 bg-[var(--bg-1)] px-3 py-2.5 text-sm text-[var(--text-1)] placeholder:text-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none disabled:opacity-60"
             />
             {!answered && (
               <button onClick={checkPracticeAnswer} disabled={!userAnswer.trim()} className="rounded-xl bg-[#4F46E5] px-4 py-2.5 text-xs font-bold text-white disabled:opacity-40">
@@ -384,8 +384,8 @@ export default function ScenarioPage() {
           </div>
 
           {showAnswer && (
-            <div className="mt-3 rounded-xl bg-[#D1FAE5] dark:bg-green-950/20 p-3">
-              <p className="text-xs font-bold text-[#065F46] dark:text-green-300 mb-1">Model answer:</p>
+            <div className="mt-3 rounded-xl bg-[#D1FAE5] p-3">
+              <p className="text-xs font-bold text-[#065F46] mb-1">Model answer:</p>
               <p className="text-base font-bold text-[var(--text-1)]">{scene.practice_answer.japanese}</p>
               <p className="text-xs text-[var(--text-3)]">{scene.practice_answer.reading}</p>
               <p className="text-xs text-[var(--text-2)] mt-1 italic">{scene.practice_answer.translation}</p>

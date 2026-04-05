@@ -21,9 +21,9 @@ const TIER_GRADIENT: Record<Tier, string> = {
 };
 
 const TIER_TEXT: Record<Tier, string> = {
-  starter: 'text-amber-600 dark:text-amber-400',
-  growing: 'text-blue-600 dark:text-blue-400',
-  established: 'text-emerald-600 dark:text-emerald-400',
+  starter: 'text-amber-600 text-amber-400',
+  growing: 'text-blue-600 text-blue-400',
+  established: 'text-emerald-600 text-emerald-400',
 };
 
 const SIZE_H: Record<string, string> = {
@@ -67,12 +67,12 @@ export default function TrustScoreBar({
           >
             {score}
           </span>
-          <span className="text-xs text-gray-400">/{maxScore}</span>
+          <span className="text-xs text-slate-400">/{maxScore}</span>
         </div>
       )}
 
       {/* Bar */}
-      <div className={`relative ${SIZE_H[size]} rounded-full bg-gray-200 dark:bg-gray-700 overflow-visible`}>
+      <div className={`relative ${SIZE_H[size]} rounded-full bg-slate-700 overflow-visible`}>
         <div
           className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${TIER_GRADIENT[tier]} transition-[width] duration-[1200ms] [transition-timing-function:var(--ease-out)]`}
           style={{ width: `${fillWidth}%` }}
@@ -82,7 +82,7 @@ export default function TrustScoreBar({
         {showMilestones && MILESTONES.map((m) => (
           <div
             key={m.pct}
-            className="absolute top-0 bottom-0 w-px bg-gray-400/40 dark:bg-gray-500/40"
+            className="absolute top-0 bottom-0 w-px bg-slate-500/40"
             style={{ left: `${m.pct}%` }}
             title={m.label}
           />

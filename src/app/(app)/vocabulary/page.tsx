@@ -54,11 +54,11 @@ export default function VocabularyPage() {
       <div className="px-4 pt-4 space-y-3">
         {/* Stats */}
         <div className="flex gap-3">
-          <div className="flex-1 rounded-xl bg-[#EEF2FF] dark:bg-indigo-950/20 p-3 text-center">
+          <div className="flex-1 rounded-xl bg-[#EEF2FF] p-3 text-center">
             <p className="text-xl font-bold text-[#4F46E5]">{words.length}</p>
             <p className="text-[10px] text-[#6B7280]">Words Saved</p>
           </div>
-          <div className="flex-1 rounded-xl bg-[#FEF3C7] dark:bg-amber-950/20 p-3 text-center">
+          <div className="flex-1 rounded-xl bg-[#FEF3C7] p-3 text-center">
             <p className="text-xl font-bold text-[#92400E]">{words.reduce((s, w) => s + w.times_seen, 0)}</p>
             <p className="text-[10px] text-[#6B7280]">Total Encounters</p>
           </div>
@@ -71,7 +71,7 @@ export default function VocabularyPage() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Search words..."
-            className="w-full rounded-xl border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-[#0A0A0A] dark:text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
+            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none"
           />
         )}
 
@@ -79,7 +79,7 @@ export default function VocabularyPage() {
         {filtered.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-3xl mb-2">📚</p>
-            <p className="text-sm font-medium text-[#374151] dark:text-gray-300">
+            <p className="text-sm font-medium text-[#374151]">
               {words.length === 0 ? 'No words saved yet' : 'No matches'}
             </p>
             <p className="text-xs text-[#9CA3AF] mt-1">
@@ -89,21 +89,21 @@ export default function VocabularyPage() {
         ) : (
           <div className="space-y-2">
             {filtered.map((w, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E5E5] dark:border-gray-700 p-3">
+              <div key={i} className="bg-slate-800 rounded-xl border border-slate-700 p-3">
                 <div className="flex items-center gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[15px] font-bold text-[#0A0A0A] dark:text-white">{w.word}</span>
+                      <span className="text-[15px] font-bold text-slate-50">{w.word}</span>
                       {w.reading && <span className="text-[12px] text-[#6B7280]">({w.reading})</span>}
                     </div>
-                    <p className="text-[13px] text-[#374151] dark:text-gray-300 mt-0.5">{w.meaning}</p>
+                    <p className="text-[13px] text-[#374151] mt-0.5">{w.meaning}</p>
                     {w.example && <p className="text-[11px] text-[#9CA3AF] italic mt-0.5">{w.example}</p>}
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-[10px] text-[#9CA3AF] bg-[#F3F4F6] dark:bg-gray-700 px-1.5 py-0.5 rounded">{w.times_seen}x</span>
+                    <span className="text-[10px] text-[#9CA3AF] bg-slate-700 px-1.5 py-0.5 rounded">{w.times_seen}x</span>
                     <button
                       onClick={() => speak(w.word, i)}
-                      className={`h-8 w-8 rounded-full flex items-center justify-center ${speakingIdx === i ? 'bg-[#4F46E5] text-white' : 'bg-[#F3F4F6] dark:bg-gray-700 text-[#9CA3AF]'}`}
+                      className={`h-8 w-8 rounded-full flex items-center justify-center ${speakingIdx === i ? 'bg-[#4F46E5] text-white' : 'bg-slate-700 text-[#9CA3AF]'}`}
                     >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
                     </button>

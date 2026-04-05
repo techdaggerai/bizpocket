@@ -243,15 +243,15 @@ export default function StudyPage() {
         <p className="text-xs text-[var(--text-4)] mt-1">{mins}m {secs}s</p>
 
         <div className="mt-6 grid grid-cols-3 gap-4 w-full max-w-xs">
-          <div className="rounded-2xl bg-[#D1FAE5] dark:bg-green-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#D1FAE5] p-3 text-center">
             <p className="text-2xl font-bold text-[#065F46]">{sessionStats.correct}</p>
             <p className="text-[10px] text-[#065F46]/60">Correct</p>
           </div>
-          <div className="rounded-2xl bg-[#FEE2E2] dark:bg-red-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#FEE2E2] p-3 text-center">
             <p className="text-2xl font-bold text-[#991B1B]">{sessionStats.incorrect}</p>
             <p className="text-[10px] text-[#991B1B]/60">Missed</p>
           </div>
-          <div className="rounded-2xl bg-[#EEF2FF] dark:bg-indigo-950/20 p-3 text-center">
+          <div className="rounded-2xl bg-[#EEF2FF] p-3 text-center">
             <p className="text-2xl font-bold text-[#4F46E5]">{pct}%</p>
             <p className="text-[10px] text-[#4F46E5]/60">Accuracy</p>
           </div>
@@ -263,7 +263,7 @@ export default function StudyPage() {
         </div>
 
         <div className="mt-6 flex gap-3 w-full max-w-xs">
-          <button onClick={() => router.push('/learn')} className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-3 text-sm font-medium text-[var(--text-2)]">
+          <button onClick={() => router.push('/learn')} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-[var(--text-2)]">
             Done
           </button>
           <button
@@ -280,7 +280,7 @@ export default function StudyPage() {
   // ─── Active Card ───────────────────────────────────────────────────────────
   const progress = (currentIdx + 1) / cards.length;
   const masteryLabels = ['New', 'Learning', 'Familiar', 'Mastered'];
-  const masteryColors = ['bg-gray-100 dark:bg-gray-800 text-gray-500', 'bg-[#FEF3C7] text-[#92400E]', 'bg-[#DBEAFE] text-[#1E40AF]', 'bg-[#D1FAE5] text-[#065F46]'];
+  const masteryColors = ['bg-slate-700 text-slate-300', 'bg-[#FEF3C7] text-[#92400E]', 'bg-[#DBEAFE] text-[#1E40AF]', 'bg-[#D1FAE5] text-[#065F46]'];
   const contextLabel = currentCard.context?.replace(/_/g, ' ').replace(/^topic /, '') || '';
   const sourceLabel = currentCard.context
     ? (currentCard.context.startsWith('topic_') ? 'topic lesson' :
@@ -298,7 +298,7 @@ export default function StudyPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="flex-1 h-2.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+        <div className="flex-1 h-2.5 rounded-full bg-slate-700 overflow-hidden">
           <div className="h-full rounded-full bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] transition-all duration-500" style={{ width: `${progress * 100}%` }} />
         </div>
         <span className="text-xs font-bold text-[var(--text-3)] tabular-nums">
@@ -309,7 +309,7 @@ export default function StudyPage() {
       {/* Flashcard */}
       <div className="flex-1 flex flex-col items-center justify-center">
         <div
-          className="w-full max-w-sm rounded-3xl border-2 border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg text-center cursor-pointer transition-all hover:shadow-xl overflow-hidden"
+          className="w-full max-w-sm rounded-3xl border-2 border-slate-700 bg-slate-800 shadow-lg text-center cursor-pointer transition-all hover:shadow-xl overflow-hidden"
           onClick={() => { if (cardState === 'question') { setCardState('answer'); speak(currentCard.word); } }}
         >
           {/* Context ribbon */}
@@ -347,7 +347,7 @@ export default function StudyPage() {
 
             {/* Revealed answer */}
             {cardState === 'answer' && (
-              <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-5">
+              <div className="mt-6 border-t border-slate-700 pt-5">
                 <p className="text-xl font-bold text-[#4F46E5]">{currentCard.meaning}</p>
 
                 {currentCard.example_sentence && (

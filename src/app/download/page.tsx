@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
+import { getBrandMode } from '@/lib/brand';
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 
@@ -14,13 +15,7 @@ interface BeforeInstallPromptEvent extends Event {
 export default function DownloadPage() {
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
-  const [isPocketChat] = useState(() => {
-    if (typeof window === 'undefined') return true;
-    const host = window.location.hostname;
-    return host.includes('evrywher') || host.includes('evrywyre') ||
-      host.includes('pocketchat') || host.includes('evrywhere') ||
-      host.includes('localhost');
-  });
+  const [isPocketChat] = useState(() => getBrandMode() === 'evrywher');
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
 
@@ -48,7 +43,7 @@ export default function DownloadPage() {
   const appName = isPocketChat ? 'Evrywher' : 'BizPocket';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#EEF2FF] to-white">
+    <div className="min-h-screen bg-slate-900">
       <PageHeader title="Download" backPath="/" />
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4">
@@ -64,15 +59,15 @@ export default function DownloadPage() {
         <div className="mx-auto mb-6">
           <PocketChatMark size={80} />
         </div>
-        <h1 className="text-[clamp(1.5rem,4vw,2rem)] font-bold text-[#111827] leading-tight">
+        <h1 className="text-[clamp(1.5rem,4vw,2rem)] font-bold text-slate-50 leading-tight">
           Get {appName} on your phone
         </h1>
-        <p className="mt-3 text-[15px] text-[#6B7280] leading-relaxed">
+        <p className="mt-3 text-[15px] text-slate-400 leading-relaxed">
           Install {appName} as a real app — no app store needed.
           It works offline, sends notifications, and feels native.
         </p>
         {installed && (
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#F0FDF4] px-4 py-2 text-sm font-medium text-[#166534]">
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
             Already installed!
           </div>
@@ -84,10 +79,10 @@ export default function DownloadPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
           {/* iPhone */}
-          <div className={`rounded-2xl border p-6 space-y-4 ${isIOS ? 'border-[#4F46E5] bg-[#4F46E5]/[0.02] ring-1 ring-[#4F46E5]/20' : 'border-[#E5E5E5] bg-white'}`}>
+          <div className={`rounded-2xl border p-6 space-y-4 ${isIOS ? 'border-[#4F46E5] bg-[#4F46E5]/[0.02] ring-1 ring-[#4F46E5]/20' : 'border-slate-700 bg-slate-800'}`}>
             <div className="flex items-center gap-2">
               <span className="text-xl">📱</span>
-              <h2 className="text-[15px] font-bold text-[#111827]">iPhone / iPad</h2>
+              <h2 className="text-[15px] font-bold text-slate-50">iPhone / iPad</h2>
               {isIOS && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#4F46E5] text-white">YOUR DEVICE</span>}
             </div>
 
@@ -112,16 +107,16 @@ export default function DownloadPage() {
           </div>
 
           {/* Android */}
-          <div className={`rounded-2xl border p-6 space-y-4 ${isAndroid ? 'border-[#4F46E5] bg-[#4F46E5]/[0.02] ring-1 ring-[#4F46E5]/20' : 'border-[#E5E5E5] bg-white'}`}>
+          <div className={`rounded-2xl border p-6 space-y-4 ${isAndroid ? 'border-[#4F46E5] bg-[#4F46E5]/[0.02] ring-1 ring-[#4F46E5]/20' : 'border-slate-700 bg-slate-800'}`}>
             <div className="flex items-center gap-2">
               <span className="text-xl">🤖</span>
-              <h2 className="text-[15px] font-bold text-[#111827]">Android</h2>
+              <h2 className="text-[15px] font-bold text-slate-50">Android</h2>
               {isAndroid && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#4F46E5] text-white">YOUR DEVICE</span>}
             </div>
 
             {deferredPrompt ? (
               <div className="space-y-3">
-                <p className="text-sm text-[#6B7280]">One tap to install — no app store required.</p>
+                <p className="text-sm text-slate-400">One tap to install — no app store required.</p>
                 <button
                   onClick={handleInstall}
                   className="w-full rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white hover:bg-[#4338CA] transition-colors"
@@ -148,22 +143,22 @@ export default function DownloadPage() {
 
       {/* Coming soon */}
       <section className="px-6 pb-8 text-center">
-        <p className="text-xs text-[#9CA3AF] font-medium uppercase tracking-wider mb-4">Coming soon</p>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-4">Coming soon</p>
         <div className="flex justify-center gap-4">
-          <div className="rounded-xl bg-[#F3F4F6] px-5 py-3 flex items-center gap-2 opacity-50">
+          <div className="rounded-xl bg-slate-800 px-5 py-3 flex items-center gap-2 opacity-50">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#9CA3AF"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">App Store</span>
+            <span className="text-sm font-medium text-slate-500">App Store</span>
           </div>
-          <div className="rounded-xl bg-[#F3F4F6] px-5 py-3 flex items-center gap-2 opacity-50">
+          <div className="rounded-xl bg-slate-800 px-5 py-3 flex items-center gap-2 opacity-50">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#9CA3AF"><path d="M3.18 23.48L14.31 12 3.18.52c-.18.18-.3.42-.3.7v21.56c0 .28.12.52.3.7zm1.2.82l12.38-7.15L5.04.7l-.66-.38 12.38 7.15-12.38 7.15.66-.38-12.38 7.15zm13.55-7.83l-3.38-1.95L3.18 23.48l14.75-6.51zm0-8.94L3.18.52l11.37 8.96 3.38-1.95z"/></svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">Google Play</span>
+            <span className="text-sm font-medium text-slate-500">Google Play</span>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
       <section className="px-6 pb-16 max-w-lg mx-auto">
-        <h3 className="text-sm font-bold text-[#111827] mb-4">FAQ</h3>
+        <h3 className="text-sm font-bold text-slate-50 mb-4">FAQ</h3>
         <div className="space-y-4">
           <FAQ q="Is this a real app?" a={`Yes! ${appName} is a Progressive Web App (PWA). It installs on your phone like a regular app — with its own icon, full-screen mode, and push notifications. No app store download needed.`} />
           <FAQ q="Does it work offline?" a="Core features work offline. Messages and data sync automatically when you reconnect." />
@@ -178,10 +173,10 @@ export default function DownloadPage() {
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-2.5">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EEF2FF] text-[#4F46E5] text-[11px] font-bold">{n}</div>
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-[#4F46E5] text-[11px] font-bold">{n}</div>
       <div>
-        <p className="text-[13px] font-semibold text-[#111827]">{title}</p>
-        <p className="text-[12px] text-[#6B7280] mt-0.5 leading-relaxed">{children}</p>
+        <p className="text-[13px] font-semibold text-slate-50">{title}</p>
+        <p className="text-[12px] text-slate-400 mt-0.5 leading-relaxed">{children}</p>
       </div>
     </div>
   );
@@ -190,14 +185,14 @@ function Step({ n, title, children }: { n: number; title: string; children: Reac
 function FAQ({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-[#E5E5E5] rounded-xl overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors">
-        <span className="text-[13px] font-medium text-[#111827]">{q}</span>
-        <svg className={`h-4 w-4 shrink-0 text-[#9CA3AF] transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+    <div className="border border-slate-700 rounded-xl overflow-hidden">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-800 transition-colors">
+        <span className="text-[13px] font-medium text-slate-50">{q}</span>
+        <svg className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       {open && (
         <div className="px-4 pb-3">
-          <p className="text-[12px] text-[#6B7280] leading-relaxed">{a}</p>
+          <p className="text-[12px] text-slate-400 leading-relaxed">{a}</p>
         </div>
       )}
     </div>

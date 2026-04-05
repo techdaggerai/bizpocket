@@ -80,7 +80,7 @@ function GifGrid({ gifs, onSelect }: { gifs: GifResult[]; onSelect: (g: GifResul
     return (
       <button
         onClick={() => onSelect(gif)}
-        className="group relative w-full overflow-hidden rounded-lg bg-[#F3F4F6] hover:ring-2 hover:ring-[#4F46E5] transition-all active:scale-95"
+        className="group relative w-full overflow-hidden rounded-lg bg-slate-700 hover:ring-2 hover:ring-[#4F46E5] transition-all active:scale-95"
         style={{ paddingBottom: `${Math.min(Math.max(aspect * 100, 40), 130)}%` }}
         title={gif.title}
       >
@@ -190,11 +190,11 @@ export default function GifPicker({ isOpen, onClose, onSelect, apiKey }: GifPick
 
       {/* Panel */}
       <div className="fixed bottom-16 left-0 right-0 z-50 mx-auto max-w-md">
-        <div className="mx-3 rounded-2xl bg-white shadow-2xl border border-[#E5E5E5] overflow-hidden flex flex-col" style={{ maxHeight: '60vh' }}>
+        <div className="mx-3 rounded-2xl bg-slate-800 shadow-2xl border border-slate-700 overflow-hidden flex flex-col" style={{ maxHeight: '60vh' }}>
 
           {/* Header */}
-          <div className="flex items-center gap-2 border-b border-[#F0F0F0] p-2.5">
-            <div className="flex flex-1 items-center gap-2 rounded-xl bg-[#F3F4F6] px-3 py-2">
+          <div className="flex items-center gap-2 border-b border-[var(--border)] p-2.5">
+            <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-700 px-3 py-2">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               <input
                 ref={searchRef}
@@ -202,22 +202,22 @@ export default function GifPicker({ isOpen, onClose, onSelect, apiKey }: GifPick
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setCategory('trending'); }}
                 placeholder="Search GIFs…"
-                className="flex-1 bg-transparent text-[14px] text-[#0A0A0A] placeholder-[#9CA3AF] focus:outline-none"
+                className="flex-1 bg-transparent text-[14px] text-slate-50 placeholder-[#9CA3AF] focus:outline-none"
               />
               {query && (
-                <button onClick={() => setQuery('')} className="text-[#9CA3AF] hover:text-[#374151]">
+                <button onClick={() => setQuery('')} className="text-[#9CA3AF] hover:text-slate-300">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
                 </button>
               )}
             </div>
-            <button onClick={onClose} className="p-1.5 text-[#9CA3AF] hover:text-[#374151] transition-colors">
+            <button onClick={onClose} className="p-1.5 text-[#9CA3AF] hover:text-slate-300 transition-colors">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
 
           {/* Category pills */}
           {!query && (
-            <div className="flex gap-2 overflow-x-auto px-2.5 py-2 scrollbar-hide border-b border-[#F0F0F0]">
+            <div className="flex gap-2 overflow-x-auto px-2.5 py-2 scrollbar-hide border-b border-[var(--border)]">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -225,7 +225,7 @@ export default function GifPicker({ isOpen, onClose, onSelect, apiKey }: GifPick
                   className={`shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold capitalize transition-colors ${
                     category === cat
                       ? 'bg-[#4F46E5] text-white'
-                      : 'bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]'
+                      : 'bg-slate-700 text-[#6B7280] hover:bg-[#E5E7EB]'
                   }`}
                 >
                   {cat === 'trending' ? '🔥 Trending' : cat}
@@ -263,7 +263,7 @@ export default function GifPicker({ isOpen, onClose, onSelect, apiKey }: GifPick
           </div>
 
           {/* Giphy attribution (required by Giphy API terms) */}
-          <div className="border-t border-[#F0F0F0] px-3 py-1.5 flex items-center justify-end gap-1">
+          <div className="border-t border-[var(--border)] px-3 py-1.5 flex items-center justify-end gap-1">
             <span className="text-[9px] text-[#C4C4C4] font-medium">Powered by</span>
             <svg width="36" height="12" viewBox="0 0 70 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <text fill="#00FF99" font-family="DM Sans,system-ui,sans-serif" font-size="18" font-weight="900" x="0" y="18">GIPHY</text>

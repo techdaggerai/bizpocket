@@ -158,13 +158,13 @@ export default function PhotoEditor({ imageUrl, onSend, onCancel }: Props) {
           )}
           <button
             onClick={() => { setTool(tool === 'draw' ? 'none' : 'draw'); setShowTextInput(false); }}
-            className={`min-w-[44px] min-h-[44px] p-2.5 rounded-full ${tool === 'draw' ? 'bg-white/20 text-white' : 'text-white/60'}`}
+            className={`min-w-[44px] min-h-[44px] p-2.5 rounded-full ${tool === 'draw' ? 'bg-slate-800/20 text-white' : 'text-white/60'}`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </button>
           <button
             onClick={() => { setTool(tool === 'text' ? 'none' : 'text'); setShowTextInput(tool !== 'text'); }}
-            className={`min-w-[44px] min-h-[44px] p-2.5 rounded-full ${tool === 'text' ? 'bg-white/20 text-white' : 'text-white/60'}`}
+            className={`min-w-[44px] min-h-[44px] p-2.5 rounded-full ${tool === 'text' ? 'bg-slate-800/20 text-white' : 'text-white/60'}`}
           >
             <span className="text-lg font-bold">T</span>
           </button>
@@ -198,11 +198,11 @@ export default function PhotoEditor({ imageUrl, onSend, onCancel }: Props) {
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             placeholder="Type text to add..."
-            className="flex-1 bg-white/10 backdrop-blur border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none"
+            className="flex-1 bg-slate-800/10 backdrop-blur border border-white/20 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none"
             autoFocus
             onKeyDown={(e) => e.key === 'Enter' && handleAddText()}
           />
-          <button onClick={handleAddText} className="px-4 py-2.5 bg-white/20 rounded-xl text-sm font-medium text-white">Add</button>
+          <button onClick={handleAddText} className="px-4 py-2.5 bg-slate-800/20 rounded-xl text-sm font-medium text-white">Add</button>
         </div>
       )}
 
@@ -213,7 +213,7 @@ export default function PhotoEditor({ imageUrl, onSend, onCancel }: Props) {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder="Add a caption..."
-          className="flex-1 bg-white/10 backdrop-blur border border-white/20 rounded-[20px] px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none"
+          className="flex-1 bg-slate-800/10 backdrop-blur border border-white/20 rounded-[20px] px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none"
         />
         <button
           onClick={handleSend}

@@ -179,7 +179,7 @@ export default function OpportunitiesPage() {
           <button
             onClick={generateMatches}
             disabled={generating}
-            className="flex items-center justify-center w-[44px] h-[44px] rounded-full active:bg-black/5 dark:active:bg-white/5 transition-colors disabled:opacity-50"
+            className="flex items-center justify-center w-[44px] h-[44px] rounded-full active:bg-black/5 transition-colors disabled:opacity-50"
             aria-label="Refresh matches"
           >
             <RefreshCw size={20} className={`text-[var(--pm-text-secondary)] ${generating ? 'animate-spin' : ''}`} />
@@ -193,7 +193,7 @@ export default function OpportunitiesPage() {
           <GlassCard tier="established" className="animate-[cardSlideDown_300ms_var(--ease-out)_both]">
             <div className="flex items-center gap-3">
               <span>{'\u{1F4A1}'}</span>
-              <p className="text-sm text-emerald-700 dark:text-emerald-300">Share your Business Card to build trust faster</p>
+              <p className="text-sm text-emerald-700">Share your Business Card to build trust faster</p>
             </div>
           </GlassCard>
         )}
@@ -203,7 +203,7 @@ export default function OpportunitiesPage() {
           <GlassCard tier="starter" glow>
             <div className="flex items-center gap-2">
               <span className="animate-[emojiFloat_3s_ease-in-out_infinite]">{'\u{1F331}'}</span>
-              <span className="text-sm font-semibold text-amber-700 dark:text-amber-300">First week: unlimited matches!</span>
+              <span className="text-sm font-semibold text-amber-700">First week: unlimited matches!</span>
             </div>
           </GlassCard>
         )}
@@ -262,7 +262,7 @@ export default function OpportunitiesPage() {
         {/* Action buttons */}
         <div className="space-y-2.5 pt-2">
           <Link href="/invite" className="block no-underline">
-            <Button variant="outline" size="lg" className="w-full border-amber-400 text-amber-600 dark:text-amber-400 dark:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20">
+            <Button variant="outline" size="lg" className="w-full border-amber-400 text-amber-600 hover:bg-amber-950/20">
               Invite Friends (+15 Trust)
             </Button>
           </Link>

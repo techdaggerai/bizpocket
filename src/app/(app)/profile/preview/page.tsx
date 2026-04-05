@@ -169,7 +169,7 @@ export default function ProfilePreviewPage() {
             />
             <button
               onClick={() => router.push('/settings')}
-              className="absolute -bottom-1 -right-1 w-7 h-7 bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-600 rounded-full flex items-center justify-center text-xs shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="absolute -bottom-1 -right-1 w-7 h-7 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-xs shadow-sm hover:bg-slate-800"
             >
               {'\u{1F4F7}'}
             </button>
@@ -182,7 +182,7 @@ export default function ProfilePreviewPage() {
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="flex-1 text-sm border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 py-1 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="flex-1 text-sm border border-indigo-200 rounded-lg px-2 py-1 bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') { saveField('title', title); setEditingTitle(false); }
@@ -210,7 +210,7 @@ export default function ProfilePreviewPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">About</h3>
-            <button onClick={() => setEditingBio(!editingBio)} className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+            <button onClick={() => setEditingBio(!editingBio)} className="text-xs text-indigo-600 font-semibold">
               {editingBio ? 'Done' : '\u270F\uFE0F Edit'}
             </button>
           </div>
@@ -220,7 +220,7 @@ export default function ProfilePreviewPage() {
               onChange={(e) => setBioEn(e.target.value)}
               onBlur={() => saveField('bio_en', bioEn)}
               rows={4}
-              className="w-full text-sm border border-indigo-200 dark:border-indigo-800 rounded-xl px-3 py-2.5 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+              className="w-full text-sm border border-indigo-200 rounded-xl px-3 py-2.5 bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
               autoFocus
             />
           ) : (
@@ -264,13 +264,13 @@ export default function ProfilePreviewPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">Services</h3>
-            <button onClick={() => setEditingServices(!editingServices)} className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">
+            <button onClick={() => setEditingServices(!editingServices)} className="text-xs text-indigo-600 font-semibold">
               {editingServices ? 'Done' : '\u270F\uFE0F Edit'}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
             {services.map((s, i) => (
-              <span key={i} className="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+              <span key={i} className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-xs font-medium px-3 py-1.5 rounded-full border border-indigo-200">
                 {s}
                 {editingServices && (
                   <button onClick={() => handleRemoveService(i)} className="text-indigo-400 hover:text-red-500 ml-0.5">&times;</button>
@@ -287,7 +287,7 @@ export default function ProfilePreviewPage() {
                 value={newService}
                 onChange={(e) => setNewService(e.target.value)}
                 placeholder="Add a service..."
-                className="flex-1 text-sm border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="flex-1 text-sm border border-slate-700 rounded-lg px-3 py-2 bg-slate-800 text-[var(--pm-text-primary)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 onKeyDown={(e) => e.key === 'Enter' && handleAddService()}
               />
               <button onClick={handleAddService} className="text-xs bg-indigo-600 text-white px-3 py-2 rounded-lg font-semibold">Add</button>
@@ -330,7 +330,7 @@ export default function ProfilePreviewPage() {
 
       {/* ─── Card 6: Next Milestone ─── */}
       {nextMilestone && (
-        <GlassCard adaptiveRefraction className="bg-gradient-to-r from-indigo-50/80 to-emerald-50/80 dark:from-indigo-950/30 dark:to-emerald-950/30">
+        <GlassCard adaptiveRefraction className="bg-gradient-to-r from-indigo-50/80 to-emerald-50/80">
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-[var(--pm-text-primary)]">Next Milestone</h3>
             <div className="flex items-center gap-2">
@@ -339,7 +339,7 @@ export default function ProfilePreviewPage() {
             </div>
             <p className="text-xs text-[var(--pm-text-secondary)]">{nextMilestone.requirement}</p>
             <div className="space-y-1">
-              <div className="h-2 rounded-full bg-white/50 dark:bg-gray-800 overflow-hidden">
+              <div className="h-2 rounded-full bg-slate-800/50 overflow-hidden">
                 {(() => {
                   const parts = nextMilestone.progress.split('/');
                   const pct = parts.length === 2 ? Math.min(100, (parseInt(parts[0]) / parseInt(parts[1])) * 100) : 0;

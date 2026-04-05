@@ -181,7 +181,7 @@ export default function TopicPage() {
   return (
     <div className="pb-24">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+      <div className="sticky top-0 z-20 flex items-center gap-3 border-b border-slate-700 bg-slate-900/95 px-4 py-3 backdrop-blur-sm">
         <button onClick={() => router.push('/learn')} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-[var(--bg-2)]">
           <svg className="h-5 w-5 text-[var(--text-2)]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -213,12 +213,12 @@ export default function TopicPage() {
           </Link>
           <Link
             href={`/learn/practice?topic=${topic.slug}`}
-            className="flex-1 flex items-center gap-2 rounded-xl bg-[#EDE9FE] dark:bg-purple-950/20 border border-[#DDD6FE]/50 dark:border-purple-800/30 px-3 py-3"
+            className="flex-1 flex items-center gap-2 rounded-xl bg-[#EDE9FE] border border-[#DDD6FE]/50 px-3 py-3"
           >
             <span className="text-lg">💬</span>
             <div>
-              <p className="text-xs font-bold text-[#7C3AED] dark:text-purple-300">AI Chat</p>
-              <p className="text-[10px] text-[#7C3AED]/60 dark:text-purple-400/60">Practice talk</p>
+              <p className="text-xs font-bold text-[#7C3AED]">AI Chat</p>
+              <p className="text-[10px] text-[#7C3AED]/60">Practice talk</p>
             </div>
           </Link>
         </div>
@@ -240,7 +240,7 @@ export default function TopicPage() {
                     className={`rounded-2xl border p-4 transition-all ${
                       isSaved
                         ? 'border-[#16A34A]/20 bg-[#16A34A]/[0.02]'
-                        : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900'
+                        : 'border-slate-700 bg-slate-800'
                     }`}
                   >
                     <div className="flex items-start justify-between">

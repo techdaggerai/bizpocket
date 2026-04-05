@@ -128,7 +128,7 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
     setCard(prev => ({ ...prev, [key]: value }));
   }
 
-  const inputCls = "w-full rounded-lg border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-[#0A0A0A] dark:text-white placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none";
+  const inputCls = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 placeholder-[#9CA3AF] focus:border-[#4F46E5] focus:outline-none";
 
   // ─── Camera ───
   if (step === 'camera') {
@@ -146,7 +146,7 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
           </div>
           {error && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-8">
-              <div className="bg-white rounded-2xl p-6 text-center max-w-sm">
+              <div className="bg-slate-800 rounded-2xl p-6 text-center max-w-sm">
                 <p className="text-sm text-[#DC2626] font-medium mb-3">{error}</p>
                 <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Go Back</button>
               </div>
@@ -156,7 +156,7 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
         <div className="relative z-10 flex items-center justify-around px-6 py-5 bg-gradient-to-t from-black/80 to-transparent">
           <button onClick={onClose} className="text-white/60 text-xs">Cancel</button>
           <button onClick={capture} disabled={!cameraReady} className="h-[68px] w-[68px] rounded-full border-[3px] border-white flex items-center justify-center disabled:opacity-40">
-            <div className="h-[56px] w-[56px] rounded-full bg-white" />
+            <div className="h-[56px] w-[56px] rounded-full bg-slate-800" />
           </button>
           <button onClick={() => fileInputRef.current?.click()} className="text-white/60">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
@@ -186,17 +186,17 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
 
   // ─── Result ───
   return (
-    <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5] dark:border-gray-800 shrink-0">
+    <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
         <button onClick={onClose} className="text-sm text-[#9CA3AF] font-medium">Cancel</button>
-        <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">📇 Business Card</p>
+        <p className="text-sm font-bold text-slate-50">📇 Business Card</p>
         <button onClick={handleSaveContact} className="text-sm text-[#4F46E5] font-bold">Save</button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {capturedImage && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={capturedImage} alt="Card" className="w-full max-h-[160px] object-contain rounded-xl bg-[#F3F4F6]" />
+          <img src={capturedImage} alt="Card" className="w-full max-h-[160px] object-contain rounded-xl bg-slate-700" />
         )}
 
         <div className="space-y-3">
@@ -250,8 +250,8 @@ export default function BusinessCardScanner({ onClose, onSave }: Props) {
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 flex gap-2">
-        <button onClick={() => { setStep('camera'); setCapturedImage(null); setCard(EMPTY_CARD); }} className="flex-1 rounded-xl border border-[#E5E5E5] dark:border-gray-700 py-3 text-sm font-semibold text-[#374151] dark:text-gray-300">
+      <div className="shrink-0 border-t border-slate-700 px-4 py-3 flex gap-2">
+        <button onClick={() => { setStep('camera'); setCapturedImage(null); setCard(EMPTY_CARD); }} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-semibold text-slate-300">
           Scan Again
         </button>
         <button onClick={handleSaveContact} className="flex-1 rounded-xl bg-[#4F46E5] py-3 text-sm font-semibold text-white">

@@ -125,16 +125,16 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 space-y-3">
+    <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[#0A0A0A]">Sign Invoice</h3>
+        <h3 className="text-sm font-semibold text-slate-50">Sign Invoice</h3>
         <button onClick={() => setShowPad(false)} className="text-xs text-[#999]">Cancel</button>
       </div>
 
       <input value={signerName} onChange={e => setSignerName(e.target.value)}
-        placeholder="Your full name" className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-sm focus:border-[#4F46E5] focus:outline-none" />
+        placeholder="Your full name" className="w-full rounded-lg border border-slate-700 px-3 py-2 text-sm focus:border-[#4F46E5] focus:outline-none" />
 
-      <div className="relative rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] overflow-hidden" style={{ touchAction: 'none' }}>
+      <div className="relative rounded-lg border border-slate-700 bg-slate-800 overflow-hidden" style={{ touchAction: 'none' }}>
         <canvas ref={canvasRef}
           className="w-full cursor-crosshair" style={{ height: '140px' }}
           onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing}
@@ -143,7 +143,7 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
       </div>
 
       <div className="flex gap-2">
-        <button onClick={clearSignature} className="flex-1 rounded-lg border border-[#E5E5E5] py-2 text-xs font-medium text-[#666]">Clear</button>
+        <button onClick={clearSignature} className="flex-1 rounded-lg border border-slate-700 py-2 text-xs font-medium text-[#666]">Clear</button>
         <button onClick={handleSave} disabled={!hasSignature || !signerName.trim()}
           className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-xs font-medium text-white disabled:opacity-40">
           Confirm Signature

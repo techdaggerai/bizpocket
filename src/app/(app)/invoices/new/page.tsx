@@ -324,7 +324,7 @@ export default function NewInvoicePage() {
   };
 
   const TemplateComponent = (TEMPLATES[selectedTemplate] || TEMPLATES.classic).Component;
-  const inputClass = "w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
+  const inputClass = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]";
 
   return (
     <>
@@ -332,12 +332,12 @@ export default function NewInvoicePage() {
       {/* Template Picker Modal */}
       {showTemplatePicker && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-[95vw] w-full max-h-[90vh] overflow-y-auto p-8">
+          <div className="bg-slate-800 rounded-2xl max-w-[95vw] w-full max-h-[90vh] overflow-y-auto p-8">
             <div className="flex items-center justify-between mb-4">
-              <div><h2 className="text-xl font-bold text-[#0A0A0A]">Choose Your Template</h2><p className="text-sm text-[#999]">Select a template for your invoice</p></div>
+              <div><h2 className="text-xl font-bold text-slate-50">Choose Your Template</h2><p className="text-sm text-[#999]">Select a template for your invoice</p></div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setShowTemplatePicker(false)} className="rounded-lg bg-[#4F46E5] px-5 py-2 text-sm font-medium text-white hover:bg-[#4338CA]">Use {TEMPLATES[selectedTemplate]?.name || 'Classic'}</button>
-                <button onClick={() => { setShowTemplatePicker(false); router.back(); }} className="text-[#999] hover:text-[#0A0A0A] p-1">
+                <button onClick={() => { setShowTemplatePicker(false); router.back(); }} className="text-[#999] hover:text-slate-50 p-1">
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
@@ -345,12 +345,12 @@ export default function NewInvoicePage() {
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {Object.entries(TEMPLATES).map(([key, tpl]) => (
                 <button key={key} onClick={() => setSelectedTemplate(key)} onDoubleClick={() => { setSelectedTemplate(key); setShowTemplatePicker(false); }}
-                  className={`relative rounded-xl border-2 overflow-hidden min-h-[320px] text-left transition-all ${selectedTemplate === key ? 'border-[#4F46E5] ring-2 ring-[#4F46E5]/20' : 'border-[#E5E5E5] hover:border-[#CCC]'}`}>
+                  className={`relative rounded-xl border-2 overflow-hidden min-h-[320px] text-left transition-all ${selectedTemplate === key ? 'border-[#4F46E5] ring-2 ring-[#4F46E5]/20' : 'border-slate-700 hover:border-[#CCC]'}`}>
                   <div className="absolute inset-0 origin-top-left pointer-events-none" style={{ transform: 'scale(0.42)', width: '238%', height: '238%' }}>
                     <tpl.Component data={liveInvoiceData} />
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent pt-10 pb-3 px-3">
-                    <p className="text-sm font-semibold text-[#0A0A0A]">{tpl.name}</p>
+                    <p className="text-sm font-semibold text-slate-50">{tpl.name}</p>
                     <p className="text-[10px] text-[#999]">{tpl.description}</p>
                   </div>
                   {selectedTemplate === key && <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-[#4F46E5] flex items-center justify-center"><svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>}
@@ -363,8 +363,8 @@ export default function NewInvoicePage() {
 
       {/* Mobile Preview Modal */}
       {showMobilePreview && (
-        <div className="fixed inset-0 z-50 bg-white lg:hidden overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b border-[#F0F0F0] px-4 py-3 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-800 lg:hidden overflow-y-auto">
+          <div className="sticky top-0 bg-slate-800 border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold">Live Preview</h3>
             <button onClick={() => setShowMobilePreview(false)} className="text-sm text-[#4F46E5] font-medium">Close</button>
           </div>
@@ -378,33 +378,33 @@ export default function NewInvoicePage() {
         <div className="flex-1 min-w-0 space-y-3 lg:max-w-[480px]">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-[#0A0A0A]">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
+              <h1 className="text-xl font-bold text-slate-50">{editId ? 'Edit Invoice' : 'Fire New Invoice'}</h1>
               <button onClick={() => setShowTemplatePicker(true)} className="text-xs text-[#4F46E5] font-medium hover:underline mt-0.5">Template: {TEMPLATES[selectedTemplate]?.name || 'Classic'} — Change</button>
             </div>
             <button onClick={() => router.push('/invoices')} className="text-sm text-[#999]">Cancel</button>
           </div>
 
           {/* Customer */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-2.5">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-2.5">
             <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Customer</h3>
             <div className="relative">
               <input value={customerSearch} onChange={e => setCustomerSearch(e.target.value)} placeholder="Search or type customer name..." className={inputClass + ' pl-9'} />
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#CCC]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             </div>
             {customerSearch && !selectedCustomer && filteredCustomers.length > 0 && (
-              <div className="max-h-[160px] overflow-y-auto rounded-lg border border-[#E5E5E5] divide-y divide-[#F0F0F0]">
-                {filteredCustomers.map(c => (<button key={c.id} onClick={() => { setSelectedCustomerId(c.id); setCustomerSearch(c.name); }} className="w-full px-3 py-2 text-left hover:bg-[#FAFAFA]"><p className="text-sm font-medium text-[#0A0A0A]">{c.name}</p>{c.email && <p className="text-[10px] text-[#999]">{c.email}</p>}</button>))}
+              <div className="max-h-[160px] overflow-y-auto rounded-lg border border-slate-700 divide-y divide-[#F0F0F0]">
+                {filteredCustomers.map(c => (<button key={c.id} onClick={() => { setSelectedCustomerId(c.id); setCustomerSearch(c.name); }} className="w-full px-3 py-2 text-left hover:bg-slate-800"><p className="text-sm font-medium text-slate-50">{c.name}</p>{c.email && <p className="text-[10px] text-[#999]">{c.email}</p>}</button>))}
               </div>
             )}
             {selectedCustomer && (
               <div className="flex items-center justify-between rounded-lg bg-[#4F46E5]/5 border border-[#4F46E5]/20 px-3 py-2">
-                <div><p className="text-sm font-medium text-[#0A0A0A]">{selectedCustomer.name}</p>{selectedCustomer.email && <p className="text-[10px] text-[#999]">{selectedCustomer.email}</p>}</div>
+                <div><p className="text-sm font-medium text-slate-50">{selectedCustomer.name}</p>{selectedCustomer.email && <p className="text-[10px] text-[#999]">{selectedCustomer.email}</p>}</div>
                 <button onClick={() => { setSelectedCustomerId(null); setCustomerSearch(''); }} className="text-[10px] text-[#DC2626]">Change</button>
               </div>
             )}
             <button onClick={() => setShowNewCustomer(!showNewCustomer)} className="text-xs text-[#4F46E5] font-medium">{showNewCustomer ? 'Cancel' : '+ Add New Customer'}</button>
             {showNewCustomer && (
-              <div className="space-y-2 border-t border-[#F0F0F0] pt-2">
+              <div className="space-y-2 border-t border-[var(--border)] pt-2">
                 <input value={newCustomer.name} onChange={e => setNewCustomer({...newCustomer, name: e.target.value})} placeholder="Name *" className={inputClass} />
                 <input value={newCustomer.company} onChange={e => setNewCustomer({...newCustomer, company: e.target.value})} placeholder="Company" className={inputClass} />
                 <div className="grid grid-cols-2 gap-2">
@@ -415,32 +415,32 @@ export default function NewInvoicePage() {
                 <button onClick={handleSaveCustomer} disabled={savingCustomer} className="w-full rounded-lg bg-[#0A0A0A] py-2 text-xs font-medium text-white disabled:opacity-50">{savingCustomer ? 'Saving...' : 'Save Customer'}</button>
               </div>
             )}
-            <div className="border-t border-[#F0F0F0] pt-2.5 space-y-2">
+            <div className="border-t border-[var(--border)] pt-2.5 space-y-2">
               <div className="grid grid-cols-2 gap-2">
                 <div><label className="text-[10px] text-[#999]">Issue Date</label><input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className={inputClass} /></div>
                 <div><label className="text-[10px] text-[#999]">Due Date</label><input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} /></div>
               </div>
               <div>
                 <label className="text-[10px] text-[#999]">Language</label>
-                <div className="flex gap-1.5 mt-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-3 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>))}</div>
+                <div className="flex gap-1.5 mt-1">{[{k:'en',l:'EN'},{k:'ja',l:'JP'},{k:'ur',l:'UR'},{k:'ar',l:'AR'},{k:'zh',l:'CN'}].map(({k,l}) => (<button key={k} onClick={() => setInvoiceLang(k)} className={`rounded-md px-3 py-1.5 text-[10px] font-medium transition-colors ${invoiceLang === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{l}</button>))}</div>
               </div>
             </div>
           </div>
 
           {/* Items */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-2.5">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-2.5">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Items</h3>
               {(templates.length > 0 || cycleItems.length > 0) && <button onClick={() => setShowTemplates(!showTemplates)} className="text-[10px] text-[#4F46E5] font-medium">From Saved</button>}
             </div>
             {showTemplates && (
               <div className="flex gap-1.5 overflow-x-auto pb-1">
-                {templates.map(tpl => (<button key={tpl.id} onClick={() => addFromTemplate(tpl)} className="shrink-0 rounded-lg border border-[#E5E5E5] px-2.5 py-1.5 text-[10px] hover:bg-[#FAFAFA]">{tpl.name} — {formatCurrency(tpl.default_price, currency)}</button>))}
+                {templates.map(tpl => (<button key={tpl.id} onClick={() => addFromTemplate(tpl)} className="shrink-0 rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] hover:bg-slate-800">{tpl.name} — {formatCurrency(tpl.default_price, currency)}</button>))}
                 {cycleItems.map((ci, i) => (<button key={`ci-${i}`} onClick={() => { setLineItems(prev => [...prev, calcLineItem({ ...emptyLineItem(), line_number: prev.length + 1, description: ci.name, unit_price: ci.sale_price || ci.purchase_price || 0 })]); }} className="shrink-0 rounded-lg border border-[#4F46E5]/20 bg-[#4F46E5]/5 px-2.5 py-1.5 text-[10px] text-[#4F46E5]">{ci.name}</button>))}
               </div>
             )}
             {lineItems.map((item, i) => (
-              <div key={i} className="space-y-1.5 pb-3 border-b border-[#F0F0F0] last:border-0 last:pb-0" onTouchStart={e => handleTouchStart(e, i)} onTouchEnd={e => handleTouchEnd(e, i)}>
+              <div key={i} className="space-y-1.5 pb-3 border-b border-[var(--border)] last:border-0 last:pb-0" onTouchStart={e => handleTouchStart(e, i)} onTouchEnd={e => handleTouchEnd(e, i)}>
                 <input value={item.description} onChange={e => updateLineItem(i, 'description', e.target.value)} placeholder="Item description" className={inputClass} />
                 {customColumns.length > 0 && (
                   <div className="flex gap-1.5">
@@ -454,7 +454,7 @@ export default function NewInvoicePage() {
                   <div className="col-span-2"><input type="number" inputMode="numeric" value={item.quantity} onChange={e => updateLineItem(i, 'quantity', parseInt(e.target.value) || 0)} placeholder="Qty" className={inputClass} /></div>
                   <div className="col-span-5"><input type="number" inputMode="numeric" value={item.unit_price || ''} onChange={e => updateLineItem(i, 'unit_price', parseInt(e.target.value) || 0)} placeholder="Price" className={inputClass} /></div>
                   <div className="col-span-2"><select value={item.tax_rate} onChange={e => updateLineItem(i, 'tax_rate', parseFloat(e.target.value))} className={inputClass + ' text-[10px]'}>{TAX_RATES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select></div>
-                  <div className="col-span-3 text-right"><p className="font-mono text-sm font-semibold text-[#0A0A0A]">{formatCurrency(item.total_price, currency)}</p></div>
+                  <div className="col-span-3 text-right"><p className="font-mono text-sm font-semibold text-slate-50">{formatCurrency(item.total_price, currency)}</p></div>
                 </div>
                 {lineItems.length > 1 && <button onClick={() => removeLineItem(i)} className="text-[10px] text-[#DC2626]">Remove</button>}
               </div>
@@ -471,7 +471,7 @@ export default function NewInvoicePage() {
             {attachments.length > 0 && (
               <div className="flex gap-2 flex-wrap">
                 {attachments.map((att, i) => (
-                  <div key={i} className="flex items-center gap-1.5 rounded-lg border border-[#E5E5E5] bg-[#FAFAFA] px-2 py-1">
+                  <div key={i} className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1">
                     {att.type.startsWith('image/') ? (
                       <img src={att.url} alt={att.name} className="h-8 w-8 rounded object-cover" />
                     ) : (
@@ -499,28 +499,28 @@ export default function NewInvoicePage() {
                 <button onClick={addCustomColumn} className="rounded-lg bg-[#4F46E5] px-3 py-2 text-xs text-white">Add</button>
               </div>
             )}
-            <div className="border-t border-[#F0F0F0] pt-3">
-              <div className="flex gap-1.5 mb-2">{(['none','percent','fixed'] as const).map(d => (<button key={d} onClick={() => setDiscountType(d)} className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${discountType === d ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{d === 'none' ? 'No discount' : d === 'percent' ? '% Off' : currency + ' Off'}</button>))}</div>
+            <div className="border-t border-[var(--border)] pt-3">
+              <div className="flex gap-1.5 mb-2">{(['none','percent','fixed'] as const).map(d => (<button key={d} onClick={() => setDiscountType(d)} className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${discountType === d ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{d === 'none' ? 'No discount' : d === 'percent' ? '% Off' : currency + ' Off'}</button>))}</div>
               {discountType !== 'none' && <input type="number" value={discountValue || ''} onChange={e => setDiscountValue(parseInt(e.target.value) || 0)} placeholder={discountType === 'percent' ? 'Discount %' : 'Discount amount'} className={inputClass} />}
             </div>
-            <div className="border-t border-[#F0F0F0] pt-3 space-y-1">
+            <div className="border-t border-[var(--border)] pt-3 space-y-1">
               <div className="flex justify-between text-sm text-[#666]"><span>Subtotal</span><span className="font-mono">{formatCurrency(subtotal, currency)}</span></div>
               {overallDiscountAmount > 0 && <div className="flex justify-between text-sm text-[#16A34A]"><span>Discount</span><span className="font-mono">-{formatCurrency(overallDiscountAmount, currency)}</span></div>}
               <div className="flex justify-between text-sm text-[#666]"><span>Tax</span><span className="font-mono">{formatCurrency(taxTotal, currency)}</span></div>
-              <div className="flex justify-between text-base font-bold text-[#0A0A0A] pt-1 border-t border-[#0A0A0A]"><span>Total</span><span className="font-mono">{formatCurrency(grandTotal, currency)}</span></div>
+              <div className="flex justify-between text-base font-bold text-slate-50 pt-1 border-t border-[#0A0A0A]"><span>Total</span><span className="font-mono">{formatCurrency(grandTotal, currency)}</span></div>
             </div>
           </div>
 
           {/* Payment & Notes */}
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-3">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-3">
             <h3 className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Payment & Notes</h3>
             <div className="flex gap-1.5">
               {[{k:'bank_transfer',l:'Bank Transfer'},{k:'cash',l:'Cash'},{k:'credit_card',l:'Card'}].map(({k,l}) => (
-                <button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-2 text-[11px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[#999]'}`}>{l}</button>
+                <button key={k} onClick={() => setPaymentMethod(k)} className={`flex-1 rounded-md py-2 text-[11px] font-medium transition-colors ${paymentMethod === k ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[#999]'}`}>{l}</button>
               ))}
             </div>
             {paymentMethod === 'bank_transfer' && (
-              <div className="space-y-2 rounded-lg bg-[#FAFAFA] p-3">
+              <div className="space-y-2 rounded-lg bg-slate-800 p-3">
                 <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider">Bank Details</p>
                 <div className="grid grid-cols-2 gap-2">
                   <input value={bankName} onChange={e => setBankName(e.target.value)} placeholder="Bank name" className={inputClass} />
@@ -561,14 +561,14 @@ export default function NewInvoicePage() {
                 <button onClick={() => handleSave()} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save Changes'}</button>
               ) : (
                 <>
-                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
+                  <button onClick={() => handleSave('draft')} disabled={saving} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-sm font-medium text-[#666] disabled:opacity-50">{saving ? 'Saving...' : 'Save for Later'}</button>
                   <button onClick={() => handleSave('sent')} disabled={saving} className="flex-1 rounded-xl bg-[#4F46E5] py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saving ? 'Sending...' : 'Send to Client'}</button>
                 </>
               )}
             </div>
             <div className="flex gap-2">
-              <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Download PDF</button>
-              <button onClick={handleShare} className="flex-1 rounded-xl border border-[#E5E5E5] py-2.5 text-xs font-medium text-[#999]">Share Link</button>
+              <button onClick={handleDownloadPDF} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-[#999]">Download PDF</button>
+              <button onClick={handleShare} className="flex-1 rounded-xl border border-slate-700 py-2.5 text-xs font-medium text-[#999]">Share Link</button>
             </div>
           </div>
         </div>
@@ -580,7 +580,7 @@ export default function NewInvoicePage() {
               <p className="text-[10px] font-semibold text-[#BBB] uppercase tracking-[0.1em]">Live Preview</p>
               <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-[#4F46E5] font-medium">Change Template</button>
             </div>
-            <div className="rounded-xl border border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
+            <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden shadow-sm">
               <div id="invoice-preview" className="origin-top-left h-full" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>
                 <TemplateComponent data={liveInvoiceData} />
               </div>

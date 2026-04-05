@@ -42,14 +42,14 @@ export default function EmojiPicker({ onSelect, onClose }: Props) {
   }
 
   return (
-    <div ref={ref} className="absolute bottom-full mb-2 left-0 w-[300px] bg-white rounded-xl border border-[#E5E5E5] shadow-lg z-50 overflow-hidden">
+    <div ref={ref} className="absolute bottom-full mb-2 left-0 w-[300px] bg-slate-800 rounded-xl border border-slate-700 shadow-lg z-50 overflow-hidden">
       {/* Category tabs */}
-      <div className="flex border-b border-[#F0F0F0]">
+      <div className="flex border-b border-[var(--border)]">
         {recents.length > 0 && (
-          <button onClick={() => setActiveTab(-1)} className={`flex-1 py-2 text-lg ${activeTab === -1 ? 'bg-[#F3F4F6]' : 'hover:bg-[#FAFAFA]'}`}>🕐</button>
+          <button onClick={() => setActiveTab(-1)} className={`flex-1 py-2 text-lg ${activeTab === -1 ? 'bg-slate-700' : 'hover:bg-slate-800'}`}>🕐</button>
         )}
         {CATEGORIES.map((cat, i) => (
-          <button key={i} onClick={() => setActiveTab(i)} className={`flex-1 py-2 text-lg ${activeTab === i ? 'bg-[#F3F4F6]' : 'hover:bg-[#FAFAFA]'}`}>{cat.label}</button>
+          <button key={i} onClick={() => setActiveTab(i)} className={`flex-1 py-2 text-lg ${activeTab === i ? 'bg-slate-700' : 'hover:bg-slate-800'}`}>{cat.label}</button>
         ))}
       </div>
 
@@ -58,13 +58,13 @@ export default function EmojiPicker({ onSelect, onClose }: Props) {
         {activeTab === -1 ? (
           <div className="grid grid-cols-8 gap-0.5">
             {recents.map((e, i) => (
-              <button key={i} onClick={() => pick(e)} className="h-9 w-9 flex items-center justify-center rounded-lg text-xl hover:bg-[#F3F4F6] transition-colors">{e}</button>
+              <button key={i} onClick={() => pick(e)} className="h-9 w-9 flex items-center justify-center rounded-lg text-xl hover:bg-slate-700 transition-colors">{e}</button>
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-8 gap-0.5">
             {CATEGORIES[activeTab].emojis.map((e, i) => (
-              <button key={i} onClick={() => pick(e)} className="h-9 w-9 flex items-center justify-center rounded-lg text-xl hover:bg-[#F3F4F6] transition-colors">{e}</button>
+              <button key={i} onClick={() => pick(e)} className="h-9 w-9 flex items-center justify-center rounded-lg text-xl hover:bg-slate-700 transition-colors">{e}</button>
             ))}
           </div>
         )}

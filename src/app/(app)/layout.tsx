@@ -11,6 +11,7 @@ import SwipeBackGesture from '@/components/SwipeBackGesture';
 import FeatureSpotlight from '@/components/FeatureSpotlight';
 import DelightProvider from '@/components/DelightProvider';
 import type { Language } from '@/lib/i18n';
+import { getBrandFromHost } from '@/lib/brand';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -28,7 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!profile) {
     const headersList = await headers();
     const host = headersList.get('host') || '';
-    const isPocketChat = host.includes('evrywher') || host.includes('evrywyre') || host.includes('pocketchat') || host.includes('evrywhere');
+    const isPocketChat = getBrandFromHost(host) === 'evrywher';
 
     if (isPocketChat) {
       // Auto-create org + profile so Evrywher users never hit /onboarding
@@ -75,7 +76,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                     <div className="flex">
                       <Sidebar />
                       <main className="flex-1 min-h-screen pb-20 lg:pb-0 lg:ml-[220px] overflow-x-hidden">
-                        <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white"><TopNav /></div>
+                        <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[var(--border)] bg-[var(--card-bg)]"><TopNav /></div>
                         <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">{children}</div>
                       </main>
                     </div>
@@ -148,7 +149,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Sidebar />
             <main className="flex-1 min-h-screen pb-20 lg:pb-0 lg:ml-[220px] overflow-x-hidden">
               {/* Desktop mini top bar */}
-              <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[#F0F0F0] bg-white">
+              <div className="hidden lg:flex items-center justify-end px-6 py-3 border-b border-[var(--border)] bg-[var(--card-bg)]">
                 <TopNav />
               </div>
               <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">

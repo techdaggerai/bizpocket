@@ -92,7 +92,7 @@ export default function SocialMediaPage() {
 
       {!result ? (
         <>
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Upload Photo (optional)</h2>
             {imagePreview ? (
               <div className="relative">
@@ -102,7 +102,7 @@ export default function SocialMediaPage() {
                 </button>
               </div>
             ) : (
-              <button onClick={() => fileInputRef.current?.click()} className="w-full rounded-lg border-2 border-dashed border-[#E5E5E5] py-8 text-center hover:border-[#4F46E5] transition-colors">
+              <button onClick={() => fileInputRef.current?.click()} className="w-full rounded-lg border-2 border-dashed border-slate-700 py-8 text-center hover:border-[#4F46E5] transition-colors">
                 <svg className="h-8 w-8 mx-auto text-[var(--text-4)] mb-2" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z" /></svg>
                 <p className="text-xs text-[var(--text-3)]">Tap to add a photo</p>
               </button>
@@ -110,16 +110,16 @@ export default function SocialMediaPage() {
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
           </div>
 
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">What is this post about?</h2>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g., 'New chocolate cake for wedding season'" rows={2} className="w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="e.g., 'New chocolate cake for wedding season'" rows={2} className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]" />
           </div>
 
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Platform</h2>
             <div className="flex gap-2">
               {PLATFORMS.map((p) => (
-                <button key={p.key} onClick={() => setPlatform(p.key)} className={`flex-1 rounded-lg py-2.5 text-center transition-all ${platform === p.key ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[var(--text-2)] hover:bg-[var(--bg-2)]'}`}>
+                <button key={p.key} onClick={() => setPlatform(p.key)} className={`flex-1 rounded-lg py-2.5 text-center transition-all ${platform === p.key ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[var(--text-2)] hover:bg-[var(--bg-2)]'}`}>
                   <span className="text-lg">{p.emoji}</span>
                   <p className="text-[10px] font-medium mt-0.5">{p.label}</p>
                 </button>
@@ -127,11 +127,11 @@ export default function SocialMediaPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-3">Tone</h2>
             <div className="flex flex-wrap gap-2">
               {MOODS.map((m) => (
-                <button key={m.key} onClick={() => setMood(m.key)} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${mood === m.key ? 'bg-[#4F46E5] text-white' : 'border border-[#E5E5E5] text-[var(--text-3)] hover:bg-[var(--bg-2)]'}`}>{m.label}</button>
+                <button key={m.key} onClick={() => setMood(m.key)} className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${mood === m.key ? 'bg-[#4F46E5] text-white' : 'border border-slate-700 text-[var(--text-3)] hover:bg-[var(--bg-2)]'}`}>{m.label}</button>
               ))}
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function SocialMediaPage() {
         <div className="space-y-4">
           {imagePreview && <img src={imagePreview} alt="Post" className="w-full rounded-xl object-cover max-h-[250px]" />}
 
-          <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#EC4899]">Caption</h3>
               <button onClick={() => copyText(result.caption + '\n\n' + result.hashtags.map(h => '#' + h).join(' '), 'caption')} className="rounded-md bg-[#4F46E5] px-2.5 py-1 text-[10px] font-semibold text-white">{copiedField === 'caption' ? 'Copied!' : 'Copy All'}</button>
@@ -153,7 +153,7 @@ export default function SocialMediaPage() {
           </div>
 
           {result.hashtags?.length > 0 && (
-            <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+            <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#7C3AED]">Hashtags</h3>
                 <button onClick={() => copyText(result.hashtags.map(h => '#' + h).join(' '), 'hashtags')} className="text-[10px] font-medium text-[#4F46E5]">{copiedField === 'hashtags' ? 'Copied!' : 'Copy'}</button>
@@ -165,7 +165,7 @@ export default function SocialMediaPage() {
           )}
 
           {result.alt_captions?.length > 0 && (
-            <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+            <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-4)] mb-2">Alternative Captions</h3>
               <div className="space-y-2">
                 {result.alt_captions.map((alt, i) => (
@@ -186,12 +186,12 @@ export default function SocialMediaPage() {
           )}
 
           <div className="grid grid-cols-2 gap-2">
-            {result.best_time && (<div className="rounded-xl border border-[#E5E5E5] bg-white p-3"><p className="text-[9px] uppercase text-[var(--text-4)] font-semibold">Best Time to Post</p><p className="text-xs text-[var(--text-1)] mt-1">{result.best_time}</p></div>)}
-            {result.story_idea && (<div className="rounded-xl border border-[#E5E5E5] bg-white p-3"><p className="text-[9px] uppercase text-[var(--text-4)] font-semibold">Story Idea</p><p className="text-xs text-[var(--text-1)] mt-1">{result.story_idea}</p></div>)}
+            {result.best_time && (<div className="rounded-xl border border-slate-700 bg-slate-800 p-3"><p className="text-[9px] uppercase text-[var(--text-4)] font-semibold">Best Time to Post</p><p className="text-xs text-[var(--text-1)] mt-1">{result.best_time}</p></div>)}
+            {result.story_idea && (<div className="rounded-xl border border-slate-700 bg-slate-800 p-3"><p className="text-[9px] uppercase text-[var(--text-4)] font-semibold">Story Idea</p><p className="text-xs text-[var(--text-1)] mt-1">{result.story_idea}</p></div>)}
           </div>
 
           <div className="flex gap-2">
-            <button onClick={() => setResult(null)} className="flex-1 rounded-xl border border-[#E5E5E5] py-3 text-sm font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">Generate Another</button>
+            <button onClick={() => setResult(null)} className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-medium text-[var(--text-2)] hover:bg-[var(--bg-2)] transition-colors">Generate Another</button>
             <button onClick={() => { const fullPost = result.caption + '\n\n' + result.hashtags.map(h => '#' + h).join(' '); copyText(fullPost, 'full'); }} className="flex-1 rounded-xl bg-gradient-to-r from-[#EC4899] to-[#F97316] py-3 text-sm font-bold text-white">{copiedField === 'full' ? 'Copied!' : 'Copy Full Post'}</button>
           </div>
         </div>

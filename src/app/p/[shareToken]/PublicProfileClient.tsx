@@ -184,7 +184,7 @@ export default function PublicProfileClient({ profile, shareToken }: Props) {
               <h2 className="text-sm font-semibold text-[var(--pm-text-primary)]">Services</h2>
               <div className="flex flex-wrap gap-2">
                 {services.map((s: string, i: number) => (
-                  <span key={i} className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 text-xs font-medium px-3 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                  <span key={i} className="bg-indigo-950/30 text-indigo-300 text-xs font-medium px-3 py-1.5 rounded-full border border-indigo-800">
                     {s}
                   </span>
                 ))}
@@ -297,7 +297,7 @@ export default function PublicProfileClient({ profile, shareToken }: Props) {
           <div className="flex items-center justify-center gap-1.5">
             <span className="text-sm">{'\u{1F30D}'}</span>
             <span className="text-xs text-[var(--pm-text-tertiary)]">Powered by</span>
-            <a href="https://evrywher.io" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 no-underline hover:underline">Evrywher</a>
+            <a href="https://evrywher.io" className="text-xs font-semibold text-indigo-400 no-underline hover:underline">Evrywher</a>
           </div>
         </div>
       </main>

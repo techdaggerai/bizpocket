@@ -53,7 +53,7 @@ export default function VoiceMessagePlayer({ url, duration, isOwner }: Props) {
       <button
         onClick={togglePlay}
         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
-          isOwner ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20'
+          isOwner ? 'bg-slate-800/20 text-white hover:bg-slate-800/30' : 'bg-[#4F46E5]/10 text-[#4F46E5] hover:bg-[#4F46E5]/20'
         }`}
       >
         {playing ? (
@@ -75,8 +75,8 @@ export default function VoiceMessagePlayer({ url, duration, isOwner }: Props) {
               key={i}
               className={`w-[3px] rounded-full transition-colors ${
                 filled
-                  ? (isOwner ? 'bg-white' : 'bg-[#4F46E5]')
-                  : (isOwner ? 'bg-white/30' : 'bg-[#0A0A0A]/10')
+                  ? (isOwner ? 'bg-slate-800' : 'bg-[#4F46E5]')
+                  : (isOwner ? 'bg-slate-800/30' : 'bg-[#0A0A0A]/10')
               }`}
               style={{ height: h }}
             />

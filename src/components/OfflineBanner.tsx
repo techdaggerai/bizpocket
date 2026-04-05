@@ -17,7 +17,7 @@ export default function OfflineBanner() {
   if (!offline) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] bg-[#F59E0B] px-4 py-2 text-center text-sm font-medium text-[#111827]">
+    <div className="fixed top-0 left-0 right-0 z-[100] bg-[#F59E0B] px-4 py-2 text-center text-sm font-medium text-slate-50">
       You&apos;re offline. Messages will send when you reconnect.
     </div>
   );

@@ -53,7 +53,7 @@ export default function DelightLayer({
       {flyingPoints && flyingPoints.points > 0 && (
         <div className="fixed inset-0 z-[195] pointer-events-none flex items-center justify-center" aria-hidden="true">
           <span
-            className="text-lg font-bold text-indigo-600 dark:text-indigo-400"
+            className="text-lg font-bold text-indigo-600 text-indigo-400"
             style={{
               fontFamily: 'var(--font-display), Outfit, sans-serif',
               animation: 'pointFlyUp 800ms ease-out forwards',
@@ -81,16 +81,16 @@ function DelightToast({ event }: { event: DelightEvent }) {
   return (
     <div className="fixed bottom-24 left-1/2 z-[180] -translate-x-1/2 animate-[cardSlideUp_400ms_ease-out]">
       <div
-        className="rounded-[16px] bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl px-5 py-3 flex items-center gap-3 min-w-[240px]"
+        className="rounded-[16px] bg-slate-800/95 backdrop-blur-xl px-5 py-3 flex items-center gap-3 min-w-[240px]"
         style={{ boxShadow: 'var(--glass-shadow)' }}
       >
         <span className="text-2xl">{config.emoji}</span>
         <div>
-          <p className="text-[14px] font-semibold text-gray-900 dark:text-white">
+          <p className="text-[14px] font-semibold text-white">
             {config.title}
           </p>
           {event.points && event.points > 0 && (
-            <p className="text-[12px] text-indigo-600 dark:text-indigo-400 font-medium">
+            <p className="text-[12px] text-indigo-600 text-indigo-400 font-medium">
               +{event.points} Trust Score
             </p>
           )}

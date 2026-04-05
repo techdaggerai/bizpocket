@@ -85,7 +85,7 @@ export default function PocketAvatar({
       <div
         className={[
           'rounded-full overflow-hidden w-full h-full flex items-center justify-center',
-          !src ? (tier ? tierBgClass[tier] : 'bg-gray-400') : '',
+          !src ? (tier ? tierBgClass[tier] : 'bg-slate-600') : '',
         ].join(' ')}
         style={{
           ...ringStyle,
@@ -113,7 +113,7 @@ export default function PocketAvatar({
       {/* Online indicator — top-right */}
       {online && (
         <span
-          className="absolute top-0 right-0 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900 animate-[heartbeat_2s_infinite]"
+          className="absolute top-0 right-0 rounded-full bg-emerald-400 border-2 border-white border-slate-900 animate-[heartbeat_2s_infinite]"
           style={{ width: cfg.badge, height: cfg.badge }}
           aria-label="Online"
         />
@@ -123,7 +123,7 @@ export default function PocketAvatar({
       {badge !== 'none' && (
         <span
           className={[
-            'absolute bottom-0 right-0 rounded-full border-2 border-white dark:border-slate-900',
+            'absolute bottom-0 right-0 rounded-full border-2 border-white border-slate-900',
             badge === 'activity_verified' ? 'bg-blue-500' : '',
             badge === 'id_verified' ? 'bg-emerald-500 animate-[badgePulse_2s_infinite]' : '',
           ].join(' ')}

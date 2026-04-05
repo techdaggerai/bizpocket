@@ -199,7 +199,7 @@ export default function NotificationSoundPicker() {
   }
 
   return (
-    <div className="bg-[#F9FAFB] rounded-lg overflow-hidden">
+    <div className="bg-slate-800 rounded-lg overflow-hidden">
       {NOTIF_SOUNDS.map((sound, i) => {
         const isSelected = selected === sound.id;
         const isPlaying = playing === sound.id;
@@ -211,7 +211,7 @@ export default function NotificationSoundPicker() {
           <button
             key={sound.id}
             onClick={() => handleSelect(sound.id)}
-            className="flex w-full items-center gap-3 px-4 py-3 hover:bg-[#F3F4F6] transition-colors text-left"
+            className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-700 transition-colors text-left"
             style={{ borderRadius: radius, marginTop: isFirst ? 0 : 1 }}
           >
             {/* Emoji / playing indicator */}
@@ -245,7 +245,7 @@ export default function NotificationSoundPicker() {
 
             {/* Selected indicator */}
             <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-              isSelected ? 'border-[#4F46E5] bg-[#4F46E5]' : 'border-[#D1D5DB] bg-white'
+              isSelected ? 'border-[#4F46E5] bg-[#4F46E5]' : 'border-[#475569] bg-slate-800'
             }`}>
               {isSelected && (
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">

@@ -196,7 +196,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           </div>
           {error && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/80 px-8">
-              <div className="bg-white rounded-2xl p-6 text-center max-w-sm">
+              <div className="bg-slate-800 rounded-2xl p-6 text-center max-w-sm">
                 <p className="text-sm text-[#DC2626] font-medium mb-3">{error}</p>
                 <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Go Back</button>
               </div>
@@ -212,7 +212,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             disabled={!cameraReady}
             className="h-[68px] w-[68px] rounded-full border-[3px] border-white flex items-center justify-center disabled:opacity-40"
           >
-            <div className="h-[56px] w-[56px] rounded-full bg-white" />
+            <div className="h-[56px] w-[56px] rounded-full bg-slate-800" />
           </button>
           <button onClick={() => fileInputRef.current?.click()} className="text-white/60">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
@@ -240,7 +240,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           </div>
         )}
         <div className="flex gap-3 px-6 py-5 bg-gradient-to-t from-black/80 to-transparent">
-          <button onClick={retake} className="flex-1 rounded-xl bg-white/10 backdrop-blur py-3.5 text-sm font-semibold text-white border border-white/20">
+          <button onClick={retake} className="flex-1 rounded-xl bg-slate-800/10 backdrop-blur py-3.5 text-sm font-semibold text-white border border-white/20">
             Retake
           </button>
           <button onClick={translate} className="flex-1 rounded-xl bg-[#4F46E5] py-3.5 text-sm font-semibold text-white">
@@ -274,40 +274,40 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
     const isLast = fillFieldIdx === total - 1;
 
     return (
-      <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+      <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5] dark:border-gray-800 shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
           <button onClick={() => setStep('result')} className="text-sm text-[#4F46E5] font-medium">← Back</button>
-          <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">📝 Field {fillFieldIdx + 1} of {total}</p>
+          <p className="text-sm font-bold text-slate-50">📝 Field {fillFieldIdx + 1} of {total}</p>
           <button onClick={() => setStep('result')} className="text-sm text-[#9CA3AF]">Done</button>
         </div>
 
         {/* Progress bar */}
-        <div className="h-1 bg-[#F3F4F6] dark:bg-gray-800">
+        <div className="h-1 bg-slate-800">
           <div className="h-full bg-[#4F46E5] transition-all duration-300" style={{ width: `${((fillFieldIdx + 1) / total) * 100}%` }} />
         </div>
 
         {/* Field content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Japanese label */}
-          <div className="bg-[#FFFBEB] dark:bg-amber-950/20 rounded-xl p-4 border border-[#FDE68A]/40 dark:border-amber-800/30">
-            <p className="text-[11px] font-semibold text-[#92400E] dark:text-[#FDE68A] uppercase tracking-wider mb-1">Japanese Label</p>
-            <p className="text-[18px] font-medium text-[#0A0A0A] dark:text-white">{field.japanese}</p>
+          <div className="bg-amber-950/20 rounded-xl p-4 border border-[#FDE68A]/40 border-amber-800/30">
+            <p className="text-[11px] font-semibold text-[#FDE68A] uppercase tracking-wider mb-1">Japanese Label</p>
+            <p className="text-[18px] font-medium text-slate-50">{field.japanese}</p>
           </div>
 
           {/* English meaning */}
           <div>
             <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-1">Meaning</p>
-            <p className="text-[15px] text-[#374151] dark:text-gray-300 leading-relaxed">{field.english}</p>
+            <p className="text-[15px] text-slate-300 leading-relaxed">{field.english}</p>
           </div>
 
           {/* What to write */}
-          <div className="bg-[#EEF2FF] dark:bg-indigo-950/20 rounded-xl p-4 border border-[#C7D2FE]/40 dark:border-indigo-800/30">
+          <div className="bg-indigo-950/20 rounded-xl p-4 border border-[#C7D2FE]/40 border-indigo-800/30">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-base">💡</span>
-              <p className="text-[11px] font-semibold text-[#4338CA] dark:text-[#A5B4FC] uppercase tracking-wider">What to Write</p>
+              <p className="text-[11px] font-semibold text-[#A5B4FC] uppercase tracking-wider">What to Write</p>
             </div>
-            <p className="text-[16px] font-medium text-[#0A0A0A] dark:text-white leading-relaxed">{field.instruction}</p>
+            <p className="text-[16px] font-medium text-slate-50 leading-relaxed">{field.instruction}</p>
           </div>
 
           {/* Copy button */}
@@ -320,7 +320,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             className={`w-full rounded-xl py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
               copiedIdx === fillFieldIdx
                 ? 'bg-[#22C55E] text-white'
-                : 'bg-[#F3F4F6] dark:bg-gray-800 text-[#374151] dark:text-gray-300 active:bg-[#E5E7EB]'
+                : 'bg-slate-800 text-slate-300 active:bg-slate-700'
             }`}
           >
             {copiedIdx === fillFieldIdx ? (
@@ -331,18 +331,18 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
           </button>
 
           {/* Write instruction */}
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#F9FAFB] dark:bg-gray-800 border border-[#E5E5E5]/50 dark:border-gray-700">
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-700/50">
             <span className="text-sm">✏️</span>
-            <p className="text-[12px] text-[#6B7280] dark:text-gray-400">Write this in the field marked <span className="font-bold text-[#4F46E5]">#{fillFieldIdx + 1}</span> on the form</p>
+            <p className="text-[12px] text-slate-400">Write this in the field marked <span className="font-bold text-[#4F46E5]">#{fillFieldIdx + 1}</span> on the form</p>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 flex gap-2">
+        <div className="shrink-0 border-t border-slate-700 px-4 py-3 flex gap-2">
           <button
             onClick={() => setFillFieldIdx(i => Math.max(0, i - 1))}
             disabled={fillFieldIdx === 0}
-            className="flex-1 rounded-xl border border-[#E5E5E5] dark:border-gray-700 py-3 text-sm font-semibold text-[#374151] dark:text-gray-300 disabled:opacity-30"
+            className="flex-1 rounded-xl border border-slate-700 py-3 text-sm font-semibold text-slate-300 disabled:opacity-30"
           >
             ← Previous
           </button>
@@ -368,11 +368,11 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
 
   // ─── Result Step ───
   return (
-    <div className="fixed inset-0 z-[70] bg-white dark:bg-gray-900 flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[70] bg-slate-900 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E5E5] dark:border-gray-800 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700 shrink-0">
         <button onClick={onClose} className="text-sm text-[#4F46E5] font-medium">Done</button>
-        <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">
+        <p className="text-sm font-bold text-slate-50">
           {result?.document_type ? `📄 ${result.document_type}` : 'Translation'}
         </p>
         <button
@@ -398,8 +398,8 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             {/* Translation */}
             <div>
               <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Translation</h3>
-              <div className="bg-[#F3F4F6] dark:bg-gray-800 rounded-xl p-4">
-                <p className="text-[15px] text-[#0A0A0A] dark:text-white leading-relaxed whitespace-pre-wrap">{result.translation}</p>
+              <div className="bg-slate-800 rounded-xl p-4">
+                <p className="text-[15px] text-slate-50 leading-relaxed whitespace-pre-wrap">{result.translation}</p>
               </div>
             </div>
 
@@ -410,8 +410,8 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
                 <svg className={`h-3.5 w-3.5 transition-transform ${showOriginal ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
               </button>
               {showOriginal && (
-                <div className="mt-2 bg-[#FFFBEB] dark:bg-gray-800 rounded-xl p-4 border border-[#FDE68A]/50 dark:border-gray-700">
-                  <p className="text-[14px] text-[#92400E] dark:text-[#FDE68A] leading-relaxed whitespace-pre-wrap">{result.extracted_text}</p>
+                <div className="mt-2 bg-slate-800 rounded-xl p-4 border border-[#FDE68A]/50 border-slate-700">
+                  <p className="text-[14px] text-[#FDE68A] leading-relaxed whitespace-pre-wrap">{result.extracted_text}</p>
                 </div>
               )}
             </div>
@@ -422,9 +422,9 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
                 <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Field Guide</h3>
                 <div className="space-y-2">
                   {result.fields.map((f, i) => (
-                    <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-[#E5E5E5] dark:border-gray-700 p-3">
+                    <div key={i} className="bg-slate-800 rounded-xl border border-slate-700 p-3">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <span className="text-[13px] font-medium text-[#0A0A0A] dark:text-white">{f.english}</span>
+                        <span className="text-[13px] font-medium text-slate-50">{f.english}</span>
                         <span className="text-[11px] text-[#9CA3AF] shrink-0">{f.japanese}</span>
                       </div>
                       <p className="text-[12px] text-[#4F46E5] leading-relaxed">{f.instruction}</p>
@@ -438,8 +438,8 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
             {result.context && (
               <div>
                 <h3 className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Context</h3>
-                <div className="bg-[#EEF2FF] dark:bg-gray-800 rounded-xl p-4 border border-[#C7D2FE]/50 dark:border-gray-700">
-                  <p className="text-[13px] text-[#4338CA] dark:text-[#A5B4FC] leading-relaxed">{result.context}</p>
+                <div className="bg-slate-800 rounded-xl p-4 border border-[#C7D2FE]/50 border-slate-700">
+                  <p className="text-[13px] text-[#A5B4FC] leading-relaxed">{result.context}</p>
                 </div>
               </div>
             )}
@@ -448,7 +448,7 @@ export default function CameraTranslate({ userLanguage, userName, onClose, onSen
       </div>
 
       {/* Bottom actions */}
-      <div className="shrink-0 border-t border-[#E5E5E5] dark:border-gray-800 px-4 py-3 space-y-2">
+      <div className="shrink-0 border-t border-slate-700 px-4 py-3 space-y-2">
         {/* Show fill assist button when form fields detected */}
         {result && result.fields && result.fields.length > 0 && (
           <button

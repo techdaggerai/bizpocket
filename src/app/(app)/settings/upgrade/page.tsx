@@ -167,7 +167,7 @@ export default function UpgradePage() {
               className={`rounded-card border-2 p-5 transition-all ${
                 isCurrent
                   ? 'border-[#4F46E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)]'
-                  : 'border-[#E5E5E5] bg-white'
+                  : 'border-slate-700 bg-slate-800'
               }`}
             >
               <div className="flex items-start justify-between">
@@ -221,7 +221,7 @@ export default function UpgradePage() {
                   <button
                     onClick={handlePortal}
                     disabled={loading === 'portal'}
-                    className="w-full rounded-btn border border-[#E5E5E5] py-3 text-sm font-medium text-[var(--text-3)] transition-colors hover:bg-[#F5F5F5] disabled:opacity-50"
+                    className="w-full rounded-btn border border-slate-700 py-3 text-sm font-medium text-[var(--text-3)] transition-colors hover:bg-slate-700 disabled:opacity-50"
                   >
                     {loading === 'portal' ? 'Loading...' : 'Change Plan'}
                   </button>
@@ -241,7 +241,7 @@ export default function UpgradePage() {
       </div>
 
       {/* Enterprise CTA */}
-      <div className="rounded-card border border-[#E5E5E5] bg-white p-5 text-center">
+      <div className="rounded-card border border-slate-700 bg-slate-800 p-5 text-center">
         <h3 className="text-lg font-bold text-[var(--text-1)]">Enterprise</h3>
         <p className="mt-1 text-sm text-[var(--text-3)]">
           Multiple orgs, API access, white label, dedicated support

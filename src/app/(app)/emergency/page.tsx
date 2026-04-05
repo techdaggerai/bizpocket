@@ -61,15 +61,15 @@ export default function EmergencyPage() {
 
       {/* Personal Info */}
       <div className="px-4 pt-4">
-        <div className="bg-[#FEF2F2] dark:bg-red-950/20 rounded-2xl p-4 border border-[#FECACA]/50 dark:border-red-900/30">
+        <div className="bg-red-950/20 rounded-2xl p-4 border border-red-900/30">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">🆔</span>
-              <h2 className="text-sm font-bold text-[#991B1B] dark:text-red-300">My Emergency Info</h2>
+              <h2 className="text-sm font-bold text-red-300">My Emergency Info</h2>
             </div>
             <button
               onClick={() => editing ? saveInfo() : setEditing(true)}
-              className="text-xs font-semibold text-[#DC2626] dark:text-red-400"
+              className="text-xs font-semibold text-red-400"
             >
               {editing ? 'Save' : 'Edit'}
             </button>
@@ -85,26 +85,26 @@ export default function EmergencyPage() {
                 ['emergencyContact', 'Emergency Contact', '+81-90-xxxx-xxxx'],
               ] as const).map(([key, label, placeholder]) => (
                 <div key={key}>
-                  <label className="text-[10px] font-medium text-[#991B1B]/60 dark:text-red-400/60 uppercase">{label}</label>
+                  <label className="text-[10px] font-medium text-red-400/60 uppercase">{label}</label>
                   <input
                     type="text"
                     value={info[key]}
                     onChange={(e) => setInfo(prev => ({ ...prev, [key]: e.target.value }))}
                     placeholder={placeholder}
-                    className="w-full mt-0.5 rounded-lg border border-[#FECACA]/50 dark:border-red-900/30 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm text-[#0A0A0A] dark:text-white placeholder-[#9CA3AF] focus:outline-none focus:border-[#DC2626]"
+                    className="w-full mt-0.5 rounded-lg border border-red-900/30 bg-slate-800 px-3 py-1.5 text-sm text-slate-50 placeholder-[#9CA3AF] focus:outline-none focus:border-[#DC2626]"
                   />
                 </div>
               ))}
             </div>
           ) : (
             <div className="space-y-1">
-              {info.name && <p className="text-sm text-[#991B1B] dark:text-red-300"><span className="font-semibold">Name:</span> {info.name}</p>}
-              {info.bloodType && <p className="text-sm text-[#991B1B] dark:text-red-300"><span className="font-semibold">Blood Type:</span> {info.bloodType}</p>}
-              {info.allergies && <p className="text-sm text-[#991B1B] dark:text-red-300"><span className="font-semibold">Allergies:</span> {info.allergies}</p>}
-              {info.medications && <p className="text-sm text-[#991B1B] dark:text-red-300"><span className="font-semibold">Medications:</span> {info.medications}</p>}
-              {info.emergencyContact && <p className="text-sm text-[#991B1B] dark:text-red-300"><span className="font-semibold">Emergency Contact:</span> {info.emergencyContact}</p>}
+              {info.name && <p className="text-sm text-red-300"><span className="font-semibold">Name:</span> {info.name}</p>}
+              {info.bloodType && <p className="text-sm text-red-300"><span className="font-semibold">Blood Type:</span> {info.bloodType}</p>}
+              {info.allergies && <p className="text-sm text-red-300"><span className="font-semibold">Allergies:</span> {info.allergies}</p>}
+              {info.medications && <p className="text-sm text-red-300"><span className="font-semibold">Medications:</span> {info.medications}</p>}
+              {info.emergencyContact && <p className="text-sm text-red-300"><span className="font-semibold">Emergency Contact:</span> {info.emergencyContact}</p>}
               {!info.name && !info.bloodType && !info.allergies && (
-                <p className="text-xs text-[#991B1B]/50 dark:text-red-400/50 italic">Tap Edit to add your emergency info</p>
+                <p className="text-xs text-red-400/50 italic">Tap Edit to add your emergency info</p>
               )}
             </div>
           )}
@@ -153,16 +153,16 @@ export default function EmergencyPage() {
                     className={`w-full text-left rounded-xl px-4 py-3 transition-all ${
                       isActive
                         ? 'bg-[#DC2626] text-white scale-[1.02] shadow-lg'
-                        : 'bg-white dark:bg-gray-800 border border-[#E5E5E5] dark:border-gray-700 active:scale-[0.98]'
+                        : 'bg-slate-800 border border-slate-700 active:scale-[0.98]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${isActive ? 'bg-white/20' : 'bg-[#F3F4F6] dark:bg-gray-700'}`}>
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${isActive ? 'bg-slate-800/20' : 'bg-slate-700'}`}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill={isActive ? 'white' : '#9CA3AF'}><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] font-medium ${isActive ? 'text-white' : 'text-[#0A0A0A] dark:text-white'}`}>{phrase.en}</p>
-                        <p className={`text-[15px] font-semibold mt-0.5 ${isActive ? 'text-white/90' : 'text-[#374151] dark:text-gray-300'}`}>{phrase.ja}</p>
+                        <p className={`text-[13px] font-medium ${isActive ? 'text-white' : 'text-slate-50'}`}>{phrase.en}</p>
+                        <p className={`text-[15px] font-semibold mt-0.5 ${isActive ? 'text-white/90' : 'text-slate-300'}`}>{phrase.ja}</p>
                       </div>
                     </div>
                   </button>
@@ -184,11 +184,11 @@ export default function EmergencyPage() {
             <a
               key={num.number}
               href={`tel:${num.number}`}
-              className="flex items-center gap-3 rounded-xl bg-white dark:bg-gray-800 border border-[#E5E5E5] dark:border-gray-700 px-4 py-3 active:bg-[#F3F4F6]"
+              className="flex items-center gap-3 rounded-xl bg-slate-800 border border-slate-700 px-4 py-3 active:bg-slate-700"
             >
               <span className="text-xl font-bold text-[#DC2626]">{num.number}</span>
               <div>
-                <p className="text-[11px] font-medium text-[#374151] dark:text-gray-300">{num.label}</p>
+                <p className="text-[11px] font-medium text-slate-300">{num.label}</p>
                 <p className="text-[10px] text-[#9CA3AF]">{num.labelJa}</p>
               </div>
             </a>
@@ -198,9 +198,9 @@ export default function EmergencyPage() {
 
       {/* Offline indicator */}
       <div className="px-4 pb-4">
-        <div className="rounded-lg bg-[#F0FDF4] dark:bg-green-950/20 border border-[#BBF7D0]/50 dark:border-green-900/30 px-3 py-2 flex items-center gap-2">
+        <div className="rounded-lg bg-green-950/20 border border-green-900/30 px-3 py-2 flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-          <p className="text-[11px] text-[#166534] dark:text-green-400">Works offline — no internet needed</p>
+          <p className="text-[11px] text-green-400">Works offline — no internet needed</p>
         </div>
       </div>
     </div>

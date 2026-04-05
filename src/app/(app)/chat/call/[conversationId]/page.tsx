@@ -103,7 +103,7 @@ export default function VoiceCallPage() {
   const fmt = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
 
   return (
-    <div className="min-h-screen bg-[#111827] flex flex-col items-center justify-center p-6 text-white">
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-white">
       {/* Logo */}
       <svg width="48" height="48" viewBox="0 0 88 88" fill="none" className="mb-6">
         <rect width="88" height="88" rx="20" fill="#4F46E5"/><path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/><path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/><text x="32" y="68" fontSize="10" fontWeight="800" fill="#4338ca" textAnchor="middle">Hi</text><text x="55.5" y="72" fontSize="9.5" fontWeight="700" fill="white" textAnchor="middle">やあ</text>
@@ -112,7 +112,7 @@ export default function VoiceCallPage() {
       <h2 className="text-[22px] font-bold mb-1">{contactName || 'Calling...'}</h2>
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4F46E5]/30 text-[#a5b4fc]">{myLang.toUpperCase()}</span>
-        <span className="text-[#6b7280]">⇄</span>
+        <span className="text-slate-400">⇄</span>
         <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F59E0B]/30 text-[#fbbf24]">{contactLang.toUpperCase()}</span>
       </div>
 
@@ -131,7 +131,7 @@ export default function VoiceCallPage() {
             <div className="bg-[#F59E0B]/20 rounded-xl px-3.5 py-2.5 border-l-[3px] border-[#F59E0B]">
               <p className="text-[11px] text-[#fbbf24] font-semibold mb-1">{contactName} (translated)</p>
               <p className="text-sm leading-relaxed">{translatedText}</p>
-              <p className="text-[11px] text-[#6b7280] italic mt-1.5">Original: {theirText}</p>
+              <p className="text-[11px] text-slate-400 italic mt-1.5">Original: {theirText}</p>
             </div>
           )}
         </div>
@@ -141,7 +141,7 @@ export default function VoiceCallPage() {
       <div className="flex gap-5 items-center">
         {callActive ? (
           <>
-            <button onClick={toggleMute} className={`w-14 h-14 rounded-full flex items-center justify-center ${muted ? 'bg-[#ef4444]' : 'bg-white/10'}`}>
+            <button onClick={toggleMute} className={`w-14 h-14 rounded-full flex items-center justify-center ${muted ? 'bg-[#ef4444]' : 'bg-slate-800/10'}`}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 {muted ? <><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/></> : <><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></>}
               </svg>
@@ -149,7 +149,7 @@ export default function VoiceCallPage() {
             <button onClick={endCall} className="w-16 h-16 rounded-full bg-[#ef4444] flex items-center justify-center">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.956.956 0 01-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg>
             </button>
-            <button className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+            <button className="w-14 h-14 rounded-full bg-slate-800/10 flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>
             </button>
           </>
@@ -160,7 +160,7 @@ export default function VoiceCallPage() {
         )}
       </div>
 
-      {!callActive && <p className="text-[13px] text-[#6b7280] mt-5 text-center max-w-[300px]">You speak {myLang.toUpperCase()}. They hear {contactLang.toUpperCase()}. AI translates in real-time.</p>}
+      {!callActive && <p className="text-[13px] text-slate-400 mt-5 text-center max-w-[300px]">You speak {myLang.toUpperCase()}. They hear {contactLang.toUpperCase()}. AI translates in real-time.</p>}
     </div>
   );
 }

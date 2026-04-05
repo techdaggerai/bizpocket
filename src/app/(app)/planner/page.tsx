@@ -237,14 +237,14 @@ export default function PlannerPage() {
 
       {/* AI Summary */}
       {aiLoading ? (
-        <div className="rounded-card border border-[#E5E5E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
+        <div className="rounded-card border border-slate-700 bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
           <div className="flex items-center gap-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
             <span className="text-xs font-medium text-[#4F46E5]">AI Planner Summary</span>
           </div>
         </div>
       ) : aiSummary ? (
-        <div className="rounded-card border border-[#E5E5E5] bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
+        <div className="rounded-card border border-slate-700 bg-gradient-to-br from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4">
           <div className="flex items-center gap-2 mb-2">
             <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
@@ -329,7 +329,7 @@ export default function PlannerPage() {
               onClick={() => setForm({ ...form, is_recurring: !form.is_recurring })}
               className={`relative h-6 w-11 rounded-full transition-colors ${form.is_recurring ? 'bg-[var(--accent)]' : 'bg-[var(--bg-3)]'}`}
             >
-              <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${form.is_recurring ? 'translate-x-[22px]' : 'translate-x-0.5'}`} />
+              <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-slate-800 shadow transition-transform ${form.is_recurring ? 'translate-x-[22px]' : 'translate-x-0.5'}`} />
             </div>
             <span className="text-sm text-[var(--text-2)]">Recurring</span>
           </label>
@@ -369,7 +369,7 @@ export default function PlannerPage() {
                   ) : (
                     <div className="space-y-1.5">
                       {dayEvents.map((evt) => (
-                        <div key={evt.id} className="flex items-center justify-between rounded-lg bg-white p-2 border border-[var(--border)]">
+                        <div key={evt.id} className="flex items-center justify-between rounded-lg bg-slate-800 p-2 border border-[var(--border)]">
                           <div className="flex items-center gap-2 min-w-0">
                             <div className={`h-2.5 w-2.5 shrink-0 rounded-full ${DOT_MAP[evt.event_type] || 'bg-[#6B7280]'}`} />
                             <div className="min-w-0">
@@ -412,7 +412,7 @@ export default function PlannerPage() {
               return (
                 <div
                   key={ds}
-                  className={`min-h-[60px] bg-white p-1 ${!isCurrentMonth ? 'opacity-40' : ''}`}
+                  className={`min-h-[60px] bg-slate-800 p-1 ${!isCurrentMonth ? 'opacity-40' : ''}`}
                 >
                   <span className={`text-[11px] ${today ? 'inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent)] text-white font-bold' : 'text-[var(--text-2)]'}`}>
                     {d.getDate()}

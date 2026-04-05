@@ -8,12 +8,12 @@ import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 
 const STYLES = [
-  { key: 'classic', label: 'Classic', desc: 'Clean, professional, trusted', preview: 'bg-white border-t-4 border-[#0A0A0A]' },
-  { key: 'modern', label: 'Modern', desc: 'Bold typography, sharp edges', preview: 'bg-white border-t-4 border-[#4F46E5]' },
+  { key: 'classic', label: 'Classic', desc: 'Clean, professional, trusted', preview: 'bg-slate-800 border-t-4 border-[#0A0A0A]' },
+  { key: 'modern', label: 'Modern', desc: 'Bold typography, sharp edges', preview: 'bg-slate-800 border-t-4 border-[#4F46E5]' },
   { key: 'elegant', label: 'Elegant', desc: 'Refined, luxury, serif fonts', preview: 'bg-[#FAF9F6] border-t-4 border-[#8B7355]' },
   { key: 'bold', label: 'Bold', desc: 'Dark, high contrast, striking', preview: 'bg-[#0A0A0A] border-t-4 border-[#FACC15]' },
   { key: 'warm', label: 'Warm', desc: 'Friendly, approachable, soft', preview: 'bg-[#FFFBF5] border-t-4 border-[#EA580C]' },
-  { key: 'minimal', label: 'Minimal', desc: 'Less is more, whitespace', preview: 'bg-white border-t-4 border-[#E5E5E5]' },
+  { key: 'minimal', label: 'Minimal', desc: 'Less is more, whitespace', preview: 'bg-slate-800 border-t-4 border-slate-700' },
 ];
 
 const SECTIONS = [
@@ -80,7 +80,7 @@ export default function WebsiteBuilderPage() {
   const [publishing, setPublishing] = useState(false);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
-  const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
+  const inputClass = 'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-slate-50 placeholder-[#999] focus:border-[#4F46E5] focus:outline-none focus:ring-1 focus:ring-[#4F46E5]';
 
   // Generate AI color palettes
   async function generatePalettes() {
@@ -200,13 +200,13 @@ export default function WebsiteBuilderPage() {
     <div className="min-h-screen">
       <PageHeader title="Website Builder" backPath="/dashboard" />
       {/* Step Header */}
-      <div className="sticky top-14 z-10 bg-white border-b border-[#F0F0F0] px-4 py-3">
+      <div className="sticky top-14 z-10 bg-slate-800 border-b border-[var(--border)] px-4 py-3">
         <div className="flex items-center justify-between">
           {step < 6 && step > 1 && (
             <button onClick={() => setStep(step - 1)} className="text-[12px] text-[#4F46E5] font-medium">Back</button>
           )}
         </div>
-        <div className="mt-2 h-1 bg-[#F0F0F0] rounded-full overflow-hidden">
+        <div className="mt-2 h-1 bg-slate-700 rounded-full overflow-hidden">
           <div className="h-full bg-[#4F46E5] transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
         </div>
       </div>
@@ -217,7 +217,7 @@ export default function WebsiteBuilderPage() {
         {step === 1 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#0A0A0A]">Tell us about your business</h2>
+              <h2 className="text-lg font-semibold text-slate-50">Tell us about your business</h2>
               <p className="text-[13px] text-[#666] mt-1">This info shapes your website. You can edit everything later.</p>
             </div>
             <div className="space-y-3">
@@ -270,7 +270,7 @@ export default function WebsiteBuilderPage() {
         {step === 2 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#0A0A0A]">Choose a style</h2>
+              <h2 className="text-lg font-semibold text-slate-50">Choose a style</h2>
               <p className="text-[13px] text-[#666] mt-1">This sets the overall feel of your website.</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -279,7 +279,7 @@ export default function WebsiteBuilderPage() {
                   key={s.key}
                   onClick={() => setSelectedStyle(s.key)}
                   className={`rounded-xl overflow-hidden text-left transition-all ${
-                    selectedStyle === s.key ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-[#E5E5E5]'
+                    selectedStyle === s.key ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-slate-700'
                   }`}
                 >
                   <div className={`h-20 ${s.preview} p-3`}>
@@ -288,7 +288,7 @@ export default function WebsiteBuilderPage() {
                     <div className="h-1.5 w-20 rounded-full bg-current opacity-10 mt-1" />
                   </div>
                   <div className="p-3">
-                    <p className="text-[13px] font-semibold text-[#0A0A0A]">{s.label}</p>
+                    <p className="text-[13px] font-semibold text-slate-50">{s.label}</p>
                     <p className="text-[10px] text-[#999]">{s.desc}</p>
                   </div>
                 </button>
@@ -307,7 +307,7 @@ export default function WebsiteBuilderPage() {
         {step === 3 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#0A0A0A]">Pick your colors</h2>
+              <h2 className="text-lg font-semibold text-slate-50">Pick your colors</h2>
               <p className="text-[13px] text-[#666] mt-1">AI suggested these based on your {businessType} business.</p>
             </div>
             {loadingPalettes ? (
@@ -321,11 +321,11 @@ export default function WebsiteBuilderPage() {
                     key={i}
                     onClick={() => setSelectedPalette(i)}
                     className={`w-full rounded-xl p-4 text-left transition-all ${
-                      selectedPalette === i ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-[#E5E5E5]'
+                      selectedPalette === i ? 'ring-2 ring-[#4F46E5] ring-offset-2' : 'border border-slate-700'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[13px] font-medium text-[#0A0A0A]">{p.name}</span>
+                      <span className="text-[13px] font-medium text-slate-50">{p.name}</span>
                       {selectedPalette === i && (
                         <svg className="h-4 w-4 text-[#4F46E5]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
                       )}
@@ -339,7 +339,7 @@ export default function WebsiteBuilderPage() {
                       ))}
                     </div>
                     {/* Mini preview */}
-                    <div className="mt-3 rounded-lg overflow-hidden border border-[#E5E5E5]" style={{ backgroundColor: p.bg }}>
+                    <div className="mt-3 rounded-lg overflow-hidden border border-slate-700" style={{ backgroundColor: p.bg }}>
                       <div className="h-1.5" style={{ backgroundColor: p.primary }} />
                       <div className="p-2">
                         <div className="h-2 w-16 rounded-full mb-1" style={{ backgroundColor: p.primary }} />
@@ -367,7 +367,7 @@ export default function WebsiteBuilderPage() {
         {step === 4 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#0A0A0A]">Choose your sections</h2>
+              <h2 className="text-lg font-semibold text-slate-50">Choose your sections</h2>
               <p className="text-[13px] text-[#666] mt-1">Select what pages appear on your website.</p>
             </div>
             <div className="space-y-2">
@@ -384,7 +384,7 @@ export default function WebsiteBuilderPage() {
                       );
                     }}
                     className={`w-full flex items-center gap-3 rounded-xl p-3.5 text-left transition-all ${
-                      isSelected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'border border-[#E5E5E5] hover:bg-[#FAFAFA]'
+                      isSelected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'border border-slate-700 hover:bg-slate-800'
                     }`}
                   >
                     <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md ${
@@ -397,7 +397,7 @@ export default function WebsiteBuilderPage() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[13px] font-medium text-[#0A0A0A]">{s.label}</p>
+                      <p className="text-[13px] font-medium text-slate-50">{s.label}</p>
                       <p className="text-[10px] text-[#999]">{s.desc}</p>
                     </div>
                     {isRequired && <span className="text-[9px] text-[#999]">Required</span>}
@@ -418,10 +418,10 @@ export default function WebsiteBuilderPage() {
         {step === 5 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-[#0A0A0A]">Ready to build</h2>
+              <h2 className="text-lg font-semibold text-slate-50">Ready to build</h2>
               <p className="text-[13px] text-[#666] mt-1">Review your choices, then let AI create your website.</p>
             </div>
-            <div className="rounded-xl border border-[#E5E5E5] p-4 space-y-3">
+            <div className="rounded-xl border border-slate-700 p-4 space-y-3">
               <div className="flex justify-between text-[13px]"><span className="text-[#999]">Business</span><span className="font-medium">{businessName}</span></div>
               <div className="flex justify-between text-[13px]"><span className="text-[#999]">Type</span><span className="font-medium">{businessType}</span></div>
               <div className="flex justify-between text-[13px]"><span className="text-[#999]">Style</span><span className="font-medium capitalize">{selectedStyle}</span></div>
@@ -449,17 +449,17 @@ export default function WebsiteBuilderPage() {
         {step === 6 && generatedHTML && (
           <div className="-mx-4 -mt-4">
             {/* Preview header */}
-            <div className="px-4 py-3 bg-white border-b border-[#F0F0F0] flex items-center justify-between">
+            <div className="px-4 py-3 bg-slate-800 border-b border-[var(--border)] flex items-center justify-between">
               <button onClick={() => setStep(5)} className="text-[12px] text-[#999]">Back</button>
-              <span className="text-[13px] font-medium text-[#0A0A0A]">Preview</span>
+              <span className="text-[13px] font-medium text-slate-50">Preview</span>
               <div className="flex gap-2">
                 <button onClick={() => { setGeneratedHTML(null); setStep(5); }} className="text-[12px] text-[#999]">Regenerate</button>
               </div>
             </div>
 
             {/* Browser frame */}
-            <div className="mx-4 mt-3 rounded-xl border border-[#E5E5E5] overflow-hidden bg-white">
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-[#FAFAFA] border-b border-[#F0F0F0]">
+            <div className="mx-4 mt-3 rounded-xl border border-slate-700 overflow-hidden bg-slate-800">
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 border-b border-[var(--border)]">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 rounded-full bg-[#FF5F57]" />
                   <div className="w-2 h-2 rounded-full bg-[#FEBC2E]" />
@@ -500,7 +500,7 @@ export default function WebsiteBuilderPage() {
                     URL.revokeObjectURL(url);
                     toast('Downloaded!', 'success');
                   }}
-                  className="rounded-xl border border-[#E5E5E5] py-2.5 text-[12px] font-medium text-[#666]"
+                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-[#666]"
                 >
                   Download HTML
                 </button>
@@ -510,7 +510,7 @@ export default function WebsiteBuilderPage() {
                     await navigator.clipboard.writeText(generatedHTML);
                     toast('HTML copied!', 'success');
                   }}
-                  className="rounded-xl border border-[#E5E5E5] py-2.5 text-[12px] font-medium text-[#666]"
+                  className="rounded-xl border border-slate-700 py-2.5 text-[12px] font-medium text-[#666]"
                 >
                   Copy HTML
                 </button>
@@ -528,7 +528,7 @@ export default function WebsiteBuilderPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-[#0A0A0A] mb-2">Your website is live!</h2>
+            <h2 className="text-xl font-semibold text-slate-50 mb-2">Your website is live!</h2>
             <a href={publishedUrl} target="_blank" rel="noopener noreferrer" className="text-[14px] text-[#4F46E5] font-medium underline break-all">
               {publishedUrl}
             </a>
@@ -550,7 +550,7 @@ export default function WebsiteBuilderPage() {
                     navigator.share({ title: businessName, url: publishedUrl });
                   }
                 }}
-                className="w-full rounded-xl border border-[#E5E5E5] py-3 text-[13px] font-medium text-[#666]"
+                className="w-full rounded-xl border border-slate-700 py-3 text-[13px] font-medium text-[#666]"
               >
                 Share
               </button>

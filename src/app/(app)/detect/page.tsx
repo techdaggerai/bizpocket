@@ -215,7 +215,7 @@ export default function DetectPage() {
 
       {/* Camera / Upload Area */}
       {!imagePreview ? (
-        <div className="rounded-xl border-2 border-dashed border-[#E5E5E5] bg-white p-8 text-center">
+        <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800 p-8 text-center">
           <input
             ref={cameraRef}
             type="file"
@@ -251,7 +251,7 @@ export default function DetectPage() {
             </button>
             <button
               onClick={() => fileRef.current?.click()}
-              className="flex items-center gap-2 rounded-xl border border-[var(--border-strong)] bg-white px-5 py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)]"
+              className="flex items-center gap-2 rounded-xl border border-[var(--border-strong)] bg-slate-800 px-5 py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)]"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
@@ -263,7 +263,7 @@ export default function DetectPage() {
       ) : (
         <>
           {/* Image Preview */}
-          <div className="relative rounded-xl border border-[#E5E5E5] bg-white overflow-hidden">
+          <div className="relative rounded-xl border border-slate-700 bg-slate-800 overflow-hidden">
             <img src={imagePreview} alt="Document" className="w-full max-h-64 object-contain bg-[#F9F9F9]" />
             <button
               onClick={reset}
@@ -290,7 +290,7 @@ export default function DetectPage() {
 
           {/* Loading State */}
           {detecting && (
-            <div className="rounded-xl border border-[#E5E5E5] bg-white p-6">
+            <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
                 <span className="text-sm font-medium text-[#4F46E5]">AI is analyzing your document...</span>
@@ -308,7 +308,7 @@ export default function DetectPage() {
           {result && (
             <div className="space-y-3">
               {/* Detection Header */}
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -336,7 +336,7 @@ export default function DetectPage() {
 
               {/* Key Information */}
               {(result.key_info.amounts.length > 0 || result.key_info.dates.length > 0 || result.key_info.parties.length > 0) && (
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                   <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-4)]">Key Information</p>
                   <div className="grid grid-cols-2 gap-3">
                     {result.key_info.amounts.length > 0 && (
@@ -387,7 +387,7 @@ export default function DetectPage() {
               </div>
 
               {/* Explanation */}
-              <div className="rounded-xl border border-[#E5E5E5] bg-white p-4">
+              <div className="rounded-xl border border-slate-700 bg-slate-800 p-4">
                 <p className="mb-2 text-xs font-semibold text-[var(--text-1)]">What does this mean?</p>
                 <p className="text-sm leading-relaxed text-[var(--text-2)]">{result.explanation}</p>
               </div>
@@ -413,7 +413,7 @@ export default function DetectPage() {
                 <button
                   onClick={handleSaveToVault}
                   disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-white py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)] disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[var(--border-strong)] bg-slate-800 py-3 text-sm font-medium text-[var(--text-2)] transition-colors hover:bg-[var(--bg-2)] disabled:opacity-50"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
@@ -429,13 +429,13 @@ export default function DetectPage() {
                 Send to Contact
               </button>
               {showContactPicker && (
-                <div className="rounded-xl border border-[#E5E5E5] bg-white p-3 space-y-1.5">
+                <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-1.5">
                   <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider">Choose contact</p>
                   {contacts.length === 0 && <p className="text-xs text-[#999] py-2">No contacts yet</p>}
                   {contacts.map(c => (
                     <button key={c.id} onClick={() => handleSendToContact(c.id)} disabled={sendingTo === c.id}
-                      className="w-full flex items-center justify-between rounded-lg border border-[#E5E5E5] px-3 py-2 text-left hover:bg-[#FAFAFA] disabled:opacity-50">
-                      <span className="text-sm font-medium text-[#0A0A0A]">{c.name}</span>
+                      className="w-full flex items-center justify-between rounded-lg border border-slate-700 px-3 py-2 text-left hover:bg-slate-700 disabled:opacity-50">
+                      <span className="text-sm font-medium text-slate-50">{c.name}</span>
                       <span className="text-[10px] text-[#999] capitalize">{c.contact_type}</span>
                     </button>
                   ))}

@@ -53,31 +53,31 @@
   /* ADAPTIVE LIQUID GLASS 3.1 */
   --glass-angle: 145deg;
   --glass-bg: rgba(255,255,255,0.78);
-  --glass-border: rgba(255,255,255,0.65);
+  --glass-border: rgba(255,255,255,0.12);
   --glass-blur: 24px;
-  --glass-refraction: linear-gradient(var(--glass-angle), rgba(255,255,255,0.4) 0%, transparent 50%);
-  --glass-shadow: 0 4px 30px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.4);
-  --glass-hover: 0 12px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
+  --glass-refraction: linear-gradient(var(--glass-angle), rgba(255,255,255,0.15) 0%, transparent 50%);
+  --glass-shadow: 0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+  --glass-hover: 0 12px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
 
-  /* SURFACES */
-  --pm-surface-0: #FFFFFF;
-  --pm-surface-1: #F9FAFB;
-  --pm-surface-2: #F3F4F6;
-  --pm-surface-3: #E5E7EB;
-  --pm-surface-4: #D1D5DB;
+  /* SURFACES — always dark */
+  --pm-surface-0: #0F172A;
+  --pm-surface-1: #1E293B;
+  --pm-surface-2: #334155;
+  --pm-surface-3: #475569;
+  --pm-surface-4: #64748B;
 
-  /* TEXT */
-  --pm-text-primary: #111827;
-  --pm-text-secondary: #6B7280;
-  --pm-text-tertiary: #9CA3AF;
-  --pm-text-inverse: #FFFFFF;
-  --pm-text-link: #4F46E5;
+  /* TEXT — always dark */
+  --pm-text-primary: #F8FAFC;
+  --pm-text-secondary: #94A3B8;
+  --pm-text-tertiary: #64748B;
+  --pm-text-inverse: #0F172A;
+  --pm-text-link: #818CF8;
 
-  /* CHAT */
-  --chat-bg: #FAF8F5;
+  /* CHAT — always dark */
+  --chat-bg: #0F172A;
   --chat-bubble-self: #4F46E5;
-  --chat-bubble-other: var(--glass-bg);
-  --chat-bubble-ai: #F3F0FF;
+  --chat-bubble-other: rgba(30,41,59,0.8);
+  --chat-bubble-ai: rgba(30,27,75,0.6);
 
   /* TYPOGRAPHY */
   --font-display: 'Outfit', sans-serif;
@@ -141,13 +141,14 @@
 }
 
 /* DARK MODE */
-[data-theme="dark"] {
+[data-theme="dark"],
+.dark {
   --pm-surface-0: #0F172A;
   --pm-surface-1: #1E293B;
   --pm-surface-2: #334155;
   --pm-surface-3: #475569;
   --pm-surface-4: #64748B;
-  --pm-text-primary: #F1F5F9;
+  --pm-text-primary: #F8FAFC;
   --pm-text-secondary: #94A3B8;
   --pm-text-tertiary: #64748B;
   --pm-text-link: #818CF8;
@@ -162,6 +163,10 @@
   --tier-starter-bg: rgba(120,53,15,0.15);
   --tier-growing-bg: rgba(30,58,95,0.15);
   --tier-established-bg: rgba(6,78,59,0.15);
+  --pm-success-bg: rgba(16,185,129,0.1);
+  --pm-warning-bg: rgba(245,158,11,0.1);
+  --pm-error-bg: rgba(239,68,68,0.1);
+  --pm-info-bg: rgba(59,130,246,0.1);
 }
 
 /* ═══════════════════════════════════════

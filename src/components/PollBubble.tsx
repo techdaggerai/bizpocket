@@ -25,7 +25,7 @@ export default function PollBubble({ pollData, userId, onVote, isOwner }: Props)
 
   return (
     <div className={`rounded-[12px] px-4 py-3 min-w-[240px] max-w-[300px] ${isOwner ? 'bg-[#4F46E5]' : 'bg-[#F3F3F1]'}`}>
-      <p className={`text-[14px] font-semibold mb-3 ${isOwner ? 'text-white' : 'text-[#0A0A0A]'}`}>
+      <p className={`text-[14px] font-semibold mb-3 ${isOwner ? 'text-white' : 'text-slate-50'}`}>
         📊 {pollData.question}
       </p>
 
@@ -42,19 +42,19 @@ export default function PollBubble({ pollData, userId, onVote, isOwner }: Props)
               disabled={userVoted && !pollData.allowMultiple}
               className={`w-full rounded-lg px-3 py-2 text-left transition-colors relative overflow-hidden ${
                 isOwner
-                  ? voted ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'
-                  : voted ? 'bg-[#4F46E5]/10 border border-[#4F46E5]/30' : 'bg-white hover:bg-[#F9FAFB] border border-[#E5E5E5]'
+                  ? voted ? 'bg-slate-800/30' : 'bg-slate-800/10 hover:bg-slate-800/20'
+                  : voted ? 'bg-[#4F46E5]/10 border border-[#4F46E5]/30' : 'bg-slate-800 hover:bg-slate-800 border border-slate-700'
               } ${userVoted && !pollData.allowMultiple ? 'cursor-default' : ''}`}
             >
               {/* Progress bar background */}
               {userVoted && (
                 <div
-                  className={`absolute inset-y-0 left-0 transition-all duration-500 ${isOwner ? 'bg-white/10' : 'bg-[#4F46E5]/5'}`}
+                  className={`absolute inset-y-0 left-0 transition-all duration-500 ${isOwner ? 'bg-slate-800/10' : 'bg-[#4F46E5]/5'}`}
                   style={{ width: `${pct}%` }}
                 />
               )}
               <div className="relative flex items-center justify-between gap-2">
-                <span className={`text-[13px] font-medium ${isOwner ? 'text-white' : 'text-[#374151]'}`}>
+                <span className={`text-[13px] font-medium ${isOwner ? 'text-white' : 'text-slate-300'}`}>
                   {voted && '✓ '}{opt}
                 </span>
                 {userVoted && (
@@ -80,7 +80,7 @@ export default function PollBubble({ pollData, userId, onVote, isOwner }: Props)
       </div>
 
       {expanded && !pollData.anonymous && (
-        <div className={`mt-2 pt-2 border-t ${isOwner ? 'border-white/10' : 'border-[#E5E5E5]'}`}>
+        <div className={`mt-2 pt-2 border-t ${isOwner ? 'border-white/10' : 'border-slate-700'}`}>
           {pollData.options.map((opt, i) => {
             const voters = (pollData.votes || {})[i] || [];
             if (voters.length === 0) return null;

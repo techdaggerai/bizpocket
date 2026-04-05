@@ -100,7 +100,7 @@ export default function FeatureSpotlight() {
 
       {/* Tooltip */}
       <div
-        className="absolute w-[280px] rounded-2xl bg-white p-4 shadow-2xl"
+        className="absolute w-[280px] rounded-2xl bg-slate-800 p-4 shadow-2xl"
         style={{ top: tooltipTop, left: tooltipLeft }}
         onClick={(e) => e.stopPropagation()}
       >

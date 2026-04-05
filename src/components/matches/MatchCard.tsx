@@ -18,9 +18,9 @@ interface MatchCardProps {
 type ConnectPhase = 'idle' | 'connecting' | 'glowing' | 'connected' | 'done';
 
 function scoreColor(score: number): string {
-  if (score > 70) return 'text-emerald-600 dark:text-emerald-400';
-  if (score > 50) return 'text-blue-600 dark:text-blue-400';
-  return 'text-amber-600 dark:text-amber-400';
+  if (score > 70) return 'text-emerald-600 text-emerald-400';
+  if (score > 50) return 'text-blue-600 text-blue-400';
+  return 'text-amber-600 text-amber-400';
 }
 
 export default function MatchCard({ match, index = 0, onConnect, onDismiss }: MatchCardProps) {
@@ -105,7 +105,7 @@ export default function MatchCard({ match, index = 0, onConnect, onDismiss }: Ma
             />
           ) : corridorTag ? (
             <div className="text-center">
-              <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{corridorTag}</span>
+              <span className="text-sm font-medium text-indigo-600 text-indigo-400">{corridorTag}</span>
             </div>
           ) : null}
 
@@ -148,9 +148,9 @@ export default function MatchCard({ match, index = 0, onConnect, onDismiss }: Ma
 
           {/* 4. Predicted deal value */}
           {predictedValue != null && (
-            <div className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800 rounded-lg px-2.5 py-1">
+            <div className="inline-flex items-center gap-1 bg-indigo-50 bg-indigo-950/30 border border-indigo-100 border-indigo-800 rounded-lg px-2.5 py-1">
               <span className="text-xs">{'\u{1F48E}'}</span>
-              <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+              <span className="text-xs font-medium text-indigo-700 text-indigo-300">
                 Predicted value: {'\u00A5'}{predictedValue >= 1000 ? `${Math.round(predictedValue / 1000)}K` : predictedValue.toLocaleString()}
               </span>
             </div>
@@ -172,23 +172,23 @@ export default function MatchCard({ match, index = 0, onConnect, onDismiss }: Ma
 
           {/* High Potential badge */}
           {isHighPotential && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-0.5 rounded-full animate-[predictPulse_2s_infinite]">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 text-emerald-400 bg-emerald-50 bg-emerald-950/30 px-2 py-0.5 rounded-full animate-[predictPulse_2s_infinite]">
               {'\u2728'} HIGH POTENTIAL
             </span>
           )}
 
           {/* 7. Buttons */}
           {phase === 'connected' || phase === 'done' ? (
-            <div className="flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-[20px] h-10 border border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center justify-center gap-2 bg-emerald-50 bg-emerald-950/30 rounded-[20px] h-10 border border-emerald-200 border-emerald-800">
               <span>{'\u{1F389}'}</span>
-              <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Connected!</span>
+              <span className="text-sm font-semibold text-emerald-700 text-emerald-300">Connected!</span>
             </div>
           ) : (
             <div className="flex gap-2">
               <button
                 onClick={handleDismiss}
                 disabled={busy}
-                className="flex-[0.5] h-10 rounded-[20px] text-sm font-medium border-2 border-gray-200 dark:border-gray-700 text-[var(--pm-text-secondary)] hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all duration-200 disabled:opacity-50"
+                className="flex-[0.5] h-10 rounded-[20px] text-sm font-medium border-2 border-slate-700 text-[var(--pm-text-secondary)] hover:bg-slate-800 active:scale-[0.97] transition-all duration-200 disabled:opacity-50"
               >
                 Not Now
               </button>

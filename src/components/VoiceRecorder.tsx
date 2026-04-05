@@ -40,10 +40,10 @@ export default function VoiceRecorder({ onRecordingComplete, disabled }: Props) 
   return (
     <button onMouseDown={startRecording} onMouseUp={stopRecording} onMouseLeave={() => recording && stopRecording()}
       onTouchStart={startRecording} onTouchEnd={stopRecording} disabled={disabled}
-      className={`flex items-center justify-center gap-2 rounded-[10px] transition-all ${recording ? 'w-[120px] h-9 bg-[#ef4444]' : 'w-9 h-9 bg-[#f3f4f6] hover:bg-[#e5e7eb]'}`}>
+      className={`flex items-center justify-center gap-2 rounded-[10px] transition-all ${recording ? 'w-[120px] h-9 bg-[#ef4444]' : 'w-9 h-9 bg-slate-800 hover:bg-[#e5e7eb]'}`}>
       {recording ? (
         <>
-          <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-slate-800 animate-pulse" />
           <span className="text-xs text-white font-semibold font-mono">{fmt(duration)}</span>
         </>
       ) : (

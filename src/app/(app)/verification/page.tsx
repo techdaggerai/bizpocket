@@ -173,8 +173,8 @@ export default function VerificationPage() {
         <Header onBack={() => router.back()} />
         <div className="flex flex-col items-center text-center py-8">
           <span className="text-5xl mb-4">{'\u{1F7E2}'}</span>
-          <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white mb-2">ID Verified</h2>
-          <p className="text-sm text-[var(--text-2)] dark:text-gray-300">
+          <h2 className="text-lg font-bold text-[var(--text-1)] mb-2">ID Verified</h2>
+          <p className="text-sm text-[var(--text-2)]">
             Your identity has been verified. You have the green badge.
           </p>
         </div>
@@ -190,15 +190,15 @@ export default function VerificationPage() {
 
         <div className="text-center">
           <span className="text-5xl">{'\u{1F7E2}'}</span>
-          <h1 className="text-xl font-bold text-[var(--text-1)] dark:text-white mt-3">Get ID Verified</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)] mt-3">Get ID Verified</h1>
         </div>
 
         {/* Rejected banner */}
         {existingStatus === 'rejected' && (
-          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
-            <p className="text-sm text-red-700 dark:text-red-300 font-semibold">{'\u274C'} Previous verification rejected</p>
-            {rejectionReason && <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-1">{rejectionReason}</p>}
-            <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-1">You can submit again below.</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-sm text-red-700 font-semibold">{'\u274C'} Previous verification rejected</p>
+            {rejectionReason && <p className="text-xs text-red-600/70 mt-1">{rejectionReason}</p>}
+            <p className="text-xs text-red-600/70 mt-1">You can submit again below.</p>
           </div>
         )}
 
@@ -210,21 +210,21 @@ export default function VerificationPage() {
             { icon: '\u{1F7E2}', text: '"Verified" label on your profile' },
             { icon: '\u2728', text: 'Green badge on business cards' },
           ].map((b, i) => (
-            <div key={i} className="flex items-center gap-3 bg-[#F9FAFB] dark:bg-gray-800 rounded-xl px-4 py-3 border border-[#E5E5E5] dark:border-gray-700">
+            <div key={i} className="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-3 border border-slate-700">
               <span className="text-lg">{b.icon}</span>
-              <span className="text-sm text-[var(--text-1)] dark:text-gray-200">{b.text}</span>
+              <span className="text-sm text-[var(--text-1)]">{b.text}</span>
             </div>
           ))}
         </div>
 
         {/* Requirements */}
-        <div className="bg-[#EEF2FF] dark:bg-indigo-950/30 rounded-xl border border-[#C7D2FE] dark:border-indigo-800 p-4">
-          <p className="text-xs font-semibold text-[#4338CA] dark:text-indigo-300 mb-2">What you'll need:</p>
-          <ul className="text-xs text-[#4338CA]/80 dark:text-indigo-300/80 space-y-1">
+        <div className="bg-[#EEF2FF] rounded-xl border border-[#C7D2FE] p-4">
+          <p className="text-xs font-semibold text-[#4338CA] mb-2">What you'll need:</p>
+          <ul className="text-xs text-[#4338CA]/80 space-y-1">
             <li>{'\u2022'} Government-issued photo ID</li>
             <li>{'\u2022'} A selfie holding your ID</li>
           </ul>
-          <p className="text-[10px] text-[#4338CA]/60 dark:text-indigo-400/60 mt-2">Takes about 2 minutes. Your data is encrypted and private.</p>
+          <p className="text-[10px] text-[#4338CA]/60 mt-2">Takes about 2 minutes. Your data is encrypted and private.</p>
         </div>
 
         <button
@@ -242,11 +242,11 @@ export default function VerificationPage() {
     return (
       <div className="px-4 py-6 space-y-6">
         <Header onBack={() => setStep('intro')} />
-        <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white">Upload Your ID</h2>
+        <h2 className="text-lg font-bold text-[var(--text-1)]">Upload Your ID</h2>
 
         {/* Document type selector */}
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-[var(--text-3)] dark:text-gray-400 uppercase tracking-wide">Document Type</p>
+          <p className="text-xs font-semibold text-[var(--text-3)] uppercase tracking-wide">Document Type</p>
           <div className="grid grid-cols-2 gap-2">
             {DOC_TYPES.map((dt) => (
               <button
@@ -254,8 +254,8 @@ export default function VerificationPage() {
                 onClick={() => setDocType(dt.value)}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-colors ${
                   docType === dt.value
-                    ? 'border-[#4F46E5] bg-[#EEF2FF] dark:bg-indigo-950/30 text-[#4338CA] dark:text-indigo-300'
-                    : 'border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-900 text-[var(--text-2)] dark:text-gray-300'
+                    ? 'border-[#4F46E5] bg-[#EEF2FF] text-[#4338CA]'
+                    : 'border-slate-700 bg-slate-800 text-[var(--text-2)]'
                 }`}
               >
                 <span>{dt.icon}</span>
@@ -269,16 +269,16 @@ export default function VerificationPage() {
         <input ref={idInputRef} type="file" accept="image/*,.pdf" capture="environment" className="hidden" onChange={handleIdSelect} />
         {idPreview ? (
           <div className="space-y-2">
-            <img src={idPreview} alt="ID preview" className="w-full h-48 object-contain rounded-xl border border-[#E5E5E5] dark:border-gray-700 bg-[#F9FAFB] dark:bg-gray-800" />
+            <img src={idPreview} alt="ID preview" className="w-full h-48 object-contain rounded-xl border border-slate-700 bg-slate-800" />
             <button onClick={() => idInputRef.current?.click()} className="text-xs text-[#4F46E5] font-semibold">Retake / Change</button>
           </div>
         ) : (
           <button
             onClick={() => idInputRef.current?.click()}
-            className="w-full h-48 rounded-xl border-2 border-dashed border-[#C7D2FE] dark:border-indigo-800 bg-[#F9FAFB] dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:bg-[#EEF2FF] dark:hover:bg-indigo-950/20 transition-colors"
+            className="w-full h-48 rounded-xl border-2 border-dashed border-[#C7D2FE] bg-slate-800 flex flex-col items-center justify-center gap-2 hover:bg-[#EEF2FF] transition-colors"
           >
             <span className="text-3xl">{'\u{1F4F7}'}</span>
-            <span className="text-sm text-[var(--text-2)] dark:text-gray-300">Tap to capture or upload</span>
+            <span className="text-sm text-[var(--text-2)]">Tap to capture or upload</span>
           </button>
         )}
 
@@ -298,29 +298,29 @@ export default function VerificationPage() {
     return (
       <div className="px-4 py-6 space-y-6">
         <Header onBack={() => setStep('upload_id')} />
-        <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white">Selfie with Your ID</h2>
-        <p className="text-sm text-[var(--text-2)] dark:text-gray-300">Hold your ID next to your face so we can match them.</p>
+        <h2 className="text-lg font-bold text-[var(--text-1)]">Selfie with Your ID</h2>
+        <p className="text-sm text-[var(--text-2)]">Hold your ID next to your face so we can match them.</p>
 
         <input ref={selfieInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleSelfieSelect} />
         {selfiePreview ? (
           <div className="space-y-2">
-            <img src={selfiePreview} alt="Selfie preview" className="w-full h-64 object-contain rounded-xl border border-[#E5E5E5] dark:border-gray-700 bg-[#F9FAFB] dark:bg-gray-800" />
+            <img src={selfiePreview} alt="Selfie preview" className="w-full h-64 object-contain rounded-xl border border-slate-700 bg-slate-800" />
             <button onClick={() => selfieInputRef.current?.click()} className="text-xs text-[#4F46E5] font-semibold">Retake</button>
           </div>
         ) : (
           <button
             onClick={() => selfieInputRef.current?.click()}
-            className="w-full h-64 rounded-xl border-2 border-dashed border-[#C7D2FE] dark:border-indigo-800 bg-[#F9FAFB] dark:bg-gray-800 flex flex-col items-center justify-center gap-3 hover:bg-[#EEF2FF] dark:hover:bg-indigo-950/20 transition-colors"
+            className="w-full h-64 rounded-xl border-2 border-dashed border-[#C7D2FE] bg-slate-800 flex flex-col items-center justify-center gap-3 hover:bg-[#EEF2FF] transition-colors"
           >
             <span className="text-4xl">{'\u{1F933}'}</span>
-            <span className="text-sm text-[var(--text-2)] dark:text-gray-300">Tap to take selfie with ID</span>
-            <span className="text-[10px] text-[var(--text-3)] dark:text-gray-500">Front camera will open</span>
+            <span className="text-sm text-[var(--text-2)]">Tap to take selfie with ID</span>
+            <span className="text-[10px] text-[var(--text-3)]">Front camera will open</span>
           </button>
         )}
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
-            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
@@ -345,9 +345,9 @@ export default function VerificationPage() {
       <Header onBack={() => router.back()} />
       <div className="flex flex-col items-center text-center py-8">
         <span className="text-5xl mb-4">{'\u2705'}</span>
-        <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white mb-2">Submitted for Review</h2>
-        <p className="text-sm text-[var(--text-2)] dark:text-gray-300 mb-4">We'll verify within 24 hours.</p>
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+        <h2 className="text-lg font-bold text-[var(--text-1)] mb-2">Submitted for Review</h2>
+        <p className="text-sm text-[var(--text-2)] mb-4">We'll verify within 24 hours.</p>
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
           {'\u23F3'} Pending Review
         </span>
         <button onClick={() => router.push('/profile/preview')} className="mt-8 text-sm font-semibold text-[#4F46E5]">

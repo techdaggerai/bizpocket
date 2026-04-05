@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { createClient } from '@/lib/supabase-client';
+import { getBrandModeClient } from '@/lib/brand';
 
 interface NavItem {
   href: string;
@@ -104,15 +105,14 @@ export default function BottomNav() {
     return () => { ch.unsubscribe(); };
   }, [organization?.id]);
 
-  const isPocketChatMode = organization?.signup_source === 'pocketchat' ||
-    (typeof window !== 'undefined' && (window.location.hostname.includes('evrywher') || window.location.hostname.includes('evrywyre') || window.location.hostname.includes('pocketchat') || window.location.hostname.includes('evrywhere')));
+  const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
 
   const items = isPocketChatMode
     ? NAV_ITEMS.filter(item => !item.bizpocketOnly)
     : NAV_ITEMS.filter(item => item.href !== '/contacts');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 safe-bottom shadow-[0_-1px_3px_rgba(0,0,0,0.04)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-slate-700 bg-slate-900 safe-bottom shadow-[0_-1px_3px_rgba(0,0,0,0.2)]">
       <div className="mx-auto flex h-full max-w-lg items-center justify-around">
         {items.map((item) => {
           const isActive =

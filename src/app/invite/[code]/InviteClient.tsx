@@ -62,7 +62,7 @@ export default function InviteClient({ inviter, code }: Props) {
             {services.length > 0 && (
               <div className="flex justify-center gap-1.5 flex-wrap">
                 {services.map((s: string, i: number) => (
-                  <span key={i} className="text-[10px] bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                  <span key={i} className="text-[10px] bg-indigo-950/30 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-800">
                     {s}
                   </span>
                 ))}
@@ -74,7 +74,7 @@ export default function InviteClient({ inviter, code }: Props) {
               <div className="flex items-start gap-3">
                 <span className="text-xl shrink-0">{'\u{1F6E1}\uFE0F'}</span>
                 <p className="text-sm text-[var(--pm-text-primary)]">
-                  <span className="font-semibold text-amber-600 dark:text-amber-400">You both earn +15 Trust Score</span> when you publish your profile.
+                  <span className="font-semibold text-amber-400">You both earn +15 Trust Score</span> when you publish your profile.
                 </p>
               </div>
             </GlassCard>
@@ -92,7 +92,7 @@ export default function InviteClient({ inviter, code }: Props) {
       {/* Footer */}
       <div className="mt-8 text-center">
         <p className="text-xs text-[var(--pm-text-tertiary)]">Already have an account?</p>
-        <Link href="/login" className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold no-underline hover:underline">Log in</Link>
+        <Link href="/login" className="text-xs text-indigo-400 font-semibold no-underline hover:underline">Log in</Link>
       </div>
     </div>
   );

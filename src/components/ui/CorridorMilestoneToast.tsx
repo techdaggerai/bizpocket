@@ -55,7 +55,7 @@ export default function CorridorMilestoneToast({
 
       {/* Toast card */}
       <div
-        className="rounded-[20px] bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 transition-all duration-500"
+        className="rounded-[20px] bg-slate-800/95 backdrop-blur-xl p-5 transition-all duration-500"
         style={{
           boxShadow: 'var(--glass-shadow), 0 8px 32px rgba(79, 70, 229, 0.15)',
           opacity: phase >= 0 ? 1 : 0,
@@ -73,7 +73,7 @@ export default function CorridorMilestoneToast({
           >
             {fromFlag}
           </span>
-          <span className="text-lg text-gray-400 dark:text-gray-500">{'\u2194'}</span>
+          <span className="text-lg text-slate-300">{'\u2194'}</span>
           <span
             className="text-4xl"
             style={{
@@ -94,12 +94,12 @@ export default function CorridorMilestoneToast({
           }}
         >
           <p
-            className="text-[17px] font-bold text-gray-900 dark:text-white mb-0.5"
+            className="text-[17px] font-bold text-white mb-0.5"
             style={{ fontFamily: 'var(--font-display), Outfit, sans-serif' }}
           >
             {'\u{1F389}'} First deal on {label}!
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-slate-400">
             Corridor milestone unlocked {'\u{1F680}'}
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function CorridorMilestoneToast({
         {phase >= 3 && (
           <div className="flex justify-center mt-2">
             <span
-              className="inline-block rounded-full bg-indigo-100 dark:bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-300"
+              className="inline-block rounded-full bg-indigo-100 bg-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-600 text-indigo-300"
               style={{ animation: 'pointFlyUp 800ms ease-out' }}
             >
               +10 Trust

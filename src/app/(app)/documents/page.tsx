@@ -96,7 +96,7 @@ export default function DocumentsPage() {
       </div>
 
       {/* Upload Area */}
-      <div className="rounded-xl border-2 border-dashed border-[#E5E5E5] bg-white p-6 text-center">
+      <div className="rounded-xl border-2 border-dashed border-slate-700 bg-slate-800 p-6 text-center">
         <input
           ref={fileRef}
           type="file"
@@ -111,12 +111,12 @@ export default function DocumentsPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Document title (optional)"
-              className="flex-1 rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[var(--text-1)] placeholder-[var(--text-4)]"
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-[var(--text-1)] placeholder-[var(--text-4)]"
             />
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[var(--text-1)]"
+              className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-[var(--text-1)]"
             >
               {DOC_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -139,7 +139,7 @@ export default function DocumentsPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" />
         </div>
       ) : documents.length === 0 ? (
-        <p className="rounded-xl border border-[#E5E5E5] bg-white p-8 text-center text-sm text-[var(--text-4)]">
+        <p className="rounded-xl border border-slate-700 bg-slate-800 p-8 text-center text-sm text-[var(--text-4)]">
           {t('documents.no_documents')}
         </p>
       ) : (
@@ -148,7 +148,7 @@ export default function DocumentsPage() {
             <h3 className="mb-2 text-xs font-semibold uppercase text-[var(--text-3)]">{monthKey}</h3>
             <div className="grid grid-cols-2 gap-2">
               {docs.map((doc) => (
-                <div key={doc.id} className="rounded-card border border-[#E5E5E5] bg-white p-3 transition-colors hover:border-[#4F46E5]">
+                <div key={doc.id} className="rounded-card border border-slate-700 bg-slate-800 p-3 transition-colors hover:border-[#4F46E5]">
                   <a
                     href={doc.file_url}
                     target="_blank"
@@ -169,7 +169,7 @@ export default function DocumentsPage() {
                       <span className="text-[10px] text-[var(--text-4)]">{formatDate(doc.date)}</span>
                     </div>
                   </a>
-                  <div className="mt-2 pt-2 border-t border-[#F0F0F0]">
+                  <div className="mt-2 pt-2 border-t border-[var(--border)]">
                     <NoteEditor
                       note={(doc as any).notes || null}
                       onSave={async (note) => {
