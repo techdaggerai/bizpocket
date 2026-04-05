@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface Topic {
   id: string;
@@ -196,7 +197,31 @@ export default function TopicPage() {
       </div>
 
       <div className="px-4 pt-4">
-        <p className="text-sm text-[var(--text-2)] mb-4">{topic.description}</p>
+        <p className="text-sm text-[var(--text-2)] mb-3">{topic.description}</p>
+
+        {/* Study mode buttons */}
+        <div className="flex gap-2 mb-4">
+          <Link
+            href={`/learn/scenario?topic=${encodeURIComponent(topic.title_en)}&topicTarget=${encodeURIComponent(topic.title_target)}`}
+            className="flex-1 flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] px-3 py-3 text-white"
+          >
+            <span className="text-lg">🎬</span>
+            <div>
+              <p className="text-xs font-bold">Scenario Lesson</p>
+              <p className="text-[10px] opacity-80">Immersive scenes</p>
+            </div>
+          </Link>
+          <Link
+            href={`/learn/practice?topic=${topic.slug}`}
+            className="flex-1 flex items-center gap-2 rounded-xl bg-[#EDE9FE] dark:bg-purple-950/20 border border-[#DDD6FE]/50 dark:border-purple-800/30 px-3 py-3"
+          >
+            <span className="text-lg">💬</span>
+            <div>
+              <p className="text-xs font-bold text-[#7C3AED] dark:text-purple-300">AI Chat</p>
+              <p className="text-[10px] text-[#7C3AED]/60 dark:text-purple-400/60">Practice talk</p>
+            </div>
+          </Link>
+        </div>
 
         {generating ? (
           <div className="flex flex-col items-center py-12">

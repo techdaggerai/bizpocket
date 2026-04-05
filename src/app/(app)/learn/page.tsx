@@ -234,10 +234,10 @@ export default function LearnPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex gap-2 mx-4 mt-4">
+      {/* Study Modes */}
+      <div className="grid grid-cols-2 gap-2 mx-4 mt-4">
         {todayStats.reviewDue > 0 && (
-          <Link href="/learn/study?mode=review" className="flex-1 flex items-center gap-2 rounded-xl bg-[#FEF3C7] dark:bg-amber-950/20 border border-[#FDE68A]/50 dark:border-amber-800/30 px-3 py-3">
+          <Link href="/learn/study?mode=review" className="flex items-center gap-2 rounded-xl bg-[#FEF3C7] dark:bg-amber-950/20 border border-[#FDE68A]/50 dark:border-amber-800/30 px-3 py-3">
             <span className="text-lg">🎯</span>
             <div>
               <p className="text-xs font-bold text-[#92400E] dark:text-amber-300">Flash Review</p>
@@ -245,7 +245,21 @@ export default function LearnPage() {
             </div>
           </Link>
         )}
-        <Link href="/learn/study?mode=new" className="flex-1 flex items-center gap-2 rounded-xl bg-[#EEF2FF] dark:bg-indigo-950/20 border border-[#C7D2FE]/50 dark:border-indigo-800/30 px-3 py-3">
+        <Link href="/learn/practice" className="flex items-center gap-2 rounded-xl bg-[#EDE9FE] dark:bg-purple-950/20 border border-[#DDD6FE]/50 dark:border-purple-800/30 px-3 py-3">
+          <span className="text-lg">💬</span>
+          <div>
+            <p className="text-xs font-bold text-[#7C3AED] dark:text-purple-300">AI Practice</p>
+            <p className="text-[10px] text-[#7C3AED]/60 dark:text-purple-400/60">Conversation</p>
+          </div>
+        </Link>
+        <Link href="/learn/quiz" className="flex items-center gap-2 rounded-xl bg-[#FEE2E2] dark:bg-red-950/20 border border-[#FECACA]/50 dark:border-red-800/30 px-3 py-3">
+          <span className="text-lg">⚡</span>
+          <div>
+            <p className="text-xs font-bold text-[#DC2626] dark:text-red-300">Quick Quiz</p>
+            <p className="text-[10px] text-[#DC2626]/60 dark:text-red-400/60">30s challenge</p>
+          </div>
+        </Link>
+        <Link href="/learn/study?mode=new" className="flex items-center gap-2 rounded-xl bg-[#EEF2FF] dark:bg-indigo-950/20 border border-[#C7D2FE]/50 dark:border-indigo-800/30 px-3 py-3">
           <span className="text-lg">📖</span>
           <div>
             <p className="text-xs font-bold text-[#4F46E5] dark:text-indigo-300">Learn New</p>
