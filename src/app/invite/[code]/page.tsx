@@ -14,7 +14,7 @@ async function getInviter(code: string) {
 
   const supabase = createClient(url, key)
 
-  // Look up inviter by share_token on global_profiles
+  // Try share_token first (new invite links)
   const { data: gp } = await supabase
     .from('global_profiles')
     .select('user_id, tier, trust_score, title, services, operating_corridors, tagline, share_token')
@@ -22,31 +22,58 @@ async function getInviter(code: string) {
     .eq('is_published', true)
     .single()
 
-  if (!gp) return null
+  if (gp) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name, full_name, avatar_url, organization_id')
+      .eq('user_id', gp.user_id)
+      .single()
 
-  const { data: profile } = await supabase
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', profile?.organization_id)
+      .single()
+
+    return {
+      tier: gp.tier,
+      trust_score: gp.trust_score,
+      title: gp.title,
+      services: gp.services,
+      operating_corridors: gp.operating_corridors,
+      tagline: gp.tagline,
+      display_name: profile?.full_name || profile?.name || 'A Business Professional',
+      avatar_url: profile?.avatar_url || null,
+      company_name: org?.name || '',
+    }
+  }
+
+  // Fallback: code might be an org ID (legacy invite links)
+  const { data: legacyOrg } = await supabase
+    .from('organizations')
+    .select('id, name')
+    .eq('id', code)
+    .single()
+
+  if (!legacyOrg) return null
+
+  const { data: ownerProfile } = await supabase
     .from('profiles')
     .select('name, full_name, avatar_url')
-    .eq('user_id', gp.user_id)
+    .eq('organization_id', legacyOrg.id)
+    .eq('role', 'owner')
     .single()
 
-  const { data: org } = await supabase
-    .from('organizations')
-    .select('name')
-    .eq('id', (await supabase.from('profiles').select('organization_id').eq('user_id', gp.user_id).single()).data?.organization_id)
-    .single()
-
-  // Only return safe display fields — no user_id, share_token, or internal IDs
   return {
-    tier: gp.tier,
-    trust_score: gp.trust_score,
-    title: gp.title,
-    services: gp.services,
-    operating_corridors: gp.operating_corridors,
-    tagline: gp.tagline,
-    display_name: profile?.full_name || profile?.name || 'A Business Professional',
-    avatar_url: profile?.avatar_url || null,
-    company_name: org?.name || '',
+    tier: 'starter' as const,
+    trust_score: 20,
+    title: null,
+    services: null,
+    operating_corridors: null,
+    tagline: null,
+    display_name: ownerProfile?.full_name || ownerProfile?.name || 'Someone',
+    avatar_url: ownerProfile?.avatar_url || null,
+    company_name: legacyOrg.name || '',
   }
 }
 
