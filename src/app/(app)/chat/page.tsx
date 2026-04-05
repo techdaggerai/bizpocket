@@ -1333,7 +1333,7 @@ export default function PocketChatPage() {
     const isGroup = activeConvo.is_group;
 
     return (
-      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white">
+      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white dark:bg-gray-900">
         {/* Header */}
         <div className="p-3 border-b border-[#E5E5E5] flex items-center gap-3">
           <button
@@ -1519,8 +1519,8 @@ export default function PocketChatPage() {
         {/* Messages */}
         <div
           ref={chatScrollRef}
-          className="flex-1 overflow-y-auto p-4 space-y-3 relative"
-          style={{ backgroundColor: chatWallpaper?.startsWith('#') ? chatWallpaper : '#FAFAFA', backgroundImage: chatWallpaper && !chatWallpaper.startsWith('#') ? chatWallpaper : undefined }}
+          className={`flex-1 overflow-y-auto p-4 space-y-3 relative ${!chatWallpaper ? 'chat-bg-pattern' : ''}`}
+          style={chatWallpaper ? { backgroundColor: chatWallpaper.startsWith('#') ? chatWallpaper : undefined, backgroundImage: !chatWallpaper.startsWith('#') ? chatWallpaper : undefined } : undefined}
           onScroll={() => {
             const el = chatScrollRef.current;
             if (el) setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);
@@ -2317,7 +2317,7 @@ export default function PocketChatPage() {
       ];
 
   return (
-    <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white">
+    <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#E5E5E5]">
         <div>
@@ -2424,26 +2424,26 @@ export default function PocketChatPage() {
                 key={convo.id}
                 onClick={() => setActiveConvoId(convo.id)}
                 onContextMenu={(e) => { e.preventDefault(); setConvoActionId(convo.id); }}
-                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#F9FAFB] hover:shadow-sm transition-all border-b border-[#F3F3F1] text-left overflow-hidden ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#F9FAFB] dark:hover:bg-gray-800 hover:shadow-sm transition-all border-b border-[#F0F0F0] dark:border-gray-800 text-left overflow-hidden ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
               >
-                {/* Avatar */}
+                {/* Avatar — 52px for visual weight */}
                 {convo.is_bot_chat ? (
                   botConfig?.avatar_url ? (
-                    <img src={botConfig.avatar_url} alt={botName} className="h-10 w-10 rounded-full object-cover shrink-0" />
-                  ) : <AnimatedPocketChatLogo size={40} />
+                    <img src={botConfig.avatar_url} alt={botName} className="h-[52px] w-[52px] rounded-2xl object-cover shrink-0" />
+                  ) : <AnimatedPocketChatLogo size={52} />
                 ) : convo.is_group ? (
-                  <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <div className="h-[52px] w-[52px] rounded-2xl bg-[#4F46E5]/10 flex items-center justify-center shrink-0">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   </div>
                 ) : (
-                  <PocketAvatar name={name} size={40} />
+                  <PocketAvatar name={name} size={52} />
                 )}
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <p className={`text-[15px] text-[#0A0A0A] truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
+                      <p className={`text-[15px] text-[#0A0A0A] dark:text-white truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
                       {convo.is_pinned && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>}
                       {convo.muted_until && new Date(convo.muted_until) > new Date() && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51" /></svg>}
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}

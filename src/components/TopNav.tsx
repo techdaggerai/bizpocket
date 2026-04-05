@@ -25,7 +25,7 @@ export default function TopNav() {
   }
 
   return (
-    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E5E5E5] bg-white/95 px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:static lg:px-0 lg:py-0">
+    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm px-4 py-2 backdrop-blur-sm lg:border-0 lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:static lg:px-0 lg:py-0">
       {/* Mobile: centered wordmark */}
       <div className="absolute left-1/2 -translate-x-1/2 lg:hidden">
         <Link href={isPocketChatMode ? '/chat' : '/dashboard'} className="flex items-center gap-2">

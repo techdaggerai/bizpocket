@@ -102,7 +102,7 @@ export default function BottomNav() {
     : NAV_ITEMS.filter(item => item.href !== '/contacts');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-[#E5E5E5] bg-white safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 safe-bottom shadow-[0_-1px_3px_rgba(0,0,0,0.04)]">
       <div className="mx-auto flex h-full max-w-lg items-center justify-around">
         {items.map((item) => {
           const isActive =
