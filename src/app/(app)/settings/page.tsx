@@ -651,6 +651,27 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* LANGUAGE LEARNING */}
+        <div>
+          <SectionLabel>Language Learning</SectionLabel>
+          <SettingsRow first>
+            <div>
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Learn from messages</span>
+              <p className="text-[11px] text-[var(--text-4)] mt-0.5">Show vocabulary cards on translated messages</p>
+            </div>
+            <Toggle on={typeof window !== 'undefined' && localStorage.getItem('language_learning') === 'on'} onChange={(val) => { localStorage.setItem('language_learning', val ? 'on' : 'off'); toast(val ? 'Language Learning enabled' : 'Language Learning disabled', 'success'); }} />
+          </SettingsRow>
+          <SettingsRow last>
+            <Link href="/vocabulary" className="flex items-center justify-between w-full">
+              <div>
+                <p className="text-[14px] text-[var(--text-1)] dark:text-white font-medium">My Vocabulary</p>
+                <p className="text-[12px] text-[var(--text-3)]">Review saved words from conversations</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </SettingsRow>
+        </div>
+
         {/* BOT & AI */}
         <div>
           <SectionLabel>Bot & AI</SectionLabel>

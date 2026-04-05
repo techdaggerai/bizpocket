@@ -25,6 +25,7 @@ import PhotoEditor from '@/components/PhotoEditor';
 import CreatePoll from '@/components/CreatePoll';
 import PollBubble from '@/components/PollBubble';
 import ScheduleMessageModal from '@/components/ScheduleMessageModal';
+import LearnFromMessage from '@/components/LearnFromMessage';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -221,6 +222,7 @@ export default function PocketChatPage() {
   const [showPhotoEditor, setShowPhotoEditor] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [chatFolder, setChatFolder] = useState('all');
+  const [learningMode] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('language_learning') === 'on' : false);
   const [photoEditorFile, setPhotoEditorFile] = useState<{ url: string; file: File } | null>(null);
   const [culturalCoach, setCulturalCoach] = useState<{
     tip: string; suggested_revision: string; cultural_note: string;
@@ -1246,6 +1248,23 @@ export default function PocketChatPage() {
     setSharedMedia(media);
   }
 
+  // Save learned words
+  function saveLearnedWords(words: { word: string; reading: string; meaning: string; example?: string }[]) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('learned_words') || '[]');
+      for (const w of words) {
+        const existing = stored.find((s: { word: string }) => s.word === w.word);
+        if (existing) {
+          existing.times_seen = (existing.times_seen || 1) + 1;
+          existing.saved_at = new Date().toISOString();
+        } else {
+          stored.push({ ...w, times_seen: 1, saved_at: new Date().toISOString() });
+        }
+      }
+      localStorage.setItem('learned_words', JSON.stringify(stored));
+    } catch { /* ignore */ }
+  }
+
   // Schedule message
   async function handleScheduleMessage(sendAt: Date) {
     if (!newMessage.trim() || !activeConvoId || !organization?.id) return;
@@ -2221,6 +2240,23 @@ export default function PocketChatPage() {
                       <span className="text-[10px] text-[#F59E0B]">★ Starred</span>
                     </div>
                   )}
+                  {/* Language Learning card */}
+                  {learningMode && !isOwner && msg.translations && (() => {
+                    // Parse learning data from translations if available
+                    const learningRaw = (msg.translations as Record<string, string>)?.['_learning'];
+                    if (!learningRaw) return null;
+                    try {
+                      const learning = JSON.parse(learningRaw);
+                      if (!learning?.key_words?.length) return null;
+                      return (
+                        <LearnFromMessage
+                          learning={learning}
+                          onSaveWords={saveLearnedWords}
+                          isOwner={isOwner}
+                        />
+                      );
+                    } catch { return null; }
+                  })()}
                 </div>
               </div>
               </div>
