@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import PageHeader from '@/components/PageHeader';
 
 const LANGUAGES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu',
@@ -197,34 +198,7 @@ export default function LiveGuidePage() {
       height: '100vh', background: '#0a0a0a',
       color: 'white', fontFamily: "'DM Sans', system-ui, sans-serif",
     }}>
-      {/* Header */}
-      <div style={{
-        padding: '12px 16px',
-        display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', borderBottom: '1px solid #222',
-        flexShrink: 0,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <a href="/chat" style={{ color: 'white', textDecoration: 'none', fontSize: 20 }}>←</a>
-          <svg width="24" height="24" viewBox="0 0 88 88" fill="none">
-            <rect width="88" height="88" rx="20" fill="#4F46E5"/>
-            <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/>
-            <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/>
-          </svg>
-          <div>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Live Guide</p>
-            <p style={{ margin: 0, fontSize: 11, color: '#F59E0B' }}>
-              {deviceType || 'Point camera at any Japanese screen'}
-            </p>
-          </div>
-        </div>
-        <span style={{
-          fontSize: 11, padding: '3px 10px', borderRadius: 100,
-          background: 'rgba(79, 70, 229, 0.3)', color: '#a5b4fc',
-        }}>
-          {LANGUAGES[userLang] || 'English'}
-        </span>
-      </div>
+      <PageHeader title="AI Guide" backPath="/chat" />
 
       {/* Camera view */}
       <div style={{

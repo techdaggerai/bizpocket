@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import AIInvoiceHelper from '@/components/AIInvoiceHelper';
+import PageHeader from '@/components/PageHeader';
 import { TEMPLATES } from '@/components/InvoiceTemplates';
 import type { InvoiceData } from '@/components/InvoiceTemplates';
 import type { Customer, InvoiceLineItem, ItemTemplate, InvoiceStatus } from '@/types/database';
@@ -315,6 +316,7 @@ export default function NewInvoicePage() {
 
   return (
     <>
+      <PageHeader title="New Invoice" backPath="/invoices" />
       {/* Template Picker Modal */}
       {showTemplatePicker && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface Stage { id: string; name: string; color: string; stage_order: number; is_start: boolean; is_end: boolean; }
 interface Item {
@@ -115,8 +116,9 @@ export default function OpsRadarPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <PageHeader title="Ops Radar" backPath="/dashboard" />
+      <div className="flex items-center justify-between px-4">
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">Ops Radar<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
           <p className="text-xs text-[var(--text-3)]">{cycleName}</p>

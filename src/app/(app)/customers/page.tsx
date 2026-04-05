@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import NoteEditor from '@/components/NoteEditor';
+import PageHeader from '@/components/PageHeader';
 import type { Customer } from '@/types/database';
 
 type CustomerForm = {
@@ -172,11 +173,11 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-4">
+      <PageHeader title="Customers" backPath="/dashboard" />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">Customers</h1>
           <p className="text-xs text-[var(--text-3)]">
             {customers.length} customer{customers.length !== 1 ? 's' : ''}
           </p>

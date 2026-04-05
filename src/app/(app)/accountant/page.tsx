@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate, getMonthRange } from '@/lib/utils';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 import type { CashFlow, Invoice } from '@/types/database';
 
 export default function AccountantPage() {
@@ -115,10 +116,10 @@ export default function AccountantPage() {
   const tabs = ['overview', 'cashflow', 'invoices', 'expenses', 'report'] as const;
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <PageHeader title="Accountant Portal" backPath="/dashboard" />
+      <div className="flex items-center justify-between px-4">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">Accountant Portal</h1>
           <p className="text-xs text-[var(--text-3)]">{isAccountant ? 'Read-only access' : 'Monthly financial overview'}</p>
         </div>
         <div className="flex gap-1.5">

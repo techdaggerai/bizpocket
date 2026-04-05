@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -48,6 +49,7 @@ export default function DownloadPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#EEF2FF] to-white">
+      <PageHeader title="Download" backPath="/" />
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2">

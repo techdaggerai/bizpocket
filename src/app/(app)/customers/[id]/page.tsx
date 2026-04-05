@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import NoteEditor from '@/components/NoteEditor';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 import type { Customer, Invoice, CashFlow } from '@/types/database';
 
 type Tab = 'invoices' | 'payments' | 'chat' | 'notes' | 'documents';
@@ -131,14 +132,8 @@ export default function CustomerDetailPage() {
   };
 
   return (
-    <div className="space-y-4 py-4">
-      {/* Back */}
-      <Link href="/customers" className="inline-flex items-center gap-1 text-xs text-[var(--text-4)] hover:text-[var(--accent)]">
-        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-        </svg>
-        Back to customers
-      </Link>
+    <div className="space-y-4">
+      <PageHeader title="Customer" backPath="/customers" />
 
       {/* Profile Card */}
       <div className="rounded-card border border-[#E5E5E5] bg-white p-5">

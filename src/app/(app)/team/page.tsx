@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import OutlinePillButton from '@/components/OutlinePillButton';
+import PageHeader from '@/components/PageHeader';
 
 const ROLES = [
   { key: 'staff', label: 'Staff', desc: 'View dashboard, create invoices, log cash flow' },
@@ -165,7 +166,8 @@ export default function TeamHubPage() {
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[#4F46E5] border-t-transparent" /></div>;
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6">
+      <PageHeader title="Team" backPath="/settings" />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

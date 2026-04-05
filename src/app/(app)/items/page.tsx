@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 interface Stage { id: string; name: string; color: string; stage_order: number; }
 interface Item {
@@ -137,8 +138,9 @@ export default function ItemsPage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <PageHeader title="Items" backPath="/dashboard" />
+      <div className="flex items-center justify-between px-4">
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">Pipeline Items</h1>
           <p className="text-xs text-[var(--text-3)]">{items.filter(i => i.status === 'active').length} active &middot; {items.filter(i => i.status === 'completed').length} completed</p>

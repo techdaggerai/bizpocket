@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
+import PageHeader from '@/components/PageHeader';
 import type { Customer } from '@/types/database';
 
 export default function TimeTrackingPage() {
@@ -113,8 +114,9 @@ export default function TimeTrackingPage() {
   const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <PageHeader title="Time Tracking" backPath="/dashboard" />
+      <div className="flex items-center justify-between px-4">
         <div><h1 className="text-xl font-semibold text-[#0A0A0A]">Time Tracking</h1><p className="text-xs text-[#999]">{totalMinutes} min unbilled &middot; {formatCurrency(totalBillable, currency)}</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ Log Time'}</button>
       </div>

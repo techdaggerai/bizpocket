@@ -5,10 +5,11 @@ import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/lib/auth-context'
 import {
   Upload, FileText, Sparkles, ChevronRight, Check,
-  Download, Save, RefreshCw, ArrowLeft, Loader2,
+  Download, Save, RefreshCw, Loader2,
   AlertCircle, Edit2, FileCheck, SkipForward,
   Globe, X, ZoomIn
 } from 'lucide-react'
+import PageHeader from '@/components/PageHeader'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormField {
@@ -235,6 +236,7 @@ export default function FormFillPage() {
   // ═══════════════════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader title="Form Fill" backPath="/dashboard" />
       {/* ── Header ── */}
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 const PLANS = [
   {
@@ -121,16 +122,8 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link href="/settings" className="text-[var(--text-3)]">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
-        </Link>
-        <h1 className="text-xl font-bold text-[var(--text-1)]">Upgrade Plan</h1>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title="Upgrade" backPath="/settings" />
 
       {/* Trial Badge */}
       {isOnTrial && (

@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 export default function BusinessSetupPage() {
   const { organization } = useAuth();
@@ -93,19 +94,8 @@ export default function BusinessSetupPage() {
     'text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3] mb-3';
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Back link */}
-      <Link
-        href="/settings"
-        className="inline-flex items-center gap-1.5 text-sm text-[var(--text-3)] hover:text-[var(--text-1)] transition-colors"
-      >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-        </svg>
-        Back to Settings
-      </Link>
-
-      <h1 className="text-xl font-semibold text-[var(--text-1)]">Business Profile Setup</h1>
+    <div className="space-y-6">
+      <PageHeader title="Business Setup" backPath="/settings" />
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Company Info */}

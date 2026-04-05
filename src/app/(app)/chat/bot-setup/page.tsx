@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
+import PageHeader from '@/components/PageHeader';
 
 const PERSONALITIES = [
   { id: 'professional', name: 'Professional', desc: 'Formal, business-appropriate responses', example: 'Thank you for reaching out. I will inform them of your message.' },
@@ -174,7 +175,9 @@ export default function BotSetupPage() {
   // EDIT MODE: single page with all fields
   if (isEditMode && loaded) {
     return (
-      <div className="max-w-[560px] mx-auto py-10 px-6">
+      <div className="max-w-[560px] mx-auto">
+        <PageHeader title="Bot Setup" backPath="/chat" />
+        <div className="px-6 pt-6">
         <div className="flex justify-center mb-6"><PocketChatMark size={48} /></div>
         <h2 className="text-2xl font-bold text-[#111827] text-center mb-2">Edit {botName || 'your assistant'}</h2>
         <p className="text-sm text-[#6b7280] text-center mb-8">Update your bot&apos;s settings.</p>
@@ -227,12 +230,15 @@ export default function BotSetupPage() {
             {!orgReady ? 'Loading...' : saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-[560px] mx-auto py-10 px-6">
+    <div className="max-w-[560px] mx-auto">
+      <PageHeader title="Bot Setup" backPath="/chat" />
+      <div className="px-6 pt-6">
       {/* Header */}
       <div className="flex justify-center mb-6"><PocketChatMark size={48} /></div>
 
@@ -340,6 +346,7 @@ export default function BotSetupPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

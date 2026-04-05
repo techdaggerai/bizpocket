@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import PageHeader from '@/components/PageHeader';
 import type { Customer } from '@/types/database';
 
 interface LineItem { description: string; quantity: number; unit_price: number; tax_rate: number; }
@@ -102,8 +103,9 @@ export default function EstimatesPage() {
   const inputClass = 'w-full rounded-lg border border-[#E5E5E5] bg-white px-3 py-2.5 text-sm text-[#0A0A0A] placeholder-[#999] focus:border-[#4F46E5] focus:outline-none';
 
   return (
-    <div className="space-y-4 p-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <PageHeader title="Estimates" backPath="/dashboard" />
+      <div className="flex items-center justify-between px-4">
         <div><h1 className="text-xl font-bold text-[#0A0A0A]">Estimates / Quotations</h1><p className="text-xs text-[#999]">Create quotes, send for approval, convert to invoices</p></div>
         <button onClick={() => setShowForm(!showForm)} className="rounded-lg bg-[#4F46E5] px-4 py-2 text-xs font-medium text-white">{showForm ? 'Cancel' : '+ New Estimate'}</button>
       </div>

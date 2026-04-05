@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 import PocketAvatar from '@/components/PocketAvatar';
+import PageHeader from '@/components/PageHeader';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -159,9 +160,11 @@ export default function EvryWherOnboarding() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex flex-col"
       style={{ background: 'var(--bg, #FFFFFF)' }}
     >
+      <PageHeader title="Welcome" />
+      <div className="flex-1 flex items-center justify-center">
       <div
         className="w-full max-w-sm mx-auto px-6 transition-all duration-200"
         style={{
@@ -405,6 +408,7 @@ export default function EvryWherOnboarding() {
           40% { transform: translateY(-4px); }
         }
       `}</style>
+      </div>
     </div>
   );
 }

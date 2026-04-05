@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import PocketAvatar from '@/components/PocketAvatar';
+import PageHeader from '@/components/PageHeader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -450,10 +451,7 @@ export default function StatusPage() {
 
   return (
     <div className="max-w-lg mx-auto pb-20">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 border-b border-[#F0F0F0] dark:border-gray-800 px-4 py-3">
-        <h1 className="text-[18px] font-bold text-[#0A0A0A] dark:text-white">Status</h1>
-      </div>
+      <PageHeader title="Status" backPath="/chat" />
 
       {loading ? (
         <div className="flex items-center justify-center py-20">

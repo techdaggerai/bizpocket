@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency, getCurrentMonth, formatDate } from '@/lib/utils';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 import type { CashFlow, PlannedExpense, PlannedIncome } from '@/types/database';
 
 const EXPENSE_CATEGORIES = [
@@ -211,10 +212,10 @@ export default function ExpensePlannerPage() {
     'w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]';
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-4">
+      <PageHeader title="Expenses" backPath="/dashboard" />
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-[var(--text-1)]">Expense & Planner</h1>
         <p className="text-xs text-[var(--text-3)]">Plan it. Track it. Compare it.</p>
       </div>
 

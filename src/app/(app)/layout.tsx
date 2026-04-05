@@ -7,6 +7,7 @@ import BottomNav from '@/components/BottomNav';
 import TopNav from '@/components/TopNav';
 import Sidebar from '@/components/Sidebar';
 import ChatLockWrapper from '@/components/ChatLockWrapper';
+import SwipeBackGesture from '@/components/SwipeBackGesture';
 import type { Language } from '@/lib/i18n';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -66,6 +67,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 <I18nProvider initialLang={(freshProfile.language || 'en') as Language}>
                   <ChatLockWrapper>
                   <div className="min-h-screen bg-[var(--bg)] overflow-x-hidden group/root has-[.chat-fullbleed]:overflow-hidden">
+                    <SwipeBackGesture />
                     <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><TopNav /></div>
                     <div className="flex">
                       <Sidebar />
@@ -129,6 +131,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <I18nProvider initialLang={(profile.language || 'en') as Language}>
         <ChatLockWrapper>
         <div className="min-h-screen bg-[var(--bg)] overflow-x-hidden group/root has-[.chat-fullbleed]:overflow-hidden">
+          <SwipeBackGesture />
           {/* Mobile: TopNav — hidden when chat view is active */}
           <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden">
             <TopNav />

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/components/PageHeader';
 
 const ADMIN_EMAILS = ['bilal@techdagger.com', 'test123@techdagger.com'];
 
@@ -102,7 +103,8 @@ export default function AdminPage() {
   const estimatedRevenue = paidSubs * 980;
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6">
+      <PageHeader title="Admin" backPath="/dashboard" />
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-[#0A0A0A]">Admin Dashboard</h1>
         <button onClick={fetchAll} className="text-sm text-[#4F46E5] font-medium hover:underline">Refresh</button>

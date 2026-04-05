@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 
 const STYLES = [
   { key: 'classic', label: 'Classic', desc: 'Clean, professional, trusted', preview: 'bg-white border-t-4 border-[#0A0A0A]' },
@@ -197,20 +198,10 @@ export default function WebsiteBuilderPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-[#F0F0F0] px-4 py-3">
+      <PageHeader title="Website Builder" backPath="/dashboard" />
+      {/* Step Header */}
+      <div className="sticky top-14 z-10 bg-white border-b border-[#F0F0F0] px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-[#999]">
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </Link>
-            <div>
-              <h1 className="text-[15px] font-semibold text-[#0A0A0A]">Website Builder<span className="ml-2 rounded-full bg-[#F59E0B]/10 px-2 py-0.5 text-[9px] font-bold text-[#F59E0B]">AI</span></h1>
-              <p className="text-[10px] text-[#999]">Step {step} of {totalSteps}</p>
-            </div>
-          </div>
           {step < 6 && step > 1 && (
             <button onClick={() => setStep(step - 1)} className="text-[12px] text-[#4F46E5] font-medium">Back</button>
           )}

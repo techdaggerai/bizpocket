@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/ui/Toast';
 import { formatDate } from '@/lib/utils';
 import NoteEditor from '@/components/NoteEditor';
+import PageHeader from '@/components/PageHeader';
 import type { Document } from '@/types/database';
 
 const DOC_CATEGORIES = ['Receipt', 'Invoice', 'Contract', 'Auction Slip', 'Other'];
@@ -86,10 +87,10 @@ export default function DocumentsPage() {
   }, {});
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-4">
+      <PageHeader title="Documents" backPath="/dashboard" />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">{t('documents.title')}</h1>
           <p className="text-xs text-[var(--text-3)]">{t('documents.subtitle')}</p>
         </div>
       </div>

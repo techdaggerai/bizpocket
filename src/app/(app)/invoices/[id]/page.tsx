@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PageHeader from '@/components/PageHeader';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
@@ -308,11 +309,8 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Back Link */}
-      <Link href="/invoices" className="inline-flex items-center text-sm text-[#4F46E5] hover:opacity-80">
-        &larr; Back to Invoices
-      </Link>
+    <div className="space-y-6">
+      <PageHeader title="Invoice" backPath="/invoices" />
 
       {/* Invoice Detail Card */}
       <div className="rounded-card border border-[#E5E5E5] bg-white p-5">
