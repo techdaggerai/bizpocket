@@ -141,7 +141,7 @@ export default function AccountantPage() {
       <div className="flex border-b border-slate-700 overflow-x-auto">
         {tabs.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-indigo-400' : 'text-[#999] hover:text-[#333]'}`}>
+            className={`px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${tab === t ? 'border-b-2 border-[#4F46E5] text-indigo-400' : 'text-slate-400 hover:text-slate-200'}`}>
             {t === 'report' ? 'AI Report' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}

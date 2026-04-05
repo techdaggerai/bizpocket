@@ -430,13 +430,13 @@ export default function DetectPage() {
               </button>
               {showContactPicker && (
                 <div className="rounded-xl border border-slate-700 bg-slate-800 p-3 space-y-1.5">
-                  <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider">Choose contact</p>
-                  {contacts.length === 0 && <p className="text-xs text-[#999] py-2">No contacts yet</p>}
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Choose contact</p>
+                  {contacts.length === 0 && <p className="text-xs text-slate-400 py-2">No contacts yet</p>}
                   {contacts.map(c => (
                     <button key={c.id} onClick={() => handleSendToContact(c.id)} disabled={sendingTo === c.id}
                       className="w-full flex items-center justify-between rounded-lg border border-slate-700 px-3 py-2 text-left hover:bg-slate-700 disabled:opacity-50">
                       <span className="text-sm font-medium text-white">{c.name}</span>
-                      <span className="text-[10px] text-[#999] capitalize">{c.contact_type}</span>
+                      <span className="text-[10px] text-slate-400 capitalize">{c.contact_type}</span>
                     </button>
                   ))}
                 </div>

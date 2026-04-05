@@ -119,7 +119,7 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
         </svg>
         <p className="text-sm font-medium text-indigo-400">Sign this invoice</p>
-        <p className="text-[10px] text-[#999]">Add your signature to confirm</p>
+        <p className="text-[10px] text-slate-400">Add your signature to confirm</p>
       </button>
     );
   }
@@ -128,7 +128,7 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
     <div className="rounded-xl border border-slate-700 bg-slate-800 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Sign Invoice</h3>
-        <button onClick={() => setShowPad(false)} className="text-xs text-[#999]">Cancel</button>
+        <button onClick={() => setShowPad(false)} className="text-xs text-slate-400">Cancel</button>
       </div>
 
       <input value={signerName} onChange={e => setSignerName(e.target.value)}
@@ -139,11 +139,11 @@ export default function SignaturePad({ onSave, disabled }: SignaturePadProps) {
           className="w-full cursor-crosshair" style={{ height: '140px' }}
           onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing}
           onTouchStart={startDrawing} onTouchMove={draw} onTouchEnd={stopDrawing} />
-        <p className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] text-[#CCC]">Draw your signature above</p>
+        <p className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] text-slate-400">Draw your signature above</p>
       </div>
 
       <div className="flex gap-2">
-        <button onClick={clearSignature} className="flex-1 rounded-lg border border-slate-700 py-2 text-xs font-medium text-[#666]">Clear</button>
+        <button onClick={clearSignature} className="flex-1 rounded-lg border border-slate-700 py-2 text-xs font-medium text-slate-300">Clear</button>
         <button onClick={handleSave} disabled={!hasSignature || !signerName.trim()}
           className="flex-1 rounded-lg bg-[#4F46E5] py-2 text-xs font-medium text-white disabled:opacity-40">
           Confirm Signature

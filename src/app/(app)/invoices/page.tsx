@@ -91,7 +91,7 @@ export default function InvoicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Your Invoices</h1>
-          <p className="text-xs text-[#999]">{invoices.length} total · {invoices.filter(i => i.status === 'paid').length} paid</p>
+          <p className="text-xs text-slate-400">{invoices.length} total · {invoices.filter(i => i.status === 'paid').length} paid</p>
         </div>
         <a
           href="/invoices/new"

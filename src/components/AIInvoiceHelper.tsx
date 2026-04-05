@@ -172,7 +172,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
           </svg>
           <span className="text-[13px] font-medium text-white">AI Invoice Helper</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="text-[#999] hover:text-white">
+        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -186,7 +186,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
             <div className={`max-w-[85%] rounded-xl px-3 py-2 text-[12px] leading-relaxed ${
               msg.role === 'user'
                 ? 'bg-[#4F46E5] text-white'
-                : 'bg-[#F5F5F5] text-[#333]'
+                : 'bg-[#F5F5F5] text-slate-200'
             }`}>
               {msg.text}
             </div>
@@ -208,7 +208,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
       {/* Quick suggestions */}
       <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto">
         {['Write a disclaimer', 'Suggest payment terms', 'Add tax notes'].map((s) => (
-          <button key={s} onClick={() => sendMessage(s)} className="shrink-0 rounded-full border border-slate-700 px-2.5 py-1 text-[10px] text-[#666] hover:bg-[#F5F5F5]">
+          <button key={s} onClick={() => sendMessage(s)} className="shrink-0 rounded-full border border-slate-700 px-2.5 py-1 text-[10px] text-slate-300 hover:bg-[#F5F5F5]">
             {s}
           </button>
         ))}
@@ -219,7 +219,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
         <button
           onClick={recording ? stopRecording : startRecording}
           className={`shrink-0 flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-            recording ? 'bg-[#DC2626] text-white animate-pulse' : 'bg-[#F5F5F5] text-[#666] hover:bg-[#E5E5E5]'
+            recording ? 'bg-[#DC2626] text-white animate-pulse' : 'bg-[#F5F5F5] text-slate-300 hover:bg-[#E5E5E5]'
           }`}
         >
           <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -233,7 +233,7 @@ export default function AIInvoiceHelper({ onSuggestion }: AIInvoiceHelperProps) 
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && sendMessage(message)}
           placeholder="Ask AI anything about your invoice..."
-          className="flex-1 text-[12px] text-white placeholder-[#BBB] bg-transparent focus:outline-none"
+          className="flex-1 text-[12px] text-white placeholder-slate-400 bg-transparent focus:outline-none"
         />
         <button
           onClick={() => sendMessage(message)}

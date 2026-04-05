@@ -36,7 +36,7 @@ export default function ChatLabels({ conversationId, currentLabel, onUpdate, isO
   return (
     <div className="absolute top-full right-0 mt-1 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-lg z-50 overflow-hidden">
       <div className="px-3 py-2 border-b border-[var(--border)]">
-        <span className="text-[10px] font-medium text-[#999] uppercase tracking-wider">Label conversation</span>
+        <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Label conversation</span>
       </div>
       {LABELS.map(l => (
         <button
@@ -45,7 +45,7 @@ export default function ChatLabels({ conversationId, currentLabel, onUpdate, isO
           className={`w-full flex items-center gap-2 px-3 py-2 hover:bg-slate-800 text-left ${currentLabel === l.label ? 'bg-slate-800' : ''}`}
         >
           <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
-          <span className="text-xs text-[#333]">{l.label}</span>
+          <span className="text-xs text-slate-200">{l.label}</span>
           {currentLabel === l.label && (
             <svg className="h-3 w-3 text-indigo-400 ml-auto" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
           )}

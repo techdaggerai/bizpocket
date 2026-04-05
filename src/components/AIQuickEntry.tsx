@@ -128,7 +128,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
         className="w-full rounded-xl border border-dashed border-[#4F46E5]/20 bg-[#4F46E5]/[0.02] p-3 text-center hover:bg-[#4F46E5]/[0.05] transition-colors"
       >
         <p className="text-[13px] font-medium text-indigo-400">Quick entry — tell AI what happened</p>
-        <p className="text-[10px] text-[#999] mt-0.5">&quot;Paid ¥5000 for flour&quot; or &quot;Got ¥50000 from Tanaka&quot;</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">&quot;Paid ¥5000 for flour&quot; or &quot;Got ¥50000 from Tanaka&quot;</p>
       </button>
     );
   }
@@ -144,13 +144,13 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
               </svg>
               <span className="text-[13px] font-medium text-white">Quick entry</span>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-[#999] text-xs">Close</button>
+            <button onClick={() => setIsOpen(false)} className="text-slate-400 text-xs">Close</button>
           </div>
           <div className="flex gap-2">
             <button
               onClick={recording ? stopRecording : startRecording}
               className={`shrink-0 flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
-                recording ? 'bg-[#DC2626] text-white animate-pulse' : 'bg-[#F5F5F5] text-[#666] hover:bg-[#E5E5E5]'
+                recording ? 'bg-[#DC2626] text-white animate-pulse' : 'bg-[#F5F5F5] text-slate-300 hover:bg-[#E5E5E5]'
               }`}
             >
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -164,7 +164,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && processText(input)}
               placeholder="e.g., 'Paid ¥5000 for flour at Costco'"
-              className="flex-1 rounded-lg border border-slate-700 px-3 py-2 text-sm placeholder-[#BBB] focus:border-[#4F46E5] focus:outline-none"
+              className="flex-1 rounded-lg border border-slate-700 px-3 py-2 text-sm placeholder-slate-400 focus:border-[#4F46E5] focus:outline-none"
             />
             <button
               onClick={() => processText(input)}
@@ -176,7 +176,7 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
           </div>
           <div className="flex gap-1.5 mt-2 overflow-x-auto">
             {['Paid rent', 'Bought supplies', 'Got payment from client', 'Fuel cost'].map((s) => (
-              <button key={s} onClick={() => setInput(s)} className="shrink-0 rounded-full border border-slate-700 px-2.5 py-1 text-[10px] text-[#666] hover:bg-[#F5F5F5]">
+              <button key={s} onClick={() => setInput(s)} className="shrink-0 rounded-full border border-slate-700 px-2.5 py-1 text-[10px] text-slate-300 hover:bg-[#F5F5F5]">
                 {s}
               </button>
             ))}
@@ -188,32 +188,32 @@ export default function AIQuickEntry({ onEntryAdded }: QuickEntryProps) {
           <p className="text-[11px] font-medium text-indigo-400 uppercase tracking-wider mb-3">AI parsed your entry — confirm?</p>
           <div className="space-y-2 mb-3">
             <div className="flex justify-between text-sm">
-              <span className="text-[#666]">Type</span>
+              <span className="text-slate-300">Type</span>
               <span className={`font-medium ${pendingEntry.flow_type === 'IN' ? 'text-[#16A34A]' : 'text-[#DC2626]'}`}>
                 {pendingEntry.flow_type === 'IN' ? 'Money In' : 'Money Out'}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#666]">Amount</span>
+              <span className="text-slate-300">Amount</span>
               <span className="font-mono font-medium">{organization.currency} {pendingEntry.amount.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#666]">Category</span>
+              <span className="text-slate-300">Category</span>
               <span className="font-medium">{pendingEntry.category}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#666]">From/To</span>
+              <span className="text-slate-300">From/To</span>
               <span className="font-medium">{pendingEntry.from_to || '—'}</span>
             </div>
             {pendingEntry.description && (
               <div className="flex justify-between text-sm">
-                <span className="text-[#666]">Note</span>
+                <span className="text-slate-300">Note</span>
                 <span className="font-medium text-right max-w-[60%]">{pendingEntry.description}</span>
               </div>
             )}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setPendingEntry(null)} className="flex-1 rounded-lg border border-slate-700 py-2.5 text-xs font-medium text-[#666]">
+            <button onClick={() => setPendingEntry(null)} className="flex-1 rounded-lg border border-slate-700 py-2.5 text-xs font-medium text-slate-300">
               Cancel
             </button>
             <button onClick={confirmEntry} disabled={processing} className="flex-1 rounded-lg bg-[#4F46E5] py-2.5 text-xs font-medium text-white disabled:opacity-50">

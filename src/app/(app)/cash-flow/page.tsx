@@ -298,7 +298,7 @@ export default function CashFlowPage() {
                 <button type="button" onClick={addCustomCategory}
                   className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Add</button>
                 <button type="button" onClick={() => setShowAddCategory(false)}
-                  className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-[#666]">Cancel</button>
+                  className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-300">Cancel</button>
               </div>
             )}
           </div>
@@ -334,7 +334,7 @@ export default function CashFlowPage() {
                     <button type="button" onClick={addCustomFromTo}
                       className="rounded-lg bg-[var(--accent)] px-3 py-2 text-xs text-white">Save</button>
                     <button type="button" onClick={() => setShowAddFromTo(false)}
-                      className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-[#666]">Cancel</button>
+                      className="rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-300">Cancel</button>
                   </>
                 )}
               </div>
