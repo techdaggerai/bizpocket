@@ -6,12 +6,16 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
+import LandingLanguageDropdown from '@/components/LandingLanguageDropdown';
+import { LandingI18nProvider, useLandingI18n } from '@/lib/landing-i18n';
 
 export default function LoginPage() {
   return (
-    <Suspense>
-      <LoginInner />
-    </Suspense>
+    <LandingI18nProvider>
+      <Suspense>
+        <LoginInner />
+      </Suspense>
+    </LandingI18nProvider>
   );
 }
 
@@ -27,6 +31,7 @@ function LoginInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useLandingI18n();
 
   useEffect(() => {
     document.title = isPocketChat ? 'Log in — Evrywher' : 'Log in — BizPocket';
@@ -53,14 +58,17 @@ function LoginInner() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
+      <div className="absolute top-4 right-4 z-10">
+        <LandingLanguageDropdown />
+      </div>
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
             {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
             {isPocketChat ? <EvryWherMark size="md" /> : <LogoWordmark />}
           </div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Log in to Evrywher' : 'Log in to BizPocket'}</p>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">{t('login_welcome')}</h1>
+          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? t('login_subtitle_evrywher') : t('login_subtitle_bizpocket')}</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -70,7 +78,7 @@ function LoginInner() {
             </div>
           )}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Email</label>
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">{t('login_email')}</label>
             <input
               type="email"
               value={email}
@@ -81,7 +89,7 @@ function LoginInner() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Password</label>
+            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">{t('login_password')}</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -110,14 +118,14 @@ function LoginInner() {
             disabled={loading}
             className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px disabled:opacity-50 disabled:hover:translate-y-0"
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? t('login_loading') : t('login_button')}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-[var(--text-3)]">
-          Don&apos;t have an account?{' '}
+          {t('login_no_account')}{' '}
           <Link href={isPocketChat ? '/signup?mode=pocketchat' : '/signup'} className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
-            Sign Up
+            {t('login_signup')}
           </Link>
         </p>
       </div>
