@@ -51,7 +51,7 @@ const PLANS = [
 export default function LandingPage() {
 
   return (
-    <div className="min-h-screen bg-white text-[#0A0A0A]">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/30 via-white to-white text-[#0A0A0A]">
 
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.06]">

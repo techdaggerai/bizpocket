@@ -475,8 +475,8 @@ export default function PocketChatLanding() {
           >
             Start Free →
           </Link>
-          <p className="mt-6 text-[13px] italic text-[#9ca3af]">
-            You bring the missing E. We bring the world.
+          <p className="mt-6 text-[13px] font-medium text-[#6B7280]">
+            You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.
           </p>
         </div>
       </section>

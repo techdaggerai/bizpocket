@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
+import EvryWherMark from '@/components/EvryWherMark';
 
 export default function LoginPage() {
   return (
@@ -25,6 +26,7 @@ function LoginInner() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     document.title = isPocketChat ? 'Log in — Evrywher' : 'Log in — BizPocket';
@@ -55,7 +57,7 @@ function LoginInner() {
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
             {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
-            {!isPocketChat && <LogoWordmark />}
+            {isPocketChat ? <EvryWherMark size="md" /> : <LogoWordmark />}
           </div>
           <h1 className="text-xl font-semibold text-[var(--text-1)]">Welcome back</h1>
           <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Log in to Evrywher' : 'Log in to BizPocket'}</p>
@@ -80,14 +82,28 @@ function LoginInner() {
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 pr-11 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-4)] hover:text-[var(--text-2)] transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
+            </div>
           </div>
           <button
             type="submit"

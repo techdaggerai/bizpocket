@@ -32,7 +32,7 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
         <div className="mt-4">
           <EvryWherMark size="lg" />
         </div>
-        <p className="mt-2 text-sm text-[#9CA3AF]">You bring the missing E. We bring the world.</p>
+        <p className="mt-2 text-sm font-medium text-[#6B7280]">You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.</p>
       </div>
       <div className="invisible">{children}</div>
     </>

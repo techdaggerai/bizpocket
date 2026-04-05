@@ -31,7 +31,7 @@ export default function TopNav() {
         <Link href={isPocketChatMode ? '/chat' : '/dashboard'} className="flex items-center gap-2">
           {isPocketChatMode ? (
             <>
-              <PocketChatMark size={28} />
+              <PocketChatMark size={32} />
               <EvryWherMark size="sm" />
             </>
           ) : (
