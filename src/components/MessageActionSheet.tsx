@@ -15,16 +15,18 @@ interface ActionSheetProps {
   onDelete: () => void;
   onReact: () => void;
   onTranslate: () => void;
+  onForward: () => void;
 }
 
 export default function MessageActionSheet({
   isOpen, isOwner, text, senderName, isStarred,
-  onClose, onReply, onCopy, onStar, onEdit, onDelete, onReact, onTranslate,
+  onClose, onReply, onCopy, onStar, onEdit, onDelete, onReact, onTranslate, onForward,
 }: ActionSheetProps) {
   if (!isOpen) return null;
 
   const actions = [
     { icon: '↩️', label: 'Reply', action: onReply, show: true },
+    { icon: '↪️', label: 'Forward', action: onForward, show: true },
     { icon: '📋', label: 'Copy', action: onCopy, show: true },
     { icon: '⭐', label: isStarred ? 'Unstar' : 'Star', action: onStar, show: true },
     { icon: '😀', label: 'React', action: onReact, show: true },

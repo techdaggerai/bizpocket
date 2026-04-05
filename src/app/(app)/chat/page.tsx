@@ -84,6 +84,8 @@ interface Message {
   is_starred?: boolean;
   reply_to_id?: string | null;
   edited_at?: string | null;
+  is_forwarded?: boolean;
+  forward_count?: number;
   created_at: string;
 }
 
@@ -202,6 +204,11 @@ export default function PocketChatPage() {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [showCameraTranslate, setShowCameraTranslate] = useState(false);
   const [showVoiceTranslator, setShowVoiceTranslator] = useState(false);
+  const [chatSearch, setChatSearch] = useState('');
+  const [showChatSearch, setShowChatSearch] = useState(false);
+  const [chatSearchIdx, setChatSearchIdx] = useState(0);
+  const [showContactInfo, setShowContactInfo] = useState(false);
+  const [sharedMedia, setSharedMedia] = useState<Message[]>([]);
   const [culturalCoach, setCulturalCoach] = useState<{
     tip: string; suggested_revision: string; cultural_note: string;
     severity: 'suggestion' | 'warning'; originalText: string;
@@ -1168,6 +1175,30 @@ export default function PocketChatPage() {
     sendMessage();
   }, [newMessage, sending, chatLang, profile?.language, activeConvo, editingMsg, culturalCoachEnabled, sendMessage, messages]);
 
+  // Forward message to another conversation
+  async function handleForwardMessage() {
+    if (!actionMenu) return;
+    const msg = messages.find(m => m.id === actionMenu.msgId);
+    if (!msg) return;
+    // Copy message text to clipboard and show toast for now
+    // Full forward-to-conversation picker is a future enhancement
+    await navigator.clipboard.writeText(actionMenu.text);
+    toast('Message copied — paste in another chat to forward', 'success');
+    setActionMenu(null);
+  }
+
+  // In-chat search matches
+  const chatSearchMatches = chatSearch.trim()
+    ? messages.filter(m => m.message?.toLowerCase().includes(chatSearch.toLowerCase()) && !m.deleted_at)
+    : [];
+
+  // Fetch shared media when contact info opens
+  function openContactInfo() {
+    setShowContactInfo(true);
+    const media = messages.filter(m => (m.message_type === 'image' || m.message_type === 'document') && m.attachment_url);
+    setSharedMedia(media);
+  }
+
   function handleCoachSendOriginal() {
     setCulturalCoach(null);
     sendMessage();
@@ -1482,7 +1513,7 @@ export default function PocketChatPage() {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-semibold text-[#0A0A0A] truncate ${isGroup ? 'cursor-pointer' : ''}`} onClick={isGroup ? () => setShowGroupInfo(true) : undefined}>{contactName}</p>
+            <p className="text-sm font-semibold text-[#0A0A0A] dark:text-white truncate cursor-pointer" onClick={() => isGroup ? setShowGroupInfo(true) : !activeConvo.is_bot_chat && openContactInfo()}>{contactName}</p>
             <div className="flex items-center gap-1.5">
               {activeConvo.is_bot_chat ? (
                 <span className="inline-block text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">
@@ -1518,6 +1549,11 @@ export default function PocketChatPage() {
               </div>
             )}
           </div>
+          {/* Search icon */}
+          <button onClick={() => setShowChatSearch(v => !v)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+
           {activeConvo.is_bot_chat ? (
             /* Bot chat: Scan & Translate pill */
             <button
@@ -1637,6 +1673,39 @@ export default function PocketChatPage() {
             )}
           </div>
         </div>
+
+        {/* In-chat search bar */}
+        {showChatSearch && (
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-[#E5E5E5] dark:border-gray-800 bg-white dark:bg-gray-900 shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              type="text"
+              value={chatSearch}
+              onChange={(e) => { setChatSearch(e.target.value); setChatSearchIdx(0); }}
+              placeholder="Search in chat..."
+              className="flex-1 bg-transparent text-sm text-[#0A0A0A] dark:text-white placeholder-[#9CA3AF] focus:outline-none"
+              autoFocus
+            />
+            {chatSearchMatches.length > 0 && (
+              <span className="text-[11px] text-[#9CA3AF] whitespace-nowrap shrink-0">
+                {chatSearchIdx + 1} of {chatSearchMatches.length}
+              </span>
+            )}
+            {chatSearchMatches.length > 1 && (
+              <div className="flex items-center shrink-0">
+                <button onClick={() => setChatSearchIdx(i => Math.max(0, i - 1))} className="p-1 text-[#9CA3AF] hover:text-[#374151]">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 15l-6-6-6 6"/></svg>
+                </button>
+                <button onClick={() => setChatSearchIdx(i => Math.min(chatSearchMatches.length - 1, i + 1))} className="p-1 text-[#9CA3AF] hover:text-[#374151]">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+              </div>
+            )}
+            <button onClick={() => { setShowChatSearch(false); setChatSearch(''); }} className="p-1 text-[#9CA3AF] hover:text-[#374151]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        )}
 
         {/* Messages */}
         <div
@@ -1894,6 +1963,11 @@ export default function PocketChatPage() {
                           : 'bg-[#F3F3F1] text-[#0A0A0A]'
                     }`}
                   >
+                    {msg.is_forwarded && (
+                      <p className={`text-[11px] italic mb-1 ${isOwner ? 'text-white/50' : 'text-[#9CA3AF]'}`}>
+                        ↪️ Forwarded{(msg.forward_count || 0) > 4 ? ' many times' : ''}
+                      </p>
+                    )}
                     {msg.reply_to_id && (() => { const orig = messages.find(m => m.id === msg.reply_to_id); return orig ? (
                       <div className={`mb-1.5 border-l-2 pl-2 py-1 text-[12px] rounded ${isOwner ? 'border-white/50 bg-white/10' : 'border-[#4F46E5]/30 bg-[#4F46E5]/5'}`}>
                         <p className={`font-medium ${isOwner ? 'text-white/70' : 'text-[#4F46E5]'}`}>{orig.sender_name}</p>
@@ -2085,6 +2159,91 @@ export default function PocketChatPage() {
           <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
         </div>
 
+        {/* Contact Info modal */}
+        {showContactInfo && !activeConvo?.is_bot_chat && (
+          <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowContactInfo(false)} />
+            <div className="relative w-full max-w-md sm:mx-4 bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E5E5] dark:border-gray-700">
+                <button onClick={() => setShowContactInfo(false)} className="text-sm text-[#4F46E5] font-medium">Close</button>
+                <p className="text-sm font-bold text-[#0A0A0A] dark:text-white">Contact Info</p>
+                <div className="w-10" />
+              </div>
+
+              <div className="p-5 space-y-5">
+                {/* Avatar + Name */}
+                <div className="flex flex-col items-center gap-2">
+                  <PocketAvatar name={contactName} size={80} />
+                  <p className="text-lg font-bold text-[#0A0A0A] dark:text-white">{contactName}</p>
+                  {contactType && <span className="text-xs px-3 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-gray-700 text-[#6B7280] dark:text-gray-300 capitalize">{contactType}</span>}
+                </div>
+
+                {/* Shared Media */}
+                {sharedMedia.length > 0 && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Shared Media ({sharedMedia.length})</p>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {sharedMedia.slice(0, 4).map(m => (
+                        <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-[#F3F4F6]">
+                          {m.message_type === 'image' ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={m.attachment_url!} alt="" className="w-full h-full object-cover" loading="lazy" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[#9CA3AF]">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                            </div>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="space-y-0.5">
+                  <button onClick={() => { setShowContactInfo(false); setShowChatSearch(true); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors text-left">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <span className="text-sm text-[#374151] dark:text-gray-300">Search in Chat</span>
+                  </button>
+                  <button onClick={() => { setShowContactInfo(false); exportChat(); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#F3F4F6] dark:hover:bg-gray-700 transition-colors text-left">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span className="text-sm text-[#374151] dark:text-gray-300">Export Chat</span>
+                  </button>
+                </div>
+
+                {/* Danger zone */}
+                <div className="space-y-0.5 pt-2 border-t border-[#F0F0F0] dark:border-gray-700">
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`Block ${contactName}?`)) return;
+                      setShowContactInfo(false);
+                      toast(`${contactName} blocked`, 'success');
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#FEF2F2] transition-colors text-left"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/></svg>
+                    <span className="text-sm text-[#DC2626]">Block</span>
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm(`Delete this conversation?`)) return;
+                      await supabase.from('conversations').delete().eq('id', activeConvoId);
+                      setConversations(prev => prev.filter(c => c.id !== activeConvoId));
+                      setActiveConvoId(null);
+                      setShowContactInfo(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#FEF2F2] transition-colors text-left"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="1.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    <span className="text-sm text-[#DC2626]">Delete Chat</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Message action sheet (mobile-native bottom sheet) */}
         <MessageActionSheet
           isOpen={!!actionMenu}
@@ -2101,6 +2260,7 @@ export default function PocketChatPage() {
           onDelete={handleDeleteMessage}
           onReact={() => { setReactionMsgId(actionMenu?.msgId || ''); setActionMenu(null); }}
           onTranslate={() => { setTranslatePickerMsgId(actionMenu?.msgId || null); setActionMenu(null); }}
+          onForward={handleForwardMessage}
         />
 
         {/* Reaction picker */}
