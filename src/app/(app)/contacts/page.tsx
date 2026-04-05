@@ -469,11 +469,21 @@ export default function ContactsPage() {
       {/* Contact List */}
       {filtered.length === 0 ? (
         <div className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-8 text-center">
-          <p className="text-sm text-[var(--text-3)] dark:text-gray-400">
-            {search || activeTab !== 'all'
-              ? 'No contacts match your filters.'
-              : 'No contacts yet. Add your first contact.'}
-          </p>
+          {search || activeTab !== 'all' ? (
+            <p className="text-sm text-[var(--text-3)] dark:text-gray-400">No contacts match your filters.</p>
+          ) : (
+            <>
+              <div className="mx-auto mb-3 h-14 w-14 rounded-full bg-[#EEF2FF] dark:bg-gray-700 flex items-center justify-center">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5" strokeLinecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+              </div>
+              <p className="text-sm font-medium text-[var(--text-1)] dark:text-white">No contacts yet</p>
+              <p className="text-xs text-[var(--text-3)] dark:text-gray-400 mt-1">Add someone to start chatting!</p>
+              <button onClick={openAdd} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[#4F46E5] px-4 py-2 text-sm font-medium text-white hover:bg-[#4338CA] transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Contact
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-1">

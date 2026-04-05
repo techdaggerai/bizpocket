@@ -164,6 +164,7 @@ export default function PocketChatPage() {
   const [newMessage, setNewMessage] = useState('');
   const [chatLang, setChatLang] = useState(profile?.language || 'en');
   const [uploading, setUploading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<{ file: File; previewUrl: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -841,19 +842,36 @@ export default function PocketChatPage() {
 
     if (file.size > 10 * 1024 * 1024) {
       toast('File too large (max 10MB)', 'error');
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
     const allowedDocTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedImageTypes.includes(file.type) && !allowedDocTypes.includes(file.type) && !file.type.startsWith('image/') && !file.type.startsWith('audio/')) {
+    if (!allowedImageTypes.includes(file.type) && !allowedDocTypes.includes(file.type) && !file.type.startsWith('image/') && !file.type.startsWith('audio/') && !file.type.startsWith('video/')) {
       toast('Unsupported file type', 'error');
+      if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
 
+    // Images/videos: show preview for confirmation before sending
+    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+      const previewUrl = URL.createObjectURL(file);
+      setPendingFile({ file, previewUrl });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // Documents: send immediately
+    await uploadAndSendFile(file);
+  }, [activeConvoId, organization?.id]);
+
+  const uploadAndSendFile = useCallback(async (file: File) => {
+    if (!activeConvoId || !organization?.id) return;
     setUploading(true);
     const ext = file.name.split('.').pop() || 'bin';
     const isImage = file.type.startsWith('image/');
-    const folder = isImage ? 'images' : 'documents';
+    const isVideo = file.type.startsWith('video/');
+    const folder = isImage ? 'images' : isVideo ? 'videos' : 'documents';
     const path = `messages/${organization.id}/${activeConvoId}/${folder}/${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
@@ -868,7 +886,7 @@ export default function PocketChatPage() {
 
     const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path);
 
-    const msgType = isImage ? 'image' : 'document';
+    const msgType = isImage || isVideo ? 'image' : 'document';
     const { error } = await supabase.from('messages').insert({
       conversation_id: activeConvoId,
       organization_id: organization.id,
@@ -891,6 +909,19 @@ export default function PocketChatPage() {
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, [activeConvoId, organization?.id, chatLang]);
+
+  function confirmPendingFile() {
+    if (!pendingFile) return;
+    URL.revokeObjectURL(pendingFile.previewUrl);
+    uploadAndSendFile(pendingFile.file);
+    setPendingFile(null);
+  }
+
+  function cancelPendingFile() {
+    if (pendingFile) URL.revokeObjectURL(pendingFile.previewUrl);
+    setPendingFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
 
   /* ---------- Translate message ---------- */
 
@@ -1364,40 +1395,29 @@ export default function PocketChatPage() {
             )}
           </div>
           {activeConvo.is_bot_chat ? (
-            /* Bot chat: disabled phone + AI Guide pill */
-            <>
-              <button
-                onClick={() => toast('Voice calls coming soon!', 'info')}
-                className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-[#D1D5DB] opacity-50 cursor-not-allowed"
-                title="Voice calls coming soon"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => router.push('/chat/live-guide')}
-                className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-[#F59E0B] shrink-0 transition-colors hover:bg-[#F59E0B] hover:text-white"
-                style={{ border: '1.5px solid #F59E0B' }}
-                title="AI Guide — point camera at any screen"
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-                AI Guide
-              </button>
-            </>
+            /* Bot chat: AI Guide pill */
+            <button
+              onClick={() => router.push('/chat/live-guide')}
+              className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-[#F59E0B] shrink-0 transition-colors hover:bg-[#F59E0B] hover:text-white"
+              style={{ border: '1.5px solid #F59E0B' }}
+              title="AI Guide — point camera at any screen"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              AI Guide
+            </button>
           ) : (
-            /* Human contact: Phone + Video buttons */
+            /* Human contact: Phone + Video call buttons — 44px tap targets */
             <>
-              <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors" title="Voice call">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button onClick={() => toast('Voice calls coming soon!', 'info')} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center shrink-0 text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors" title="Voice call (coming soon)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
               </button>
-              <button onClick={() => router.push(`/chat/call/${activeConvoId}?video=true`)} className="h-10 w-10 rounded-full flex items-center justify-center shrink-0 text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors" title="Video call">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button onClick={() => toast('Video calls coming soon!', 'info')} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center shrink-0 text-[#4F46E5] hover:bg-[#4F46E5]/10 transition-colors" title="Video call (coming soon)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 7l-7 5 7 5V7z" />
                   <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                 </svg>
@@ -1831,6 +1851,37 @@ export default function PocketChatPage() {
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
         <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} className="hidden" />
         <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} className="hidden" />
+
+        {/* File preview confirmation */}
+        {pendingFile && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70">
+            <div className="w-full max-w-sm mx-4 bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-xl">
+              <div className="p-4">
+                <p className="text-sm font-semibold text-[var(--text-1)] dark:text-white mb-3">Send this {pendingFile.file.type.startsWith('video/') ? 'video' : 'photo'}?</p>
+                {pendingFile.file.type.startsWith('image/') ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={pendingFile.previewUrl} alt="Preview" className="w-full max-h-[300px] object-contain rounded-xl bg-[#F3F4F6]" />
+                ) : (
+                  <div className="w-full h-[200px] rounded-xl bg-[#F3F4F6] flex items-center justify-center">
+                    <div className="text-center">
+                      <svg className="h-12 w-12 mx-auto text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                      <p className="text-xs text-[#9CA3AF] mt-2">{pendingFile.file.name}</p>
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-[var(--text-4)] dark:text-gray-500 mt-2 truncate">{pendingFile.file.name} · {(pendingFile.file.size / 1024).toFixed(0)} KB</p>
+              </div>
+              <div className="flex border-t border-[#E5E5E5] dark:border-gray-700">
+                <button onClick={cancelPendingFile} className="flex-1 py-3 text-sm font-medium text-[var(--text-3)] dark:text-gray-400 hover:bg-[#F9FAFB] dark:hover:bg-gray-700 transition-colors">
+                  Cancel
+                </button>
+                <button onClick={confirmPendingFile} disabled={uploading} className="flex-1 py-3 text-sm font-semibold text-[#4F46E5] hover:bg-[#4F46E5]/5 transition-colors border-l border-[#E5E5E5] dark:border-gray-700 disabled:opacity-50">
+                  {uploading ? 'Sending...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Upload progress */}
         {uploading && (

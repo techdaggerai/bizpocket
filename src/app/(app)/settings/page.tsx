@@ -1003,9 +1003,7 @@ export default function SettingsPage() {
       {/* Account + Logout */}
       <div className="rounded-card border border-[#E5E5E5] dark:border-gray-700 bg-white dark:bg-gray-800 p-4 space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F46E5] text-white text-sm font-semibold">
-            {userName.charAt(0).toUpperCase()}
-          </div>
+          <PocketAvatar name={userName} size={40} />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-[var(--text-1)] truncate">{userName}</p>
             <p className="text-xs text-[var(--text-4)] truncate">{user.email}</p>
