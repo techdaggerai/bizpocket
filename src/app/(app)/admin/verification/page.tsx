@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { useToast } from '@/components/ui/Toast'
+import PageHeader from '@/components/ui/PageHeader'
+import GlassCard from '@/components/ui/GlassCard'
+import Button from '@/components/ui/Button'
 
 const ADMIN_EMAILS = ['bilal@techdagger.com', 'test123@techdagger.com']
 
@@ -102,18 +105,11 @@ export default function AdminVerificationPage() {
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <button onClick={() => router.push('/admin')} className="p-1.5 -ml-1.5 rounded-lg hover:bg-[#F3F4F6] dark:hover:bg-gray-800 transition-colors">
-          <svg className="w-5 h-5 text-[var(--text-1)] dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-          </svg>
-        </button>
-        <h1 className="text-lg font-bold text-[var(--text-1)] dark:text-white">{'\u{1F6E1}\uFE0F'} Verification Queue</h1>
-        <span className="text-xs bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-semibold">
-          {verifications.length}
-        </span>
-      </div>
+    <div className="min-h-screen">
+      <PageHeader
+        title={`\u{1F6E1}\uFE0F Verification Queue (${verifications.length})`}
+        onBack={() => router.push('/admin')}
+      />
 
       {verifications.length === 0 ? (
         <div className="text-center py-12">

@@ -10,6 +10,10 @@ import Link from 'next/link';
 import NotificationSoundPicker from '@/components/NotificationSoundPicker';
 import { useChatLock, ChatLockSetupModal } from '@/components/ChatLockScreen';
 import PocketAvatar from '@/components/PocketAvatar';
+import PocketAvatarUI from '@/components/ui/PocketAvatar';
+import TierBadge from '@/components/profile/TierBadge';
+import GlassCard from '@/components/ui/GlassCard';
+import type { Tier } from '@/lib/tier-system';
 
 // ─── Dark mode helpers ────────────────────────────────────────────────────────
 type ThemeMode = 'light' | 'dark' | 'system';
@@ -239,6 +243,12 @@ export default function SettingsPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
+  // Global profile for tier badge
+  const [gpData, setGpData] = useState<any>(null);
+  useEffect(() => {
+    fetch('/api/profile/me').then(r => r.json()).then(d => { if (d.profile) setGpData(d.profile); }).catch(() => {});
+  }, []);
+
   // Delete account state
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -398,7 +408,12 @@ export default function SettingsPage() {
             />
           </div>
           <p className="text-[16px] font-medium text-[var(--text-1)]">{userName}</p>
-          <p className="text-[13px] text-[var(--text-3)]">{statusValue}</p>
+          <p className="text-[13px] text-[var(--text-3)]">{user?.email || statusValue}</p>
+          {gpData && (
+            <div className="mt-1.5">
+              <TierBadge tier={(gpData.tier || 'starter') as Tier} trustScore={gpData.trust_score} size="sm" />
+            </div>
+          )}
         </div>
 
         {/* PROFILE */}
@@ -686,27 +701,34 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
-        {/* GLOBAL PROFILE */}
+        {/* TRUST & VERIFICATION */}
         <div>
-          <SectionLabel>Global Profile</SectionLabel>
-          <SettingsRow first last>
-            <Link href="/profile/build" className="flex items-center justify-between w-full">
+          <SectionLabel>Trust & Verification</SectionLabel>
+          <SettingsRow first>
+            <Link href={gpData ? '/profile/preview' : '/profile/build'} className="flex items-center justify-between w-full">
               <div className="flex items-center gap-3">
                 <span className="text-xl">{'\u{1F30D}'}</span>
                 <div>
                   <p className="text-[14px] text-[var(--text-1)] dark:text-gray-200 font-medium">Global Profile</p>
-                  <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">AI-powered professional profile</p>
+                  <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">{gpData ? 'View & edit your profile' : 'Build your AI-powered profile'}</p>
                 </div>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
           </SettingsRow>
-        </div>
-
-        {/* INVITE FRIENDS */}
-        <div>
-          <SectionLabel>Referrals</SectionLabel>
-          <SettingsRow first last>
+          <SettingsRow>
+            <Link href="/verification" className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">{'\u{1F7E2}'}</span>
+                <div>
+                  <p className="text-[14px] text-[var(--text-1)] dark:text-gray-200 font-medium">ID Verification</p>
+                  <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">Get the green verified badge</p>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+          </SettingsRow>
+          <SettingsRow last>
             <Link href="/invite" className="flex items-center justify-between w-full">
               <div className="flex items-center gap-3">
                 <span className="text-xl">{'\u{1F4E4}'}</span>
@@ -719,6 +741,8 @@ export default function SettingsPage() {
             </Link>
           </SettingsRow>
         </div>
+
+        {/* (Referrals section moved to Trust & Verification above) */}
 
         {/* FEEDBACK */}
         <FeedbackSection />
@@ -739,15 +763,6 @@ export default function SettingsPage() {
                 <p className="text-[12px] text-[var(--text-3)]">Invoices, business tools, team management</p>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-            </Link>
-          </SettingsRow>
-          <SettingsRow>
-            <Link href="/verification" className="flex items-center justify-between w-full">
-              <div>
-                <p className="text-[14px] text-[var(--text-1)] dark:text-gray-200 font-medium">{'\u{1F7E2}'} ID Verification</p>
-                <p className="text-[12px] text-[var(--text-3)] dark:text-gray-400">Get the green verified badge</p>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
           </SettingsRow>
           <SettingsRow last>

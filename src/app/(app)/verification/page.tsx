@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { createClient } from '@/lib/supabase-client'
 import TierBadge from '@/components/profile/TierBadge'
+import TrustScoreBar from '@/components/profile/TrustScoreBar'
+import PageHeader from '@/components/ui/PageHeader'
+import GlassCard from '@/components/ui/GlassCard'
+import Button from '@/components/ui/Button'
+import EmptyState from '@/components/ui/EmptyState'
 import type { Tier } from '@/lib/tier-system'
 
 type Step = 'intro' | 'upload_id' | 'selfie' | 'submitted'
@@ -141,27 +146,21 @@ export default function VerificationPage() {
   // Tier gate — Starters can't verify
   if (tier === 'starter') {
     return (
-      <div className="px-4 py-6 space-y-6">
+      <div>
         <Header onBack={() => router.back()} />
-        <div className="flex flex-col items-center text-center py-8">
-          <span className="text-5xl mb-4">{'\u{1F512}'}</span>
-          <h2 className="text-lg font-bold text-[var(--text-1)] dark:text-white mb-2">Unlock ID Verification</h2>
-          <p className="text-sm text-[var(--text-2)] dark:text-gray-300 max-w-xs mb-4">
-            Reach Growing tier to verify your identity and earn the green badge.
-          </p>
-          <TierBadge tier="starter" size="md" />
-          <div className="mt-6 w-full max-w-xs">
-            <div className="flex items-center justify-between text-xs mb-1">
-              <span className="text-[var(--text-3)] dark:text-gray-400">Progress to Growing</span>
-              <span className="font-bold text-[var(--text-1)] dark:text-white">{trustScore}/45</span>
+        <div className="px-4 py-4 space-y-4">
+          <EmptyState
+            icon={<span>{'\u{1F512}'}</span>}
+            title="Unlock ID Verification at Growing Tier"
+            description="Reach Growing tier to verify your identity and earn the green badge (+8 Trust)."
+            action={{ label: 'View Your Profile \u2192', onClick: () => router.push('/profile/preview') }}
+          />
+          <GlassCard tier="starter">
+            <div className="space-y-2">
+              <TierBadge tier="starter" size="md" />
+              <TrustScoreBar score={trustScore} maxScore={45} tier="starter" showNumber showMilestones animated />
             </div>
-            <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-              <div className="h-full rounded-full bg-amber-500" style={{ width: `${Math.min(100, (trustScore / 45) * 100)}%` }} />
-            </div>
-          </div>
-          <button onClick={() => router.push('/profile/preview')} className="mt-6 text-sm font-semibold text-[#4F46E5]">
-            View Your Profile {'\u2192'}
-          </button>
+          </GlassCard>
         </div>
       </div>
     )
@@ -360,14 +359,5 @@ export default function VerificationPage() {
 }
 
 function Header({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex items-center gap-3">
-      <button onClick={onBack} className="p-1.5 -ml-1.5 rounded-lg hover:bg-[#F3F4F6] dark:hover:bg-gray-800 transition-colors">
-        <svg className="w-5 h-5 text-[var(--text-1)] dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
-      </button>
-      <h1 className="text-lg font-bold text-[var(--text-1)] dark:text-white">{'\u{1F7E2}'} ID Verification</h1>
-    </div>
-  )
+  return <PageHeader title={'\u{1F7E2} ID Verification'} onBack={onBack} />;
 }
