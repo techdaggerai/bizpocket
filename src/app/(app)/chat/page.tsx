@@ -21,6 +21,9 @@ import ChatLabels from '@/components/ChatLabels';
 import CameraTranslate from '@/components/CameraTranslate';
 import MessageActionSheet from '@/components/MessageActionSheet';
 import VoiceTranslator from '@/components/VoiceTranslator';
+import PhotoEditor from '@/components/PhotoEditor';
+import CreatePoll from '@/components/CreatePoll';
+import PollBubble from '@/components/PollBubble';
 import { usePocketBot } from '@/lib/use-pocket-bot';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
@@ -212,6 +215,9 @@ export default function PocketChatPage() {
   const [convoSummary, setConvoSummary] = useState<{ summary: string; relationship_context: string; key_topics: string[]; formality_level: string } | null>(null);
   const [showSummaryPopup, setShowSummaryPopup] = useState(false);
   const summaryCheckRef = useRef<number>(0);
+  const [showCreatePoll, setShowCreatePoll] = useState(false);
+  const [showPhotoEditor, setShowPhotoEditor] = useState(false);
+  const [photoEditorFile, setPhotoEditorFile] = useState<{ url: string; file: File } | null>(null);
   const [culturalCoach, setCulturalCoach] = useState<{
     tip: string; suggested_revision: string; cultural_note: string;
     severity: 'suggestion' | 'warning'; originalText: string;
@@ -944,8 +950,15 @@ export default function PocketChatPage() {
       return;
     }
 
-    // Images/videos: show preview for confirmation before sending
-    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+    // Images: open photo editor. Videos: simple confirm.
+    if (file.type.startsWith('image/')) {
+      const previewUrl = URL.createObjectURL(file);
+      setPhotoEditorFile({ url: previewUrl, file });
+      setShowPhotoEditor(true);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    if (file.type.startsWith('video/')) {
       const previewUrl = URL.createObjectURL(file);
       setPendingFile({ file, previewUrl });
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1227,6 +1240,58 @@ export default function PocketChatPage() {
     setShowContactInfo(true);
     const media = messages.filter(m => (m.message_type === 'image' || m.message_type === 'document') && m.attachment_url);
     setSharedMedia(media);
+  }
+
+  // Photo editor send
+  async function handlePhotoEditorSend(blob: Blob, caption: string) {
+    setShowPhotoEditor(false);
+    if (photoEditorFile) URL.revokeObjectURL(photoEditorFile.url);
+    setPhotoEditorFile(null);
+    const file = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+    if (caption) setNewMessage(caption);
+    await uploadAndSendFile(file);
+  }
+
+  function handlePhotoEditorCancel() {
+    setShowPhotoEditor(false);
+    if (photoEditorFile) URL.revokeObjectURL(photoEditorFile.url);
+    setPhotoEditorFile(null);
+  }
+
+  // Create poll
+  async function handleCreatePoll(poll: { question: string; options: string[]; allowMultiple: boolean; anonymous: boolean }) {
+    if (!activeConvoId || !organization?.id) return;
+    setShowCreatePoll(false);
+    const pollData = { ...poll, votes: {} as Record<number, string[]> };
+    await supabase.from('messages').insert({
+      conversation_id: activeConvoId,
+      organization_id: organization.id,
+      sender_type: 'owner',
+      sender_name: profile?.full_name || profile?.name || 'You',
+      message: JSON.stringify(pollData),
+      message_type: 'poll' as 'text',
+      original_language: chatLang,
+    });
+    await supabase.from('conversations').update({
+      last_message: `📊 ${poll.question}`,
+      last_message_at: new Date().toISOString(),
+    }).eq('id', activeConvoId);
+  }
+
+  // Vote on poll
+  async function handlePollVote(msgId: string, optionIndex: number) {
+    const msg = messages.find(m => m.id === msgId);
+    if (!msg) return;
+    try {
+      const pollData = JSON.parse(msg.message);
+      const votes = pollData.votes || {};
+      const current = votes[optionIndex] || [];
+      if (current.includes(user?.id || '')) return;
+      votes[optionIndex] = [...current, user?.id || ''];
+      pollData.votes = votes;
+      await supabase.from('messages').update({ message: JSON.stringify(pollData) }).eq('id', msgId);
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, message: JSON.stringify(pollData) } : m));
+    } catch { /* ignore parse errors */ }
   }
 
   function handleCoachSendOriginal() {
@@ -1891,6 +1956,30 @@ export default function PocketChatPage() {
               );
             }
 
+            // Poll message
+            if ((msg.message_type as string) === 'poll') {
+              let pollData;
+              try { pollData = JSON.parse(msg.message); } catch { pollData = null; }
+              if (pollData) {
+                return (
+                  <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
+                    <div className="max-w-[80%]">
+                      {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                      <PollBubble
+                        pollData={pollData}
+                        userId={user?.id || ''}
+                        onVote={(idx) => handlePollVote(msg.id, idx)}
+                        isOwner={isOwner}
+                      />
+                      <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                        {formatTimestamp(msg.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+            }
+
             // Invoice message
             if (msg.message_type === 'invoice') {
               const invoiceData = (() => {
@@ -2166,6 +2255,23 @@ export default function PocketChatPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Photo Editor */}
+        {showPhotoEditor && photoEditorFile && (
+          <PhotoEditor
+            imageUrl={photoEditorFile.url}
+            onSend={handlePhotoEditorSend}
+            onCancel={handlePhotoEditorCancel}
+          />
+        )}
+
+        {/* Create Poll */}
+        {showCreatePoll && (
+          <CreatePoll
+            onClose={() => setShowCreatePoll(false)}
+            onSubmit={handleCreatePoll}
+          />
         )}
 
         {/* Voice Translator */}
@@ -2590,6 +2696,12 @@ export default function PocketChatPage() {
                           <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
                           Voice Translate
                         </button>
+                        {activeConvo?.is_group && (
+                          <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6]">
+                            <span className="h-4 w-4 flex items-center justify-center text-[14px]">📊</span>
+                            Poll
+                          </button>
+                        )}
                       </div>
                     </>
                   )}
