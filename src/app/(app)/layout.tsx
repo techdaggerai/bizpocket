@@ -8,6 +8,7 @@ import TopNav from '@/components/TopNav';
 import Sidebar from '@/components/Sidebar';
 import ChatLockWrapper from '@/components/ChatLockWrapper';
 import SwipeBackGesture from '@/components/SwipeBackGesture';
+import FeatureSpotlight from '@/components/FeatureSpotlight';
 import type { Language } from '@/lib/i18n';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -77,6 +78,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                       </main>
                     </div>
                     <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><BottomNav /></div>
+                    <FeatureSpotlight />
                   </div>
                   </ChatLockWrapper>
                 </I18nProvider>
@@ -155,6 +157,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden">
             <BottomNav />
           </div>
+          <FeatureSpotlight />
         </div>
         </ChatLockWrapper>
       </I18nProvider>

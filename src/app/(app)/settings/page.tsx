@@ -730,6 +730,11 @@ export default function SettingsPage() {
               </span>
             </a>
             <div className="h-px bg-[#EFEFEF]" />
+            <Link href="/updates" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
+              <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">What&apos;s New ✨</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </Link>
+            <div className="h-px bg-[#EFEFEF]" />
             <Link href="/privacy" className="flex items-center justify-between px-4 py-3 hover:bg-[#F3F4F6] transition-colors">
               <span className="text-[14px] text-[var(--text-2)] dark:text-gray-200">Privacy Policy</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
@@ -1063,6 +1068,10 @@ export default function SettingsPage() {
           <div className="flex justify-between text-sm">
             <span className="text-[var(--text-3)]">Made with</span>
             <span className="text-[var(--text-1)]">❤️ in Japan</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <Link href="/updates" className="text-[var(--text-3)] hover:text-[#4F46E5]">What&apos;s New ✨</Link>
+            <span className="text-xs text-[#4F46E5]">→</span>
           </div>
           <div className="flex gap-4 pt-1">
             <Link href="/privacy" className="text-xs text-[#4F46E5] hover:underline">Privacy Policy</Link>

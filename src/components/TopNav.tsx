@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { PocketMark, PocketChatMark } from '@/components/Logo';
 import EvryWherMark from '@/components/EvryWherMark';
 import NotificationBell from './NotificationBell';
+import UpdateBell from './UpdateBell';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -49,6 +50,9 @@ export default function TopNav() {
       {/* Mobile: spacer for left side */}
       <div className="w-8 lg:hidden" />
       <div className="flex items-center gap-2">
+        <div data-spotlight="update-bell">
+          <UpdateBell />
+        </div>
         <NotificationBell />
         {/* Profile menu — desktop only on mobile, always on desktop top bar */}
         <div className="relative hidden lg:block">
