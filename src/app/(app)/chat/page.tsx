@@ -1646,7 +1646,7 @@ export default function PocketChatPage() {
         <div className="p-3 border-b border-slate-700 flex items-center gap-3">
           <button
             onClick={() => setActiveConvoId(null)}
-            className="min-w-[44px] min-h-[44px] p-2.5 -ml-1 flex items-center justify-center hover:bg-[#F3F3F1] rounded-lg transition-colors"
+            className="min-w-[44px] min-h-[44px] p-2.5 -ml-1 flex items-center justify-center hover:bg-slate-700 rounded-lg transition-colors"
             aria-label="Back"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -1691,15 +1691,15 @@ export default function PocketChatPage() {
                   AI Assistant
                 </span>
               ) : isGroup ? (
-                <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-[#4F46E5] hover:underline">
+                <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-indigo-400 hover:underline">
                   Tap for group info
                 </button>
               ) : contactLastSeen ? (
-                <span className={`text-[11px] ${onlineStatus(contactLastSeen).online ? 'text-[#22C55E]' : 'text-[#9CA3AF]'}`}>
+                <span className={`text-[11px] ${onlineStatus(contactLastSeen).online ? 'text-[#22C55E]' : 'text-slate-400'}`}>
                   {onlineStatus(contactLastSeen).text}
                 </span>
               ) : contactType ? (
-                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
+                <span className="inline-block text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 capitalize">
                   {contactType}
                 </span>
               ) : null}
@@ -1713,23 +1713,23 @@ export default function PocketChatPage() {
             {!activeConvo.is_bot_chat && (
               <div className="flex items-center gap-1.5 sm:gap-2 mt-1 overflow-hidden">
                 <AnimatedPocketChatLogo size={32} isTranslating={sending} />
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#eef2ff] text-[#4F46E5]">{(profile?.language || 'en').toUpperCase()}</span>
-                <span className="text-[11px] text-[#d1d5db]">⇄</span>
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">{(profile?.language || 'en').toUpperCase()}</span>
+                <span className="text-[11px] text-slate-500">⇄</span>
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
-                <span className={`text-[11px] whitespace-nowrap ${sending ? 'text-[#F59E0B]' : 'text-slate-500'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
+                <span className={`text-[11px] whitespace-nowrap ${sending ? 'text-amber-400' : 'text-slate-500'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
               </div>
             )}
           </div>
           {/* Memory icon */}
           {convoSummary && (
-            <button onClick={() => setShowSummaryPopup(v => !v)} className="relative min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#F59E0B] hover:bg-[#F59E0B]/10 transition-colors shrink-0" title="AI Context">
+            <button onClick={() => setShowSummaryPopup(v => !v)} className="relative min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-amber-400 hover:bg-[#F59E0B]/10 transition-colors shrink-0" title="AI Context">
               <span className="text-lg">🧠</span>
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#22C55E]" />
             </button>
           )}
 
           {/* Search icon */}
-          <button onClick={() => setShowChatSearch(v => !v)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#9CA3AF] hover:text-[#4F46E5] transition-colors shrink-0">
+          <button onClick={() => setShowChatSearch(v => !v)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-colors shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </button>
 
@@ -1737,7 +1737,7 @@ export default function PocketChatPage() {
             /* Bot chat: Scan & Translate pill */
             <button
               onClick={() => setShowCameraTranslate(true)}
-              className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-[#F59E0B] shrink-0 transition-colors hover:bg-[#F59E0B] hover:text-white"
+              className="flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium text-amber-400 shrink-0 transition-colors hover:bg-[#F59E0B] hover:text-white"
               style={{ border: '1.5px solid #F59E0B' }}
               title="Scan & Translate — point camera at any text"
             >
@@ -1754,8 +1754,8 @@ export default function PocketChatPage() {
           {/* Label button */}
           {!activeConvo.is_bot_chat && (
             <div className="relative">
-              <button onClick={() => setShowLabels(!showLabels)} className="p-1.5 hover:bg-[#F3F3F1] rounded-lg transition-colors" title="Label">
-                <svg className="h-5 w-5 text-[#A3A3A3] hover:text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <button onClick={() => setShowLabels(!showLabels)} className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors" title="Label">
+                <svg className="h-5 w-5 text-slate-400 hover:text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
                 </svg>
@@ -1778,10 +1778,10 @@ export default function PocketChatPage() {
           <div className="relative">
             <button
               onClick={() => setShowChatMenu(v => !v)}
-              className="p-1.5 hover:bg-[#F3F3F1] rounded-lg transition-colors"
+              className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
               title="More options"
             >
-              <svg className="h-5 w-5 text-[#A3A3A3]" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
               </svg>
             </button>
@@ -1793,40 +1793,40 @@ export default function PocketChatPage() {
                   {['pro', 'business', 'enterprise'].includes(organization?.plan || '') ? (
                     <button
                       onClick={handleSummarize}
-                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]"
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
                     >
-                      <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
+                      <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
                       Summarize chat
                     </button>
                   ) : (
                     <button
                       onClick={() => { setShowChatMenu(false); toast('Summarize is a Pro feature', 'info'); }}
-                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-[#9CA3AF] hover:bg-[#F3F4F6]"
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-400 hover:bg-slate-700"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
-                      Summarize <span className="ml-auto text-[10px] bg-[#EEF2FF] text-[#4F46E5] px-1.5 py-0.5 rounded-full font-medium">PRO</span>
+                      Summarize <span className="ml-auto text-[10px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded-full font-medium">PRO</span>
                     </button>
                   )}
                   {/* Voice call hidden — not functional */}
                   <button
                     onClick={() => { setShowChatMenu(false); setShowInvite(true); }}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
                   >
-                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
+                    <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
                     Invite contact
                   </button>
                   <button
                     onClick={() => { setShowChatMenu(false); setShowMediaGallery(true); }}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
                   >
-                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5" /></svg>
+                    <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5" /></svg>
                     Media & Docs
                   </button>
                   <button
                     onClick={() => { setShowChatMenu(false); exportChat(); }}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]"
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
                   >
-                    <svg className="h-4 w-4 text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                    <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                     Export chat
                   </button>
                 </div>
@@ -1846,11 +1846,11 @@ export default function PocketChatPage() {
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-900/40 text-[#FDE68A] font-medium capitalize">{convoSummary.relationship_context}</span>
                 )}
               </div>
-              <button onClick={() => setShowSummaryPopup(false)} className="text-[#9CA3AF] p-0.5">
+              <button onClick={() => setShowSummaryPopup(false)} className="text-slate-400 p-0.5">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <p className="text-[12px] text-[#374151] text-slate-300 leading-relaxed">{convoSummary.summary}</p>
+            <p className="text-[12px] text-slate-300 leading-relaxed">{convoSummary.summary}</p>
             {convoSummary.key_topics?.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {convoSummary.key_topics.map((t, i) => (
@@ -1870,25 +1870,25 @@ export default function PocketChatPage() {
               value={chatSearch}
               onChange={(e) => { setChatSearch(e.target.value); setChatSearchIdx(0); }}
               placeholder="Search in chat..."
-              className="flex-1 bg-transparent text-sm text-white placeholder-[#9CA3AF] focus:outline-none"
+              className="flex-1 bg-transparent text-sm text-white placeholder-slate-400 focus:outline-none"
               autoFocus
             />
             {chatSearchMatches.length > 0 && (
-              <span className="text-[11px] text-[#9CA3AF] whitespace-nowrap shrink-0">
+              <span className="text-[11px] text-slate-400 whitespace-nowrap shrink-0">
                 {chatSearchIdx + 1} of {chatSearchMatches.length}
               </span>
             )}
             {chatSearchMatches.length > 1 && (
               <div className="flex items-center shrink-0">
-                <button onClick={() => setChatSearchIdx(i => Math.max(0, i - 1))} className="p-1 text-[#9CA3AF] hover:text-slate-300">
+                <button onClick={() => setChatSearchIdx(i => Math.max(0, i - 1))} className="p-1 text-slate-400 hover:text-slate-300">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 15l-6-6-6 6"/></svg>
                 </button>
-                <button onClick={() => setChatSearchIdx(i => Math.min(chatSearchMatches.length - 1, i + 1))} className="p-1 text-[#9CA3AF] hover:text-slate-300">
+                <button onClick={() => setChatSearchIdx(i => Math.min(chatSearchMatches.length - 1, i + 1))} className="p-1 text-slate-400 hover:text-slate-300">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
               </div>
             )}
-            <button onClick={() => { setShowChatSearch(false); setChatSearch(''); }} className="p-1 text-[#9CA3AF] hover:text-slate-300">
+            <button onClick={() => { setShowChatSearch(false); setChatSearch(''); }} className="p-1 text-slate-400 hover:text-slate-300">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
@@ -1934,7 +1934,7 @@ export default function PocketChatPage() {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="text-4xl mb-3">👋</div>
               <p className="text-sm font-medium text-slate-300">Say hello!</p>
-              <p className="text-xs text-[#9CA3AF] mt-1">Messages are translated in real-time</p>
+              <p className="text-xs text-slate-400 mt-1">Messages are translated in real-time</p>
             </div>
           )}
           {messages.map((msg, idx) => {
@@ -1951,7 +1951,7 @@ export default function PocketChatPage() {
                   <div className="bg-[#059669] text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                     Payment Confirmed ✓
                   </div>
-                  <div className="text-[10px] text-[#A3A3A3] text-center mt-1">
+                  <div className="text-[10px] text-slate-400 text-center mt-1">
                     {formatTimestamp(msg.created_at)}
                   </div>
                 </div>
@@ -1963,11 +1963,11 @@ export default function PocketChatPage() {
               return (
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[70%]">
-                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    {!isOwner && <p className="text-[10px] text-slate-400 mb-1 ml-1">{msg.sender_name}</p>}
                     <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className="block rounded-[12px] overflow-hidden border border-slate-700">
                       <img src={msg.attachment_url} alt={msg.message} className="max-h-[240px] w-full object-cover" loading="lazy" />
                     </a>
-                    <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                    <p className={`text-[10px] text-slate-400 mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
                       {formatTimestamp(msg.created_at)}
                     </p>
                   </div>
@@ -1988,12 +1988,12 @@ export default function PocketChatPage() {
               return (
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[80%]">
-                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    {!isOwner && <p className="text-[10px] text-slate-400 mb-1 ml-1">{msg.sender_name}</p>}
                     <a
                       href={msg.attachment_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 rounded-[12px] border border-slate-700 bg-slate-800 px-3.5 py-2.5 hover:bg-[#F9F9F8] transition-colors"
+                      className="flex items-center gap-3 rounded-[12px] border border-slate-700 bg-slate-800 px-3.5 py-2.5 hover:bg-slate-700 transition-colors"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: `${iconBg}15` }}>
                         <svg className="h-5 w-5" style={{ color: iconColor }} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -2002,10 +2002,10 @@ export default function PocketChatPage() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-white truncate">{fileName}</p>
-                        <p className="text-[10px] text-[#A3A3A3]">{ext.toUpperCase()} — Tap to download</p>
+                        <p className="text-[10px] text-slate-400">{ext.toUpperCase()} — Tap to download</p>
                       </div>
                     </a>
-                    <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                    <p className={`text-[10px] text-slate-400 mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
                       {formatTimestamp(msg.created_at)}
                     </p>
                   </div>
@@ -2019,7 +2019,7 @@ export default function PocketChatPage() {
               return (
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[80%]">
-                    {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                    {!isOwner && <p className="text-[10px] text-slate-400 mb-1 ml-1">{msg.sender_name}</p>}
                     <div
                       className={`rounded-2xl px-3.5 py-2.5 min-w-[200px] ${
                         isOwner ? 'bg-[#4F46E5]' : 'bg-slate-800/80 backdrop-blur-[12px] border border-white/[0.06]'
@@ -2033,7 +2033,7 @@ export default function PocketChatPage() {
                     </div>
                     <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
                       {langFlag && <span className="text-[10px]">{langFlag}</span>}
-                      <span className="text-[10px] text-[#A3A3A3]">{formatTimestamp(msg.created_at)}</span>
+                      <span className="text-[10px] text-slate-400">{formatTimestamp(msg.created_at)}</span>
                     </div>
                   </div>
                 </div>
@@ -2048,14 +2048,14 @@ export default function PocketChatPage() {
                 return (
                   <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                     <div className="max-w-[80%]">
-                      {!isOwner && <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>}
+                      {!isOwner && <p className="text-[10px] text-slate-400 mb-1 ml-1">{msg.sender_name}</p>}
                       <PollBubble
                         pollData={pollData}
                         userId={user?.id || ''}
                         onVote={(idx) => handlePollVote(msg.id, idx)}
                         isOwner={isOwner}
                       />
-                      <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                      <p className={`text-[10px] text-slate-400 mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
                         {formatTimestamp(msg.created_at)}
                       </p>
                     </div>
@@ -2072,7 +2072,7 @@ export default function PocketChatPage() {
               if (cardData) {
                 return (
                   <div key={msg.id}>
-                    {showDateSep && <div className="text-center text-[10px] text-[#A3A3A3] my-3">{msgDate}</div>}
+                    {showDateSep && <div className="text-center text-[10px] text-slate-400 my-3">{msgDate}</div>}
                     <BusinessCardMessage
                       cardData={{
                         ...cardData,
@@ -2114,14 +2114,14 @@ export default function PocketChatPage() {
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
                   <div className="max-w-[80%]">
                     {!isOwner && (
-                      <p className="text-[10px] text-[#A3A3A3] mb-1 ml-1">{msg.sender_name}</p>
+                      <p className="text-[10px] text-slate-400 mb-1 ml-1">{msg.sender_name}</p>
                     )}
                     <div className="bg-slate-800 border border-slate-700 rounded-[12px] px-3.5 py-2.5 shadow-sm">
                       <div className="flex items-center gap-2 mb-1">
                         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#4F46E5" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <span className="text-xs font-semibold text-[#4F46E5]">Invoice</span>
+                        <span className="text-xs font-semibold text-indigo-400">Invoice</span>
                       </div>
                       {invoiceData && (
                         <>
@@ -2145,7 +2145,7 @@ export default function PocketChatPage() {
                         </>
                       )}
                     </div>
-                    <p className={`text-[10px] text-[#A3A3A3] mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
+                    <p className={`text-[10px] text-slate-400 mt-1 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
                       {formatTimestamp(msg.created_at)}
                     </p>
                   </div>
@@ -2157,8 +2157,8 @@ export default function PocketChatPage() {
             if (msg.deleted_at) {
               return (
                 <div key={msg.id} className={`flex ${isOwner ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`rounded-[12px] px-3.5 py-2.5 ${isOwner ? 'bg-[#E5E5E5]/50' : 'bg-[#F3F3F1]/50'}`}>
-                    <p className="text-[13px] italic text-[#9CA3AF]">Message deleted</p>
+                  <div className={`rounded-[12px] px-3.5 py-2.5 ${isOwner ? 'bg-slate-700/50' : 'bg-slate-700/50'}`}>
+                    <p className="text-[13px] italic text-slate-400">Message deleted</p>
                   </div>
                 </div>
               );
@@ -2184,9 +2184,9 @@ export default function PocketChatPage() {
               <div key={msg.id}>
                 {showDateSep && (
                   <div className="flex items-center gap-3 py-2">
-                    <div className="flex-1 h-px bg-[#E5E5E5]" />
-                    <span className="text-[11px] font-medium text-[#9CA3AF] shrink-0">{(() => { const d = new Date(msg.created_at); const t = new Date().toDateString(); const y = new Date(Date.now()-86400000).toDateString(); if (msgDate===t) return 'Today'; if (msgDate===y) return 'Yesterday'; return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); })()}</span>
-                    <div className="flex-1 h-px bg-[#E5E5E5]" />
+                    <div className="flex-1 h-px bg-slate-700" />
+                    <span className="text-[11px] font-medium text-slate-400 shrink-0">{(() => { const d = new Date(msg.created_at); const t = new Date().toDateString(); const y = new Date(Date.now()-86400000).toDateString(); if (msgDate===t) return 'Today'; if (msgDate===y) return 'Yesterday'; return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); })()}</span>
+                    <div className="flex-1 h-px bg-slate-700" />
                   </div>
                 )}
                 <div
@@ -2221,7 +2221,7 @@ export default function PocketChatPage() {
                     <p className="text-[12px] mb-1 ml-1 font-medium" style={{ color: avatarColor(msg.sender_name || '') }}>{msg.sender_name}</p>
                   )}
                   {isBot && (
-                    <p className="text-[15px] text-[#F59E0B] mb-1 ml-1 font-semibold">{botName}</p>
+                    <p className="text-[15px] text-amber-400 mb-1 ml-1 font-semibold">{botName}</p>
                   )}
                   <div
                     onContextMenu={(e) => { e.preventDefault(); openActionMenu(msg.id, e.clientX, e.clientY, isOwner, displayText); }}
@@ -2237,25 +2237,25 @@ export default function PocketChatPage() {
                     }`}
                   >
                     {msg.is_forwarded && (
-                      <p className={`text-[11px] italic mb-1 ${isOwner ? 'text-white/50' : 'text-[#9CA3AF]'}`}>
+                      <p className={`text-[11px] italic mb-1 ${isOwner ? 'text-white/50' : 'text-slate-400'}`}>
                         ↪️ Forwarded{(msg.forward_count || 0) > 4 ? ' many times' : ''}
                       </p>
                     )}
                     {msg.reply_to_id && (() => { const orig = messages.find(m => m.id === msg.reply_to_id); return orig ? (
                       <div className={`mb-1.5 border-l-2 pl-2 py-1 text-[12px] rounded ${isOwner ? 'border-white/50 bg-slate-800/10' : 'border-[#4F46E5]/30 bg-[#4F46E5]/5'}`}>
-                        <p className={`font-medium ${isOwner ? 'text-white/70' : 'text-[#4F46E5]'}`}>{orig.sender_name}</p>
-                        <p className={`truncate ${isOwner ? 'text-white/60' : 'text-[#6B7280]'}`}>{orig.message?.slice(0, 60)}</p>
+                        <p className={`font-medium ${isOwner ? 'text-white/70' : 'text-indigo-400'}`}>{orig.sender_name}</p>
+                        <p className={`truncate ${isOwner ? 'text-white/60' : 'text-slate-300'}`}>{orig.message?.slice(0, 60)}</p>
                       </div>
                     ) : null; })()}
                     <p className="text-[15px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', ...(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : {}) } as React.CSSProperties}>{displayText}</p>
-                    {msg.edited_at && <p className={`text-[10px] mt-0.5 ${isOwner ? 'text-white/40' : 'text-[#9CA3AF]'}`}>(edited)</p>}
+                    {msg.edited_at && <p className={`text-[10px] mt-0.5 ${isOwner ? 'text-white/40' : 'text-slate-400'}`}>(edited)</p>}
                     {(() => { const urlMatch = displayText.match(/https?:\/\/[^\s]+/); return urlMatch ? <LinkPreview url={urlMatch[0]} /> : null; })()}
                   </div>
                   <div className={`flex items-center gap-1.5 mt-1 ${isOwner ? 'justify-end mr-1' : 'ml-1'}`}>
                     {showTranslated && (
                       <button
                         onClick={() => setShowOriginal(p => ({ ...p, [msg.id]: !p[msg.id] }))}
-                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-white/50' : 'text-[#9CA3AF]'} hover:opacity-70`}
+                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-white/50' : 'text-slate-400'} hover:opacity-70`}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
                         {showOriginal[msg.id] ? 'See translation' : `Translated from ${LANG_NAMES[origLang || ''] || origLang || 'unknown'}`}
@@ -2264,13 +2264,13 @@ export default function PocketChatPage() {
                     {!showTranslated && !hasTranslation && origLang && origLang !== userLang && (
                       <button
                         onClick={() => translateMessage(msg.id, userLang)}
-                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-[#A3A3A3]' : 'text-[#4F46E5]'} hover:opacity-70`}
+                        className={`text-[11px] flex items-center gap-1 ${isOwner ? 'text-slate-400' : 'text-indigo-400'} hover:opacity-70`}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
                         Translate
                       </button>
                     )}
-                    <span className="text-[11px] text-[#A3A3A3]">
+                    <span className="text-[11px] text-slate-400">
                       {formatTimestamp(msg.created_at)}
                     </span>
                     {isOwner && (
@@ -2300,16 +2300,16 @@ export default function PocketChatPage() {
                   {msg.reactions && Object.keys(msg.reactions).length > 0 && (
                     <div className={`flex flex-wrap gap-1 mt-1 ${isOwner ? 'justify-end' : ''}`}>
                       {Object.entries(msg.reactions as Record<string, string[]>).map(([emoji, users]) => (
-                        <button key={emoji} onClick={() => { setReactionMsgId(msg.id); handleReaction(emoji); }} className="flex items-center gap-0.5 rounded-full bg-[#F3F4F6] px-1.5 py-0.5 text-xs hover:bg-[#E5E7EB] transition-colors">
+                        <button key={emoji} onClick={() => { setReactionMsgId(msg.id); handleReaction(emoji); }} className="flex items-center gap-0.5 rounded-full bg-slate-700 px-1.5 py-0.5 text-xs hover:bg-slate-600 transition-colors">
                           <span>{emoji}</span>
-                          {users.length > 1 && <span className="text-[10px] text-[#6B7280]">{users.length}</span>}
+                          {users.length > 1 && <span className="text-[10px] text-slate-300">{users.length}</span>}
                         </button>
                       ))}
                     </div>
                   )}
                   {msg.is_starred && (
                     <div className={`mt-0.5 ${isOwner ? 'text-right mr-1' : 'ml-1'}`}>
-                      <span className="text-[10px] text-[#F59E0B]">★ Starred</span>
+                      <span className="text-[10px] text-amber-400">★ Starred</span>
                     </div>
                   )}
                   {/* Language Learning card */}
@@ -2350,7 +2350,7 @@ export default function PocketChatPage() {
           {showScrollBtn && (
             <button
               onClick={() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); setShowScrollBtn(false); }}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-slate-800 border border-slate-700 px-4 py-2 text-xs font-medium text-[#4F46E5] shadow-lg hover:bg-[#F9FAFB] transition-colors z-10"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-slate-800 border border-slate-700 px-4 py-2 text-xs font-medium text-indigo-400 shadow-lg hover:bg-slate-700 transition-colors z-10"
             >
               New messages
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 14l-7 7-7-7"/></svg>
@@ -2371,22 +2371,22 @@ export default function PocketChatPage() {
                 <p className="text-sm font-semibold text-white mb-3">Send this {pendingFile.file.type.startsWith('video/') ? 'video' : 'photo'}?</p>
                 {pendingFile.file.type.startsWith('image/') ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={pendingFile.previewUrl} alt="Preview" className="w-full max-h-[300px] object-contain rounded-xl bg-[#F3F4F6]" />
+                  <img src={pendingFile.previewUrl} alt="Preview" className="w-full max-h-[300px] object-contain rounded-xl bg-slate-700" />
                 ) : (
-                  <div className="w-full h-[200px] rounded-xl bg-[#F3F4F6] flex items-center justify-center">
+                  <div className="w-full h-[200px] rounded-xl bg-slate-700 flex items-center justify-center">
                     <div className="text-center">
-                      <svg className="h-12 w-12 mx-auto text-[#9CA3AF]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
-                      <p className="text-xs text-[#9CA3AF] mt-2">{pendingFile.file.name}</p>
+                      <svg className="h-12 w-12 mx-auto text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                      <p className="text-xs text-slate-400 mt-2">{pendingFile.file.name}</p>
                     </div>
                   </div>
                 )}
                 <p className="text-xs text-slate-400 mt-2 truncate">{pendingFile.file.name} · {(pendingFile.file.size / 1024).toFixed(0)} KB</p>
               </div>
               <div className="flex border-t border-slate-700">
-                <button onClick={cancelPendingFile} className="flex-1 py-3 text-sm font-medium text-[var(--text-3)] dark:text-gray-400 hover:bg-[#F9FAFB] dark:hover:bg-gray-700 transition-colors">
+                <button onClick={cancelPendingFile} className="flex-1 py-3 text-sm font-medium text-slate-400 hover:bg-slate-700 transition-colors">
                   Cancel
                 </button>
-                <button onClick={confirmPendingFile} disabled={uploading} className="flex-1 py-3 text-sm font-semibold text-[#4F46E5] hover:bg-[#4F46E5]/5 transition-colors border-l border-slate-700 disabled:opacity-50">
+                <button onClick={confirmPendingFile} disabled={uploading} className="flex-1 py-3 text-sm font-semibold text-indigo-400 hover:bg-[#4F46E5]/5 transition-colors border-l border-slate-700 disabled:opacity-50">
                   {uploading ? 'Sending...' : 'Send'}
                 </button>
               </div>
@@ -2480,32 +2480,32 @@ export default function PocketChatPage() {
 
         {/* Upload progress */}
         {uploading && (
-          <div className="px-4 py-2 border-t border-slate-700 bg-[#F9F9F8]">
+          <div className="px-4 py-2 border-t border-slate-700 bg-slate-800">
             <div className="flex items-center gap-2">
-              <div className="h-1.5 flex-1 rounded-full bg-[#E5E5E5] overflow-hidden">
+              <div className="h-1.5 flex-1 rounded-full bg-slate-700 overflow-hidden">
                 <div className="h-full bg-[#4F46E5] rounded-full animate-pulse" style={{ width: '60%' }} />
               </div>
-              <span className="text-[10px] text-[#A3A3A3]">Uploading...</span>
+              <span className="text-[10px] text-slate-400">Uploading...</span>
             </div>
           </div>
         )}
 
         {/* Toolbar */}
         <div className="flex items-center gap-1 px-3 py-1.5 border-t border-[var(--border)]">
-          <button className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Emoji">
+          <button className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Emoji">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
           </button>
-          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Attach file">
+          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Attach file">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
           </button>
-          <button className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Photo">
+          <button className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Photo">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
           </button>
-          <button onClick={startRecording} className="p-1.5 rounded-lg hover:bg-[#F5F5F5] text-[#999]" title="Voice note">
+          <button onClick={startRecording} className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Voice note">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
           </button>
           <div className="flex-1" />
-          <span className="text-[9px] text-[#CCC]">AI translates automatically</span>
+          <span className="text-[9px] text-slate-500">AI translates automatically</span>
         </div>
 
         {/* Contact Info modal */}
@@ -2515,7 +2515,7 @@ export default function PocketChatPage() {
             <div className="relative w-full max-w-md sm:mx-4 bg-slate-800 rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
-                <button onClick={() => setShowContactInfo(false)} className="text-sm text-[#4F46E5] font-medium">Close</button>
+                <button onClick={() => setShowContactInfo(false)} className="text-sm text-indigo-400 font-medium">Close</button>
                 <p className="text-sm font-bold text-white">Contact Info</p>
                 <div className="w-10" />
               </div>
@@ -2525,21 +2525,21 @@ export default function PocketChatPage() {
                 <div className="flex flex-col items-center gap-2">
                   <PocketAvatar name={contactName} size={80} />
                   <p className="text-lg font-bold text-white">{contactName}</p>
-                  {contactType && <span className="text-xs px-3 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-gray-700 text-[#6B7280] dark:text-gray-300 capitalize">{contactType}</span>}
+                  {contactType && <span className="text-xs px-3 py-0.5 rounded-full bg-slate-700 text-slate-300 capitalize">{contactType}</span>}
                 </div>
 
                 {/* Shared Media */}
                 {sharedMedia.length > 0 && (
                   <div>
-                    <p className="text-[11px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-2">Shared Media ({sharedMedia.length})</p>
+                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Shared Media ({sharedMedia.length})</p>
                     <div className="grid grid-cols-4 gap-1.5">
                       {sharedMedia.slice(0, 4).map(m => (
-                        <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-[#F3F4F6]">
+                        <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-slate-700">
                           {m.message_type === 'image' ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={m.attachment_url!} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[#9CA3AF]">
+                            <div className="w-full h-full flex items-center justify-center text-slate-400">
                               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                             </div>
                           )}
@@ -2553,16 +2553,16 @@ export default function PocketChatPage() {
                 <div className="space-y-0.5">
                   <button onClick={() => { setShowContactInfo(false); setShowChatSearch(true); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors text-left">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <span className="text-sm text-[#374151] text-slate-300">Search in Chat</span>
+                    <span className="text-sm text-slate-300">Search in Chat</span>
                   </button>
                   <button onClick={() => { setShowContactInfo(false); exportChat(); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors text-left">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                    <span className="text-sm text-[#374151] text-slate-300">Export Chat</span>
+                    <span className="text-sm text-slate-300">Export Chat</span>
                   </button>
                 </div>
 
                 {/* Danger zone */}
-                <div className="space-y-0.5 pt-2 border-t border-[var(--border)] dark:border-gray-700">
+                <div className="space-y-0.5 pt-2 border-t border-slate-700">
                   <button
                     onClick={async () => {
                       if (!confirm(`Block ${contactName}?`)) return;
@@ -2626,43 +2626,43 @@ export default function PocketChatPage() {
 
         {/* Free tier usage indicator */}
         {isFreePlan && activeConvo && (
-          <div className="px-4 py-1.5 border-t border-[var(--border)] bg-[#FAFAFA] flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs text-[#9CA3AF] whitespace-nowrap">
+          <div className="px-4 py-1.5 border-t border-[var(--border)] bg-slate-800/50 flex items-center justify-between">
+            <span className="text-[11px] sm:text-xs text-slate-400 whitespace-nowrap">
               {activeConvo.is_bot_chat
                 ? null
                 : `${Math.max(0, 10 - translationsUsed)}/10 translations left today`
               }
             </span>
             {(!activeConvo.is_bot_chat && translationsUsed >= 10) && (
-              <Link href="/settings/upgrade" className="text-[11px] font-medium text-[#4F46E5]">Upgrade</Link>
+              <Link href="/settings/upgrade" className="text-[11px] font-medium text-indigo-400">Upgrade</Link>
             )}
           </div>
         )}
 
         {/* Cultural Coach card */}
         {culturalCoach && (
-          <div className={`px-3 py-3 border-t ${culturalCoach.severity === 'warning' ? 'bg-[#FEF2F2] border-[#FECACA] dark:bg-red-950/30 dark:border-red-900' : 'bg-[#FFFBEB] border-[#FDE68A] dark:bg-amber-950/30 dark:border-amber-900'}`}>
+          <div className={`px-3 py-3 border-t ${culturalCoach.severity === 'warning' ? 'bg-red-950/30 border-red-900' : 'bg-amber-950/30 border-amber-900'}`}>
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-1.5">
                 <span className="text-base">🌏</span>
                 <span className="text-[13px] font-semibold text-white">Cultural Tip</span>
               </div>
-              <button onClick={() => setCulturalCoach(null)} className="text-[#9CA3AF] hover:text-slate-300 dark:hover:text-white p-0.5">
+              <button onClick={() => setCulturalCoach(null)} className="text-slate-400 hover:text-white p-0.5">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            <p className="text-[13px] text-[#374151] text-slate-300 leading-relaxed mb-2">{culturalCoach.tip}</p>
+            <p className="text-[13px] text-slate-300 leading-relaxed mb-2">{culturalCoach.tip}</p>
             {culturalCoach.cultural_note && (
               <p className="text-[11px] text-slate-400 italic mb-2">{culturalCoach.cultural_note}</p>
             )}
             {culturalCoach.suggested_revision && (
-              <div className="bg-slate-800/60 rounded-lg px-3 py-2 mb-2 border border-slate-700/50 dark:border-gray-700">
-                <p className="text-[11px] text-[#9CA3AF] font-medium mb-1">Suggested version</p>
+              <div className="bg-slate-800/60 rounded-lg px-3 py-2 mb-2 border border-slate-700">
+                <p className="text-[11px] text-slate-400 font-medium mb-1">Suggested version</p>
                 <p className="text-[13px] text-white leading-relaxed">{culturalCoach.suggested_revision}</p>
               </div>
             )}
             <div className="flex gap-2">
-              <button onClick={handleCoachSendOriginal} className="flex-1 rounded-lg border border-[#D1D5DB] dark:border-gray-600 py-2 text-[12px] font-medium text-[#374151] text-slate-300 active:bg-[#F3F4F6]">
+              <button onClick={handleCoachSendOriginal} className="flex-1 rounded-lg border border-slate-600 py-2 text-[12px] font-medium text-slate-300 active:bg-slate-700">
                 Send Original
               </button>
               {culturalCoach.suggested_revision && (
@@ -2676,12 +2676,12 @@ export default function PocketChatPage() {
 
         {/* Reply/Edit preview above input */}
         {(replyTo || editingMsg) && (
-          <div className="px-3 py-2 border-t border-[var(--border)] bg-[#F9FAFB] flex items-center gap-2">
+          <div className="px-3 py-2 border-t border-[var(--border)] bg-slate-800 flex items-center gap-2">
             <div className="flex-1 min-w-0 border-l-2 border-[#4F46E5] pl-2">
-              <p className="text-[11px] font-medium text-[#4F46E5]">{editingMsg ? 'Editing message' : `Replying to ${replyTo?.sender}`}</p>
-              <p className="text-[12px] text-[#6B7280] truncate">{editingMsg ? editingMsg.text : replyTo?.text}</p>
+              <p className="text-[11px] font-medium text-indigo-400">{editingMsg ? 'Editing message' : `Replying to ${replyTo?.sender}`}</p>
+              <p className="text-[12px] text-slate-300 truncate">{editingMsg ? editingMsg.text : replyTo?.text}</p>
             </div>
-            <button onClick={() => { setReplyTo(null); setEditingMsg(null); setNewMessage(''); }} className="text-[#9CA3AF] hover:text-slate-300">
+            <button onClick={() => { setReplyTo(null); setEditingMsg(null); setNewMessage(''); }} className="text-slate-400 hover:text-slate-300">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -2701,7 +2701,7 @@ export default function PocketChatPage() {
           {/* SEND AS language selector — desktop only */}
           {!activeConvo?.is_bot_chat && (
             <div className="hidden md:flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] text-[#999] font-medium">SEND AS</span>
+              <span className="text-[10px] text-slate-500 font-medium">SEND AS</span>
               <select
                 value={chatLang}
                 onChange={(e) => setChatLang(e.target.value)}
@@ -2776,7 +2776,7 @@ export default function PocketChatPage() {
                 <div className="relative shrink-0">
                   <button
                     onClick={() => setShowEmoji(!showEmoji)}
-                    className="h-[42px] w-[36px] flex items-center justify-center text-[#A3A3A3] hover:text-[#F59E0B] transition-colors"
+                    className="h-[42px] w-[36px] flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors"
                     title="Emoji, Stickers, GIFs"
                   >
                     <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
@@ -2788,7 +2788,7 @@ export default function PocketChatPage() {
                         {/* Tabs */}
                         <div className="flex border-b border-[var(--border)]">
                           {[{k:'emoji' as const,l:'😊'},{k:'stickers' as const,l:'🎨'},{k:'gifs' as const,l:'GIF'}].map(t => (
-                            <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]' : 'text-[#9CA3AF]'}`}>{t.l}</button>
+                            <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-indigo-400 border-b-2 border-[#4F46E5]' : 'text-slate-400'}`}>{t.l}</button>
                           ))}
                         </div>
                         {pickerTab === 'emoji' && (
@@ -2839,7 +2839,7 @@ export default function PocketChatPage() {
                   <button
                     onClick={() => setShowAttachMenu(!showAttachMenu)}
                     disabled={uploading}
-                    className="h-[42px] w-[36px] flex items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors disabled:opacity-40"
+                    className="h-[42px] w-[36px] flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-colors disabled:opacity-40"
                     title="Attach"
                   >
                     <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -2850,28 +2850,28 @@ export default function PocketChatPage() {
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowAttachMenu(false)} />
                       <div className="absolute bottom-full mb-2 left-0 z-50 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
-                        <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
-                          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
+                        <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
                           Photo
                         </button>
-                        <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
+                        <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
                           <svg className="h-4 w-4 text-[#F43F5E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                           Video
                         </button>
-                        <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
-                          <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                        <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
                           Document
                         </button>
-                        <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
+                        <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
                           <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                           Location
                         </button>
-                        <button onClick={() => { setShowAttachMenu(false); setShowCameraTranslate(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
-                          <svg className="h-4 w-4 text-[#4F46E5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
+                        <button onClick={() => { setShowAttachMenu(false); setShowCameraTranslate(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
                           Scan & Translate
                         </button>
-                        <button onClick={() => { setShowAttachMenu(false); setShowVoiceTranslator(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
-                          <svg className="h-4 w-4 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
+                        <button onClick={() => { setShowAttachMenu(false); setShowVoiceTranslator(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
                           Voice Translate
                         </button>
                         <button onClick={async () => {
@@ -2932,12 +2932,12 @@ export default function PocketChatPage() {
                               setShowBizCardGate(true);
                             }
                           } catch { /* ignore errors */ }
-                        }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
+                        }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
                           <span className="h-4 w-4 flex items-center justify-center text-[14px]">{'\u{1F4C7}'}</span>
                           Business Card
                         </button>
                         {activeConvo?.is_group && (
-                          <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-[#F3F4F6]">
+                          <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
                             <span className="h-4 w-4 flex items-center justify-center text-[14px]">📊</span>
                             Poll
                           </button>
@@ -2950,7 +2950,7 @@ export default function PocketChatPage() {
                 {/* Quick reply trigger — desktop only */}
                 <button
                   onClick={() => setShowQuickReplies(!showQuickReplies)}
-                  className="hidden md:flex h-[42px] w-[36px] shrink-0 items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors"
+                  className="hidden md:flex h-[42px] w-[36px] shrink-0 items-center justify-center text-slate-400 hover:text-indigo-400 transition-colors"
                   title="Quick replies"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
@@ -2977,7 +2977,7 @@ export default function PocketChatPage() {
                   rows={1}
                   maxLength={5000}
                   aria-label="Message input"
-                  className="flex-1 min-w-0 bg-[#F3F4F6] rounded-[20px] px-3.5 py-2.5 text-[15px] text-white placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800"
+                  className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800"
                 />
 
                 {/* Right: Mic OR Send — mutually exclusive */}
@@ -3002,7 +3002,7 @@ export default function PocketChatPage() {
                     onMouseDown={startRecording}
                     onTouchStart={(e) => { e.preventDefault(); startRecording(); }}
                     disabled={uploading}
-                    className="h-[42px] w-[42px] shrink-0 flex items-center justify-center text-[#A3A3A3] hover:text-[#4F46E5] transition-colors disabled:opacity-40"
+                    className="h-[42px] w-[42px] shrink-0 flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-colors disabled:opacity-40"
                     title="Hold to record"
                   >
                     <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -3035,7 +3035,7 @@ export default function PocketChatPage() {
       <div className="p-4 flex items-center justify-between border-b border-slate-700">
         <div>
           <EvryWherMark size="md" />
-          <p className="text-[13px] text-[#999]">Chat in 21 languages — AI translates in real-time</p>
+          <p className="text-[13px] text-slate-500">Chat in 21 languages — AI translates in real-time</p>
         </div>
         {/* Desktop: inline buttons */}
         <div className="hidden sm:flex items-center gap-2">
@@ -3055,11 +3055,11 @@ export default function PocketChatPage() {
       </div>
       {/* Mobile: action buttons row */}
       <div className="flex sm:hidden gap-2 px-4 py-2 border-b border-[var(--border)]">
-        <button onClick={() => setShowInvite(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F59E0B] py-2 text-[12px] font-medium text-[#F59E0B]">
+        <button onClick={() => setShowInvite(true)} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F59E0B] py-2 text-[12px] font-medium text-amber-400">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
           Invite
         </button>
-        <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#4F46E5] py-2 text-[12px] font-medium text-[#4F46E5]">
+        <button onClick={() => { fetchContacts(); setShowNewChat(true); }} className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#4F46E5] py-2 text-[12px] font-medium text-indigo-400">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           Chat
         </button>
@@ -3083,7 +3083,7 @@ export default function PocketChatPage() {
             className={`px-3 py-1.5 rounded-full text-[12px] font-medium whitespace-nowrap transition-colors ${
               chatFolder === f.key
                 ? 'bg-[#4F46E5] text-white'
-                : 'bg-[#F3F4F6] dark:bg-gray-800 text-slate-400'
+                : 'bg-slate-700 text-slate-400'
             }`}
           >
             {f.label}
@@ -3092,15 +3092,15 @@ export default function PocketChatPage() {
       </div>
 
       {/* Filter tabs */}
-      <div className="px-4 pt-2 pb-0 flex flex-nowrap gap-6 overflow-x-auto border-b border-[var(--border)] dark:border-gray-800">
+      <div className="px-4 pt-2 pb-0 flex flex-nowrap gap-6 overflow-x-auto border-b border-slate-700">
         {filters.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={`text-sm font-medium pb-2 whitespace-nowrap flex-shrink-0 transition-colors ${
               filter === f.key
-                ? 'text-[#4F46E5] border-b-2 border-[#4F46E5]'
-                : 'text-[#6B7280] hover:text-white'
+                ? 'text-indigo-400 border-b-2 border-[#4F46E5]'
+                : 'text-slate-300 hover:text-white'
             }`}
           >
             {f.label}
@@ -3115,7 +3115,7 @@ export default function PocketChatPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search conversations..."
-          className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+          className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
         />
       </div>
 
@@ -3128,14 +3128,14 @@ export default function PocketChatPage() {
         ) : sortedConversations.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
             {search || filter !== 'all' ? (
-              <p className="text-sm text-[#A3A3A3]">No conversations match your filter.</p>
+              <p className="text-sm text-slate-400">No conversations match your filter.</p>
             ) : (
               <>
                 <PocketChatMark size={56} />
-                <h3 className="mt-4 text-lg font-bold text-[#111827] dark:text-slate-50">Start a conversation in any language</h3>
-                <p className="text-sm text-[#6b7280] dark:text-slate-400 mt-2 text-center max-w-xs leading-relaxed">You type English. They read Japanese. Voice notes, photos, documents — all translated instantly.</p>
+                <h3 className="mt-4 text-lg font-bold text-white">Start a conversation in any language</h3>
+                <p className="text-sm text-slate-400 mt-2 text-center max-w-xs leading-relaxed">You type English. They read Japanese. Voice notes, photos, documents — all translated instantly.</p>
                 <div className="flex justify-center gap-2 mt-4 flex-wrap">
-                  <span className="text-xs px-3 py-1 rounded-full bg-[#eef2ff] text-[#4F46E5] font-medium">21 languages</span>
+                  <span className="text-xs px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 font-medium">21 languages</span>
                   <span className="text-xs px-3 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-medium">Real-time AI</span>
                   <span className="text-xs px-3 py-1 rounded-full bg-[#f0fdf4] text-[#166534] font-medium">No app for clients</span>
                 </div>
@@ -3159,7 +3159,7 @@ export default function PocketChatPage() {
                 key={convo.id}
                 onClick={() => setActiveConvoId(convo.id)}
                 onContextMenu={(e) => { e.preventDefault(); setConvoActionId(convo.id); }}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-700 hover:shadow-sm transition-all border-b border-[var(--border)] dark:border-gray-800 text-left overflow-hidden ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
+                className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-700 hover:shadow-sm transition-all border-b border-slate-700 text-left overflow-hidden ${convo.is_bot_chat ? 'border-l-2 border-l-[#F59E0B]' : ''}`}
               >
                 {/* Avatar — 52px for visual weight */}
                 {convo.is_bot_chat ? (
@@ -3179,10 +3179,10 @@ export default function PocketChatPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <p className={`text-[15px] text-white truncate ${convo.unread_count > 0 ? 'font-bold' : 'font-semibold'}`}>{name}</p>
-                      {convo.is_pinned && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>}
-                      {convo.muted_until && new Date(convo.muted_until) > new Date() && <svg className="h-3 w-3 text-[#9CA3AF] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51" /></svg>}
+                      {convo.is_pinned && <svg className="h-3 w-3 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>}
+                      {convo.muted_until && new Date(convo.muted_until) > new Date() && <svg className="h-3 w-3 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51" /></svg>}
                       {convo.is_bot_chat && <span className="text-[12px] text-[#F43F5E] font-medium">AI Assistant</span>}
-                      {convo.is_group && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Group</span>}
+                      {convo.is_group && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-[#4F46E5]/10 text-indigo-400 font-medium">Group</span>}
                       {convo.label && <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: convo.label_color || '#999' }} />}
                     </div>
                     {convo.last_message_at && (
@@ -3192,7 +3192,7 @@ export default function PocketChatPage() {
                     )}
                   </div>
                   <div className="flex items-center justify-between gap-2 mt-0.5">
-                    <p className="text-[13px] text-[#6B7280] truncate">
+                    <p className="text-[13px] text-slate-300 truncate">
                       {convo.last_message ?? 'No messages yet'}
                     </p>
                     {convo.unread_count > 0 && (
@@ -3213,19 +3213,19 @@ export default function PocketChatPage() {
         <>
           <div className="fixed inset-0 z-50" onClick={() => setConvoActionId(null)} />
           <div className="fixed z-50 bottom-0 left-0 right-0 bg-slate-800 rounded-t-2xl shadow-lg border-t border-slate-700 p-4 space-y-1 safe-bottom">
-            <button onClick={() => handlePinConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-[#F3F4F6]">
-              <svg className="h-5 w-5 text-[#6B7280]" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
+            <button onClick={() => handlePinConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700">
+              <svg className="h-5 w-5 text-slate-300" viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>
               {conversations.find(c => c.id === convoActionId)?.is_pinned ? 'Unpin' : 'Pin to top'}
             </button>
-            <button onClick={() => handleMuteConvo(conversations.find(c => c.id === convoActionId)?.muted_until ? 'unmute' : '8h')} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-[#F3F4F6]">
-              <svg className="h-5 w-5 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>
+            <button onClick={() => handleMuteConvo(conversations.find(c => c.id === convoActionId)?.muted_until ? 'unmute' : '8h')} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700">
+              <svg className="h-5 w-5 text-slate-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" /></svg>
               {conversations.find(c => c.id === convoActionId)?.muted_until ? 'Unmute' : 'Mute (8h)'}
             </button>
-            <button onClick={() => handleArchiveConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-[#F3F4F6]">
-              <svg className="h-5 w-5 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
+            <button onClick={() => handleArchiveConvo(convoActionId)} className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-300 hover:bg-slate-700">
+              <svg className="h-5 w-5 text-slate-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg>
               Archive
             </button>
-            <button onClick={() => setConvoActionId(null)} className="w-full rounded-xl px-4 py-3 text-sm font-medium text-[#9CA3AF] hover:bg-[#F3F4F6]">
+            <button onClick={() => setConvoActionId(null)} className="w-full rounded-xl px-4 py-3 text-sm font-medium text-slate-400 hover:bg-slate-700">
               Cancel
             </button>
           </div>
@@ -3239,7 +3239,7 @@ export default function PocketChatPage() {
           <div className="relative bg-slate-800 w-full max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-base font-bold text-white">Media, Links & Docs</h2>
-              <button onClick={() => setShowMediaGallery(false)} className="text-[#A3A3A3] hover:text-white">
+              <button onClick={() => setShowMediaGallery(false)} className="text-slate-400 hover:text-white">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -3256,7 +3256,7 @@ export default function PocketChatPage() {
                         <p className="text-sm font-semibold text-slate-300 mb-2">Media ({images.length})</p>
                         <div className="grid grid-cols-3 gap-1.5">
                           {images.map(m => (
-                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-[#F3F4F6]">
+                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="aspect-square rounded-lg overflow-hidden bg-slate-700">
                               <img src={m.attachment_url!} alt="" className="w-full h-full object-cover" loading="lazy" />
                             </a>
                           ))}
@@ -3268,8 +3268,8 @@ export default function PocketChatPage() {
                         <p className="text-sm font-semibold text-slate-300 mb-2">Documents ({docs.length})</p>
                         <div className="space-y-1">
                           {docs.map(m => (
-                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 hover:bg-[#F9FAFB]">
-                              <svg className="h-5 w-5 text-[#F59E0B] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                            <a key={m.id} href={m.attachment_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 hover:bg-slate-700">
+                              <svg className="h-5 w-5 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
                               <span className="text-sm text-slate-300 truncate">{m.message}</span>
                             </a>
                           ))}
@@ -3283,9 +3283,9 @@ export default function PocketChatPage() {
                           {links.slice(0, 20).map(m => {
                             const url = m.message.match(/https?:\/\/[^\s]+/)?.[0];
                             return url ? (
-                              <a key={m.id} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 hover:bg-[#F9FAFB]">
-                                <svg className="h-4 w-4 text-[#4F46E5] shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
-                                <span className="text-sm text-[#4F46E5] truncate">{url}</span>
+                              <a key={m.id} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 hover:bg-slate-700">
+                                <svg className="h-4 w-4 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
+                                <span className="text-sm text-indigo-400 truncate">{url}</span>
                               </a>
                             ) : null;
                           })}
@@ -3293,7 +3293,7 @@ export default function PocketChatPage() {
                       </div>
                     )}
                     {images.length === 0 && docs.length === 0 && links.length === 0 && (
-                      <p className="text-center text-sm text-[#9CA3AF] py-8">No media, documents, or links shared yet</p>
+                      <p className="text-center text-sm text-slate-400 py-8">No media, documents, or links shared yet</p>
                     )}
                   </div>
                 );
@@ -3310,20 +3310,20 @@ export default function PocketChatPage() {
           <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-base font-bold text-white">Broadcast Message</h2>
-              <button onClick={() => { setShowBroadcast(false); setBroadcastContacts([]); setBroadcastMsg(''); }} className="text-[#A3A3A3] hover:text-white">
+              <button onClick={() => { setShowBroadcast(false); setBroadcastContacts([]); setBroadcastMsg(''); }} className="text-slate-400 hover:text-white">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="p-4 space-y-4 overflow-y-auto">
               <textarea value={broadcastMsg} onChange={e => setBroadcastMsg(e.target.value)} placeholder="Type your broadcast message..." rows={3} maxLength={5000}
-                className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5] resize-none" />
+                className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5] resize-none" />
               <p className="text-sm font-medium text-slate-300">Select recipients ({broadcastContacts.length})</p>
               <div className="max-h-[200px] overflow-y-auto space-y-1">
                 {contacts.map(c => {
                   const sel = broadcastContacts.includes(c.id);
                   return (
                     <button key={c.id} onClick={() => setBroadcastContacts(prev => sel ? prev.filter(id => id !== c.id) : [...prev, c.id])}
-                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${sel ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-[#F9FAFB] border border-transparent'}`}>
+                      className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${sel ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-slate-700 border border-transparent'}`}>
                       <PocketAvatar name={c.name} size={32} />
                       <span className="text-sm font-medium text-white flex-1 truncate">{c.name}</span>
                       {sel && <svg width="16" height="16" viewBox="0 0 24 24" fill="#4F46E5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
@@ -3332,7 +3332,7 @@ export default function PocketChatPage() {
                 })}
               </div>
               <button onClick={sendBroadcast} disabled={!broadcastMsg.trim() || broadcastContacts.length === 0 || sending}
-                className="w-full rounded-lg bg-[#F59E0B] py-3 text-sm font-semibold text-[#111827] dark:text-slate-50 disabled:opacity-50 hover:bg-[#D97706] transition-colors">
+                className="w-full rounded-lg bg-[#F59E0B] py-3 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#D97706] transition-colors">
                 {sending ? 'Sending...' : `Broadcast to ${broadcastContacts.length} contacts`}
               </button>
             </div>
@@ -3347,14 +3347,14 @@ export default function PocketChatPage() {
           <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-base font-bold text-white">New Group</h2>
-              <button onClick={() => { setShowGroupCreate(false); setSelectedContacts([]); setGroupName(''); }} className="text-[#A3A3A3] hover:text-white">
+              <button onClick={() => { setShowGroupCreate(false); setSelectedContacts([]); setGroupName(''); }} className="text-slate-400 hover:text-white">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
             <div className="p-4 space-y-4">
               <div>
                 <label className="text-sm font-medium text-slate-300 block mb-1.5">Group name</label>
-                <input type="text" value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="e.g. Team Japan, Family" className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]" />
+                <input type="text" value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="e.g. Team Japan, Family" className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]" />
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-300 block mb-1.5">Select members ({selectedContacts.length} selected)</label>
@@ -3363,7 +3363,7 @@ export default function PocketChatPage() {
                     const selected = selectedContacts.includes(c.id);
                     return (
                       <button key={c.id} onClick={() => setSelectedContacts(prev => selected ? prev.filter(id => id !== c.id) : [...prev, c.id])}
-                        className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${selected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-[#F9FAFB] border border-transparent'}`}>
+                        className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${selected ? 'bg-[#4F46E5]/5 border border-[#4F46E5]/20' : 'hover:bg-slate-700 border border-transparent'}`}>
                         <PocketAvatar name={c.name} size={36} />
                         <span className="text-sm font-medium text-white flex-1 truncate">{c.name}</span>
                         {selected && <svg width="18" height="18" viewBox="0 0 24 24" fill="#4F46E5"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>}
@@ -3388,7 +3388,7 @@ export default function PocketChatPage() {
           <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[80vh] flex flex-col overflow-hidden">
             <div className="p-5 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-base font-bold text-white">Group Info</h2>
-              <button onClick={() => setShowGroupInfo(false)} className="text-[#A3A3A3] hover:text-white">
+              <button onClick={() => setShowGroupInfo(false)} className="text-slate-400 hover:text-white">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
@@ -3399,7 +3399,7 @@ export default function PocketChatPage() {
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <p className="text-lg font-bold text-white">{activeConvo.group_name || activeConvo.title}</p>
-                <span className="text-xs text-[#9CA3AF]">Group · Created {new Date(activeConvo.created_at).toLocaleDateString()}</span>
+                <span className="text-xs text-slate-400">Group · Created {new Date(activeConvo.created_at).toLocaleDateString()}</span>
               </div>
 
               {/* Members */}
@@ -3407,21 +3407,21 @@ export default function PocketChatPage() {
                 <p className="text-sm font-semibold text-slate-300 mb-3">Members</p>
                 <div className="space-y-2">
                   {/* Owner (you) */}
-                  <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#F9FAFB]">
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-800">
                     <PocketAvatar name={profile?.full_name || profile?.name || 'You'} size={36} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-white truncate">{profile?.full_name || profile?.name || 'You'}</p>
-                      <p className="text-xs text-[#9CA3AF]">You · {profile?.language || 'en'}</p>
+                      <p className="text-xs text-slate-400">You · {profile?.language || 'en'}</p>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-[#4F46E5] font-medium">Creator</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#4F46E5]/10 text-indigo-400 font-medium">Creator</span>
                   </div>
                   {/* Contact members (from contacts in this org who were selected) */}
                   {contacts.filter(c => selectedContacts.includes(c.id) || true).slice(0, 10).map(c => (
-                    <div key={c.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[#F9FAFB]">
+                    <div key={c.id} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-700">
                       <PocketAvatar name={c.name} size={36} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">{c.name}</p>
-                        <p className="text-xs text-[#9CA3AF]">{c.language || 'en'}</p>
+                        <p className="text-xs text-slate-400">{c.language || 'en'}</p>
                       </div>
                     </div>
                   ))}
@@ -3430,7 +3430,7 @@ export default function PocketChatPage() {
 
               {/* Actions */}
               <div className="space-y-2 pt-2 border-t border-[var(--border)]">
-                <button onClick={() => { fetchContacts(); setShowGroupInfo(false); setShowGroupCreate(true); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#4F46E5] hover:bg-[#4F46E5]/5 transition-colors">
+                <button onClick={() => { fetchContacts(); setShowGroupInfo(false); setShowGroupCreate(true); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-indigo-400 hover:bg-[#4F46E5]/5 transition-colors">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                   Add Member
                 </button>
@@ -3477,7 +3477,7 @@ export default function PocketChatPage() {
                   setShowNewChat(false);
                   setContactSearch('');
                 }}
-                className="text-[#A3A3A3] hover:text-white transition-colors"
+                className="text-slate-400 hover:text-white transition-colors"
                 aria-label="Close"
               >
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -3490,26 +3490,26 @@ export default function PocketChatPage() {
             <div className="px-4 pt-3 space-y-2">
               <button
                 onClick={() => { setShowGroupCreate(true); setShowNewChat(false); fetchContacts(); }}
-                className="w-full flex items-center gap-3 rounded-xl border border-slate-700 px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors"
+                className="w-full flex items-center gap-3 rounded-xl border border-slate-700 px-4 py-3 text-left hover:bg-slate-700 transition-colors"
               >
-                <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-[#4F46E5]">
+                <div className="h-10 w-10 rounded-full bg-[#4F46E5]/10 flex items-center justify-center text-indigo-400">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">New Group</p>
-                  <p className="text-xs text-[#9CA3AF]">Chat with multiple contacts</p>
+                  <p className="text-xs text-slate-400">Chat with multiple contacts</p>
                 </div>
               </button>
               <button
                 onClick={() => { setShowBroadcast(true); setShowNewChat(false); fetchContacts(); }}
-                className="w-full flex items-center gap-3 rounded-xl border border-slate-700 px-4 py-3 text-left hover:bg-[#F9FAFB] transition-colors"
+                className="w-full flex items-center gap-3 rounded-xl border border-slate-700 px-4 py-3 text-left hover:bg-slate-700 transition-colors"
               >
-                <div className="h-10 w-10 rounded-full bg-[#F59E0B]/10 flex items-center justify-center text-[#F59E0B]">
+                <div className="h-10 w-10 rounded-full bg-[#F59E0B]/10 flex items-center justify-center text-amber-400">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 0 1-1.44-4.282m3.102.069a18.03 18.03 0 0 1-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 0 1 8.835 2.535M10.34 6.66a23.847 23.847 0 0 0 8.835-2.535m0 0A23.74 23.74 0 0 0 18.795 3m.38 1.125a23.91 23.91 0 0 1 1.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 0 0 1.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 0 1 0 3.46" /></svg>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">Broadcast</p>
-                  <p className="text-xs text-[#9CA3AF]">Send to many, delivered as 1:1</p>
+                  <p className="text-xs text-slate-400">Send to many, delivered as 1:1</p>
                 </div>
               </button>
             </div>
@@ -3522,29 +3522,29 @@ export default function PocketChatPage() {
                 onChange={(e) => setContactSearch(e.target.value)}
                 placeholder="Search contacts..."
                 autoFocus
-                className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-[#A3A3A3] focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
+                className="w-full border border-slate-700 rounded-[10px] px-3.5 py-2.5 text-base text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5]"
               />
             </div>
 
             {/* Contact list */}
             <div className="flex-1 overflow-y-auto px-2 pb-4">
               {filteredContacts.length === 0 ? (
-                <p className="text-center text-sm text-[#A3A3A3] py-8">No contacts found.</p>
+                <p className="text-center text-sm text-slate-400 py-8">No contacts found.</p>
               ) : (
                 filteredContacts.map((contact) => (
                   <button
                     key={contact.id}
                     onClick={() => createConversation(contact)}
-                    className="w-full flex items-center gap-3 px-3 py-3 hover:bg-[#F9FAFB] rounded-lg transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-3 hover:bg-slate-700 rounded-lg transition-colors text-left"
                   >
                     <PocketAvatar name={contact.name} size={40} />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white truncate">{contact.name}</p>
                       <div className="flex items-center gap-2">
                         {contact.company && (
-                          <p className="text-xs text-[#6B7280] truncate">{contact.company}</p>
+                          <p className="text-xs text-slate-300 truncate">{contact.company}</p>
                         )}
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3F3F1] text-[#6B7280] capitalize">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 capitalize">
                           {contact.contact_type}
                         </span>
                       </div>
