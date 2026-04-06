@@ -1,0 +1,28 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "Evrywher Menu",
+  "chatBarText": "Menu",
+  "areas": [
+    {
+      "bounds": { "x": 0, "y": 0, "width": 1250, "height": 843 },
+      "action": { "type": "message", "text": "/translate" }
+    },
+    {
+      "bounds": { "x": 1250, "y": 0, "width": 1250, "height": 843 },
+      "action": { "type": "message", "text": "/scan" }
+    },
+    {
+      "bounds": { "x": 0, "y": 843, "width": 833, "height": 843 },
+      "action": { "type": "message", "text": "/invoice" }
+    },
+    {
+      "bounds": { "x": 833, "y": 843, "width": 834, "height": 843 },
+      "action": { "type": "message", "text": "/card" }
+    },
+    {
+      "bounds": { "x": 1667, "y": 843, "width": 833, "height": 843 },
+      "action": { "type": "uri", "uri": "https://evrywher.io" }
+    }
+  ]
+}
