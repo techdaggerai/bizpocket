@@ -457,46 +457,42 @@ export default function PocketChatPage() {
     }
   }, [activeConvoId]);
 
-  /* ---------- iOS keyboard: lock body + resize chat to visual viewport ---------- */
+  /* ---------- iOS keyboard: pin chat to visual viewport ---------- */
   useEffect(() => {
-    if (!activeConvoId) return;
-    // Lock body scroll so iOS can't push header off-screen
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, scrollY);
-    };
-  }, [activeConvoId]);
+    if (!activeConvoId || typeof window === 'undefined') return;
 
-  useEffect(() => {
-    if (!activeConvoId || typeof window === 'undefined' || !window.visualViewport) return;
-    const vv = window.visualViewport;
     const container = chatContainerRef.current;
-    const onResize = () => {
-      if (container) {
+    if (!container) return;
+
+    // Prevent page scroll
+    const preventScroll = () => { window.scrollTo(0, 0); };
+    window.addEventListener('scroll', preventScroll);
+
+    const vv = window.visualViewport;
+    if (vv) {
+      const sync = () => {
+        // Position container exactly where the visual viewport is
+        container.style.top = `${vv.offsetTop}px`;
         container.style.height = `${vv.height}px`;
-      }
-      requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      });
-    };
-    vv.addEventListener('resize', onResize);
-    vv.addEventListener('scroll', onResize);
-    onResize();
-    return () => {
-      vv.removeEventListener('resize', onResize);
-      vv.removeEventListener('scroll', onResize);
-      if (container) container.style.height = '';
-    };
+        container.style.bottom = 'auto';
+        requestAnimationFrame(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        });
+      };
+      vv.addEventListener('resize', sync);
+      vv.addEventListener('scroll', sync);
+      sync();
+      return () => {
+        vv.removeEventListener('resize', sync);
+        vv.removeEventListener('scroll', sync);
+        window.removeEventListener('scroll', preventScroll);
+        container.style.top = '';
+        container.style.height = '';
+        container.style.bottom = '';
+      };
+    }
+
+    return () => { window.removeEventListener('scroll', preventScroll); };
   }, [activeConvoId]);
 
   /* ---------- Realtime subscription ---------- */
@@ -1714,7 +1710,7 @@ export default function PocketChatPage() {
     }
 
     return (
-      <div ref={chatContainerRef} className="chat-fullbleed fixed inset-0 z-50 flex flex-col bg-slate-900">
+      <div ref={chatContainerRef} className="chat-fullbleed fixed top-0 left-0 right-0 z-50 flex flex-col bg-slate-900" style={{ height: '100dvh' }}>
         {/* Header — clean mobile layout: back+avatar | name centered | phone+video */}
         <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
           {/* Left: back + avatar */}
