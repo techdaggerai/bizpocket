@@ -1712,16 +1712,15 @@ export default function PocketChatPage() {
                 </span>
               )}
             </div>
-            {!activeConvo.is_bot_chat && (
-              <div className="flex items-center gap-1.5 sm:gap-2 mt-1 overflow-hidden">
-                <AnimatedPocketChatLogo size={32} isTranslating={sending} />
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">{(profile?.language || 'en').toUpperCase()}</span>
-                <span className="text-[11px] text-slate-500">⇄</span>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e]">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
-                <span className={`text-[11px] whitespace-nowrap ${sending ? 'text-amber-400' : 'text-slate-500'}`}>{sending ? 'Translating...' : 'Auto-translating'}</span>
-              </div>
-            )}
           </div>
+          {/* Language badges — centered between name and right buttons */}
+          {!activeConvo.is_bot_chat && (
+            <div className="flex items-center gap-1.5 shrink-0 mx-2 sm:mx-4">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">{(profile?.language || 'en').toUpperCase()}</span>
+              <span className="text-[11px] text-slate-500">⇄</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
+            </div>
+          )}
           {/* Memory icon */}
           {convoSummary && (
             <button onClick={() => setShowSummaryPopup(v => !v)} className="relative min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-amber-400 hover:bg-[#F59E0B]/10 transition-colors shrink-0" title="AI Context">
