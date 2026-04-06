@@ -450,7 +450,27 @@ export default function PocketChatPage() {
     }
   }, [activeConvoId]);
 
-  /* ---------- Mobile keyboard: keep input visible ---------- */
+  /* ---------- iOS: hide form accessory bar (∧ ∨ ✓) ---------- */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    // iOS Safari shows form navigation when it finds focusable form elements.
+    // Setting interactive-widget=resizes-content tells Safari we handle the keyboard ourselves.
+    const existing = document.querySelector('meta[name="viewport"]');
+    if (existing) {
+      const content = existing.getAttribute('content') || '';
+      if (!content.includes('interactive-widget')) {
+        existing.setAttribute('content', content + ', interactive-widget=resizes-content');
+      }
+    }
+    return () => {
+      // Restore on unmount
+      if (existing) {
+        const content = existing.getAttribute('content') || '';
+        existing.setAttribute('content', content.replace(', interactive-widget=resizes-content', ''));
+      }
+    };
+  }, []);
+
   /* ---------- Mobile keyboard: shrink chat to visible viewport ---------- */
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
@@ -2311,10 +2331,10 @@ export default function PocketChatPage() {
           )}
         </div>
 
-        {/* Hidden file inputs */}
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-        <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} className="hidden" />
-        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} className="hidden" />
+        {/* Hidden file inputs — rendered outside form context to prevent iOS arrows */}
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
+        <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
+        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
 
         {/* File preview confirmation */}
         {pendingFile && (

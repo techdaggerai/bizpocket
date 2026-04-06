@@ -31,20 +31,20 @@ export default function BottomNav() {
   /* ---------- Evrywher 5-tab layout ---------- */
   if (isPocketChatMode) {
     const evrywherTabs = [
-      { href: '/contacts', label: 'Contacts', icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
-        </svg>
-      )},
       { href: '/chat', label: 'Chats', icon: (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
         </svg>
       )},
-      { href: '/ai', label: 'EvryAI', isCenter: true },
-      { href: '/learn', label: 'Learn', icon: (
+      { href: '/calls', label: 'Calls', icon: (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+      )},
+      { href: '/ai', label: 'EvryAI', isCenter: true },
+      { href: '/contacts', label: 'Contacts', icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
         </svg>
       )},
       { href: '/settings', label: 'Settings', icon: (
@@ -68,12 +68,12 @@ export default function BottomNav() {
                     className="relative h-12 w-12 rounded-full flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-500/30"
                     style={isActive ? { animation: 'orb-glow 2s ease-in-out infinite' } : undefined}
                   >
-                    {/* Evrywher waves (white + amber) with spark badge */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M4 14c2-3 4-5 8-5s6 2 8 5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                      <path d="M4 18c2-3 4-5 8-5s6 2 8 5" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="19" cy="6" r="3" fill="#F59E0B"/>
-                      <path d="M19 4.5v3M17.5 6h3" stroke="white" strokeWidth="1" strokeLinecap="round"/>
+                    {/* Evrywher logo: white wave + amber wave + amber spark with white + */}
+                    <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                      <path d="M4 15c3-4 5-6 10-6s7 2 10 6" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                      <path d="M4 20c3-4 5-6 10-6s7 2 10 6" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"/>
+                      <circle cx="22" cy="7" r="3.5" fill="#F59E0B"/>
+                      <path d="M22 5v4M20 7h4" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
                     </svg>
                   </div>
                   <span className="text-[10px] font-semibold mt-0.5">
