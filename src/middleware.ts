@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
 
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {
-    if (user && (pathname === '/login' || pathname === '/signup')) {
+    if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/pocketchat')) {
       const url = request.nextUrl.clone();
       const mode = request.nextUrl.searchParams.get('mode');
       url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
