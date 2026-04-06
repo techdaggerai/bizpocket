@@ -19,9 +19,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect('/login');
 
+  // Single query: fetch profile + organization together (saves a round-trip)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, organization:organizations(*)')
     .eq('user_id', user.id)
     .single();
 
@@ -96,13 +97,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect('/onboarding');
   }
 
-  const { data: organization } = await supabase
-    .from('organizations')
-    .select('*')
-    .eq('id', profile.organization_id)
-    .single();
-
+  // Organization was fetched in the joined profile query above
+  const organization = (profile as any).organization;
   if (!organization) redirect('/onboarding');
+
+  // Remove the joined org from profile to keep types clean
+  const cleanProfile = { ...profile };
+  delete (cleanProfile as any).organization;
 
   // Trial auto-downgrade: if trial expired and still on free, ensure downgraded
   if (organization.trial_ends_at && organization.plan !== 'free') {
@@ -133,8 +134,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <AuthProvider user={user} profile={profile} organization={organization}>
-      <I18nProvider initialLang={(profile.language || 'en') as Language}>
+    <AuthProvider user={user} profile={cleanProfile} organization={organization}>
+      <I18nProvider initialLang={(cleanProfile.language || 'en') as Language}>
         <ChatLockWrapper>
         <DelightProvider>
         <div className="min-h-screen bg-[var(--bg)] overflow-x-hidden group/root has-[.chat-fullbleed]:overflow-hidden">

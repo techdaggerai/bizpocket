@@ -7,46 +7,49 @@ const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/']; // Public invo
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
-  // Evrywher domain routing — evrywher.com / evrywyre.com / pocketchat.co serves Evrywher experience
   const hostname = request.headers.get('host') || '';
   const isPocketChat = getBrandFromHost(hostname) === 'evrywher';
+  const pathname = request.nextUrl.pathname;
 
+  // ── Fast exits: skip Supabase entirely for static/public paths ──
+
+  // Public prefix routes (e.g., /i/{token}) — always allow, no auth needed
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  // API routes — let the route handler do its own auth, don't add middleware latency
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
+  // Evrywher domain routing
   if (isPocketChat) {
-    const path = request.nextUrl.pathname;
-
-    // Root → Evrywher landing (no auth needed)
-    if (path === '/') {
+    if (pathname === '/') {
       return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
-
-    // Public pages on pocketchat.co — pass through without auth
-    if (['/privacy', '/terms'].includes(path) || path.startsWith('/auth')) {
+    if (['/privacy', '/terms'].includes(pathname) || pathname.startsWith('/auth')) {
       return NextResponse.next();
     }
-
-    // Evrywher users should never see BizPocket dashboard
-    if (path === '/dashboard') {
+    if (pathname === '/dashboard') {
       return NextResponse.redirect(new URL('/chat', request.url));
     }
-
-    // Login/Signup on pocketchat.co — fall through to session check below
-    // (logged-in users get redirected to /chat at line 78 via isPocketChat check)
-    // All other pocketchat.co paths (/chat, etc.) — fall through to normal auth flow below
   }
+
+  // ── Supabase auth check ──
 
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If Supabase is not configured, allow all requests
   if (!supabaseUrl || !supabaseKey) {
     return supabaseResponse;
   }
 
-  // Cookie options for persistent login (400 days like WhatsApp)
+  // Persistent cookies — 400 days (WhatsApp-like)
   const persistentCookieOptions = {
-    maxAge: 400 * 24 * 60 * 60, // 400 days in seconds
+    maxAge: 400 * 24 * 60 * 60,
     path: '/',
     sameSite: 'lax' as const,
     secure: request.nextUrl.protocol === 'https:',
@@ -74,24 +77,17 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Single auth call — this is the only network round-trip for most requests
   const { data: { user } } = await supabase.auth.getUser();
-  const pathname = request.nextUrl.pathname;
-
-  // Public prefix routes (e.g., /i/{token}) — always allow
-  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return supabaseResponse;
-  }
 
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {
-    // If logged in and on landing/login/signup, redirect appropriately
     if (user && (pathname === '/login' || pathname === '/signup')) {
       const url = request.nextUrl.clone();
       const mode = request.nextUrl.searchParams.get('mode');
       url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
       return NextResponse.redirect(url);
     }
-    // Not logged in on pocketchat.co login/signup — rewrite to inject mode param
     if (isPocketChat && (pathname === '/login' || pathname === '/signup')) {
       const url = request.nextUrl.clone();
       url.searchParams.set('mode', 'pocketchat');
@@ -107,31 +103,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Inject pathname for server layouts that need it
   supabaseResponse.headers.set('x-pathname', pathname);
 
-  // Evrywher onboarding gate — new users see welcome once
-  if (isPocketChat && pathname !== '/welcome' && !pathname.startsWith('/auth') && !pathname.startsWith('/api')) {
-    const { data: pcProfile } = await supabase
+  // ── Single profile query for BOTH onboarding + role check ──
+  // Only needed for page navigations, not for /auth or /onboarding
+  if (pathname !== '/onboarding' && !pathname.startsWith('/auth')) {
+    const { data: profile } = await supabase
       .from('profiles')
-      .select('onboarding_completed')
+      .select('role, onboarding_completed')
       .eq('user_id', user.id)
       .single();
-    if (pcProfile && !pcProfile.onboarding_completed) {
+
+    // Evrywher onboarding gate
+    if (isPocketChat && pathname !== '/welcome' && profile && !profile.onboarding_completed) {
       const url = request.nextUrl.clone();
       url.pathname = '/welcome';
       return NextResponse.redirect(url);
     }
-  }
 
-  // Check role for accountant restriction
-  if (pathname !== '/onboarding') {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
+    // Accountant role restriction
     if (profile?.role === 'accountant') {
       const isAllowed = ACCOUNTANT_ALLOWED.some(
         (route) => pathname === route || pathname.startsWith(route + '/')

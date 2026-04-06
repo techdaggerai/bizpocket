@@ -53,7 +53,10 @@ function LoginInner() {
       return;
     }
 
-    router.push(isPocketChat ? '/chat' : '/dashboard');
+    // Replace (not push) so user can't back-button to login screen
+    // refresh() ensures server components pick up the new session cookies
+    router.refresh();
+    router.replace(isPocketChat ? '/chat' : '/dashboard');
   }
 
   return (
