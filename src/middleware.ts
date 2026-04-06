@@ -23,11 +23,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Evrywher domain routing
+  // Evrywher domain routing (non-auth shortcuts)
   if (isPocketChat) {
-    if (pathname === '/') {
-      return NextResponse.rewrite(new URL('/pocketchat', request.url));
-    }
+    // Note: '/' is NOT handled here — it flows through to auth check below.
+    // Authenticated users → /chat, unauthenticated → /pocketchat landing.
     if (['/privacy', '/terms'].includes(pathname) || pathname.startsWith('/auth')) {
       return NextResponse.next();
     }
@@ -82,16 +81,22 @@ export async function middleware(request: NextRequest) {
 
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {
+    // Authenticated users on public pages → redirect to app
     if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/pocketchat')) {
       const url = request.nextUrl.clone();
       const mode = request.nextUrl.searchParams.get('mode');
       url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
       return NextResponse.redirect(url);
     }
+    // Evrywher domain: rewrite login/signup to add mode param
     if (isPocketChat && (pathname === '/login' || pathname === '/signup')) {
       const url = request.nextUrl.clone();
       url.searchParams.set('mode', 'pocketchat');
       return NextResponse.rewrite(url);
+    }
+    // Evrywher domain: show pocketchat landing for unauthenticated users on /
+    if (isPocketChat && pathname === '/') {
+      return NextResponse.rewrite(new URL('/pocketchat', request.url));
     }
     return supabaseResponse;
   }

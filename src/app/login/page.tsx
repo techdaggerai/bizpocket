@@ -65,8 +65,8 @@ function LoginInner() {
       return;
     }
 
-    router.refresh();
-    router.replace(isPocketChat ? '/chat' : '/dashboard');
+    // Hard redirect — ensures middleware runs fresh with the new auth cookie
+    window.location.href = isPocketChat ? '/chat' : '/dashboard';
   }
 
   // Sync handler for both onChange and onInput (covers all autofill behaviors)
