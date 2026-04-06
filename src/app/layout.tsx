@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import SplashScreen from '@/components/SplashScreen';
 import OfflineBanner from '@/components/OfflineBanner';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import PWAUpdateBanner from '@/components/PWAUpdateBanner';
 import { getBrandFromHost } from '@/lib/brand';
 
 const outfit = Outfit({
@@ -73,6 +74,7 @@ export default function RootLayout({
             {children}
           </SplashScreen>
           <PWAInstallBanner />
+          <PWAUpdateBanner />
         </ToastProvider>
       </body>
     </html>
