@@ -13,9 +13,8 @@ import BotOnboarding from '@/components/BotOnboarding';
 import InviteModal from '@/components/InviteModal';
 import QuickReplies from '@/components/QuickReplies';
 import VoiceMessagePlayer from '@/components/VoiceMessagePlayer';
-import EmojiPicker from '@/components/EmojiPicker';
-import StickerPicker from '@/components/StickerPicker';
-import GifPicker from '@/components/GifPicker';
+import EmojiMartPicker from '@emoji-mart/react';
+import emojiData from '@emoji-mart/data';
 import LinkPreview from '@/components/LinkPreview';
 import EvryWherMark from '@/components/EvryWherMark';
 import ChatLabels from '@/components/ChatLabels';
@@ -214,6 +213,7 @@ export default function PocketChatPage() {
   const [pickerTab, setPickerTab] = useState<'emoji' | 'stickers' | 'gifs'>('emoji');
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showAIMenu, setShowAIMenu] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [matchPillDismissed, setMatchPillDismissed] = useState(false);
   const [bizCardTipDismissed, setBizCardTipDismissed] = useState(() => { try { return localStorage.getItem('tipDismissed_bizcard') === '1'; } catch { return false; } });
@@ -2510,23 +2510,7 @@ export default function PocketChatPage() {
           </div>
         )}
 
-        {/* Toolbar */}
-        <div className="flex items-center gap-1 px-3 py-1.5 border-t border-[var(--border)]">
-          <button className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Emoji">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1" fill="currentColor"/><circle cx="15" cy="9" r="1" fill="currentColor"/></svg>
-          </button>
-          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Attach file">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <button className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Photo">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          </button>
-          <button onClick={startRecording} className="p-1.5 rounded-lg hover:bg-slate-700 text-slate-500" title="Voice note">
-            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
-          </button>
-          <div className="flex-1" />
-          <span className="text-[9px] text-slate-500">AI translates automatically</span>
-        </div>
+        {/* Toolbar removed — consolidated into main input row */}
 
         {/* Contact Info modal */}
         {showContactInfo && !activeConvo?.is_bot_chat && (
@@ -2644,20 +2628,7 @@ export default function PocketChatPage() {
           </>
         )}
 
-        {/* Free tier usage indicator */}
-        {isFreePlan && activeConvo && (
-          <div className="px-4 py-1.5 border-t border-[var(--border)] bg-slate-800/50 flex items-center justify-between">
-            <span className="text-[11px] sm:text-xs text-slate-400 whitespace-nowrap">
-              {activeConvo.is_bot_chat
-                ? null
-                : `${Math.max(0, 10 - translationsUsed)}/10 translations left today`
-              }
-            </span>
-            {(!activeConvo.is_bot_chat && translationsUsed >= 10) && (
-              <Link href="/settings/upgrade" className="text-[11px] font-medium text-indigo-400">Upgrade</Link>
-            )}
-          </div>
-        )}
+        {/* Free tier usage — merged into input bar info line */}
 
         {/* Cultural Coach card */}
         {culturalCoach && (
@@ -2718,38 +2689,26 @@ export default function PocketChatPage() {
             />
           </div>
 
-          {/* SEND AS language selector — desktop only */}
+          {/* Translation info + Send As — compact single line */}
           {!activeConvo?.is_bot_chat && (
-            <div className="hidden md:flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] text-slate-500 font-medium">SEND AS</span>
-              <select
-                value={chatLang}
-                onChange={(e) => setChatLang(e.target.value)}
-                className="h-7 rounded-lg border border-slate-700 bg-slate-800 px-1.5 text-xs text-[var(--text-2)] focus:border-[#4F46E5] focus:outline-none appearance-none"
-                title="Message language"
-              >
-                <option value="en">🇬🇧 EN</option>
-                <option value="ja">🇯🇵 JA</option>
-                <option value="ur">🇵🇰 UR</option>
-                <option value="ar">🇦🇪 AR</option>
-                <option value="bn">🇧🇩 BN</option>
-                <option value="pt">🇧🇷 PT</option>
-                <option value="tl">🇵🇭 TL</option>
-                <option value="vi">🇻🇳 VI</option>
-                <option value="tr">🇹🇷 TR</option>
-                <option value="zh">🇨🇳 ZH</option>
-                <option value="fr">🇫🇷 FR</option>
-                <option value="nl">🇳🇱 NL</option>
-                <option value="es">🇪🇸 ES</option>
-                <option value="ps">🇦🇫 PS</option>
-                <option value="fa">🇮🇷 FA</option>
-                <option value="hi">🇮🇳 HI</option>
-                <option value="ko">🇰🇷 KO</option>
-                <option value="th">🇹🇭 TH</option>
-                <option value="id">🇮🇩 ID</option>
-                <option value="ne">🇳🇵 NE</option>
-                <option value="si">🇱🇰 SI</option>
-              </select>
+            <div className="flex items-center justify-between px-1 mb-1">
+              <span className="text-[11px] text-slate-400">
+                {isFreePlan ? `${Math.max(0, 10 - translationsUsed)}/10 translations left` : 'Unlimited translations'}
+                {' · Send as: '}
+                <select
+                  value={chatLang}
+                  onChange={(e) => setChatLang(e.target.value)}
+                  className="bg-transparent text-[11px] text-slate-300 font-medium border-none focus:outline-none appearance-none cursor-pointer"
+                >
+                  <option value="en">EN</option><option value="ja">JA</option><option value="ur">UR</option>
+                  <option value="ar">AR</option><option value="bn">BN</option><option value="pt">PT</option>
+                  <option value="tl">TL</option><option value="vi">VI</option><option value="tr">TR</option>
+                  <option value="zh">ZH</option><option value="fr">FR</option><option value="nl">NL</option>
+                  <option value="es">ES</option><option value="ko">KO</option><option value="hi">HI</option>
+                  <option value="th">TH</option><option value="id">ID</option>
+                </select>
+              </span>
+              <span className="text-[10px] text-slate-500">AI translates automatically</span>
             </div>
           )}
 
@@ -2792,63 +2751,27 @@ export default function PocketChatPage() {
               </>
             ) : (
               <>
-                {/* Left: Emoji button */}
+                {/* Emoji button — emoji-mart picker */}
                 <div className="relative shrink-0">
                   <button
                     onClick={() => setShowEmoji(!showEmoji)}
-                    className="h-[42px] w-[36px] flex items-center justify-center text-slate-400 hover:text-amber-400 transition-colors"
-                    title="Emoji, Stickers, GIFs"
+                    className="h-[42px] w-[42px] flex items-center justify-center rounded-full text-slate-400 hover:text-amber-400 hover:bg-slate-700 transition-colors"
+                    title="Emoji"
                   >
-                    <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
                   </button>
                   {showEmoji && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowEmoji(false)} />
-                      <div className="absolute bottom-full mb-2 left-0 w-[min(320px,calc(100vw-24px))] bg-slate-800 rounded-xl border border-slate-700 shadow-lg z-50 overflow-hidden">
-                        {/* Tabs */}
-                        <div className="flex border-b border-[var(--border)]">
-                          {[{k:'emoji' as const,l:'😊'},{k:'stickers' as const,l:'🎨'},{k:'gifs' as const,l:'GIF'}].map(t => (
-                            <button key={t.k} onClick={() => setPickerTab(t.k)} className={`flex-1 py-2 text-sm font-medium ${pickerTab === t.k ? 'text-indigo-400 border-b-2 border-[#4F46E5]' : 'text-slate-400'}`}>{t.l}</button>
-                          ))}
-                        </div>
-                        {pickerTab === 'emoji' && (
-                          <EmojiPicker
-                            onSelect={(emoji) => { setNewMessage(prev => prev + emoji); setShowEmoji(false); }}
-                            onClose={() => setShowEmoji(false)}
-                          />
-                        )}
-                        {pickerTab === 'stickers' && (
-                          <StickerPicker
-                            isOpen={true}
-                            onSelect={(stickerUrl) => {
-                              if (activeConvoId && organization?.id) {
-                                supabase.from('messages').insert({
-                                  conversation_id: activeConvoId, organization_id: organization.id,
-                                  sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
-                                  message: '🎨 Sticker', message_type: 'image', attachment_url: stickerUrl,
-                                });
-                              }
-                              setShowEmoji(false);
-                            }}
-                            onClose={() => setShowEmoji(false)}
-                          />
-                        )}
-                        {pickerTab === 'gifs' && (
-                          <GifPicker
-                            isOpen={true}
-                            onSelect={(gif) => {
-                              if (activeConvoId && organization?.id) {
-                                supabase.from('messages').insert({
-                                  conversation_id: activeConvoId, organization_id: organization.id,
-                                  sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You',
-                                  message: gif.title || 'GIF', message_type: 'image', attachment_url: gif.url,
-                                });
-                              }
-                              setShowEmoji(false);
-                            }}
-                            onClose={() => setShowEmoji(false)}
-                          />
-                        )}
+                      <div className="absolute bottom-full mb-2 left-0 z-50">
+                        <EmojiMartPicker
+                          data={emojiData}
+                          theme="dark"
+                          onEmojiSelect={(emoji: { native: string }) => { setNewMessage(prev => prev + emoji.native); setShowEmoji(false); }}
+                          previewPosition="none"
+                          skinTonePosition="search"
+                          set="native"
+                        />
                       </div>
                     </>
                   )}
@@ -2869,99 +2792,78 @@ export default function PocketChatPage() {
                   {showAttachMenu && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowAttachMenu(false)} />
-                      <div className="absolute bottom-full mb-2 left-0 z-50 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
-                        <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                      <div className="absolute bottom-full mb-2 left-0 z-50 w-44 rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
+                        <button onClick={() => { fileInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
                           <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" /></svg>
                           Photo
                         </button>
-                        <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
-                          <svg className="h-4 w-4 text-[#F43F5E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                        <button onClick={() => { videoInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-rose-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                           Video
                         </button>
-                        <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                        <button onClick={() => { docInputRef.current?.click(); setShowAttachMenu(false); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
                           <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
                           Document
                         </button>
-                        <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
-                          <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
+                        <button onClick={shareLocation} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" /></svg>
                           Location
                         </button>
-                        <button onClick={() => { setShowAttachMenu(false); setShowCameraTranslate(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
-                          <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
-                          Scan & Translate
-                        </button>
-                        <button onClick={() => { setShowAttachMenu(false); setShowVoiceTranslator(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
-                          <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
-                          Voice Translate
-                        </button>
-                        <button onClick={async () => {
-                          setShowAttachMenu(false);
-                          // Check if user can share biz card
-                          try {
-                            const res = await fetch('/api/profile/me');
-                            const data = await res.json();
-                            if (!data.profile) {
-                              router.push('/profile/build');
-                              return;
-                            }
-                            const gp = data.profile;
-                            const ti = data.tierInfo || {};
-                            if (canShareBizCard(gp.tier || 'starter', gp.trust_score || 0, gp.is_published || false)) {
-                              // Snapshot card data from server profile (not client-editable)
-                              const cardData = {
-                                display_name: profile?.full_name || profile?.name || '',
-                                avatar_url: (profile as any).avatar_url || null,
-                                title: gp.title || '',
-                                company_name: organization?.name || '',
-                                tier: gp.tier,
-                                trust_score: gp.trust_score,
-                                services: gp.services || [],
-                                operating_corridors: gp.operating_corridors || [],
-                                badge_tier: gp.badge_tier || 'none',
-                                deals: 0,
-                                share_token: gp.share_token || '',
-                              };
-                              // Insert biz card record (server-side snapshot)
-                              const { data: cardRecord } = await supabase.from('business_cards').insert({
-                                user_id: user.id,
-                                organization_id: organization.id,
-                                card_data: cardData,
-                              }).select('id').single();
-                              // Send message with card_id reference
-                              if (cardRecord && activeConvoId) {
-                                await supabase.from('messages').insert({
-                                  conversation_id: activeConvoId,
-                                  organization_id: organization.id,
-                                  sender_type: 'owner',
-                                  sender_name: profile?.full_name || profile?.name || 'You',
-                                  message: JSON.stringify({ ...cardData, card_id: cardRecord.id }),
-                                  message_type: 'business_card',
-                                  original_text: `Business Card: ${cardData.display_name}`,
-                                  original_language: profile?.language || 'en',
-                                });
-                              }
-                            } else {
-                              // Show gate with all three requirements
-                              setBizCardGateData({
-                                trustScore: gp.trust_score || 0,
-                                tier: gp.tier || 'starter',
-                                isPublished: gp.is_published || false,
-                                nextActions: ti.nextActions || [],
-                                shareToken: gp.share_token || '',
-                              });
-                              setShowBizCardGate(true);
-                            }
-                          } catch { /* ignore errors */ }
-                        }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
-                          <span className="h-4 w-4 flex items-center justify-center text-[14px]">{'\u{1F4C7}'}</span>
-                          Business Card
-                        </button>
                         {activeConvo?.is_group && (
-                          <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700">
+                          <button onClick={() => { setShowAttachMenu(false); setShowCreatePoll(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
                             <span className="h-4 w-4 flex items-center justify-center text-[14px]">📊</span>
                             Poll
                           </button>
                         )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* AI Features button — Scan, Voice Translate, Business Card */}
+                <div className="relative shrink-0">
+                  <button
+                    onClick={() => setShowAIMenu(!showAIMenu)}
+                    className="h-[42px] w-[42px] flex items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                    title="AI Features"
+                  >
+                    <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                  </button>
+                  {showAIMenu && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowAIMenu(false)} />
+                      <div className="absolute bottom-full mb-2 left-0 z-50 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-lg py-1">
+                        <button onClick={() => { setShowAIMenu(false); setShowCameraTranslate(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>
+                          Scan & Translate
+                        </button>
+                        <button onClick={() => { setShowAIMenu(false); setShowVoiceTranslator(true); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" /></svg>
+                          Voice Translate
+                        </button>
+                        <button onClick={async () => {
+                          setShowAIMenu(false);
+                          try {
+                            const res = await fetch('/api/profile/me');
+                            const d = await res.json();
+                            if (!d.profile) { router.push('/profile/build'); return; }
+                            const gp = d.profile;
+                            const ti = d.tierInfo || {};
+                            if (canShareBizCard(gp.tier || 'starter', gp.trust_score || 0, gp.is_published || false)) {
+                              const cardData = { display_name: profile?.full_name || profile?.name || '', avatar_url: (profile as any).avatar_url || null, title: gp.title || '', company_name: organization?.name || '', tier: gp.tier, trust_score: gp.trust_score, services: gp.services || [], operating_corridors: gp.operating_corridors || [], badge_tier: gp.badge_tier || 'none', deals: 0, share_token: gp.share_token || '' };
+                              const { data: cardRecord } = await supabase.from('business_cards').insert({ user_id: user.id, organization_id: organization.id, card_data: cardData }).select('id').single();
+                              if (cardRecord && activeConvoId) {
+                                await supabase.from('messages').insert({ conversation_id: activeConvoId, organization_id: organization.id, sender_type: 'owner', sender_name: profile?.full_name || profile?.name || 'You', message: JSON.stringify({ ...cardData, card_id: cardRecord.id }), message_type: 'business_card', original_text: `Business Card: ${cardData.display_name}`, original_language: profile?.language || 'en' });
+                              }
+                            } else {
+                              setBizCardGateData({ trustScore: gp.trust_score || 0, tier: gp.tier || 'starter', isPublished: gp.is_published || false, nextActions: ti.nextActions || [], shareToken: gp.share_token || '' });
+                              setShowBizCardGate(true);
+                            }
+                          } catch { /* ignore */ }
+                        }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <span className="h-4 w-4 flex items-center justify-center text-[14px]">{'\u{1F4C7}'}</span>
+                          Business Card
+                        </button>
                       </div>
                     </>
                   )}
