@@ -1,6 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase-client';
 import GlassCard from '@/components/ui/GlassCard';
 import PocketAvatar from '@/components/ui/PocketAvatar';
 import Button from '@/components/ui/Button';
@@ -18,22 +21,57 @@ export default function InviteClient({ inviter, code }: Props) {
   const tier = (inviter.tier || 'starter') as Tier;
   const corridors = inviter.operating_corridors || [];
   const services = (inviter.services || []).slice(0, 3);
+  const router = useRouter();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setIsLoggedIn(true);
+    });
+  }, []);
+
+  async function handleAccept() {
+    setAccepting(true);
+    setError('');
+    try {
+      const res = await fetch('/api/invites/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAccepted(true);
+        setTimeout(() => router.push('/chat'), 1500);
+      } else if (data.already_connected) {
+        setError('You are already connected!');
+        setTimeout(() => router.push('/chat'), 1500);
+      } else {
+        setError(data.error || 'Failed to connect');
+      }
+    } catch {
+      setError('Network error — try again');
+    }
+    setAccepting(false);
+  }
 
   return (
     <div className="min-h-screen bg-[var(--pm-surface-1)] flex flex-col items-center justify-center px-6 py-12">
-      {/* Evrywher header */}
       <div className="flex items-center gap-2 mb-8">
         <span className="text-2xl">{'\u{1F30D}'}</span>
         <EvryWherMark size="md" />
       </div>
 
-      {/* Invite card */}
       <div className="w-full max-w-sm">
         <GlassCard>
           <div className="space-y-5">
             <p className="text-center text-sm text-[var(--pm-text-secondary)]">You've been invited by</p>
 
-            {/* Inviter profile */}
             <div className="flex flex-col items-center text-center">
               <PocketAvatar
                 src={inviter.avatar_url}
@@ -49,7 +87,6 @@ export default function InviteClient({ inviter, code }: Props) {
               </div>
             </div>
 
-            {/* Corridors */}
             {corridors.length > 0 && (
               <div className="flex justify-center gap-2 flex-wrap">
                 {corridors.map((c: any, i: number) => (
@@ -58,7 +95,6 @@ export default function InviteClient({ inviter, code }: Props) {
               </div>
             )}
 
-            {/* Services */}
             {services.length > 0 && (
               <div className="flex justify-center gap-1.5 flex-wrap">
                 {services.map((s: string, i: number) => (
@@ -69,7 +105,6 @@ export default function InviteClient({ inviter, code }: Props) {
               </div>
             )}
 
-            {/* Trust reward */}
             <GlassCard tier="starter" glow>
               <div className="flex items-start gap-3">
                 <span className="text-xl shrink-0">{'\u{1F6E1}\uFE0F'}</span>
@@ -79,21 +114,36 @@ export default function InviteClient({ inviter, code }: Props) {
               </div>
             </GlassCard>
 
-            {/* CTA */}
-            <Link href={`/signup?ref=${code}`} className="block no-underline">
-              <Button variant="primary" size="xl" className="w-full">
-                Join Evrywher {'\u2192'}
+            {/* CTA — different for logged-in vs. new users */}
+            {error && (
+              <p className="text-center text-sm text-amber-400">{error}</p>
+            )}
+
+            {accepted ? (
+              <div className="text-center py-2">
+                <p className="text-sm font-semibold text-[#16A34A]">Connected! Redirecting to chat...</p>
+              </div>
+            ) : isLoggedIn ? (
+              <Button variant="primary" size="xl" className="w-full" onClick={handleAccept} disabled={accepting}>
+                {accepting ? 'Connecting...' : 'Add to Contacts'}
               </Button>
-            </Link>
+            ) : (
+              <Link href={`/signup?ref=${code}`} className="block no-underline">
+                <Button variant="primary" size="xl" className="w-full">
+                  Join Evrywher {'\u2192'}
+                </Button>
+              </Link>
+            )}
           </div>
         </GlassCard>
       </div>
 
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-xs text-[var(--pm-text-tertiary)]">Already have an account?</p>
-        <Link href="/login" className="text-xs text-indigo-400 font-semibold no-underline hover:underline">Log in</Link>
-      </div>
+      {!isLoggedIn && (
+        <div className="mt-8 text-center">
+          <p className="text-xs text-[var(--pm-text-tertiary)]">Already have an account?</p>
+          <Link href="/login" className="text-xs text-indigo-400 font-semibold no-underline hover:underline">Log in</Link>
+        </div>
+      )}
     </div>
   );
 }

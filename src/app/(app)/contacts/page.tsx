@@ -9,6 +9,7 @@ import OutlinePillButton from '@/components/OutlinePillButton';
 import PocketAvatar from '@/components/PocketAvatar';
 import QRCode from 'qrcode';
 import BusinessCardScanner from '@/components/BusinessCardScanner';
+import QRScanner from '@/components/QRScanner';
 import { getBrandModeClient } from '@/lib/brand';
 
 type ContactType = 'customer' | 'supplier' | 'accountant' | 'partner' | 'friend' | 'family' | 'work';
@@ -136,6 +137,13 @@ export default function ContactsPage() {
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
   const [showCardScanner, setShowCardScanner] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [addingUser, setAddingUser] = useState<string | null>(null);
+  const [permanentInviteCode, setPermanentInviteCode] = useState<string | null>(null);
 
   useEffect(() => { document.title = 'Evrywher — Contacts'; }, []);
 
@@ -270,12 +278,25 @@ export default function ContactsPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  const inviteUrl = `https://evrywher.io/invite/${organization?.id || ''}`;
+  const inviteUrl = permanentInviteCode
+    ? `https://evrywher.io/invite/${permanentInviteCode}`
+    : `https://evrywher.io/invite/${organization?.id || ''}`;
 
   async function openQRModal() {
     setShowQR(true);
+    // Ensure we have a permanent invite code
+    if (!permanentInviteCode) {
+      try {
+        const res = await fetch('/api/invites/create', { method: 'POST' });
+        const data = await res.json();
+        if (data.permanent_code) setPermanentInviteCode(data.permanent_code);
+      } catch {}
+    }
     try {
-      const dataUrl = await QRCode.toDataURL(inviteUrl, {
+      const url = permanentInviteCode
+        ? `https://evrywher.io/invite/${permanentInviteCode}`
+        : `https://evrywher.io/invite/${organization?.id || ''}`;
+      const dataUrl = await QRCode.toDataURL(url, {
         width: 280,
         margin: 2,
         color: { dark: '#0A0A0A', light: '#FFFFFF' },
@@ -283,6 +304,71 @@ export default function ContactsPage() {
       setQrDataUrl(dataUrl);
     } catch {
       toast('Failed to generate QR code', 'error');
+    }
+  }
+
+  async function handleContactSearch() {
+    if (!searchQuery.trim() || searchQuery.trim().length < 3) return;
+    setSearching(true);
+    try {
+      const res = await fetch('/api/contacts/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery.trim() }),
+      });
+      const data = await res.json();
+      setSearchResults(data.results || []);
+    } catch {
+      toast('Search failed', 'error');
+    }
+    setSearching(false);
+  }
+
+  async function handleAddFromSearch(inviteCode: string, userName: string) {
+    setAddingUser(inviteCode);
+    try {
+      const res = await fetch('/api/invites/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: inviteCode }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`Connected with ${userName}!`, 'success');
+        setShowSearch(false);
+        setSearchQuery('');
+        setSearchResults([]);
+        fetchContacts();
+      } else if (data.already_connected) {
+        toast('Already connected!', 'info');
+      } else {
+        toast(data.error || 'Failed to connect', 'error');
+      }
+    } catch {
+      toast('Network error', 'error');
+    }
+    setAddingUser(null);
+  }
+
+  async function handleQRScan(code: string) {
+    setShowQRScanner(false);
+    try {
+      const res = await fetch('/api/invites/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(`Connected with ${data.inviter?.name || 'contact'}!`, 'success');
+        fetchContacts();
+      } else if (data.already_connected) {
+        toast('Already connected!', 'info');
+      } else {
+        toast(data.error || 'Invalid QR code', 'error');
+      }
+    } catch {
+      toast('Failed to process QR code', 'error');
     }
   }
 
@@ -329,13 +415,19 @@ export default function ContactsPage() {
         </div>
         <div className="flex items-center gap-2">
           <OutlinePillButton
-            label="Scan Card"
-            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h4v4H7zM13 7h4v4h-4zM7 13h4v4H7z"/></svg>}
-            color="#F59E0B"
-            onClick={() => setShowCardScanner(true)}
+            label="Find"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>}
+            color="#16A34A"
+            onClick={() => setShowSearch(true)}
           />
           <OutlinePillButton
-            label="QR Code"
+            label="Scan QR"
+            icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><path d="M14 14h3v3h-3zM17 17h3v3h-3z"/></svg>}
+            color="#F59E0B"
+            onClick={() => setShowQRScanner(true)}
+          />
+          <OutlinePillButton
+            label="My QR"
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="3" height="3" /><rect x="18" y="14" width="3" height="3" /><rect x="14" y="18" width="3" height="3" /><rect x="18" y="18" width="3" height="3" /></svg>}
             color="#F59E0B"
             onClick={openQRModal}
@@ -718,6 +810,78 @@ export default function ContactsPage() {
             else { toast('Contact saved from business card!', 'success'); fetchContacts(); }
           }}
         />
+      )}
+
+      {/* QR Scanner */}
+      <QRScanner
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onScan={handleQRScan}
+      />
+
+      {/* Find by Email/Phone Modal */}
+      {showSearch && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setShowSearch(false); setSearchResults([]); setSearchQuery(''); }} />
+          <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+              <h2 className="text-base font-bold text-white">Find Contact</h2>
+              <button onClick={() => { setShowSearch(false); setSearchResults([]); setSearchQuery(''); }} className="text-slate-400 hover:text-white">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <p className="text-xs text-slate-400">Search by email or phone number to find Evrywher users</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleContactSearch()}
+                  placeholder="Email or phone number..."
+                  className="flex-1 rounded-[10px] border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:border-[#4F46E5]"
+                />
+                <button
+                  onClick={handleContactSearch}
+                  disabled={searching || searchQuery.trim().length < 3}
+                  className="rounded-[10px] bg-[#4F46E5] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#4338CA] disabled:opacity-40"
+                >
+                  {searching ? '...' : 'Search'}
+                </button>
+              </div>
+
+              {/* Results */}
+              {searchResults.length > 0 && (
+                <div className="space-y-2">
+                  {searchResults.map((r) => (
+                    <div key={r.user_id} className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3">
+                      <PocketAvatar name={r.name} size={40} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{r.name}</p>
+                        {r.language && <p className="text-xs text-slate-400">{r.language.toUpperCase()}</p>}
+                      </div>
+                      <button
+                        onClick={() => handleAddFromSearch(r.invite_code, r.name)}
+                        disabled={addingUser === r.invite_code}
+                        className="rounded-lg bg-[#4F46E5] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#4338CA] disabled:opacity-50"
+                      >
+                        {addingUser === r.invite_code ? 'Adding...' : 'Add'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {searchResults.length === 0 && searchQuery.trim().length >= 3 && !searching && (
+                <div className="text-center py-6">
+                  <p className="text-sm text-slate-300">No users found</p>
+                  <p className="text-xs text-slate-400 mt-1">Invite them to Evrywher instead!</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -14,7 +14,29 @@ async function getInviter(code: string) {
 
   const supabase = createClient(url, key)
 
-  // Try share_token first (new invite links)
+  // 1. Try invites table (one-time invite links)
+  const { data: invite } = await supabase
+    .from('invites')
+    .select('inviter_id')
+    .eq('code', code)
+    .single()
+
+  if (invite) {
+    return await resolveProfile(supabase, invite.inviter_id)
+  }
+
+  // 2. Try permanent_invite_code on profiles (QR codes)
+  const { data: profileByCode } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('permanent_invite_code', code)
+    .single()
+
+  if (profileByCode) {
+    return await resolveProfile(supabase, profileByCode.user_id)
+  }
+
+  // 3. Try share_token on global_profiles (existing flow)
   const { data: gp } = await supabase
     .from('global_profiles')
     .select('user_id, tier, trust_score, title, services, operating_corridors, tagline, share_token')
@@ -48,7 +70,7 @@ async function getInviter(code: string) {
     }
   }
 
-  // Fallback: code might be an org ID (legacy invite links)
+  // 4. Fallback: org ID (legacy)
   const { data: legacyOrg } = await supabase
     .from('organizations')
     .select('id, name')
@@ -77,15 +99,45 @@ async function getInviter(code: string) {
   }
 }
 
+async function resolveProfile(supabase: any, userId: string) {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name, full_name, avatar_url, organization_id')
+    .eq('user_id', userId)
+    .single()
+
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('name')
+    .eq('id', profile?.organization_id)
+    .single()
+
+  const { data: gp } = await supabase
+    .from('global_profiles')
+    .select('tier, trust_score, title, services, operating_corridors, tagline')
+    .eq('user_id', userId)
+    .single()
+
+  return {
+    tier: gp?.tier || 'starter',
+    trust_score: gp?.trust_score || 20,
+    title: gp?.title || null,
+    services: gp?.services || null,
+    operating_corridors: gp?.operating_corridors || null,
+    tagline: gp?.tagline || null,
+    display_name: profile?.full_name || profile?.name || 'A Business Professional',
+    avatar_url: profile?.avatar_url || null,
+    company_name: org?.name || '',
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const inviter = await getInviter(params.code)
   if (!inviter) return { title: 'Join Evrywher' }
 
-  const tierEmoji = inviter.tier === 'established' ? '\u{1F333}' : inviter.tier === 'growing' ? '\u{1F33F}' : '\u{1F331}'
-
   return {
     title: `${inviter.display_name} invited you to Evrywher`,
-    description: `Join the global business network. ${tierEmoji} Trust: ${inviter.trust_score}. You both earn +15 Trust Score.`,
+    description: `Join the global business network. You both earn +15 Trust Score.`,
     openGraph: {
       title: `${inviter.display_name} invited you to Evrywher`,
       description: `Build your verified professional profile. Both earn +15 Trust Score.`,
