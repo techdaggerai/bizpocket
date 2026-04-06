@@ -54,7 +54,7 @@ function LoginInner() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email: emailVal,
       password: passVal,
     });
@@ -63,6 +63,21 @@ function LoginInner() {
       setError(authError.message);
       setLoading(false);
       return;
+    }
+
+    // Verify session is set before redirecting
+    if (!data.session) {
+      setError('Login succeeded but session was not created. Please try again.');
+      setLoading(false);
+      return;
+    }
+
+    // Wait for Supabase client to write auth cookies, then verify
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const { data: check } = await supabase.auth.getSession();
+    if (!check.session) {
+      // Retry once more
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     // Hard redirect — ensures middleware runs fresh with the new auth cookie
