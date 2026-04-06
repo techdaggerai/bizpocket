@@ -576,9 +576,9 @@ export default function NewInvoicePage() {
         {/* RIGHT: Live Preview (desktop) */}
         <div className="hidden lg:block flex-1 shrink-0">
           <div className="sticky top-4 h-[calc(100vh-2rem)]">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.1em]">Live Preview</p>
-              <button onClick={() => setShowTemplatePicker(true)} className="text-[10px] text-indigo-400 font-medium">Change Template</button>
+            <div className="flex items-end justify-between mb-3" style={{ minHeight: 52 }}>
+              <p className="text-sm font-semibold text-slate-200 uppercase tracking-[0.08em]">Live Preview</p>
+              <button onClick={() => setShowTemplatePicker(true)} className="text-xs text-indigo-400 font-medium">Change Template</button>
             </div>
             <div className="rounded-xl border border-slate-700 bg-slate-800 overflow-hidden shadow-sm">
               <div id="invoice-preview" className="origin-top-left h-full" style={{ transform: 'scale(0.85)', width: '118%', transformOrigin: 'top left' }}>

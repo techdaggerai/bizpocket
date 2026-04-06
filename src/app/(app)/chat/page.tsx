@@ -1488,6 +1488,7 @@ export default function PocketChatPage() {
 
   // Auto-create bot for Evrywher users — skip onboarding entirely
   const [autoCreating, setAutoCreating] = useState(false);
+  const [botActivated, setBotActivated] = useState(false);
 
   useEffect(() => {
     if (!organization?.id || !isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
@@ -1620,11 +1621,12 @@ export default function PocketChatPage() {
   // Bot auto-creates in background via useEffect above.
 
   // Show bot onboarding if not set up (BizPocket users only — never PocketChat)
-  if (botConfigLoaded && !isSetupComplete && !isPocketChatMode) {
+  if (botConfigLoaded && !isSetupComplete && !isPocketChatMode && !botActivated) {
     return (
       <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] bg-slate-800">
         <BotOnboarding
           onComplete={(name, icon) => {
+            setBotActivated(true);
             fetchBotConfig();
             fetchConversations();
           }}

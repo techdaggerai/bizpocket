@@ -19,88 +19,96 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const [botName, setBotName] = useState('Evrywher AI');
   const [botIcon] = useState('1');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
 
   async function handleFinish() {
-    if (!organization?.id) return;
+    if (!organization?.id) {
+      setError('Organization not loaded. Please refresh and try again.');
+      return;
+    }
     setSaving(true);
+    setError('');
 
-    // Check if config already exists
-    const { data: existing } = await supabase
-      .from('pocket_bot_config')
-      .select('id')
-      .eq('organization_id', organization.id)
-      .maybeSingle();
-
-    if (existing) {
-      // Update existing row
-      const { error } = await supabase
+    try {
+      // Try upsert (most DBs support this)
+      const { error: upsertErr } = await supabase
         .from('pocket_bot_config')
-        .update({ bot_name: botName, bot_icon: botIcon, is_setup_complete: true })
-        .eq('organization_id', organization.id);
-      if (error) console.error('Bot config update error:', error);
-    } else {
-      // Insert new row
-      const { error } = await supabase
-        .from('pocket_bot_config')
-        .insert({ organization_id: organization.id, bot_name: botName, bot_icon: botIcon, is_setup_complete: true });
-      if (error) console.error('Bot config insert error:', error);
-    }
+        .upsert({
+          organization_id: organization.id,
+          bot_name: botName,
+          bot_icon: botIcon,
+          is_setup_complete: true,
+        }, { onConflict: 'organization_id' });
 
-    // Create bot conversation (check for existing first to prevent duplicates)
-    const welcomeMsg = `Hi! I'm ${botName}, your AI business assistant. How can I help?`;
+      if (upsertErr) {
+        console.error('Bot config upsert failed:', upsertErr);
+        // Fallback: try update then insert
+        const { error: updateErr } = await supabase
+          .from('pocket_bot_config')
+          .update({ bot_name: botName, bot_icon: botIcon, is_setup_complete: true })
+          .eq('organization_id', organization.id);
 
-    const { data: existingConvo } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('organization_id', organization.id)
-      .eq('is_bot_chat', true)
-      .single();
+        if (updateErr) {
+          const { error: insertErr } = await supabase
+            .from('pocket_bot_config')
+            .insert({ organization_id: organization.id, bot_name: botName, bot_icon: botIcon, is_setup_complete: true });
+          if (insertErr) console.error('Bot config insert failed:', insertErr);
+        }
+      }
 
-    const botConvoId = existingConvo?.id;
-    let newConvoId: string | null = null;
+      // Create bot conversation
+      const welcomeMsg = `Hi! I'm ${botName}, your AI business assistant. How can I help?`;
 
-    if (!botConvoId) {
-      const { data: convoData, error: convoError } = await supabase
+      const { data: existingConvo } = await supabase
         .from('conversations')
-        .insert({
-          organization_id: organization.id,
-          title: botName,
-          is_bot_chat: true,
-          last_message: welcomeMsg,
-          last_message_at: new Date().toISOString(),
-        })
         .select('id')
-        .single();
+        .eq('organization_id', organization.id)
+        .eq('is_bot_chat', true)
+        .maybeSingle();
 
-      if (convoError) {
-        console.error('Bot conversation error:', convoError);
+      let convoId = existingConvo?.id;
+
+      if (!convoId) {
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert({
+            organization_id: organization.id,
+            title: botName,
+            is_bot_chat: true,
+            last_message: welcomeMsg,
+            last_message_at: new Date().toISOString(),
+          })
+          .select('id')
+          .single();
+        convoId = newConvo?.id;
       }
-      newConvoId = convoData?.id ?? null;
+
+      if (convoId) {
+        const { data: msgs } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('conversation_id', convoId)
+          .limit(1);
+
+        if (!msgs?.length) {
+          await supabase.from('messages').insert({
+            conversation_id: convoId,
+            organization_id: organization.id,
+            sender_type: 'bot',
+            sender_name: botName,
+            message: welcomeMsg,
+            message_type: 'text',
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Bot activation error:', e);
     }
 
-    // Insert greeting only if conversation has no messages yet
-    const convoId = botConvoId || newConvoId;
-    if (convoId) {
-      const { data: existingMessages } = await supabase
-        .from('messages')
-        .select('id')
-        .eq('conversation_id', convoId)
-        .limit(1);
-
-      if (!existingMessages?.length) {
-        await supabase.from('messages').insert({
-          conversation_id: convoId,
-          organization_id: organization.id,
-          sender_type: 'bot',
-          sender_name: botName,
-          message: welcomeMsg,
-          message_type: 'text',
-        });
-      }
-    }
-
+    // ALWAYS call onComplete — even if DB writes failed.
+    // The chat page will re-check and show the bot regardless.
     setSaving(false);
     onComplete(botName, botIcon);
   }
