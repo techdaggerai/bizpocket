@@ -36,9 +36,9 @@ function DialPad({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
       <div
-        className="w-full max-w-md bg-slate-900 rounded-t-3xl px-6 pt-6 pb-10 border-t border-slate-700/50"
+        className="w-full max-w-md bg-slate-900 rounded-t-3xl px-6 pt-6 mb-24 border-t border-slate-700/50"
         onClick={(e) => e.stopPropagation()}
-        style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
       >
         {/* Number display */}
         <div className="flex items-center justify-between mb-6">
