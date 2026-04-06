@@ -456,26 +456,7 @@ export default function PocketChatPage() {
     }
   }, [activeConvoId]);
 
-  /* ---------- iOS: hide form accessory bar (∧ ∨ ✓) ---------- */
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // iOS Safari shows form navigation when it finds focusable form elements.
-    // Setting interactive-widget=resizes-content tells Safari we handle the keyboard ourselves.
-    const existing = document.querySelector('meta[name="viewport"]');
-    if (existing) {
-      const content = existing.getAttribute('content') || '';
-      if (!content.includes('interactive-widget')) {
-        existing.setAttribute('content', content + ', interactive-widget=resizes-content');
-      }
-    }
-    return () => {
-      // Restore on unmount
-      if (existing) {
-        const content = existing.getAttribute('content') || '';
-        existing.setAttribute('content', content.replace(', interactive-widget=resizes-content', ''));
-      }
-    };
-  }, []);
+  /* interactive-widget=resizes-content is set in root layout viewport export */
 
   /* keyboard: scroll to bottom when input focused (iOS) */
   useEffect(() => {
@@ -1705,7 +1686,7 @@ export default function PocketChatPage() {
     }
 
     return (
-      <div className="chat-fullbleed fixed inset-0 flex flex-col bg-slate-900 lg:relative lg:inset-auto" style={{ height: '100dvh' }}>
+      <div className="chat-fullbleed flex flex-col bg-slate-900" style={{ height: '100dvh' }}>
         {/* Header — clean mobile layout: back+avatar | name centered | phone+video */}
         <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
           {/* Left: back + avatar */}
