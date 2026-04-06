@@ -349,9 +349,9 @@ export default function NewInvoicePage() {
                   <div className="absolute inset-0 origin-top-left pointer-events-none" style={{ transform: 'scale(0.42)', width: '238%', height: '238%' }}>
                     <tpl.Component data={liveInvoiceData} />
                   </div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-10 pb-3 px-3">
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent pt-6 pb-3 px-3">
                     <p className="text-sm font-semibold text-white">{tpl.name}</p>
-                    <p className="text-[10px] text-slate-400">{tpl.description}</p>
+                    <p className="text-[10px] text-slate-300">{tpl.description}</p>
                   </div>
                   {selectedTemplate === key && <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-[#4F46E5] flex items-center justify-center"><svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>}
                 </button>
@@ -373,7 +373,7 @@ export default function NewInvoicePage() {
       )}
 
       {/* Split View */}
-      <div className="flex gap-4 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
+      <div className="flex items-start gap-4 py-4 -mx-4 lg:-mx-8 px-4 lg:px-8">
         {/* LEFT: Form */}
         <div className="flex-1 min-w-0 space-y-3 lg:max-w-[480px]">
           <div className="flex items-center justify-between">

@@ -23,34 +23,29 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
 
   async function handleFinish() {
+    if (!organization?.id) return;
     setSaving(true);
 
-    // Save bot config — try upsert first, fall back to insert
-    const { error: configError } = await supabase
+    // Check if config already exists
+    const { data: existing } = await supabase
       .from('pocket_bot_config')
-      .upsert({
-        organization_id: organization.id,
-        bot_name: botName,
-        bot_icon: botIcon,
-        is_setup_complete: true,
-      }, { onConflict: 'organization_id' });
+      .select('id')
+      .eq('organization_id', organization.id)
+      .maybeSingle();
 
-    if (configError) {
-      console.error('Bot config upsert error:', configError);
-      // Fallback: try plain insert if upsert fails (RLS edge case)
-      const { error: insertError } = await supabase
+    if (existing) {
+      // Update existing row
+      const { error } = await supabase
         .from('pocket_bot_config')
-        .insert({
-          organization_id: organization.id,
-          bot_name: botName,
-          bot_icon: botIcon,
-          is_setup_complete: true,
-        });
-      if (insertError) {
-        console.error('Bot config insert fallback error:', insertError);
-        setSaving(false);
-        return;
-      }
+        .update({ bot_name: botName, bot_icon: botIcon, is_setup_complete: true })
+        .eq('organization_id', organization.id);
+      if (error) console.error('Bot config update error:', error);
+    } else {
+      // Insert new row
+      const { error } = await supabase
+        .from('pocket_bot_config')
+        .insert({ organization_id: organization.id, bot_name: botName, bot_icon: botIcon, is_setup_complete: true });
+      if (error) console.error('Bot config insert error:', error);
     }
 
     // Create bot conversation (check for existing first to prevent duplicates)

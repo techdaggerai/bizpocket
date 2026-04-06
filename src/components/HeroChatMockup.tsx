@@ -106,7 +106,7 @@ export default function HeroChatMockup() {
   };
 
   return (
-    <div className="hero-mockup-anim overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-lg" role="img" aria-label="Live chat demo showing real-time English to Japanese translation" style={{ maxWidth: 420 }}>
+    <div className="hero-mockup-anim overflow-hidden rounded-2xl border border-slate-700 bg-slate-800 shadow-lg w-full" role="img" aria-label="Live chat demo showing real-time English to Japanese translation">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes hMsgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes hFadeOut { from { opacity: 1; } to { opacity: 0; } }
