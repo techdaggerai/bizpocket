@@ -1488,7 +1488,10 @@ export default function PocketChatPage() {
 
   // Auto-create bot for Evrywher users — skip onboarding entirely
   const [autoCreating, setAutoCreating] = useState(false);
-  const [botActivated, setBotActivated] = useState(false);
+  const [botActivated, setBotActivated] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('bot_activated') === '1';
+    return false;
+  });
 
   useEffect(() => {
     if (!organization?.id || !isPocketChatMode || !botConfigLoaded || isSetupComplete) return;
@@ -1627,6 +1630,7 @@ export default function PocketChatPage() {
         <BotOnboarding
           onComplete={(name, icon) => {
             setBotActivated(true);
+            localStorage.setItem('bot_activated', '1');
             fetchBotConfig();
             fetchConversations();
           }}
@@ -2819,14 +2823,24 @@ export default function PocketChatPage() {
                   )}
                 </div>
 
-                {/* AI Features button — Scan, Voice Translate, Business Card */}
+                {/* EvryAI button — Scan, Voice Translate, Business Card, Live Guide */}
                 <div className="relative shrink-0">
                   <button
                     onClick={() => setShowAIMenu(!showAIMenu)}
-                    className="h-[42px] w-[42px] flex items-center justify-center rounded-full bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
-                    title="AI Features"
+                    className="flex items-center gap-1 shrink-0 hover:opacity-80 transition-opacity"
+                    title="EvryAI"
                   >
-                    <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                    <svg width="32" height="32" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="16" fill="#4F46E5"/>
+                      <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="30" cy="6" r="4.5" fill="#F59E0B"/>
+                      <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="white"/>
+                    </svg>
+                    <span className="text-xs font-semibold hidden sm:inline" style={{ fontFamily: 'Outfit' }}>
+                      <span style={{ color: '#818CF8' }}>Evry</span>
+                      <span style={{ color: '#F59E0B' }}>AI</span>
+                    </span>
                   </button>
                   {showAIMenu && (
                     <>
@@ -2862,6 +2876,10 @@ export default function PocketChatPage() {
                         }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
                           <span className="h-4 w-4 flex items-center justify-center text-[14px]">{'\u{1F4C7}'}</span>
                           Business Card
+                        </button>
+                        <button onClick={() => { setShowAIMenu(false); router.push('/chat/live-guide'); }} className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-200 hover:bg-slate-700">
+                          <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                          Live Guide
                         </button>
                       </div>
                     </>
@@ -2913,10 +2931,17 @@ export default function PocketChatPage() {
                       e.target.addEventListener('touchmove', cleanup, { once: true });
                     }}
                     disabled={sending}
-                    className="h-[42px] w-[42px] shrink-0 flex items-center justify-center bg-[#4F46E5] text-white rounded-full hover:bg-[#4338CA] transition-colors disabled:opacity-60"
+                    className="h-[36px] w-[36px] shrink-0 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-500 transition-colors disabled:opacity-60"
                     aria-label="Send (hold to schedule)"
                   >
-                    <PocketSendIcon size={20} />
+                    <svg width="24" height="24" viewBox="0 0 120 120">
+                      <rect x="20" y="30" width="80" height="65" rx="12" fill="white" opacity="0.95"/>
+                      <path d="M20 45 Q60 30 100 45" fill="white" stroke="white" strokeWidth="2"/>
+                      <rect x="35" y="48" width="30" height="22" rx="8" fill="white" stroke="#4F46E5" strokeWidth="2"/>
+                      <text x="50" y="63" textAnchor="middle" fill="#4F46E5" fontSize="11" fontWeight="700">Hi</text>
+                      <rect x="55" y="56" width="30" height="22" rx="8" fill="#F59E0B"/>
+                      <text x="70" y="71" textAnchor="middle" fill="white" fontSize="9" fontWeight="700">やあ</text>
+                    </svg>
                   </button>
                 ) : (
                   <button
