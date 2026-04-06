@@ -63,22 +63,19 @@ export default function BottomNav() {
             /* EvryAI center elevated orb */
             if (tab.isCenter) {
               return (
-                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-3 relative">
-                  <div
-                    className="relative h-12 w-12 rounded-full flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-500/30"
-                    style={isActive ? { animation: 'orb-glow 2s ease-in-out infinite' } : undefined}
-                  >
-                    {/* Evrywher logo: white wave + amber wave + amber spark with white + */}
-                    <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-                      <path d="M4 15c3-4 5-6 10-6s7 2 10 6" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                      <path d="M4 20c3-4 5-6 10-6s7 2 10 6" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round"/>
-                      <circle cx="22" cy="7" r="3.5" fill="#F59E0B"/>
-                      <path d="M22 5v4M20 7h4" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
+                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-3">
+                  <div className="relative w-14 h-14 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 overflow-visible" style={{ animation: 'orb-glow 2s ease-in-out infinite' }}>
+                    <svg width="32" height="32" viewBox="0 0 36 36" className="overflow-visible">
+                      <circle cx="18" cy="18" r="16" fill="#4F46E5"/>
+                      <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="30" cy="6" r="4.5" fill="#F59E0B"/>
+                      <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="white"/>
                     </svg>
                   </div>
-                  <span className="text-[10px] font-semibold mt-0.5">
-                    <span className="text-indigo-400">Evry</span>
-                    <span className="text-amber-400">AI</span>
+                  <span className="text-[10px] font-semibold mt-1">
+                    <span style={{ color: '#818CF8' }}>Evry</span>
+                    <span style={{ color: '#F59E0B' }}>AI</span>
                   </span>
                 </Link>
               );
