@@ -63,20 +63,22 @@ export default function BottomNav() {
             /* EvryAI center elevated orb */
             if (tab.isCenter) {
               return (
-                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-4 relative">
-                  <div className="relative h-14 w-14 rounded-full flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-500/30">
-                    {/* Glow ring */}
-                    <div className="absolute inset-0 rounded-full animate-pulse opacity-30" style={{ boxShadow: '0 0 16px 4px #818CF8' }} />
-                    {/* EvryAI spark icon — white */}
-                    <svg width="28" height="28" viewBox="0 0 36 36">
-                      <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/>
-                      <circle cx="30" cy="6" r="4.5" fill="white"/>
-                      <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="#4F46E5"/>
+                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-3 relative">
+                  <div
+                    className="relative h-12 w-12 rounded-full flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-500/30"
+                    style={isActive ? { animation: 'orb-glow 2s ease-in-out infinite' } : undefined}
+                  >
+                    {/* Evrywher waves (white + amber) with spark badge */}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 14c2-3 4-5 8-5s6 2 8 5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M4 18c2-3 4-5 8-5s6 2 8 5" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
+                      <circle cx="19" cy="6" r="3" fill="#F59E0B"/>
+                      <path d="M19 4.5v3M17.5 6h3" stroke="white" strokeWidth="1" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <span className={`text-[10px] font-medium mt-0.5 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`}>
-                    EvryAI
+                  <span className="text-[10px] font-semibold mt-0.5">
+                    <span className="text-indigo-400">Evry</span>
+                    <span className="text-amber-400">AI</span>
                   </span>
                 </Link>
               );
