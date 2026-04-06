@@ -44,6 +44,14 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // Cookie options for persistent login (400 days like WhatsApp)
+  const persistentCookieOptions = {
+    maxAge: 400 * 24 * 60 * 60, // 400 days in seconds
+    path: '/',
+    sameSite: 'lax' as const,
+    secure: request.nextUrl.protocol === 'https:',
+  };
+
   const supabase = createServerClient(
     supabaseUrl,
     supabaseKey,
@@ -56,7 +64,10 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, {
+              ...options,
+              ...persistentCookieOptions,
+            })
           );
         },
       },

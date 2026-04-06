@@ -8,6 +8,15 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const cookieStore = await cookies();
+
+    // Persistent cookie options — 400 days
+    const persistOpts = {
+      maxAge: 400 * 24 * 60 * 60,
+      path: '/',
+      sameSite: 'lax' as const,
+      secure: process.env.NODE_ENV === 'production',
+    };
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,7 +28,7 @@ export async function GET(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
+                cookieStore.set(name, value, { ...options, ...persistOpts })
               );
             } catch {
               // Server component — ignore

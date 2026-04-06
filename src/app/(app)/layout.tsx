@@ -80,7 +80,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                         <div className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8 py-4 has-[.chat-fullbleed]:px-0 has-[.chat-fullbleed]:py-0 has-[.chat-fullbleed]:max-w-none">{children}</div>
                       </main>
                     </div>
-                    <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden"><BottomNav /></div>
+                    <div className="group-has-[.chat-fullbleed]/root:hidden"><BottomNav /></div>
                     <FeatureSpotlight />
                   </div>
                   </DelightProvider>
@@ -159,7 +159,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Mobile: Bottom Nav — hidden when chat view is active */}
-          <div className="lg:hidden group-has-[.chat-fullbleed]/root:hidden">
+          <div className="group-has-[.chat-fullbleed]/root:hidden">
             <BottomNav />
           </div>
           <FeatureSpotlight />
