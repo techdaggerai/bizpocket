@@ -1750,8 +1750,20 @@ export default function PocketChatPage() {
               Scan
             </button>
           ) : (
-            /* Human contact: Voice/Video calls hidden — not functional */
-            null
+            /* Human contact: Phone + Video call buttons */
+            <>
+              <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center shrink-0 text-[#22C55E] hover:bg-[#22C55E]/10 transition-colors" title="Voice call">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              </button>
+              <button onClick={() => router.push(`/chat/call/${activeConvoId}`)} className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center shrink-0 text-indigo-400 hover:bg-indigo-400/10 transition-colors" title="Video call">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 7l-7 5 7 5V7z" />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                </svg>
+              </button>
+            </>
           )}
           {/* Label button */}
           {!activeConvo.is_bot_chat && (
@@ -1809,7 +1821,13 @@ export default function PocketChatPage() {
                       Summarize <span className="ml-auto text-[10px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded-full font-medium">PRO</span>
                     </button>
                   )}
-                  {/* Voice call hidden — not functional */}
+                  <button
+                    onClick={() => { setShowChatMenu(false); router.push(`/chat/call/${activeConvoId}`); }}
+                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
+                  >
+                    <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 6.75Z" /></svg>
+                    Voice call
+                  </button>
                   <button
                     onClick={() => { setShowChatMenu(false); setShowInvite(true); }}
                     className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
