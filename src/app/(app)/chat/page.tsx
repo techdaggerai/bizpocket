@@ -278,6 +278,7 @@ export default function PocketChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Clear both React state and contentEditable DOM
   const clearInput = useCallback(() => {
@@ -456,20 +457,47 @@ export default function PocketChatPage() {
     }
   }, [activeConvoId]);
 
-  /* interactive-widget=resizes-content is set in root layout viewport export */
-
-  /* keyboard: scroll to bottom when input focused (iOS) */
+  /* ---------- iOS keyboard: lock body + resize chat to visual viewport ---------- */
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.visualViewport) return;
-    const viewport = window.visualViewport;
+    if (!activeConvoId) return;
+    // Lock body scroll so iOS can't push header off-screen
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, [activeConvoId]);
+
+  useEffect(() => {
+    if (!activeConvoId || typeof window === 'undefined' || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const container = chatContainerRef.current;
     const onResize = () => {
+      if (container) {
+        container.style.height = `${vv.height}px`;
+      }
       requestAnimationFrame(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
     };
-    viewport.addEventListener('resize', onResize);
-    return () => viewport.removeEventListener('resize', onResize);
-  }, []);
+    vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
+    onResize();
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
+      if (container) container.style.height = '';
+    };
+  }, [activeConvoId]);
 
   /* ---------- Realtime subscription ---------- */
 
@@ -1686,7 +1714,7 @@ export default function PocketChatPage() {
     }
 
     return (
-      <div className="chat-fullbleed flex flex-col bg-slate-900" style={{ height: '100dvh' }}>
+      <div ref={chatContainerRef} className="chat-fullbleed fixed inset-0 z-50 flex flex-col bg-slate-900">
         {/* Header — clean mobile layout: back+avatar | name centered | phone+video */}
         <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
           {/* Left: back + avatar */}
@@ -2308,10 +2336,10 @@ export default function PocketChatPage() {
           )}
         </div>
 
-        {/* Hidden file inputs — rendered outside form context to prevent iOS arrows */}
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
-        <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
-        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} tabIndex={-1} style={{ position: 'fixed', top: -9999, left: -9999, opacity: 0, pointerEvents: 'none' }} />
+        {/* Hidden file inputs — display:none prevents iOS form navigation arrows */}
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} tabIndex={-1} style={{ display: 'none' }} />
+        <input ref={videoInputRef} type="file" accept="video/*" onChange={handleFileUpload} tabIndex={-1} style={{ display: 'none' }} />
+        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" onChange={handleFileUpload} tabIndex={-1} style={{ display: 'none' }} />
 
         {/* File preview confirmation */}
         {pendingFile && (
