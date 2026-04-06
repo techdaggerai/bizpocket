@@ -406,14 +406,14 @@ export default function ContactsPage() {
   return (
     <div className="space-y-4 py-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div>
+        <div className="flex items-center justify-between mb-3">
           <h1 className="text-xl font-semibold text-[var(--text-1)]">Contacts</h1>
           <p className="text-xs text-[var(--text-3)]">
             {contacts.length} contact{contacts.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <OutlinePillButton
             label="Find"
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>}
