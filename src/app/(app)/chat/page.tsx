@@ -2621,19 +2621,17 @@ export default function PocketChatPage() {
               <span className="text-[11px] text-slate-400">
                 {isFreePlan ? `${Math.max(0, 10 - translationsUsed)}/10 translations left` : 'Unlimited translations'}
                 {' · Send as: '}
-                <select
-                  value={chatLang}
-                  onChange={(e) => setChatLang(e.target.value)}
-                  tabIndex={-1}
-                  className="bg-transparent text-[11px] text-slate-300 font-medium border-none focus:outline-none appearance-none cursor-pointer"
+                <span
+                  role="button"
+                  onClick={() => {
+                    const langs = ['en','ja','ur','ar','bn','pt','tl','vi','tr','zh','fr','nl','es','ko','hi','th','id'];
+                    const idx = langs.indexOf(chatLang);
+                    setChatLang(langs[(idx + 1) % langs.length]);
+                  }}
+                  className="text-[11px] text-slate-300 font-medium cursor-pointer underline decoration-dotted underline-offset-2"
                 >
-                  <option value="en">EN</option><option value="ja">JA</option><option value="ur">UR</option>
-                  <option value="ar">AR</option><option value="bn">BN</option><option value="pt">PT</option>
-                  <option value="tl">TL</option><option value="vi">VI</option><option value="tr">TR</option>
-                  <option value="zh">ZH</option><option value="fr">FR</option><option value="nl">NL</option>
-                  <option value="es">ES</option><option value="ko">KO</option><option value="hi">HI</option>
-                  <option value="th">TH</option><option value="id">ID</option>
-                </select>
+                  {chatLang.toUpperCase()}
+                </span>
               </span>
               <span className="text-[10px] text-slate-500">AI translates automatically</span>
             </div>
