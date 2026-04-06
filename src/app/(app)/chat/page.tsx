@@ -171,7 +171,6 @@ export default function PocketChatPage() {
   const supabase = createClient();
 
   const isPocketChatMode = getBrandModeClient(organization?.signup_source) === 'evrywher';
-
   useEffect(() => { document.title = 'Evrywher — Chat'; }, []);
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
