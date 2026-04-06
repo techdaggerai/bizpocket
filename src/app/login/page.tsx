@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -32,6 +32,8 @@ function LoginInner() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { t } = useLandingI18n();
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     document.title = isPocketChat ? 'Log in — Evrywher' : 'Log in — BizPocket';
@@ -42,9 +44,19 @@ function LoginInner() {
     setLoading(true);
     setError('');
 
+    // Read directly from DOM — autofill often doesn't fire onChange/onInput
+    const emailVal = email || emailRef.current?.value || '';
+    const passVal = password || passRef.current?.value || '';
+
+    if (!emailVal || !passVal) {
+      setError('Please enter email and password');
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: emailVal,
+      password: passVal,
     });
 
     if (authError) {
@@ -53,11 +65,13 @@ function LoginInner() {
       return;
     }
 
-    // Replace (not push) so user can't back-button to login screen
-    // refresh() ensures server components pick up the new session cookies
     router.refresh();
     router.replace(isPocketChat ? '/chat' : '/dashboard');
   }
+
+  // Sync handler for both onChange and onInput (covers all autofill behaviors)
+  const syncEmail = (e: React.SyntheticEvent<HTMLInputElement>) => setEmail(e.currentTarget.value);
+  const syncPass = (e: React.SyntheticEvent<HTMLInputElement>) => setPassword(e.currentTarget.value);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
@@ -83,9 +97,13 @@ function LoginInner() {
           <div>
             <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">{t('login_email')}</label>
             <input
+              ref={emailRef}
               type="email"
+              name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={syncEmail}
+              onInput={syncEmail}
+              autoComplete="email"
               className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               placeholder="you@example.com"
               required
@@ -95,9 +113,13 @@ function LoginInner() {
             <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">{t('login_password')}</label>
             <div className="relative">
               <input
+                ref={passRef}
                 type={showPassword ? 'text' : 'password'}
+                name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={syncPass}
+                onInput={syncPass}
+                autoComplete="current-password"
                 className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 pr-11 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 placeholder="••••••••"
                 required
