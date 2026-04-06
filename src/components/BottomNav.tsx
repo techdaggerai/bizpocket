@@ -31,20 +31,20 @@ export default function BottomNav() {
   /* ---------- Evrywher 5-tab layout ---------- */
   if (isPocketChatMode) {
     const evrywherTabs = [
-      { href: '/chat', label: 'Chats', icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M20 2H4a2 2 0 00-2 2v12a2 2 0 002 2h3l3.5 4 3.5-4H20a2 2 0 002-2V4a2 2 0 00-2-2z"/>
-        </svg>
-      )},
       { href: '/contacts', label: 'Contacts', icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
         </svg>
       )},
-      { href: '/chat/bot-setup', label: 'EvryAI', isCenter: true },
+      { href: '/chat', label: 'Chats', icon: (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      )},
+      { href: '/ai', label: 'EvryAI', isCenter: true },
       { href: '/learn', label: 'Learn', icon: (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>
         </svg>
       )},
       { href: '/settings', label: 'Settings', icon: (
@@ -55,7 +55,7 @@ export default function BottomNav() {
     ];
 
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-700 bg-slate-900 safe-bottom shadow-[0_-1px_3px_rgba(0,0,0,0.2)] md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700/50 bg-slate-900/95 backdrop-blur md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="mx-auto flex h-16 max-w-lg items-center justify-around relative">
           {evrywherTabs.map((tab) => {
             const isActive = pathname === tab.href || pathname.startsWith(tab.href + '/');
@@ -63,25 +63,20 @@ export default function BottomNav() {
             /* EvryAI center elevated orb */
             if (tab.isCenter) {
               return (
-                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-5 relative">
-                  <div className={`relative h-14 w-14 rounded-full flex items-center justify-center shadow-lg ${
-                    isActive
-                      ? 'bg-[#4F46E5] shadow-[0_0_20px_rgba(79,70,229,0.5)]'
-                      : 'bg-[#4F46E5] shadow-[0_0_12px_rgba(79,70,229,0.3)]'
-                  }`}>
+                <Link key={tab.href} href={tab.href} className="flex flex-col items-center -mt-4 relative">
+                  <div className="relative h-14 w-14 rounded-full flex items-center justify-center bg-indigo-600 shadow-lg shadow-indigo-500/30">
                     {/* Glow ring */}
                     <div className="absolute inset-0 rounded-full animate-pulse opacity-30" style={{ boxShadow: '0 0 16px 4px #818CF8' }} />
-                    {/* EvryAI logo */}
+                    {/* EvryAI spark icon — white */}
                     <svg width="28" height="28" viewBox="0 0 36 36">
-                      <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <circle cx="30" cy="6" r="4.5" fill="#F59E0B"/>
-                      <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="white"/>
+                      <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/>
+                      <circle cx="30" cy="6" r="4.5" fill="white"/>
+                      <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="#4F46E5"/>
                     </svg>
                   </div>
-                  <span className={`text-[10px] font-semibold mt-0.5 ${isActive ? 'text-[#4F46E5]' : 'text-[#A3A3A3]'}`}>
-                    <span style={{ color: isActive ? '#818CF8' : undefined }}>Evry</span>
-                    <span style={{ color: isActive ? '#F59E0B' : undefined }}>AI</span>
+                  <span className={`text-[10px] font-medium mt-0.5 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`}>
+                    EvryAI
                   </span>
                 </Link>
               );
@@ -92,7 +87,7 @@ export default function BottomNav() {
                 key={tab.href}
                 href={tab.href}
                 className={`flex min-w-[48px] flex-col items-center gap-0.5 px-2 py-2 transition-colors ${
-                  isActive ? 'text-[#4F46E5]' : 'text-[#A3A3A3] hover:text-[var(--text-2)]'
+                  isActive ? 'text-indigo-400' : 'text-slate-500'
                 }`}
               >
                 <div className="relative">
@@ -103,7 +98,7 @@ export default function BottomNav() {
                     </span>
                   )}
                 </div>
-                <span className="mt-0.5 text-[11px] font-medium">{tab.label}</span>
+                <span className="mt-0.5 text-[10px] font-medium">{tab.label}</span>
               </Link>
             );
           })}
@@ -137,8 +132,8 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t border-slate-700 bg-slate-900 safe-bottom shadow-[0_-1px_3px_rgba(0,0,0,0.2)] md:hidden">
-      <div className="mx-auto flex h-full max-w-lg items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700/50 bg-slate-900/95 backdrop-blur md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="mx-auto flex h-16 max-w-lg items-center justify-around">
         {bizpocketTabs.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
           return (
@@ -146,7 +141,7 @@ export default function BottomNav() {
               key={item.href}
               href={item.href}
               className={`flex min-w-[48px] flex-col items-center gap-0.5 px-2 py-2 transition-colors ${
-                isActive ? 'text-[#4F46E5]' : 'text-[#A3A3A3] hover:text-[var(--text-2)]'
+                isActive ? 'text-indigo-400' : 'text-slate-500'
               }`}
             >
               <div className="relative">
@@ -157,7 +152,7 @@ export default function BottomNav() {
                   </span>
                 )}
               </div>
-              <span className="mt-0.5 text-[11px] font-medium">{item.label}</span>
+              <span className="mt-0.5 text-[10px] font-medium">{item.label}</span>
             </Link>
           );
         })}

@@ -47,9 +47,12 @@ interface Contact {
   id: string;
   organization_id: string;
   name: string;
+  display_name?: string;
+  full_name?: string;
   company: string;
   phone: string;
   email: string;
+  language?: string;
   contact_type: 'customer' | 'supplier' | 'accountant' | 'partner';
 }
 
@@ -448,6 +451,24 @@ export default function PocketChatPage() {
     }
   }, [activeConvoId]);
 
+  /* ---------- Mobile keyboard: keep input visible ---------- */
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+    const viewport = window.visualViewport;
+    const onResize = () => {
+      const keyboardHeight = window.innerHeight - viewport.height;
+      document.documentElement.style.setProperty('--keyboard-height', keyboardHeight + 'px');
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+    viewport.addEventListener('resize', onResize);
+    viewport.addEventListener('scroll', onResize);
+    return () => {
+      viewport.removeEventListener('resize', onResize);
+      viewport.removeEventListener('scroll', onResize);
+      document.documentElement.style.setProperty('--keyboard-height', '0px');
+    };
+  }, []);
+
   /* ---------- Realtime subscription ---------- */
 
   useEffect(() => {
@@ -464,6 +485,7 @@ export default function PocketChatPage() {
           filter: `organization_id=eq.${organization.id}`,
         },
         (payload) => {
+          console.log('[Realtime] message event:', payload.eventType, 'convo:', (payload.new as any)?.conversation_id, 'sender:', (payload.new as any)?.sender_type, 'activeConvo:', activeConvoId);
           if (payload.eventType === 'UPDATE') {
             // Merge updated fields: translations, delivered_at, read_at
             const updated = payload.new as Message;
@@ -519,7 +541,9 @@ export default function PocketChatPage() {
           );
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('[Realtime] subscription status:', status, err ? `error: ${err.message}` : '', 'org:', organization?.id);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -1151,6 +1175,8 @@ export default function PocketChatPage() {
       }).select().single();
       setReplyTo(null);
 
+      console.log('[SendMessage] insert result:', { msgId: msg?.id, convoId: activeConvoId, orgId: organization.id, senderType: 'owner', error: error?.message || null });
+
       if (error) {
         toast('Failed to send message', 'error');
         setNewMessage(text);
@@ -1642,12 +1668,22 @@ export default function PocketChatPage() {
   /* ---------- Render: Active Conversation ---------- */
 
   if (activeConvoId && activeConvo) {
-    const contactName = activeConvo.is_bot_chat ? botName : activeConvo.is_group ? (activeConvo.group_name || activeConvo.title) : (activeConvo.contact?.name ?? activeConvo.title ?? 'Chat');
+    const contactName = activeConvo.is_bot_chat
+      ? botName
+      : activeConvo.is_group
+        ? (activeConvo.group_name || activeConvo.title || 'Group')
+        : (activeConvo.contact?.name || activeConvo.contact?.display_name || activeConvo.contact?.full_name || activeConvo.title || 'Chat');
     const contactType = activeConvo.contact?.contact_type;
     const isGroup = activeConvo.is_group;
 
+    // Debug: log contact object to verify name fields (remove after confirming)
+    if (typeof window !== 'undefined' && activeConvo.contact) {
+      console.log('[ChatHeader] contact:', JSON.stringify(activeConvo.contact));
+      console.log('[ChatHeader] contactName resolved:', contactName);
+    }
+
     return (
-      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-slate-900">
+      <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-slate-900" style={{ paddingBottom: 'var(--keyboard-height, 0px)' }}>
         {/* Header — clean mobile layout: back+avatar | name centered | phone+video */}
         <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
           {/* Left: back + avatar */}
@@ -1677,30 +1713,17 @@ export default function PocketChatPage() {
             )}
           </div>
 
-          {/* Center: name + subtitle — takes all available space */}
+          {/* Center: name — takes all available space */}
           <div className="flex-1 min-w-0 text-center px-1">
-            <p className="text-[15px] font-bold text-white truncate cursor-pointer leading-tight" onClick={() => isGroup ? setShowGroupInfo(true) : !activeConvo.is_bot_chat && openContactInfo()}>
+            <p className="text-base font-semibold text-white truncate cursor-pointer leading-tight" onClick={() => isGroup ? setShowGroupInfo(true) : !activeConvo.is_bot_chat && openContactInfo()}>
               {contactName}
             </p>
-            <div className="flex items-center justify-center gap-1.5 mt-0.5">
-              {activeConvo.is_bot_chat ? (
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">AI Assistant</span>
-              ) : isGroup ? (
-                <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-indigo-400 hover:underline">Tap for group info</button>
-              ) : (
-                <>
-                  {contactType && <span className="text-[11px] text-slate-400 capitalize">{contactType}</span>}
-                  {contactType && !activeConvo.is_bot_chat && <span className="text-slate-600 text-[11px]">·</span>}
-                  {!activeConvo.is_bot_chat && (
-                    <>
-                      <span className="text-[11px] font-semibold px-1.5 py-0 rounded bg-indigo-500/10 text-indigo-400">{(profile?.language || 'en').toUpperCase()}</span>
-                      <span className="text-[11px] text-slate-500">⇄</span>
-                      <span className="text-[11px] font-semibold px-1.5 py-0 rounded bg-amber-500/10 text-amber-400">{(activeConvo.contact?.language || 'ja').toUpperCase()}</span>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+            {activeConvo.is_bot_chat && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-[#F43F5E]/10 text-[#F43F5E]">AI Assistant</span>
+            )}
+            {isGroup && !activeConvo.is_bot_chat && (
+              <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-indigo-400 hover:underline">Tap for group info</button>
+            )}
           </div>
 
           {/* Right: phone + video ONLY (search + labels + memory moved to ⋮ menu) */}
@@ -1734,102 +1757,6 @@ export default function PocketChatPage() {
               </>
             )}
 
-            {/* ⋮ More options menu (search, labels, summarize, etc.) */}
-            <div className="relative">
-              <button
-                onClick={() => setShowChatMenu(v => !v)}
-                className="min-w-[40px] min-h-[40px] p-2 flex items-center justify-center hover:bg-slate-700 rounded-lg transition-colors"
-                title="More options"
-              >
-                <svg className="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
-                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
-                </svg>
-              </button>
-              {showChatMenu && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setShowChatMenu(false)} />
-                  <div className="absolute right-0 top-9 z-50 w-48 rounded-xl border border-slate-700 bg-slate-800 shadow-xl py-1">
-                    {/* Search in chat */}
-                    <button
-                      onClick={() => { setShowChatMenu(false); setShowChatSearch(v => !v); }}
-                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                    >
-                      <svg className="h-4 w-4 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                      Search in chat
-                    </button>
-                    {/* AI Context / Memory */}
-                    {convoSummary && (
-                      <button
-                        onClick={() => { setShowChatMenu(false); setShowSummaryPopup(v => !v); }}
-                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                      >
-                        <span className="h-4 w-4 flex items-center justify-center text-[14px]">🧠</span>
-                        AI Context
-                      </button>
-                    )}
-                    {/* Label */}
-                    {!activeConvo.is_bot_chat && (
-                      <button
-                        onClick={() => { setShowChatMenu(false); setShowLabels(!showLabels); }}
-                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                      >
-                        <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-                        </svg>
-                        Label
-                      </button>
-                    )}
-                    {/* Summarize — Pro/Business only */}
-                    {['pro', 'business', 'enterprise'].includes(organization?.plan || '') ? (
-                      <button
-                        onClick={handleSummarize}
-                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                      >
-                        <svg className="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
-                        Summarize chat
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => { setShowChatMenu(false); toast('Summarize is a Pro feature', 'info'); }}
-                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-400 hover:bg-slate-700"
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
-                        Summarize <span className="ml-auto text-[10px] bg-indigo-500/10 text-indigo-400 px-1.5 py-0.5 rounded-full font-medium">PRO</span>
-                      </button>
-                    )}
-                    <button
-                      onClick={() => { setShowChatMenu(false); router.push(`/chat/call/${activeConvoId}`); }}
-                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                    >
-                      <svg className="h-4 w-4 text-[#22C55E]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 6.75Z" /></svg>
-                      Voice call
-                    </button>
-                    <button
-                      onClick={() => { setShowChatMenu(false); setShowInvite(true); }}
-                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                    >
-                      <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
-                      Invite contact
-                    </button>
-                  <button
-                    onClick={() => { setShowChatMenu(false); setShowMediaGallery(true); }}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                  >
-                    <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5" /></svg>
-                    Media & Docs
-                  </button>
-                  <button
-                    onClick={() => { setShowChatMenu(false); exportChat(); }}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-slate-300 hover:bg-slate-700"
-                  >
-                    <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                    Export chat
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
           </div>{/* close right buttons */}
         </div>{/* close header */}
         {/* ChatLabels overlay — triggered from ⋮ menu */}
@@ -2913,7 +2840,9 @@ export default function PocketChatPage() {
                   autoCorrect="off"
                   autoCapitalize="off"
                   enterKeyHint="send"
-                  className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800"
+                  inputMode="text"
+                  data-form-type="other"
+                  className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800 chat-input-no-arrows"
                 />
 
                 {/* Right: Mic OR Send — mutually exclusive */}
