@@ -455,16 +455,21 @@ export default function PocketChatPage() {
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
     const viewport = window.visualViewport;
+    let lastHeight = viewport.height;
     const onResize = () => {
-      const keyboardHeight = window.innerHeight - viewport.height;
-      document.documentElement.style.setProperty('--keyboard-height', keyboardHeight + 'px');
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const kbh = Math.max(0, window.innerHeight - viewport.height);
+      // Only update if height actually changed (avoids scroll-triggered jitter)
+      if (Math.abs(viewport.height - lastHeight) < 10) return;
+      lastHeight = viewport.height;
+      document.documentElement.style.setProperty('--keyboard-height', kbh + 'px');
+      if (kbh > 0) {
+        // Keyboard opened — scroll messages into view after layout settles
+        requestAnimationFrame(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }));
+      }
     };
     viewport.addEventListener('resize', onResize);
-    viewport.addEventListener('scroll', onResize);
     return () => {
       viewport.removeEventListener('resize', onResize);
-      viewport.removeEventListener('scroll', onResize);
       document.documentElement.style.setProperty('--keyboard-height', '0px');
     };
   }, []);
@@ -2620,6 +2625,7 @@ export default function PocketChatPage() {
                 <select
                   value={chatLang}
                   onChange={(e) => setChatLang(e.target.value)}
+                  tabIndex={-1}
                   className="bg-transparent text-[11px] text-slate-300 font-medium border-none focus:outline-none appearance-none cursor-pointer"
                 >
                   <option value="en">EN</option><option value="ja">JA</option><option value="ur">UR</option>
@@ -2895,7 +2901,7 @@ export default function PocketChatPage() {
       ];
 
   return (
-    <div className="chat-fullbleed h-[100dvh] lg:h-[calc(100vh-80px)] flex flex-col bg-slate-900">
+    <div className="h-[calc(100dvh-64px)] lg:h-[calc(100vh-80px)] flex flex-col bg-slate-900">
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-slate-700">
         <div>
