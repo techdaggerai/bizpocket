@@ -124,9 +124,16 @@ h1, h2, h3, h4, h5, h6 {
   100% { width: 0%; transform: none; }
 }
 
-/* Chat mobile — fixed viewport, only messages scroll */
+/* Chat mobile — lock EVERYTHING except messages scroll area */
 .chat-fullbleed {
   overflow: hidden;
+}
+html:has(.chat-fullbleed),
+html:has(.chat-fullbleed) body {
+  overflow: hidden !important;
+  height: 100dvh !important;
+  position: fixed !important;
+  width: 100% !important;
 }
 
 /* Scrollbar hide utility */
