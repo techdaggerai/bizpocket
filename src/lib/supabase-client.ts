@@ -15,8 +15,6 @@ export function createClient() {
   client = createBrowserClient(url, key, {
     auth: {
       persistSession: true,
-      storageKey: 'evrywher-auth',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       autoRefreshToken: true,
       detectSessionInUrl: true,
     },

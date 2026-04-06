@@ -72,15 +72,8 @@ function LoginInner() {
       return;
     }
 
-    // Wait for Supabase client to write auth cookies, then verify
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const { data: check } = await supabase.auth.getSession();
-    if (!check.session) {
-      // Retry once more
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    // Hard redirect — ensures middleware runs fresh with the new auth cookie
+    // Small delay to let @supabase/ssr flush cookies, then hard redirect
+    await new Promise(resolve => setTimeout(resolve, 100));
     window.location.href = isPocketChat ? '/chat' : '/dashboard';
   }
 
