@@ -821,9 +821,9 @@ export default function ContactsPage() {
 
       {/* Find by Email/Phone Modal */}
       {showSearch && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => { setShowSearch(false); setSearchResults([]); setSearchQuery(''); }} />
-          <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
+          <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] min-h-[50vh] overflow-y-auto pb-20 sm:pb-4">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <h2 className="text-base font-bold text-white">Find Contact</h2>
               <button onClick={() => { setShowSearch(false); setSearchResults([]); setSearchQuery(''); }} className="text-slate-400 hover:text-white">
