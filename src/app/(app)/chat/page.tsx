@@ -277,7 +277,13 @@ export default function PocketChatPage() {
   } = usePocketBot();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  // Clear both React state and contentEditable DOM
+  const clearInput = useCallback(() => {
+    setNewMessage('');
+    if (inputRef.current) inputRef.current.textContent = '';
+  }, []);
 
   const activeConvo = conversations.find((c) => c.id === activeConvoId) ?? null;
 
@@ -471,28 +477,17 @@ export default function PocketChatPage() {
     };
   }, []);
 
-  /* ---------- Mobile keyboard: shrink chat to visible viewport ---------- */
+  /* keyboard: scroll to bottom when input focused (iOS) */
   useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
     const viewport = window.visualViewport;
     const onResize = () => {
-      // viewport.height = visible area; difference = keyboard height
-      const kbh = Math.max(0, Math.round(window.innerHeight - viewport.height));
-      document.documentElement.style.setProperty('--kb-height', kbh + 'px');
-      // After layout recalculates, scroll to bottom
-      if (kbh > 0) {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          });
-        });
-      }
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
     };
     viewport.addEventListener('resize', onResize);
-    return () => {
-      viewport.removeEventListener('resize', onResize);
-      document.documentElement.style.setProperty('--kb-height', '0px');
-    };
+    return () => viewport.removeEventListener('resize', onResize);
   }, []);
 
   /* ---------- Realtime subscription ---------- */
@@ -779,6 +774,7 @@ export default function PocketChatPage() {
     if (!actionMenu) return;
     setEditingMsg({ id: actionMenu.msgId, text: actionMenu.text });
     setNewMessage(actionMenu.text);
+    if (inputRef.current) inputRef.current.textContent = actionMenu.text;
     setActionMenu(null);
     inputRef.current?.focus();
   }
@@ -788,7 +784,7 @@ export default function PocketChatPage() {
     await supabase.from('messages').update({ message: newMessage.trim(), edited_at: new Date().toISOString() }).eq('id', editingMsg.id);
     setMessages(prev => prev.map(m => m.id === editingMsg.id ? { ...m, message: newMessage.trim(), edited_at: new Date().toISOString() } : m));
     setEditingMsg(null);
-    setNewMessage('');
+    clearInput();
   }
 
   async function shareLocation() {
@@ -1128,7 +1124,7 @@ export default function PocketChatPage() {
     if (activeConvo?.is_bot_chat) {
       if (!newMessage.trim() || sending) return;
       const msg = newMessage.trim();
-      setNewMessage('');
+      clearInput();
       setSending(true);
 
       // Optimistically add user message to UI
@@ -1180,7 +1176,7 @@ export default function PocketChatPage() {
     if (editingMsg) { await saveEditedMsg(); setSending(false); return; }
     setSending(true);
     const text = newMessage.trim();
-    setNewMessage('');
+    clearInput();
 
     try {
       // INSTANT SEND — save message immediately, translate in background
@@ -1344,7 +1340,7 @@ export default function PocketChatPage() {
       send_at: sendAt.toISOString(),
       status: 'pending',
     });
-    setNewMessage('');
+    clearInput();
     toast(`Message scheduled for ${sendAt.toLocaleString()}`, 'success');
   }
 
@@ -1709,7 +1705,7 @@ export default function PocketChatPage() {
     }
 
     return (
-      <div className="chat-fullbleed lg:!h-[calc(100vh-80px)] flex flex-col bg-slate-900" style={{ height: 'calc(100dvh - var(--kb-height, 0px))' }}>
+      <div className="chat-fullbleed fixed inset-0 flex flex-col bg-slate-900 lg:relative lg:inset-auto" style={{ height: '100dvh' }}>
         {/* Header — clean mobile layout: back+avatar | name centered | phone+video */}
         <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
           {/* Left: back + avatar */}
@@ -2625,19 +2621,19 @@ export default function PocketChatPage() {
               <p className="text-[11px] font-medium text-indigo-400">{editingMsg ? 'Editing message' : `Replying to ${replyTo?.sender}`}</p>
               <p className="text-[12px] text-slate-300 truncate">{editingMsg ? editingMsg.text : replyTo?.text}</p>
             </div>
-            <button onClick={() => { setReplyTo(null); setEditingMsg(null); setNewMessage(''); }} className="text-slate-400 hover:text-slate-300">
+            <button onClick={() => { setReplyTo(null); setEditingMsg(null); clearInput(); }} className="text-slate-400 hover:text-slate-300">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
         )}
 
-        {/* Input area — single consolidated bar */}
-        <div className="px-2 py-2 border-t border-slate-700 bg-slate-800">
+        {/* Input area — single consolidated bar, never scrolls */}
+        <div className="px-2 py-2 border-t border-slate-700 bg-slate-800 shrink-0">
           <div className="relative">
             <QuickReplies
               isOpen={showQuickReplies}
               onClose={() => setShowQuickReplies(false)}
-              onSelect={(msg) => { setNewMessage(msg); setShowQuickReplies(false); }}
+              onSelect={(msg) => { setNewMessage(msg); if (inputRef.current) inputRef.current.textContent = msg; setShowQuickReplies(false); }}
               inputValue={newMessage}
             />
           </div>
@@ -2719,7 +2715,7 @@ export default function PocketChatPage() {
                         <EmojiMartPicker
                           data={emojiData}
                           theme="dark"
-                          onEmojiSelect={(emoji: { native: string }) => { setNewMessage(prev => prev + emoji.native); setShowEmoji(false); }}
+                          onEmojiSelect={(emoji: { native: string }) => { setNewMessage(prev => prev + emoji.native); if (inputRef.current) inputRef.current.textContent = (inputRef.current.textContent || '') + emoji.native; setShowEmoji(false); }}
                           previewPosition="none"
                           skinTonePosition="search"
                           set="native"
@@ -2844,13 +2840,18 @@ export default function PocketChatPage() {
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L14.9 3.5h2L9 21H7z"/></svg>
                 </button>
 
-                {/* Center: Message input */}
-                <textarea
+                {/* Center: Message input — contentEditable kills iOS ∧∨✓ arrows */}
+                <div
                   ref={inputRef}
-                  value={newMessage}
-                  onChange={(e) => {
-                    setNewMessage(e.target.value);
-                    if (e.target.value.startsWith('/')) setShowQuickReplies(true);
+                  contentEditable
+                  role="textbox"
+                  aria-label="Message input"
+                  data-placeholder="Type a message..."
+                  suppressContentEditableWarning
+                  onInput={(e) => {
+                    const text = e.currentTarget.textContent || '';
+                    setNewMessage(text);
+                    if (text.startsWith('/')) setShowQuickReplies(true);
                     else setShowQuickReplies(false);
                     broadcastTyping();
                   }}
@@ -2859,20 +2860,10 @@ export default function PocketChatPage() {
                       e.preventDefault();
                       setShowQuickReplies(false);
                       trySendMessage();
+                      if (inputRef.current) inputRef.current.textContent = '';
                     }
                   }}
-                  placeholder="Type a message..."
-                  rows={1}
-                  maxLength={5000}
-                  aria-label="Message input"
-                  spellCheck={false}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  enterKeyHint="send"
-                  inputMode="text"
-                  data-form-type="other"
-                  className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white placeholder:text-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800 chat-input-no-arrows"
+                  className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white max-h-24 overflow-y-auto whitespace-pre-wrap break-words focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800"
                 />
 
                 {/* Right: Mic OR Send — mutually exclusive */}

@@ -124,27 +124,20 @@ h1, h2, h3, h4, h5, h6 {
   100% { width: 0%; transform: none; }
 }
 
-/* Chat mobile fixes — header never overflows, input sticks above keyboard */
-@media (max-width: 767px) {
-  .chat-fullbleed {
-    height: 100dvh !important;
-  }
-  .chat-fullbleed > div:first-child {
-    flex-shrink: 0;
-  }
+/* Chat mobile — fixed viewport, only messages scroll */
+.chat-fullbleed {
+  overflow: hidden;
 }
 
 /* Scrollbar hide utility */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Hide iOS form navigation bar (∧ ∨ ✓) on chat input */
-.chat-input-no-arrows {
-  -webkit-user-modify: read-write-plaintext-only;
-}
-.chat-input-no-arrows::-webkit-contacts-auto-fill-button,
-.chat-input-no-arrows::-webkit-credentials-auto-fill-button {
-  display: none !important;
+/* contentEditable placeholder */
+[contenteditable]:empty:before {
+  content: attr(data-placeholder);
+  color: #94A3B8;
+  pointer-events: none;
 }
 
 /* EvryAI bottom nav orb glow */
