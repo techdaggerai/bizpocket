@@ -2931,17 +2931,10 @@ export default function PocketChatPage() {
                       e.target.addEventListener('touchmove', cleanup, { once: true });
                     }}
                     disabled={sending}
-                    className="h-[36px] w-[36px] shrink-0 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-500 transition-colors disabled:opacity-60"
+                    className="shrink-0 evrywher-logo-glow disabled:opacity-60"
                     aria-label="Send (hold to schedule)"
                   >
-                    <svg width="24" height="24" viewBox="0 0 120 120">
-                      <rect x="20" y="30" width="80" height="65" rx="12" fill="white" opacity="0.95"/>
-                      <path d="M20 45 Q60 30 100 45" fill="white" stroke="white" strokeWidth="2"/>
-                      <rect x="35" y="48" width="30" height="22" rx="8" fill="white" stroke="#4F46E5" strokeWidth="2"/>
-                      <text x="50" y="63" textAnchor="middle" fill="#4F46E5" fontSize="11" fontWeight="700">Hi</text>
-                      <rect x="55" y="56" width="30" height="22" rx="8" fill="#F59E0B"/>
-                      <text x="70" y="71" textAnchor="middle" fill="white" fontSize="9" fontWeight="700">やあ</text>
-                    </svg>
+                    <PocketChatMark size={36} />
                   </button>
                 ) : (
                   <button
