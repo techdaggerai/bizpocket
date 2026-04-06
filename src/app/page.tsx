@@ -91,9 +91,9 @@ function LandingPageInner() {
 
       {/* HERO — Split layout with Liquid Glass card */}
       <section className="pt-32 pb-16 px-6">
-        <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 items-center">
+        <div className="mx-auto max-w-[1100px] grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-10 items-stretch">
           {/* LEFT — Text inside Liquid Glass card */}
-          <div className="text-center lg:text-left rounded-[20px] bg-slate-800/[0.78] backdrop-blur-[24px] p-8" style={{ boxShadow: 'var(--glass-shadow)' }}>
+          <div className="text-center lg:text-left rounded-[20px] bg-slate-800/[0.78] backdrop-blur-[24px] p-8 flex flex-col justify-center" style={{ boxShadow: 'var(--glass-shadow)' }}>
             <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-white/10 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] inline-block" />
               <span className="text-[13px] text-slate-300 font-medium">{t('hero_badge')}</span>

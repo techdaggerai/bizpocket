@@ -25,7 +25,7 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
   async function handleFinish() {
     setSaving(true);
 
-    // Save bot config
+    // Save bot config — try upsert first, fall back to insert
     const { error: configError } = await supabase
       .from('pocket_bot_config')
       .upsert({
@@ -36,7 +36,21 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
       }, { onConflict: 'organization_id' });
 
     if (configError) {
-      console.error('Bot config error:', configError);
+      console.error('Bot config upsert error:', configError);
+      // Fallback: try plain insert if upsert fails (RLS edge case)
+      const { error: insertError } = await supabase
+        .from('pocket_bot_config')
+        .insert({
+          organization_id: organization.id,
+          bot_name: botName,
+          bot_icon: botIcon,
+          is_setup_complete: true,
+        });
+      if (insertError) {
+        console.error('Bot config insert fallback error:', insertError);
+        setSaving(false);
+        return;
+      }
     }
 
     // Create bot conversation (check for existing first to prevent duplicates)
@@ -145,7 +159,9 @@ export default function BotOnboarding({ onComplete }: BotOnboardingProps) {
           onChange={(e) => setBotName(e.target.value)}
           placeholder="e.g., Pocket, Atlas, Jarvis"
           maxLength={20}
-          className="w-full max-w-xs rounded-xl border-2 border-slate-700 bg-slate-800 px-4 py-3.5 text-center text-lg font-semibold text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[#4F46E5] focus:outline-none transition-colors"
+          spellCheck={false}
+          autoComplete="off"
+          className="w-full max-w-xs rounded-xl border-2 border-slate-700 bg-slate-800 px-4 py-3.5 text-center text-lg font-semibold text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-indigo-500 focus:outline-none transition-colors"
         />
         <p className="text-[10px] text-[var(--text-4)] mt-2 mb-6">You can change this anytime in settings</p>
         <button

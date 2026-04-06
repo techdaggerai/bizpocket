@@ -198,7 +198,29 @@ export default function DashboardPage() {
   const org = organization as any;
   const profileIncomplete = !org.address || !org.phone || !org.bank_name || !org.bank_account_number;
 
-  if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" /></div>;
+  if (loading) return (
+    <div className="space-y-6 py-6 animate-pulse">
+      {/* Greeting skeleton */}
+      <div>
+        <div className="h-7 w-48 bg-slate-800 rounded-lg" />
+        <div className="h-4 w-64 bg-slate-800 rounded mt-2" />
+      </div>
+      {/* Pulse card skeleton */}
+      <div className="rounded-2xl bg-slate-800 border border-slate-700 p-5 h-[180px]" />
+      {/* Capsules skeleton */}
+      <div className="flex gap-2.5 overflow-hidden">
+        {[1,2,3,4].map(i => <div key={i} className="w-[100px] h-[90px] min-w-[100px] rounded-xl bg-slate-800 border border-slate-700" />)}
+      </div>
+      {/* KPI cards skeleton */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[1,2,3,4].map(i => <div key={i} className="rounded-xl bg-slate-800 border border-slate-700 h-[88px]" />)}
+      </div>
+      {/* Activity skeleton */}
+      <div className="space-y-2">
+        {[1,2,3].map(i => <div key={i} className="rounded-xl bg-slate-800 border border-slate-700 h-[60px]" />)}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6 py-6">
@@ -321,11 +343,11 @@ export default function DashboardPage() {
       {smartTiles && smartTiles.length > 0 && (
         <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
           {smartTiles.map((t: any, i: number) => (
-            <Link key={i} href={t.route} className="no-underline shrink-0" style={{ width: 120 }}>
-              <GlassCard elevated className={`text-center py-3 px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
+            <Link key={i} href={t.route} className="no-underline shrink-0 w-[100px] min-w-[100px]">
+              <GlassCard elevated className={`text-center h-[90px] flex flex-col items-center justify-center px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
                 <span className="text-lg">{t.icon}</span>
-                <p className="text-[12px] font-semibold text-[var(--pm-text-primary)] mt-1">{t.label}</p>
-                {t.points && <p className="text-[10px] text-[var(--pm-text-tertiary)]">+{t.points}</p>}
+                <p className="text-[12px] font-semibold text-white mt-1 truncate max-w-[80px]">{t.label}</p>
+                {t.points && <p className="text-[10px] text-slate-400">+{t.points}</p>}
               </GlassCard>
             </Link>
           ))}

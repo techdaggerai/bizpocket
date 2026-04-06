@@ -183,7 +183,7 @@ export default function BotSetupPage() {
         <p className="text-sm text-slate-200 text-center mb-8">Update your bot&apos;s settings.</p>
 
         <label className="text-sm font-medium text-slate-200 block mb-1.5">Bot name</label>
-        <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant" style={{ ...inputStyle, marginBottom: 20 }} />
+        <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant" spellCheck={false} autoComplete="off" style={{ ...inputStyle, marginBottom: 20 }} />
 
         <label className="text-sm font-medium text-slate-200 block mb-2.5">Avatar</label>
         <div className="flex flex-col items-center gap-3 mb-6">
@@ -255,7 +255,7 @@ export default function BotSetupPage() {
           <h2 className="text-2xl font-bold text-white text-center mb-2">Create your AI assistant</h2>
           <p className="text-sm text-slate-200 text-center mb-8">Your bot responds when you can&apos;t. In any language.</p>
           <label className="text-sm font-medium text-slate-200 block mb-1.5">Give your bot a name</label>
-          <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant, Sweet Cakes Bot" style={{ ...inputStyle, marginBottom: 20 }} />
+          <input type="text" value={botName} onChange={e => setBotName(e.target.value)} placeholder="e.g. Bilal's Assistant, Sweet Cakes Bot" spellCheck={false} autoComplete="off" style={{ ...inputStyle, marginBottom: 20 }} />
           <label className="text-sm font-medium text-slate-200 block mb-2.5">Avatar</label>
           <div className="flex flex-col items-center gap-3 mb-6">
             <label className="relative cursor-pointer group">
