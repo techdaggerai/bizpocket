@@ -105,6 +105,9 @@ export async function middleware(request: NextRequest) {
   if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
+    if (isPocketChat) {
+      url.searchParams.set('mode', 'pocketchat');
+    }
     return NextResponse.redirect(url);
   }
 
