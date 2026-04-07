@@ -21,8 +21,8 @@ export async function GET() {
         categories: ['communication', 'social'],
         icons: [
           { src: '/favicon-pocketchat.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/evrywher-icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/evrywher-icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       }
     : {
@@ -38,8 +38,8 @@ export async function GET() {
         categories: ['business', 'finance'],
         icons: [
           { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icons/bizpocket-icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icons/bizpocket-icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       };
 
