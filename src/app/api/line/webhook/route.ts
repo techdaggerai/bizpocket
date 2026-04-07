@@ -66,69 +66,36 @@ async function handleCommand(command: string, replyToken: string): Promise<boole
 
   if (cmd === '/translate') {
     await lineReply(replyToken, [
-      { type: 'text', text: '🌐 Send me any message and I\'ll translate it!\n\nメッセージを送ってください。翻訳します！' },
+      { type: 'text', text: '🌐 Send me any message and I\'ll translate it! Or send a photo of Japanese text.\n\nメッセージを送ってください。翻訳します！' },
     ])
     return true
   }
 
   if (cmd === '/scan') {
-    await lineReply(replyToken, [{
-      type: 'flex', altText: 'Document Scanner',
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box', layout: 'vertical', spacing: 'md',
-          contents: [
-            { type: 'text', text: '📄 Document Scanner', weight: 'bold', size: 'lg', color: '#4F46E5' },
-            { type: 'text', text: 'Send me a photo of any document and I\'ll translate it!', wrap: true, size: 'sm', color: '#475569' },
-            { type: 'text', text: '書類の写真を送ってください。翻訳します！', wrap: true, size: 'sm', color: '#64748B' },
-          ],
-        },
-      },
-    }])
+    await lineReply(replyToken, [
+      { type: 'text', text: '📷 Send me a photo of any Japanese text — menu, sign, document — and I\'ll translate everything in it!\n\n写真を送ってください。翻訳します！' },
+    ])
     return true
   }
 
   if (cmd === '/invoice') {
-    await lineReply(replyToken, [{
-      type: 'flex', altText: 'Create Invoice',
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box', layout: 'vertical', spacing: 'md',
-          contents: [
-            { type: 'text', text: '🧾 Create Invoice', weight: 'bold', size: 'lg', color: '#4F46E5' },
-            { type: 'text', text: 'Open BizPocket to create and send invoices.', wrap: true, size: 'sm' },
-          ],
-        },
-        footer: {
-          type: 'box', layout: 'vertical',
-          contents: [{
-            type: 'button',
-            action: { type: 'uri', label: 'Open BizPocket', uri: 'https://bizpocket.io/invoices' },
-            style: 'primary', color: '#4F46E5',
-          }],
-        },
-      },
-    }])
+    await lineReply(replyToken, [
+      { type: 'text', text: '🧾 Create invoices in the Evrywher app:\nhttps://evrywher.io/invoices' },
+    ])
     return true
   }
 
   if (cmd === '/card') {
-    await lineReply(replyToken, [{
-      type: 'flex', altText: 'Business Card Scanner',
-      contents: {
-        type: 'bubble',
-        body: {
-          type: 'box', layout: 'vertical', spacing: 'md',
-          contents: [
-            { type: 'text', text: '💳 Business Card Scanner', weight: 'bold', size: 'lg', color: '#4F46E5' },
-            { type: 'text', text: 'Send a photo of a business card to scan and save it.', wrap: true, size: 'sm' },
-            { type: 'text', text: '名刺の写真を送ってください。スキャンして保存します！', wrap: true, size: 'sm', color: '#64748B' },
-          ],
-        },
-      },
-    }])
+    await lineReply(replyToken, [
+      { type: 'text', text: '💳 Send me a photo of a business card and I\'ll extract all the details and translate them!\n\n名刺の写真を送ってください。' },
+    ])
+    return true
+  }
+
+  if (cmd === '/help') {
+    await lineReply(replyToken, [
+      { type: 'text', text: '🌏 Evrywher — AI Translation\n\n/translate — Translate any message\n/scan — Translate photos of text\n/invoice — Create an invoice\n/card — Scan a business card\n/help — Show this menu\n\nOr just send any message to translate!' },
+    ])
     return true
   }
 

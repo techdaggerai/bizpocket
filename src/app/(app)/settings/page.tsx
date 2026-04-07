@@ -1469,6 +1469,29 @@ export default function SettingsPage() {
         )}
       </div>
 
+      {/* Connect on LINE */}
+      {isPocketChatMode && (
+        <section className="rounded-card border border-slate-700 bg-slate-800 p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-[#06C755] rounded-xl flex items-center justify-center shrink-0">
+              <span className="text-white text-lg font-bold">L</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--text-1)]">Connect on LINE</p>
+              <p className="text-xs text-[var(--text-3)]">Get translations directly in LINE</p>
+            </div>
+          </div>
+          <a
+            href="https://line.me/R/ti/p/@446nkazb"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full bg-[#06C755] text-white text-center font-semibold py-3 rounded-xl text-sm active:opacity-90"
+          >
+            Add Evrywher on LINE
+          </a>
+        </section>
+      )}
+
       {/* Your Voice */}
       {isPocketChatMode && <VoiceCloneSection />}
 

@@ -122,6 +122,25 @@ export default function AIPage() {
         <p className="text-sm text-slate-400 mt-1">Your AI-powered toolkit</p>
       </div>
 
+      {/* LINE banner */}
+      <a
+        href="https://line.me/R/ti/p/@446nkazb"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mx-4 mb-4 flex items-center gap-3 bg-[#06C755]/10 border border-[#06C755]/30 rounded-2xl px-4 py-3 active:opacity-80"
+      >
+        <div className="w-9 h-9 bg-[#06C755] rounded-xl flex items-center justify-center shrink-0">
+          <span className="text-white text-sm font-bold">L</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-white text-sm font-semibold">Add Evrywher on LINE</p>
+          <p className="text-slate-400 text-xs">Translate directly in LINE chat</p>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06C755" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7" />
+        </svg>
+      </a>
+
       {/* Feature grid */}
       <div className="grid grid-cols-2 gap-3 px-4">
         {FEATURES.map((f) => {
