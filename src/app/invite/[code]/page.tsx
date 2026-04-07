@@ -36,7 +36,18 @@ async function getInviter(code: string) {
     return await resolveProfile(supabase, profileByCode.user_id)
   }
 
-  // 3. Try share_token on global_profiles (existing flow)
+  // 3. Try username on profiles (vanity URLs)
+  const { data: profileByUsername } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('username', code.toLowerCase())
+    .single()
+
+  if (profileByUsername) {
+    return await resolveProfile(supabase, profileByUsername.user_id)
+  }
+
+  // 4. Try share_token on global_profiles (existing flow)
   const { data: gp } = await supabase
     .from('global_profiles')
     .select('user_id, tier, trust_score, title, services, operating_corridors, tagline, share_token')
@@ -70,7 +81,7 @@ async function getInviter(code: string) {
     }
   }
 
-  // 4. Fallback: org ID (legacy)
+  // 5. Fallback: org ID (legacy)
   const { data: legacyOrg } = await supabase
     .from('organizations')
     .select('id, name')

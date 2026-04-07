@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getBrandFromHost } from '@/lib/brand';
 
 const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/privacy', '/terms', '/pocketchat'];
-const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/']; // Public invoice + published websites + order + invite pages
+const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/', '/c/', '/guest/']; // Public invoice + published websites + order + invite + vanity + guest pages
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {

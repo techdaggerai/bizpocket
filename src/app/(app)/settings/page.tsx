@@ -235,6 +235,50 @@ function WallpaperPicker() {
   );
 }
 
+function InviteLinkRow() {
+  const { user } = useAuth();
+  const [username, setUsername] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    supabase.from('profiles').select('username').eq('user_id', user.id).single().then(({ data }) => {
+      if (data?.username) setUsername(data.username);
+    });
+  }, [user.id, supabase]);
+
+  async function handleCopy() {
+    if (!username) return;
+    const link = `evrywher.io/c/${username}`;
+    try { await navigator.clipboard.writeText(`https://${link}`); } catch {
+      const el = document.createElement('input');
+      el.value = `https://${link}`;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (!username) return null;
+
+  return (
+    <SettingsRow last>
+      <span className="text-[14px] text-[var(--text-2)]">Invite link</span>
+      <button onClick={handleCopy} className="text-[14px] text-indigo-400 font-medium flex items-center gap-1">
+        <span className="font-mono text-[13px]">evrywher.io/c/{username}</span>
+        {copied ? (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        )}
+      </button>
+    </SettingsRow>
+  );
+}
+
 export default function SettingsPage() {
   const { profile, organization, user } = useAuth();
   const { t, lang, setLang } = useI18n();
@@ -579,10 +623,11 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
-          <SettingsRow last>
+          <SettingsRow>
             <span className="text-[14px] text-[var(--text-2)]">Email</span>
             <span className="text-[14px] text-[var(--text-3)]">{user.email}</span>
           </SettingsRow>
+          <InviteLinkRow />
         </div>
 
         {/* LANGUAGE & TRANSLATION */}

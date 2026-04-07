@@ -1,0 +1,341 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { createBrowserClient } from '@supabase/ssr';
+import { PocketChatMark } from '@/components/Logo';
+
+interface GuestSession {
+  guestId: string;
+  guestToken: string;
+  guestName: string;
+  chatId: string;
+  inviterName: string;
+  inviterOrgId: string;
+}
+
+interface Message {
+  id: string;
+  conversation_id: string;
+  sender_type: string;
+  sender_name: string;
+  message: string;
+  message_type: string;
+  created_at: string;
+  sender_id?: string;
+}
+
+export default function GuestChatPage() {
+  const params = useParams();
+  const router = useRouter();
+  const chatId = params.id as string;
+
+  const [session, setSession] = useState<GuestSession | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [msgCount, setMsgCount] = useState(0);
+  const [showSignup, setShowSignup] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signingUp, setSigningUp] = useState(false);
+  const [signupError, setSignupError] = useState('');
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // ─── Load session from localStorage ───
+  useEffect(() => {
+    const stored = localStorage.getItem('evrywher_guest_session');
+    if (stored) {
+      const parsed = JSON.parse(stored) as GuestSession;
+      if (parsed.chatId === chatId) {
+        setSession(parsed);
+        return;
+      }
+    }
+    // No valid session for this chat — redirect to invite
+    router.push('/');
+  }, [chatId, router]);
+
+  // ─── Fetch messages ───
+  const fetchMessages = useCallback(async () => {
+    if (!session) return;
+    const { data } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', chatId)
+      .order('created_at', { ascending: true })
+      .limit(200);
+    if (data) setMessages(data as Message[]);
+  }, [chatId, session, supabase]);
+
+  useEffect(() => {
+    if (session) fetchMessages();
+  }, [session, fetchMessages]);
+
+  // ─── Realtime subscription ───
+  useEffect(() => {
+    if (!session) return;
+
+    const channel = supabase
+      .channel(`guest-chat-${chatId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${chatId}`,
+      }, (payload) => {
+        const newMsg = payload.new as Message;
+        setMessages(prev => {
+          if (prev.some(m => m.id === newMsg.id)) return prev;
+          return [...prev, newMsg];
+        });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [chatId, session, supabase]);
+
+  // ─── Scroll to bottom ───
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages]);
+
+  // ─── Send message ───
+  const sendMessage = useCallback(async () => {
+    if (!newMessage.trim() || !session || sending) return;
+    const text = newMessage.trim();
+    setNewMessage('');
+    setSending(true);
+
+    // Optimistic add
+    const tempMsg: Message = {
+      id: `temp-${Date.now()}`,
+      conversation_id: chatId,
+      sender_type: 'contact',
+      sender_name: session.guestName,
+      message: text,
+      message_type: 'text',
+      created_at: new Date().toISOString(),
+      sender_id: session.guestId,
+    };
+    setMessages(prev => [...prev, tempMsg]);
+    setMsgCount(c => c + 1);
+
+    await supabase.from('messages').insert({
+      conversation_id: chatId,
+      organization_id: session.inviterOrgId,
+      sender_type: 'contact',
+      sender_name: session.guestName,
+      message: text,
+      message_type: 'text',
+    });
+
+    // Update conversation
+    await supabase.from('conversations').update({
+      last_message: text,
+      last_message_at: new Date().toISOString(),
+    }).eq('id', chatId);
+
+    setSending(false);
+  }, [newMessage, session, sending, chatId, supabase]);
+
+  // ─── Upgrade to real account ───
+  const handleSignup = useCallback(async () => {
+    if (!signupEmail || !signupPassword || !session) return;
+    setSigningUp(true);
+    setSignupError('');
+
+    try {
+      const res = await fetch('/api/guest/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: session.guestId,
+          email: signupEmail,
+          password: signupPassword,
+          name: session.guestName,
+        }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.removeItem('evrywher_guest_session');
+        // Sign in with new credentials
+        const supabaseAuth = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        await supabaseAuth.auth.signInWithPassword({ email: signupEmail, password: signupPassword });
+        window.location.href = '/chat';
+      } else {
+        setSignupError(data.error || 'Signup failed');
+      }
+    } catch {
+      setSignupError('Network error — try again');
+    }
+    setSigningUp(false);
+  }, [signupEmail, signupPassword, session]);
+
+  if (!session) {
+    return (
+      <div className="min-h-[100dvh] bg-slate-900 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const showBanner = !bannerDismissed || msgCount >= 5;
+  const bannerPersistent = msgCount >= 5;
+
+  return (
+    <div className="fixed inset-0 bg-slate-900 flex flex-col">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 pt-[env(safe-area-inset-top)] border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm">
+        <div className="pt-3 pb-3 flex items-center gap-3 flex-1">
+          <PocketChatMark size={28} />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white truncate">{session.inviterName}</p>
+            <p className="text-[10px] text-slate-500">Evrywher Chat</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowSignup(true)}
+          className="pt-3 pb-3 text-xs font-semibold text-indigo-400 active:opacity-60"
+        >
+          Sign Up
+        </button>
+      </div>
+
+      {/* Signup banner */}
+      {showBanner && !showSignup && (
+        <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-4 py-2.5 flex items-center gap-2">
+          <p className="text-xs text-indigo-300 flex-1">
+            {msgCount >= 5
+              ? 'Sign up to keep your messages and unlock AI translation'
+              : 'Sign up to unlock AI translation, voice, camera + keep your messages'}
+          </p>
+          {!bannerPersistent && (
+            <button onClick={() => setBannerDismissed(true)} className="text-indigo-500/50 p-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          )}
+          <button
+            onClick={() => setShowSignup(true)}
+            className="shrink-0 text-[10px] font-bold text-indigo-400 bg-indigo-600/20 px-2.5 py-1 rounded-full"
+          >
+            Sign Up
+          </button>
+        </div>
+      )}
+
+      {/* Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3 chat-bg-pattern">
+        {messages.map(msg => {
+          const isMe = msg.sender_type === 'contact' && (msg.sender_name === session.guestName || msg.sender_id === session.guestId);
+          const isSystem = msg.sender_type === 'system';
+
+          if (isSystem) {
+            return (
+              <div key={msg.id} className="flex justify-center">
+                <p className="text-[10px] text-slate-500 bg-slate-800/60 px-3 py-1 rounded-full">{msg.message}</p>
+              </div>
+            );
+          }
+
+          return (
+            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 ${
+                isMe
+                  ? 'bg-indigo-600 rounded-tr-md'
+                  : 'bg-slate-800/80 rounded-tl-md'
+              }`}>
+                {!isMe && (
+                  <p className="text-[10px] text-slate-400 mb-0.5">{msg.sender_name}</p>
+                )}
+                <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words">{msg.message}</p>
+                <p className={`text-[9px] mt-1 ${isMe ? 'text-indigo-200/50' : 'text-slate-500'}`}>
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Input */}
+      <div className="shrink-0 border-t border-slate-800 px-4 py-2 bg-slate-900/95 backdrop-blur-sm" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
+        <div className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            type="text"
+            value={newMessage}
+            onChange={e => setNewMessage(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+            placeholder="Type a message..."
+            className="flex-1 bg-slate-800/60 text-white text-sm rounded-xl px-4 py-2.5 outline-none border border-slate-700/50 focus:border-indigo-500/50 placeholder:text-slate-600"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!newMessage.trim() || sending}
+            className="p-2.5 bg-indigo-600 rounded-xl text-white disabled:opacity-30 active:bg-indigo-700"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Inline signup modal */}
+      {showSignup && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => setShowSignup(false)}>
+          <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-white">Create Your Account</h3>
+              <button onClick={() => setShowSignup(false)} className="text-slate-500 p-1">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <p className="text-xs text-slate-400">Keep your messages + unlock AI translation, voice, camera, and more.</p>
+
+            {signupError && (
+              <p className="text-sm text-red-400 bg-red-950/30 px-3 py-2 rounded-lg">{signupError}</p>
+            )}
+
+            <input
+              type="email"
+              value={signupEmail}
+              onChange={e => setSignupEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full bg-slate-700/50 text-white text-sm rounded-xl px-4 py-3 outline-none border border-slate-600/50 focus:border-indigo-500/50 placeholder:text-slate-500"
+            />
+            <input
+              type="password"
+              value={signupPassword}
+              onChange={e => setSignupPassword(e.target.value)}
+              placeholder="Password (6+ characters)"
+              className="w-full bg-slate-700/50 text-white text-sm rounded-xl px-4 py-3 outline-none border border-slate-600/50 focus:border-indigo-500/50 placeholder:text-slate-500"
+            />
+            <button
+              onClick={handleSignup}
+              disabled={signingUp || !signupEmail || signupPassword.length < 6}
+              className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl active:bg-indigo-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {signingUp ? (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                'Create Account'
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

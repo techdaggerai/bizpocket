@@ -73,7 +73,20 @@ export async function POST(request: Request) {
     }
   }
 
-  // 3. Check share_token on global_profiles
+  // 3. Check username on profiles (vanity URLs)
+  if (!inviterId) {
+    const { data: p } = await admin
+      .from('profiles')
+      .select('user_id, organization_id')
+      .eq('username', code.toLowerCase())
+      .single()
+    if (p) {
+      inviterId = p.user_id
+      inviterOrgId = p.organization_id
+    }
+  }
+
+  // 4. Check share_token on global_profiles
   if (!inviterId) {
     const { data: gp } = await admin
       .from('global_profiles')
@@ -91,7 +104,7 @@ export async function POST(request: Request) {
     }
   }
 
-  // 4. Try org ID (legacy)
+  // 5. Try org ID (legacy)
   if (!inviterId) {
     const { data: legacyOrg } = await admin
       .from('organizations')

@@ -21,7 +21,7 @@ export async function POST() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('organization_id, permanent_invite_code')
+    .select('organization_id, permanent_invite_code, username, full_name, name')
     .eq('user_id', user.id)
     .single()
 
@@ -36,6 +36,16 @@ export async function POST() {
     await supabase
       .from('profiles')
       .update({ permanent_invite_code: permanentCode })
+      .eq('user_id', user.id)
+  }
+
+  // Ensure user has a username (for vanity URLs)
+  let username = profile.username
+  if (!username) {
+    username = await generateUsername(supabase, profile.full_name || profile.name || user.email?.split('@')[0] || 'user')
+    await supabase
+      .from('profiles')
+      .update({ username })
       .eq('user_id', user.id)
   }
 
@@ -61,5 +71,30 @@ export async function POST() {
     invite_url: `${baseUrl}/invite/${code}`,
     permanent_code: permanentCode,
     permanent_url: `${baseUrl}/invite/${permanentCode}`,
+    username,
+    vanity_url: `${baseUrl}/c/${username}`,
   })
+}
+
+async function generateUsername(supabase: ReturnType<typeof createServerClient>, fullName: string): Promise<string> {
+  const parts = fullName.trim().split(/\s+/).map(p => p.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean)
+  if (!parts.length) return `user-${Date.now().toString(36)}`
+
+  const candidates = [
+    parts[0],
+    parts.length > 1 ? `${parts[0]}-${parts[1]}` : null,
+  ].filter(Boolean) as string[]
+
+  for (const candidate of candidates) {
+    const { data } = await supabase.from('profiles').select('id').eq('username', candidate).single()
+    if (!data) return candidate
+  }
+
+  for (let i = 1; i < 100; i++) {
+    const candidate = `${candidates[candidates.length - 1]}-${i}`
+    const { data } = await supabase.from('profiles').select('id').eq('username', candidate).single()
+    if (!data) return candidate
+  }
+
+  return `${parts[0]}-${Date.now().toString(36)}`
 }
