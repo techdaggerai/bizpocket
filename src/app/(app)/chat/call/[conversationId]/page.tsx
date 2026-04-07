@@ -10,6 +10,12 @@ const LANG_VOICES: Record<string, string> = {
   fil: 'fil-PH', vi: 'vi-VN', tr: 'tr-TR', zh: 'zh-CN', fr: 'fr-FR', nl: 'nl-NL', es: 'es-ES',
 };
 
+const LANG_3: Record<string, string> = {
+  en: 'ENG', ja: 'JPN', ur: 'URD', ar: 'ARB', hi: 'HIN', bn: 'BEN', ne: 'NEP',
+  zh: 'CHN', ko: 'KOR', fr: 'FRA', es: 'ESP', pt: 'POR', vi: 'VIE', fil: 'FIL',
+  tr: 'TUR', id: 'IND', th: 'THA', nl: 'NLD', si: 'SIN', tl: 'TGL',
+};
+
 export default function VoiceCallPage() {
   const params = useParams();
   const router = useRouter();
@@ -147,10 +153,15 @@ export default function VoiceCallPage() {
       </svg>
 
       <h2 className="text-[22px] font-bold mb-1">{contactName || 'Calling...'}</h2>
+      {effectiveMode !== 'direct' && (
+        <span className="bg-indigo-600/20 text-indigo-400 text-xs px-2 py-0.5 rounded-full mb-1">
+          {LANG_3[myLang] || myLang.toUpperCase()}⇄{LANG_3[contactLang] || contactLang.toUpperCase()}
+        </span>
+      )}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4F46E5]/30 text-[#a5b4fc]">{myLang.toUpperCase()}</span>
+        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4F46E5]/30 text-[#a5b4fc]">{LANG_3[myLang] || myLang.toUpperCase()}</span>
         <span className="text-slate-400">⇄</span>
-        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F59E0B]/30 text-[#fbbf24]">{contactLang.toUpperCase()}</span>
+        <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#F59E0B]/30 text-[#fbbf24]">{LANG_3[contactLang] || contactLang.toUpperCase()}</span>
       </div>
 
       {callActive && <p className="text-sm text-[#22c55e] font-mono mb-8">{fmt(callDuration)}</p>}
@@ -197,7 +208,7 @@ export default function VoiceCallPage() {
         )}
       </div>
 
-      {!callActive && <p className="text-[13px] text-slate-400 mt-5 text-center max-w-[300px]">You speak {myLang.toUpperCase()}. They hear {contactLang.toUpperCase()}. AI translates in real-time.</p>}
+      {!callActive && <p className="text-[13px] text-slate-400 mt-5 text-center max-w-[300px]">You speak {LANG_3[myLang] || myLang.toUpperCase()}. They hear {LANG_3[contactLang] || contactLang.toUpperCase()}. AI translates in real-time.</p>}
     </div>
   );
 }

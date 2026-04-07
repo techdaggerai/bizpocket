@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
@@ -276,6 +276,248 @@ function InviteLinkRow() {
         )}
       </button>
     </SettingsRow>
+  );
+}
+
+const VOICE_SAMPLE_TEXT = "Hi, my name is USER_NAME. I live in Japan and I use Evrywher to communicate with people in different languages. I love how technology brings us all together no matter what language we speak. This is a test of my voice for cloning purposes, so I'm speaking naturally and clearly.";
+
+function VoiceCloneSection() {
+  const { profile, organization } = useAuth();
+  const { toast } = useToast();
+  const supabase = createClient();
+  const [voiceCloneId, setVoiceCloneId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [screen, setScreen] = useState<'idle' | 'recording' | 'preview' | 'uploading' | 'done'>('idle');
+  const [duration, setDuration] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  const userName = profile?.full_name || profile?.name || 'User';
+
+  useEffect(() => {
+    if (!organization?.id) return;
+    supabase.from('pocket_bot_config').select('voice_clone_id').eq('organization_id', organization.id).single()
+      .then(({ data }) => { setVoiceCloneId(data?.voice_clone_id || null); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [organization?.id]); // eslint-disable-line
+
+  const startRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const recorder = new MediaRecorder(stream, { mimeType });
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        setAudioBlob(blob);
+        setAudioUrl(URL.createObjectURL(blob));
+        setScreen('preview');
+      };
+
+      recorder.start(250);
+      mediaRecorderRef.current = recorder;
+      setDuration(0);
+      setScreen('recording');
+
+      timerRef.current = setInterval(() => {
+        setDuration(prev => {
+          if (prev >= 60) { stopRecording(); return prev; }
+          return prev + 1;
+        });
+      }, 1000);
+    } catch {
+      toast('Microphone access denied', 'error');
+    }
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    if (timerRef.current) clearInterval(timerRef.current);
+  }, []);
+
+  const saveVoice = useCallback(async () => {
+    if (!audioBlob) return;
+    setScreen('uploading');
+    try {
+      const fd = new FormData();
+      fd.append('audio', audioBlob, 'voice-clone.webm');
+      fd.append('botName', userName);
+      const res = await fetch('/api/ai/voice-clone', { method: 'POST', body: fd });
+      if (!res.ok) throw new Error('Clone failed');
+      const data = await res.json();
+      setVoiceCloneId(data.voice_id);
+      setScreen('done');
+      toast('Voice clone saved!', 'success');
+    } catch {
+      toast('Voice cloning failed. Try again.', 'error');
+      setScreen('preview');
+    }
+  }, [audioBlob, userName, toast]);
+
+  if (loading) return null;
+
+  return (
+    <section className="rounded-card border border-slate-700 bg-slate-800 p-4">
+      <div className="flex items-center gap-2 mb-1">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+        <h3 className="text-[var(--text-1)] font-semibold text-[15px]">Your Voice</h3>
+      </div>
+      <p className="text-[var(--text-3)] text-sm mb-4">
+        Clone your voice so translations sound like YOU, not a robot. Record 30 seconds of natural speech.
+      </p>
+
+      {/* Already set up */}
+      {voiceCloneId && screen === 'idle' && (
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-emerald-400 text-sm font-medium">Voice active</span>
+          </div>
+          <p className="text-[var(--text-3)] text-xs mb-3">Your translated voice messages and calls now sound like you.</p>
+          <button
+            onClick={() => { setVoiceCloneId(null); setAudioBlob(null); setAudioUrl(null); }}
+            className="text-xs text-indigo-400 font-medium"
+          >
+            Re-record
+          </button>
+        </div>
+      )}
+
+      {/* Not set up / re-record */}
+      {!voiceCloneId && screen === 'idle' && (
+        <button
+          onClick={startRecording}
+          className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm active:bg-indigo-700"
+        >
+          Set Up My Voice
+        </button>
+      )}
+
+      {/* Recording screen */}
+      {screen === 'recording' && (
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
+          <p className="text-slate-400 text-sm font-medium mb-6 uppercase tracking-wider">Read this aloud</p>
+          <div className="bg-slate-800 rounded-xl p-4 mb-8 border border-slate-700 max-w-md">
+            <p className="text-slate-200 text-lg leading-relaxed">
+              {VOICE_SAMPLE_TEXT.replace('USER_NAME', userName)}
+            </p>
+          </div>
+
+          {/* Pulsing indicator */}
+          <div className="relative w-20 h-20 mb-4">
+            <div className="absolute inset-0 rounded-full bg-red-500/20 animate-ping" />
+            <div className="relative w-20 h-20 rounded-full bg-red-500 flex items-center justify-center">
+              <div className="w-4 h-4 rounded-full bg-white" />
+            </div>
+          </div>
+
+          {/* Waveform bars */}
+          <div className="flex items-end gap-1 h-8 mb-4">
+            {Array.from({ length: 20 }, (_, i) => (
+              <div
+                key={i}
+                className="w-1.5 rounded-full bg-red-400/60"
+                style={{
+                  height: `${12 + Math.sin(Date.now() / 200 + i) * 10}px`,
+                  animation: `pulse 0.5s ease-in-out ${i * 0.05}s infinite alternate`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Timer */}
+          <p className="text-white text-3xl font-mono mb-2">
+            {Math.floor(duration / 60)}:{String(duration % 60).padStart(2, '0')}
+          </p>
+          <p className="text-slate-400 text-sm mb-8">
+            {duration < 20 ? `Keep talking... ${20 - duration} seconds minimum` : duration >= 55 ? `${60 - duration} seconds left` : 'Looking good! Tap stop when ready.'}
+          </p>
+
+          <button
+            onClick={stopRecording}
+            disabled={duration < 20}
+            className={`w-full max-w-xs py-3 rounded-xl font-semibold text-sm ${
+              duration < 20 ? 'bg-slate-700 text-slate-500' : 'bg-white text-slate-900 active:bg-slate-200'
+            }`}
+          >
+            {duration < 20 ? `Recording... (${20 - duration}s min)` : 'Stop Recording'}
+          </button>
+        </div>
+      )}
+
+      {/* Preview screen */}
+      {screen === 'preview' && audioUrl && (
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
+          <p className="text-white text-xl font-bold mb-2">Listen & Confirm</p>
+          <p className="text-slate-400 text-sm mb-6">Make sure your voice sounds clear and natural.</p>
+
+          <audio src={audioUrl} controls className="mb-8 w-full max-w-sm" />
+
+          <div className="w-full max-w-sm space-y-3">
+            <button
+              onClick={saveVoice}
+              className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm active:bg-indigo-700"
+            >
+              Save My Voice
+            </button>
+            <button
+              onClick={() => { setAudioBlob(null); setAudioUrl(null); startRecording(); }}
+              className="w-full py-3 rounded-xl border border-slate-700 text-slate-300 font-medium text-sm active:bg-slate-800"
+            >
+              Record Again
+            </button>
+            <button
+              onClick={() => { setAudioBlob(null); setAudioUrl(null); setScreen('idle'); }}
+              className="w-full py-2 text-slate-500 text-sm"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Uploading */}
+      {screen === 'uploading' && (
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
+          <div className="w-16 h-16 rounded-full border-4 border-slate-700 border-t-indigo-500 animate-spin mb-6" />
+          <p className="text-white font-semibold text-lg">Cloning your voice...</p>
+          <p className="text-slate-400 text-sm mt-2">This takes about 10-15 seconds</p>
+        </div>
+      )}
+
+      {/* Success */}
+      {screen === 'done' && (
+        <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col items-center justify-center px-6">
+          <div className="w-16 h-16 rounded-full bg-emerald-600 flex items-center justify-center mb-6">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <p className="text-white font-bold text-xl mb-2">Your voice is ready!</p>
+          <p className="text-slate-400 text-sm text-center max-w-sm mb-8">
+            Translated messages and calls will now use your voice. The other person will hear YOU, not a robot.
+          </p>
+          <button
+            onClick={() => setScreen('idle')}
+            className="w-full max-w-xs py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm active:bg-indigo-700"
+          >
+            Done
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -1226,6 +1468,9 @@ export default function SettingsPage() {
           </Link>
         )}
       </div>
+
+      {/* Your Voice */}
+      {isPocketChatMode && <VoiceCloneSection />}
 
       {/* Account + Logout */}
       <div className="rounded-card border border-slate-700 bg-slate-800 p-4 space-y-3">
