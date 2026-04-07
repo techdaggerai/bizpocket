@@ -1793,7 +1793,7 @@ export default function PocketChatPage() {
                       : 'bg-indigo-600/20 text-indigo-400'
                   }`}
                 >
-                  {effMode === 'direct' ? 'Direct' : effMode === 'text_only' ? 'Text Only' : `${(chatLang || profile?.language || 'en').toUpperCase()}⇄${(activeConvo.contact?.language || 'ja').toUpperCase()}`}
+                  {effMode === 'direct' ? 'Direct' : effMode === 'text_only' ? 'Text Only' : `${LANG_CODES_3[chatLang || profile?.language || 'en'] || (chatLang || 'en').toUpperCase()}⇄${LANG_CODES_3[activeConvo.contact?.language || 'ja'] || (activeConvo.contact?.language || 'ja').toUpperCase()}`}
                 </button>
               );
             })()}
