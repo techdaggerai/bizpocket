@@ -165,6 +165,32 @@ function SignupInner() {
       }
     }
 
+    // Process pending invite code (from /invite/[code] flow)
+    if (isPocketChat) {
+      const inviteCode = localStorage.getItem('pending_invite_code')
+        || searchParams.get('invite');
+
+      if (inviteCode) {
+        try {
+          const res = await fetch('/api/invites/accept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: inviteCode }),
+          });
+          const data = await res.json();
+          localStorage.removeItem('pending_invite_code');
+
+          if (data.success && data.conversation_id) {
+            window.location.href = '/chat';
+            return;
+          }
+        } catch (err) {
+          console.error('[signup] invite accept failed:', err);
+          localStorage.removeItem('pending_invite_code');
+        }
+      }
+    }
+
     router.push(isPocketChat ? '/chat' : `/onboarding?plan=${plan}`);
   }
 

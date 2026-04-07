@@ -40,9 +40,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Complete onboarding first' }, { status: 400 })
   }
 
-  // Try to find the inviter: 1) invites table, 2) permanent_invite_code, 3) share_token
+  // Try to find the inviter: 1) invites table, 2) permanent_invite_code, 3) share_token, 4) org ID
   let inviterId: string | null = null
   let inviterOrgId: string | null = null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let inviteRow: any = null
 
   // 1. Check invites table
@@ -90,6 +91,27 @@ export async function POST(request: Request) {
     }
   }
 
+  // 4. Try org ID (legacy)
+  if (!inviterId) {
+    const { data: legacyOrg } = await admin
+      .from('organizations')
+      .select('id')
+      .eq('id', code)
+      .single()
+    if (legacyOrg) {
+      const { data: ownerProfile } = await admin
+        .from('profiles')
+        .select('user_id, organization_id')
+        .eq('organization_id', legacyOrg.id)
+        .eq('role', 'owner')
+        .single()
+      if (ownerProfile) {
+        inviterId = ownerProfile.user_id
+        inviterOrgId = ownerProfile.organization_id
+      }
+    }
+  }
+
   if (!inviterId || !inviterOrgId) {
     return NextResponse.json({ error: 'Invalid invite code' }, { status: 404 })
   }
@@ -122,9 +144,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Already connected', already_connected: true }, { status: 409 })
   }
 
-  // Create mutual contact relationship
-  // 1. Add inviter as contact in acceptor's org
-  await admin.from('contacts').insert({
+  // ═══ Step 1: Create mutual contacts ═══
+
+  // Add inviter as contact in acceptor's org
+  const { data: contactInAcceptor } = await admin.from('contacts').insert({
     organization_id: acceptorProfile.organization_id,
     name: inviterProfile.full_name || inviterProfile.name || 'Contact',
     email: inviterProfile.email,
@@ -132,10 +155,10 @@ export async function POST(request: Request) {
     language: inviterProfile.language || 'en',
     contact_type: 'friend',
     category: 'friend',
-  })
+  }).select('id').single()
 
-  // 2. Add acceptor as contact in inviter's org
-  await admin.from('contacts').insert({
+  // Add acceptor as contact in inviter's org
+  const { data: contactInInviter } = await admin.from('contacts').insert({
     organization_id: inviterOrgId,
     name: acceptorProfile.full_name || acceptorProfile.name || 'Contact',
     email: acceptorProfile.email,
@@ -143,20 +166,80 @@ export async function POST(request: Request) {
     language: acceptorProfile.language || 'en',
     contact_type: 'friend',
     category: 'friend',
-  })
-
-  // 3. Create conversations both ways so they can chat
-  const { data: convo } = await admin.from('conversations').insert({
-    organization_id: acceptorProfile.organization_id,
-    title: inviterProfile.full_name || inviterProfile.name || 'Chat',
   }).select('id').single()
 
-  // Mark invite as used
+  // ═══ Step 2: Create conversations BOTH ways ═══
+
+  const now = new Date().toISOString()
+  const welcomeMsg = `${acceptorProfile.full_name || acceptorProfile.name || 'Someone'} joined Evrywher! Start chatting.`
+
+  // Conversation in acceptor's org (linked to inviter contact)
+  const { data: convoAcceptor } = await admin.from('conversations').insert({
+    organization_id: acceptorProfile.organization_id,
+    contact_id: contactInAcceptor?.id || null,
+    title: inviterProfile.full_name || inviterProfile.name || 'Chat',
+    last_message: welcomeMsg,
+    last_message_at: now,
+    unread_count: 0,
+  }).select('id').single()
+
+  // Conversation in inviter's org (linked to acceptor contact)
+  const { data: convoInviter } = await admin.from('conversations').insert({
+    organization_id: inviterOrgId,
+    contact_id: contactInInviter?.id || null,
+    title: acceptorProfile.full_name || acceptorProfile.name || 'Chat',
+    last_message: welcomeMsg,
+    last_message_at: now,
+    unread_count: 1,
+  }).select('id').single()
+
+  // ═══ Step 3: Send welcome message in both conversations ═══
+
+  if (convoAcceptor) {
+    await admin.from('messages').insert({
+      conversation_id: convoAcceptor.id,
+      organization_id: acceptorProfile.organization_id,
+      sender_type: 'system',
+      sender_name: 'Evrywher',
+      message: welcomeMsg,
+      message_type: 'text',
+    })
+  }
+
+  if (convoInviter) {
+    await admin.from('messages').insert({
+      conversation_id: convoInviter.id,
+      organization_id: inviterOrgId,
+      sender_type: 'system',
+      sender_name: 'Evrywher',
+      message: welcomeMsg,
+      message_type: 'text',
+    })
+  }
+
+  // ═══ Step 4: Mark invite as used ═══
+
   if (inviteRow) {
     await admin.from('invites').update({
       used_by: user.id,
-      used_at: new Date().toISOString(),
+      used_at: now,
     }).eq('id', inviteRow.id)
+  }
+
+  // ═══ Step 5: Create referral record for trust rewards ═══
+
+  const { data: existingRef } = await admin
+    .from('referrals')
+    .select('id')
+    .eq('invitee_id', user.id)
+    .maybeSingle()
+
+  if (!existingRef) {
+    await admin.from('referrals').insert({
+      inviter_id: inviterId,
+      invitee_id: user.id,
+      trust_awarded: false,
+    }).catch(() => {}) // table may not exist yet
   }
 
   return NextResponse.json({
@@ -165,6 +248,6 @@ export async function POST(request: Request) {
       name: inviterProfile.full_name || inviterProfile.name,
       avatar_url: inviterProfile.avatar_url,
     },
-    conversation_id: convo?.id,
+    conversation_id: convoAcceptor?.id,
   })
 }

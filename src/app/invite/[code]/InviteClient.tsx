@@ -128,11 +128,17 @@ export default function InviteClient({ inviter, code }: Props) {
                 {accepting ? 'Connecting...' : 'Add to Contacts'}
               </Button>
             ) : (
-              <Link href={`/signup?ref=${code}`} className="block no-underline">
+              <button
+                onClick={() => {
+                  localStorage.setItem('pending_invite_code', code);
+                  window.location.href = `/signup?invite=${code}&mode=pocketchat`;
+                }}
+                className="block w-full no-underline"
+              >
                 <Button variant="primary" size="xl" className="w-full">
                   Join Evrywher {'\u2192'}
                 </Button>
-              </Link>
+              </button>
             )}
           </div>
         </GlassCard>
