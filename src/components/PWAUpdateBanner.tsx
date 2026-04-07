@@ -89,11 +89,16 @@ export default function PWAUpdateBanner() {
   }, []);
 
   // ── 3. Handle refresh ──
+  const [refreshing, setRefreshing] = useState(false);
+
   const handleRefresh = useCallback(() => {
+    setRefreshing(true);
     if (swWaiting) {
       // Tell the waiting SW to activate
       swWaiting.postMessage('SKIP_WAITING');
       // controllerchange listener above will reload the page
+      // Fallback: if controllerchange doesn't fire within 3s, force reload
+      setTimeout(() => window.location.reload(), 3000);
     } else {
       // No SW waiting — just hard reload
       window.location.reload();
@@ -106,16 +111,24 @@ export default function PWAUpdateBanner() {
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] animate-slide-down">
       <div className="flex items-center gap-3 rounded-xl bg-[#4F46E5] pl-4 pr-2 py-2.5 shadow-lg shadow-indigo-500/25 border border-indigo-400/20">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-base shrink-0">✨</span>
+          <span className="text-base shrink-0">{refreshing ? '⏳' : '✨'}</span>
           <span className="text-[13px] font-medium text-white whitespace-nowrap">
-            New update available
+            {refreshing ? 'Updating...' : 'New update available'}
           </span>
         </div>
         <button
           onClick={handleRefresh}
-          className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-[12px] font-bold text-[#4F46E5] hover:bg-indigo-50 transition-colors"
+          disabled={refreshing}
+          className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-[12px] font-bold text-[#4F46E5] hover:bg-indigo-50 transition-colors disabled:opacity-70 flex items-center gap-1.5"
         >
-          Refresh
+          {refreshing ? (
+            <>
+              <div className="w-3 h-3 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+              Updating
+            </>
+          ) : (
+            'Refresh'
+          )}
         </button>
         <button
           onClick={() => setUpdateAvailable(false)}
