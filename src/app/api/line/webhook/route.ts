@@ -324,14 +324,27 @@ async function handleFollow(event: any) {
 
 // ── Main webhook handler ──
 
+export async function GET() {
+  return new Response('LINE webhook is alive', { status: 200 })
+}
+
 export async function POST(req: NextRequest) {
+  console.log('[LINE WEBHOOK HIT]', new Date().toISOString())
+  console.log('[LINE] Method: POST')
+
   const body = await req.text()
   const signature = req.headers.get('x-line-signature') || ''
 
+  console.log('[LINE] Body length:', body.length)
+  console.log('[LINE] Body preview:', body.substring(0, 200))
+  console.log('[LINE] Signature header:', signature || '(none)')
+
   if (!verifySignature(body, signature)) {
-    console.log('[LINE] Invalid signature')
+    console.log('[LINE] Invalid signature — rejecting')
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
+
+  console.log('[LINE] Signature valid — processing events')
 
   const data = JSON.parse(body)
   const events = data.events || []
