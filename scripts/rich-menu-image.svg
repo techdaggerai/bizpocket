@@ -1,17 +1,4 @@
-/**
- * Generate the Rich Menu image (2500x1686 PNG) for LINE bot.
- * Run: npx ts-node scripts/generate-rich-menu-image.ts
- *
- * Creates an SVG and converts it to PNG using sharp.
- * Install if needed: npm install sharp
- */
-
-/* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require('fs');
-const path = require('path');
-
-// Generate SVG — reliable, no native deps needed
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="1686" viewBox="0 0 2500 1686">
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="1686" viewBox="0 0 2500 1686">
   <defs>
     <style>
       text { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; }
@@ -53,30 +40,4 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="1686" 
 
   <!-- Bottom branding -->
   <text x="1250" y="1670" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="24" font-weight="500">Evrywher — AI Translation for Life in Japan</text>
-</svg>`;
-
-const outDir = path.resolve(__dirname);
-
-// Save SVG
-const svgPath = path.join(outDir, 'rich-menu-image.svg');
-fs.writeFileSync(svgPath, svg);
-console.log('SVG saved to', svgPath);
-
-// Try to convert to PNG with sharp
-async function convertToPng() {
-  try {
-    const sharp = require('sharp');
-    const pngPath = path.join(outDir, 'rich-menu-image.png');
-    await sharp(Buffer.from(svg)).png().toFile(pngPath);
-    console.log('PNG saved to', pngPath);
-    console.log('Done! Now run: npx ts-node scripts/register-line-rich-menu.ts');
-  } catch {
-    console.log('\nsharp not installed. To convert SVG to PNG:');
-    console.log('  npm install sharp && npx ts-node scripts/generate-rich-menu-image.ts');
-    console.log('\nOr convert the SVG manually:');
-    console.log('  Open rich-menu-image.svg in browser → screenshot at 2500x1686');
-    console.log('  Or use: npx svgexport rich-menu-image.svg rich-menu-image.png 2500:1686');
-  }
-}
-
-convertToPng();
+</svg>

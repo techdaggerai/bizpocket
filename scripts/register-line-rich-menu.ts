@@ -7,9 +7,10 @@
  *   - scripts/rich-menu-image.png (2500x1686) — generate first with generate-rich-menu-image.ts
  */
 
-import fs from 'fs';
-import path from 'path';
-import dotenv from 'dotenv';
+/* eslint-disable @typescript-eslint/no-require-imports */
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 const TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
