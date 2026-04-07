@@ -75,7 +75,7 @@ export default async function RootLayout({
       <body className={`${outfit.variable} ${dmSans.variable} ${dmMono.variable} font-sans bg-[var(--bg)] text-[var(--text-1)] antialiased`}>
         <ToastProvider>
           <OfflineBanner />
-          <SplashScreen>
+          <SplashScreen brand={brand}>
             {children}
           </SplashScreen>
           <PWAInstallBanner />
