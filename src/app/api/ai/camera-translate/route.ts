@@ -12,7 +12,7 @@ const LANG_NAMES: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { image, userLanguage = 'en', userName = '' } = body;
+    const { image, userLanguage, userName, targetLanguage, sourceLang } = body;
 
     if (!image) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 });
@@ -34,9 +34,68 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Image too large (max 10MB)' }, { status: 400 });
     }
 
-    const targetLang = LANG_NAMES[userLanguage] || 'English';
+    // Determine mode: new Camera Translate page vs legacy CameraTranslate component
+    const isNewMode = !!targetLanguage;
+    const targetLang = targetLanguage || LANG_NAMES[userLanguage] || 'English';
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    if (isNewMode) {
+      // ─── New Camera Translate mode ───
+      const sourceHint = sourceLang && LANG_NAMES[sourceLang]
+        ? `The source language is likely ${LANG_NAMES[sourceLang]}, but verify by analyzing the text.`
+        : 'Auto-detect the source language.';
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mediaType, data: base64Data },
+            },
+            {
+              type: 'text',
+              text: `Extract ALL visible text from this image. ${sourceHint} Translate to ${targetLang}.
+
+Return ONLY this JSON:
+{
+  "detected_language": "language name (e.g. Japanese, Arabic, French)",
+  "original_text": "all original text exactly as it appears",
+  "translated_text": "full translation to ${targetLang}",
+  "confidence": "high or medium or low"
+}
+
+If the image contains no readable text, return:
+{
+  "detected_language": "Unknown",
+  "original_text": "",
+  "translated_text": "",
+  "confidence": "low"
+}
+
+Return ONLY valid JSON. No markdown, no explanation.`,
+            },
+          ],
+        }],
+      });
+
+      const text = response.content[0].type === 'text' ? response.content[0].text.trim() : '{}';
+      const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      let result;
+      try {
+        result = JSON.parse(clean);
+      } catch {
+        return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
+      }
+
+      return NextResponse.json(result);
+    }
+
+    // ─── Legacy mode (CameraTranslate component from chat) ───
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 3000,

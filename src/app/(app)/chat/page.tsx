@@ -40,6 +40,8 @@ import TierBadge from '@/components/profile/TierBadge';
 import CorridorBadge from '@/components/profile/CorridorBadge';
 import BottomSheet from '@/components/ui/BottomSheet';
 import type { Tier } from '@/lib/tier-system';
+import { getSavedWallpaperId, getWallpaperById } from '@/lib/wallpapers';
+import { playSound } from '@/lib/sounds';
 
 /* ---------- Types ---------- */
 
@@ -202,7 +204,10 @@ export default function PocketChatPage() {
   const [showGroupCreate, setShowGroupCreate] = useState(false);
   const [reactionMsgId, setReactionMsgId] = useState<string | null>(null);
   const [convoActionId, setConvoActionId] = useState<string | null>(null);
-  const [chatWallpaper, setChatWallpaper] = useState<string>(() => typeof window !== 'undefined' ? localStorage.getItem('chat_wallpaper') || '' : '');
+  const [chatWallpaper] = useState(() => {
+    if (typeof window === 'undefined') return getWallpaperById('default');
+    return getWallpaperById(getSavedWallpaperId());
+  });
   const [showGroupInfo, setShowGroupInfo] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
@@ -545,6 +550,10 @@ export default function PocketChatPage() {
             // Smart replies: generate suggestions for incoming contact/bot messages
             if (newMsg.sender_type !== 'owner' && newMsg.message_type === 'text' && newMsg.message?.trim()) {
               fetchSmartReplies(newMsg.message, newMsg.sender_name || '', newMsg.conversation_id);
+            }
+            // Play incoming message sound
+            if (newMsg.sender_type !== 'owner') {
+              playSound('message');
             }
           }
 
@@ -1208,6 +1217,7 @@ export default function PocketChatPage() {
         toast('Failed to send message', 'error');
         setNewMessage(text);
       } else {
+        playSound('send');
         supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
 
         // Background translation — don't block UI
@@ -1868,8 +1878,8 @@ export default function PocketChatPage() {
         {/* Messages — flex-col-reverse keeps content anchored to bottom so keyboard doesn't push messages too far up */}
         <div
           ref={chatScrollRef}
-          className={`flex-1 overflow-y-auto relative ${!chatWallpaper ? 'chat-bg-pattern' : ''}`}
-          style={chatWallpaper ? { backgroundColor: chatWallpaper.startsWith('#') ? chatWallpaper : undefined, backgroundImage: !chatWallpaper.startsWith('#') ? chatWallpaper : undefined } : undefined}
+          className={`flex-1 overflow-y-auto relative ${chatWallpaper.id === 'default' ? 'chat-bg-pattern' : ''}`}
+          style={chatWallpaper.id !== 'default' ? chatWallpaper.style : undefined}
           onScroll={() => {
             const el = chatScrollRef.current;
             if (el) setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 200);

@@ -1,20 +1,33 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase-server';
 
-export default function EvryAIChatPage() {
-  const router = useRouter();
-  return (
-    <div className="min-h-[100dvh] bg-slate-900 flex flex-col items-center justify-center px-6">
-      <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center mb-4">
-        <Sparkles size={28} className="text-white" />
-      </div>
-      <h1 className="text-xl font-bold text-white mb-1">EvryAI Chat</h1>
-      <p className="text-sm text-slate-400 text-center mb-6">Your AI assistant for everything</p>
-      <p className="text-xs text-slate-500 text-center mb-8">This feature is being built. Check back soon!</p>
-      <button onClick={() => router.push('/ai')} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 text-sm text-slate-300 active:bg-slate-700">
-        <ArrowLeft size={16} /> Back to EvryAI
-      </button>
-    </div>
-  );
+export default async function AIChatPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+
+  // Get user's organization
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!profile?.organization_id) redirect('/chat');
+
+  // Find existing AI bot chat
+  const { data: botChat } = await supabase
+    .from('conversations')
+    .select('id')
+    .eq('organization_id', profile.organization_id)
+    .eq('is_bot_chat', true)
+    .maybeSingle();
+
+  if (botChat) {
+    redirect(`/chat?convo=${botChat.id}`);
+  }
+
+  // Fallback — redirect to chat list
+  redirect('/chat');
 }

@@ -4,7 +4,6 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/Toast';
-import { createClient } from '@/lib/supabase-client';
 import {
   Camera,
   FolderOpen,
@@ -17,6 +16,7 @@ import {
   Printer,
   Mail,
   Check,
+  Sun,
 } from 'lucide-react';
 
 /* ---------- Types ---------- */
@@ -56,21 +56,28 @@ function StepDots({ current, total }: { current: number; total: number }) {
   );
 }
 
+/* ---------- Enhancement Presets ---------- */
+
+const ENHANCE_PRESETS = [
+  { key: 'clean', emoji: '📄', label: 'Clean Scan', filter: 'contrast(1.3) brightness(1.1) saturate(0.9)' },
+  { key: 'bw', emoji: '🔲', label: 'B&W', filter: 'grayscale(1) contrast(1.5) brightness(1.1)' },
+  { key: 'color', emoji: '🎨', label: 'Color Enhanced', filter: 'contrast(1.2) saturate(1.4) brightness(1.05)' },
+  { key: 'original', emoji: '📸', label: 'Original', filter: 'none' },
+];
+
 /* ---------- Step Labels ---------- */
 
-const STEP_LABELS = ['Capture', 'Translate', 'Fill', 'Export'];
+const STEP_LABELS = ['Capture', 'Enhance', 'Translate', 'Fill', 'Export'];
 
 /* ---------- Main Page ---------- */
 
 export default function DocumentScannerPage() {
   const router = useRouter();
-  const { user, organization, profile } = useAuth();
+  const { organization, profile } = useAuth();
   const { toast } = useToast();
-  const supabase = createClient();
-
   const [step, setStep] = useState(0);
   const [imageData, setImageData] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [enhancedImage, setEnhancedImage] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState('image/jpeg');
   const [rotation, setRotation] = useState(0);
   const [translating, setTranslating] = useState(false);
@@ -78,14 +85,30 @@ export default function DocumentScannerPage() {
   const [editedFields, setEditedFields] = useState<TranslationField[]>([]);
   const [fillAnswers, setFillAnswers] = useState<Record<number, string>>({});
   const [exporting, setExporting] = useState(false);
+
+  // Enhancement state
+  const [activePreset, setActivePreset] = useState('clean');
+  const [brightness, setBrightness] = useState(1.0);
+
+  // Corner handles for manual crop
+  const [showCorners, setShowCorners] = useState(false);
+  const [corners, setCorners] = useState([
+    { x: 10, y: 10 }, { x: 90, y: 10 },
+    { x: 90, y: 90 }, { x: 10, y: 90 },
+  ]);
+  const [draggingCorner, setDraggingCorner] = useState<number | null>(null);
+
   const [pdfOptions, setPdfOptions] = useState({
     includeScan: true,
     includeTranslation: true,
     includeFilledForm: true,
   });
+  const [exportMode, setExportMode] = useState<'scan' | 'translated' | 'both'>('translated');
 
   const cameraRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const enhanceCanvasRef = useRef<HTMLCanvasElement>(null);
+  const cornerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.title = 'Document Scanner — Evrywher';
@@ -93,22 +116,91 @@ export default function DocumentScannerPage() {
 
   const userLang = profile?.language || 'en';
   const isForm = result?.document_type === 'Form';
-  const totalSteps = isForm ? 4 : 3;
+  const totalSteps = isForm ? 5 : 4; // Capture, Enhance, Translate, [Fill], Export
   const isPro = ['pro', 'business', 'enterprise'].includes(organization?.plan || '');
+
+  /* ---------- Apply Enhancement ---------- */
+
+  const applyEnhancement = useCallback((preset: string, brightnessVal: number, rot: number, srcImage?: string) => {
+    const src = srcImage || imageData;
+    if (!src || !enhanceCanvasRef.current) return;
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = enhanceCanvasRef.current!;
+      const ctx = canvas.getContext('2d')!;
+
+      // Handle rotation
+      const isRotated = rot % 180 !== 0;
+      canvas.width = isRotated ? img.height : img.width;
+      canvas.height = isRotated ? img.width : img.height;
+
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((rot * Math.PI) / 180);
+      ctx.translate(-img.width / 2, -img.height / 2);
+
+      // Apply filter
+      const presetObj = ENHANCE_PRESETS.find(p => p.key === preset);
+      const baseFilter = presetObj?.filter || 'none';
+      const brightnessFilter = `brightness(${brightnessVal})`;
+      ctx.filter = baseFilter === 'none' ? brightnessFilter : `${baseFilter} ${brightnessFilter}`;
+
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+
+      setEnhancedImage(canvas.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = src;
+  }, [imageData]);
+
+  useEffect(() => {
+    if (step === 1 && imageData) {
+      applyEnhancement(activePreset, brightness, rotation);
+    }
+  }, [step, imageData, activePreset, brightness, rotation, applyEnhancement]);
+
+  /* ---------- Corner Drag ---------- */
+
+  const handleCornerDrag = useCallback((e: React.TouchEvent | React.MouseEvent, idx: number) => {
+    e.preventDefault();
+    setDraggingCorner(idx);
+  }, []);
+
+  const handleCornerMove = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    if (draggingCorner === null || !cornerContainerRef.current) return;
+    const rect = cornerContainerRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+    setCorners(prev => {
+      const next = [...prev];
+      next[draggingCorner] = { x, y };
+      return next;
+    });
+  }, [draggingCorner]);
+
+  const handleCornerEnd = useCallback(() => {
+    setDraggingCorner(null);
+  }, []);
 
   /* ---------- Capture ---------- */
 
   const handleCapture = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setImageFile(file);
     setMediaType(file.type || 'image/jpeg');
     setRotation(0);
+    setBrightness(1.0);
+    setActivePreset('clean');
+    setShowCorners(false);
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
       setImageData(dataUrl);
-      setStep(0); // stay on capture to preview
+      setEnhancedImage(null);
+      setStep(0);
     };
     reader.readAsDataURL(file);
   }, []);
@@ -116,13 +208,13 @@ export default function DocumentScannerPage() {
   /* ---------- Translate ---------- */
 
   const handleTranslate = useCallback(async () => {
-    if (!imageData) return;
+    const img = enhancedImage || imageData;
+    if (!img) return;
     setTranslating(true);
-    setStep(1);
+    setStep(2);
 
     try {
-      // Extract base64 from data URL
-      const base64 = imageData.split(',')[1];
+      const base64 = img.split(',')[1];
       const res = await fetch('/api/ai/translate-document', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -141,36 +233,39 @@ export default function DocumentScannerPage() {
       const data: TranslationResult = await res.json();
       setResult(data);
       setEditedFields(data.fields.map((f) => ({ ...f })));
-    } catch (err: any) {
-      toast(err.message || 'Translation failed', 'error');
-      setStep(0);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Translation failed';
+      toast(message, 'error');
+      setStep(1);
     } finally {
       setTranslating(false);
     }
-  }, [imageData, mediaType, userLang, toast]);
+  }, [enhancedImage, imageData, mediaType, userLang, toast]);
 
   /* ---------- Export PDF ---------- */
 
   const handleExport = useCallback(async () => {
-    if (!result) return;
+    if (!result && exportMode !== 'scan') return;
+    if (!enhancedImage && !imageData) return;
     setExporting(true);
 
     try {
       const html2pdf = (await import('html2pdf.js')).default;
-
-      // Build HTML content for PDF
       const sections: string[] = [];
+      const scanImg = enhancedImage || imageData;
 
-      if (pdfOptions.includeScan && imageData) {
+      // Scan-only or Both: include enhanced scan image
+      if (exportMode === 'scan' || exportMode === 'both' || pdfOptions.includeScan) {
         sections.push(`
-          <div style="page-break-after:always;text-align:center;padding:20px;">
-            <h2 style="color:#333;margin-bottom:16px;">Original Document</h2>
-            <img src="${imageData}" style="max-width:100%;max-height:90vh;border-radius:8px;transform:rotate(${rotation}deg);" />
+          <div style="page-break-after:${exportMode === 'scan' ? 'auto' : 'always'};text-align:center;padding:20px;">
+            <h2 style="color:#333;margin-bottom:16px;">Scanned Document</h2>
+            <img src="${scanImg}" style="max-width:100%;max-height:90vh;border-radius:8px;" />
           </div>
         `);
       }
 
-      if (pdfOptions.includeTranslation) {
+      // Translated or Both: include translation
+      if ((exportMode === 'translated' || exportMode === 'both') && result && pdfOptions.includeTranslation) {
         const fieldsHtml = editedFields.length > 0
           ? editedFields.map((f) => `
               <tr>
@@ -207,6 +302,7 @@ export default function DocumentScannerPage() {
         `);
       }
 
+      // Filled form
       if (pdfOptions.includeFilledForm && isForm && Object.keys(fillAnswers).length > 0) {
         const filledHtml = editedFields.map((f, i) => `
           <tr>
@@ -254,13 +350,11 @@ export default function DocumentScannerPage() {
 
       document.body.removeChild(container);
 
-      // Try native share first
       const pdfFile = new File([pdf], `evrywher-scan-${Date.now()}.pdf`, { type: 'application/pdf' });
 
       if (navigator.share && navigator.canShare?.({ files: [pdfFile] })) {
-        await navigator.share({ files: [pdfFile], title: 'Translated Document' });
+        await navigator.share({ files: [pdfFile], title: 'Scanned Document' });
       } else {
-        // Fallback: download
         const url = URL.createObjectURL(pdf);
         const a = document.createElement('a');
         a.href = url;
@@ -269,29 +363,46 @@ export default function DocumentScannerPage() {
         URL.revokeObjectURL(url);
         toast('PDF downloaded', 'success');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[PDF export]', err);
       toast('Export failed', 'error');
     } finally {
       setExporting(false);
     }
-  }, [result, imageData, rotation, editedFields, fillAnswers, pdfOptions, isForm, isPro, toast]);
+  }, [result, imageData, enhancedImage, editedFields, fillAnswers, pdfOptions, exportMode, isForm, isPro, toast]);
 
-  /* ---------- Share helpers ---------- */
+  /* ---------- Helpers ---------- */
 
   const handlePrint = () => window.print();
-
-  /* ---------- Reset ---------- */
 
   const reset = () => {
     setStep(0);
     setImageData(null);
-    setImageFile(null);
+    setEnhancedImage(null);
     setResult(null);
     setEditedFields([]);
     setFillAnswers({});
     setRotation(0);
+    setBrightness(1.0);
+    setActivePreset('clean');
+    setShowCorners(false);
   };
+
+  const getStepForBack = () => {
+    if (step === 0) return -1; // go back to /ai
+    if (step === 1) return 0;
+    if (step === 2) return 1;
+    if (step === 3 && isForm) return 2;
+    if (step === 3 && !isForm) return 2;
+    if (step === 4) return isForm ? 3 : 2;
+    return step - 1;
+  };
+
+  const getExportStep = () => {
+    return isForm ? 4 : 3;
+  };
+
+  const getFillStep = () => 3;
 
   /* ---------- Render ---------- */
 
@@ -299,7 +410,14 @@ export default function DocumentScannerPage() {
     <div className="min-h-[100dvh] bg-slate-900 flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-4 pb-2 shrink-0">
-        <button onClick={() => step > 0 && !translating ? setStep(step === 2 && !isForm ? 0 : step - 1) : router.back()} className="p-2 -ml-2 text-slate-400 hover:text-white">
+        <button
+          onClick={() => {
+            const back = getStepForBack();
+            if (back < 0) router.back();
+            else setStep(back);
+          }}
+          className="p-2 -ml-2 text-slate-400 hover:text-white"
+        >
           <ArrowLeft size={20} />
         </button>
         <div className="flex-1">
@@ -351,42 +469,156 @@ export default function DocumentScannerPage() {
           </div>
         )}
 
-        {/* STEP 0: Image preview */}
+        {/* STEP 0: Image preview with corner handles */}
         {step === 0 && imageData && (
           <div className="mt-2">
-            <div className="relative bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50">
+            <div
+              ref={cornerContainerRef}
+              className="relative bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50"
+              onMouseMove={handleCornerMove}
+              onTouchMove={handleCornerMove}
+              onMouseUp={handleCornerEnd}
+              onTouchEnd={handleCornerEnd}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={imageData}
                 alt="Scanned document"
                 className="w-full max-h-[55vh] object-contain"
                 style={{ transform: `rotate(${rotation}deg)` }}
               />
+
+              {/* Semi-transparent overlay when corners shown */}
+              {showCorners && (
+                <div className="absolute inset-0 bg-black/30 pointer-events-none">
+                  <svg className="absolute inset-0 w-full h-full">
+                    <polygon
+                      points={corners.map(c => `${c.x}%,${c.y}%`).join(' ')}
+                      fill="none"
+                      stroke="#22C55E"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </div>
+              )}
+
+              {/* Corner handles */}
+              {showCorners && corners.map((c, i) => (
+                <div
+                  key={i}
+                  className="absolute w-6 h-6 bg-white rounded-full border-2 border-indigo-500 cursor-grab active:cursor-grabbing shadow-lg z-10 -translate-x-1/2 -translate-y-1/2"
+                  style={{ left: `${c.x}%`, top: `${c.y}%` }}
+                  onMouseDown={(e) => handleCornerDrag(e, i)}
+                  onTouchStart={(e) => handleCornerDrag(e, i)}
+                />
+              ))}
             </div>
-            <div className="flex items-center gap-3 mt-3">
+
+            <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={() => setRotation((r) => (r + 90) % 360)}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 text-sm text-slate-300 active:bg-slate-700"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 text-sm text-slate-300 active:bg-slate-700"
               >
                 <RotateCw size={16} /> Rotate
               </button>
               <button
-                onClick={() => { setImageData(null); setImageFile(null); }}
+                onClick={() => setShowCorners(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm active:bg-slate-700 ${
+                  showCorners ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-slate-800 text-slate-300'
+                }`}
+              >
+                Crop
+              </button>
+              <button
+                onClick={() => { setImageData(null); setEnhancedImage(null); }}
+                className="flex-1 px-3 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-300 text-center active:bg-slate-800"
+              >
+                Retake
+              </button>
+            </div>
+
+            <button
+              onClick={() => setStep(1)}
+              className="w-full mt-3 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-base active:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+            >
+              Next: Enhance <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+
+        {/* ═══ STEP 1: ENHANCE ═══ */}
+        {step === 1 && imageData && (
+          <div className="mt-2">
+            {/* Enhanced image preview */}
+            <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={enhancedImage || imageData}
+                alt="Enhanced"
+                className="w-full max-h-[50vh] object-contain"
+              />
+            </div>
+
+            {/* Preset buttons */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-3 -mx-1 px-1">
+              {ENHANCE_PRESETS.map(p => (
+                <button
+                  key={p.key}
+                  onClick={() => setActivePreset(p.key)}
+                  className={`shrink-0 flex flex-col items-center gap-1 px-4 py-2.5 rounded-xl border transition-colors ${
+                    activePreset === p.key
+                      ? 'bg-indigo-600/20 border-indigo-500 text-white'
+                      : 'bg-slate-800/60 border-slate-700/50 text-slate-400 active:bg-slate-800'
+                  }`}
+                >
+                  <span className="text-lg">{p.emoji}</span>
+                  <span className="text-[10px] font-medium whitespace-nowrap">{p.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Brightness slider */}
+            <div className="flex items-center gap-3 mb-3">
+              <Sun size={16} className="text-slate-500 shrink-0" />
+              <input
+                type="range"
+                min="0.5"
+                max="1.8"
+                step="0.05"
+                value={brightness}
+                onChange={e => setBrightness(parseFloat(e.target.value))}
+                className="flex-1 accent-indigo-500"
+              />
+              <span className="text-xs text-slate-500 w-8 text-right">{Math.round(brightness * 100)}%</span>
+            </div>
+
+            {/* Rotate */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setRotation(r => (r + 90) % 360)}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 text-sm text-slate-300 active:bg-slate-700"
+              >
+                <RotateCw size={16} /> Rotate 90°
+              </button>
+              <button
+                onClick={() => setStep(0)}
                 className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-300 text-center active:bg-slate-800"
               >
                 Retake
               </button>
             </div>
+
             <button
               onClick={handleTranslate}
-              className="w-full mt-3 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-base active:bg-indigo-700 transition-colors"
+              className="w-full py-3 rounded-xl bg-indigo-600 text-white font-semibold text-base active:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
             >
-              Translate Document
+              Next: Translate <ChevronRight size={16} />
             </button>
           </div>
         )}
 
-        {/* ═══ STEP 1: AI TRANSLATE ═══ */}
-        {step === 1 && (
+        {/* ═══ STEP 2: AI TRANSLATE ═══ */}
+        {step === 2 && (
           <div className="mt-2">
             {translating ? (
               <div className="flex flex-col items-center justify-center py-20">
@@ -412,8 +644,9 @@ export default function DocumentScannerPage() {
 
                 {/* Original image (collapsed) */}
                 <details className="mb-4">
-                  <summary className="text-sm text-slate-400 cursor-pointer hover:text-slate-300 mb-2">Show original scan</summary>
-                  <img src={imageData!} alt="Original" className="w-full rounded-xl border border-slate-700/50" style={{ transform: `rotate(${rotation}deg)` }} />
+                  <summary className="text-sm text-slate-400 cursor-pointer hover:text-slate-300 mb-2">Show enhanced scan</summary>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={enhancedImage || imageData!} alt="Enhanced" className="w-full rounded-xl border border-slate-700/50" />
                 </details>
 
                 {/* Fields (editable) */}
@@ -453,7 +686,7 @@ export default function DocumentScannerPage() {
                     <RefreshCw size={16} /> Retranslate
                   </button>
                   <button
-                    onClick={() => setStep(isForm ? 2 : totalSteps - 1)}
+                    onClick={() => setStep(isForm ? getFillStep() : getExportStep())}
                     className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm active:bg-indigo-700 flex items-center justify-center gap-2"
                   >
                     Next <ChevronRight size={16} />
@@ -464,11 +697,11 @@ export default function DocumentScannerPage() {
           </div>
         )}
 
-        {/* ═══ STEP 2: FILL (forms only) ═══ */}
-        {step === 2 && isForm && result && (
+        {/* ═══ STEP 3: FILL (forms only) ═══ */}
+        {step === getFillStep() && isForm && result && (
           <div className="mt-2">
             <h3 className="text-base font-semibold text-white mb-1">Fill Out This Form</h3>
-            <p className="text-xs text-slate-400 mb-4">Type your answers — they'll be ready to copy onto the form</p>
+            <p className="text-xs text-slate-400 mb-4">Type your answers — they&apos;ll be ready to copy onto the form</p>
 
             <div className="space-y-3">
               {editedFields.map((f, i) => (
@@ -487,7 +720,7 @@ export default function DocumentScannerPage() {
             </div>
 
             <button
-              onClick={() => setStep(totalSteps - 1)}
+              onClick={() => setStep(getExportStep())}
               className="w-full mt-4 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm active:bg-indigo-700 flex items-center justify-center gap-2"
             >
               Next: Export <ChevronRight size={16} />
@@ -495,33 +728,61 @@ export default function DocumentScannerPage() {
           </div>
         )}
 
-        {/* ═══ STEP 3 (or 2 for non-forms): EXPORT ═══ */}
-        {step === totalSteps - 1 && result && (
+        {/* ═══ STEP 4 (or 3): EXPORT ═══ */}
+        {step === getExportStep() && (
           <div className="mt-2">
             <h3 className="text-base font-semibold text-white mb-4">Export & Share</h3>
 
-            {/* PDF options */}
+            {/* Export mode selector */}
             <div className="bg-slate-800/60 rounded-xl border border-slate-700/50 divide-y divide-slate-700/50 mb-4">
               {[
-                { key: 'includeScan' as const, label: 'Include original scan' },
-                { key: 'includeTranslation' as const, label: 'Include translation' },
-                ...(isForm ? [{ key: 'includeFilledForm' as const, label: 'Include filled form' }] : []),
-              ].map((opt) => (
-                <label key={opt.key} className="flex items-center justify-between px-4 py-3.5 cursor-pointer">
-                  <span className="text-sm text-slate-300">{opt.label}</span>
+                { key: 'scan' as const, label: 'Scan-only PDF', desc: 'Clean enhanced image only' },
+                { key: 'translated' as const, label: 'Translated PDF', desc: 'Enhanced scan + translation' },
+                { key: 'both' as const, label: 'Both pages', desc: 'Page 1: scan, Page 2: translation' },
+              ].map(opt => (
+                <label key={opt.key} className="flex items-center gap-3 px-4 py-3.5 cursor-pointer">
                   <div
-                    className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${
-                      pdfOptions[opt.key]
-                        ? 'bg-indigo-600 border-indigo-600'
-                        : 'bg-slate-700 border-slate-600'
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      exportMode === opt.key
+                        ? 'border-indigo-500 bg-indigo-600'
+                        : 'border-slate-600 bg-slate-700'
                     }`}
-                    onClick={() => setPdfOptions((p) => ({ ...p, [opt.key]: !p[opt.key] }))}
+                    onClick={() => setExportMode(opt.key)}
                   >
-                    {pdfOptions[opt.key] && <Check size={14} className="text-white" />}
+                    {exportMode === opt.key && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                  <div onClick={() => setExportMode(opt.key)}>
+                    <span className="text-sm text-slate-300 block">{opt.label}</span>
+                    <span className="text-[10px] text-slate-500">{opt.desc}</span>
                   </div>
                 </label>
               ))}
             </div>
+
+            {/* Additional options (if translated mode) */}
+            {exportMode !== 'scan' && result && (
+              <div className="bg-slate-800/60 rounded-xl border border-slate-700/50 divide-y divide-slate-700/50 mb-4">
+                {[
+                  { key: 'includeScan' as const, label: 'Include scan image' },
+                  { key: 'includeTranslation' as const, label: 'Include translation text' },
+                  ...(isForm ? [{ key: 'includeFilledForm' as const, label: 'Include filled form' }] : []),
+                ].map((opt) => (
+                  <label key={opt.key} className="flex items-center justify-between px-4 py-3 cursor-pointer">
+                    <span className="text-sm text-slate-300">{opt.label}</span>
+                    <div
+                      className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${
+                        pdfOptions[opt.key]
+                          ? 'bg-indigo-600 border-indigo-600'
+                          : 'bg-slate-700 border-slate-600'
+                      }`}
+                      onClick={() => setPdfOptions((p) => ({ ...p, [opt.key]: !p[opt.key] }))}
+                    >
+                      {pdfOptions[opt.key] && <Check size={14} className="text-white" />}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
 
             {!isPro && (
               <p className="text-[11px] text-slate-500 mb-4 text-center">
@@ -536,9 +797,7 @@ export default function DocumentScannerPage() {
                 { label: 'Download', icon: Download, action: handleExport },
                 { label: 'Print', icon: Printer, action: handlePrint },
                 { label: 'Share', icon: Share2, action: handleExport },
-                { label: 'Email', icon: Mail, action: () => {
-                  handleExport(); // triggers native share on mobile
-                }},
+                { label: 'Email', icon: Mail, action: handleExport },
               ].map((btn) => {
                 const Icon = btn.icon;
                 return (
@@ -577,6 +836,9 @@ export default function DocumentScannerPage() {
           </div>
         )}
       </div>
+
+      {/* Hidden canvas for enhancement */}
+      <canvas ref={enhanceCanvasRef} className="hidden" />
     </div>
   );
 }

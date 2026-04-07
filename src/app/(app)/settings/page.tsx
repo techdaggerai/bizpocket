@@ -13,6 +13,8 @@ import NotificationSoundPicker from '@/components/NotificationSoundPicker';
 import { useChatLock, ChatLockSetupModal } from '@/components/ChatLockScreen';
 import PocketAvatar from '@/components/PocketAvatar';
 import PocketAvatarUI from '@/components/ui/PocketAvatar';
+import { wallpapers, getSavedWallpaperId, saveWallpaperId } from '@/lib/wallpapers';
+import { getSoundPrefs, saveSoundPrefs, previewMessageSound } from '@/lib/sounds';
 import TierBadge from '@/components/profile/TierBadge';
 import GlassCard from '@/components/ui/GlassCard';
 import type { Tier } from '@/lib/tier-system';
@@ -184,6 +186,55 @@ function FeedbackSection() {
   );
 }
 
+/* ---------- Wallpaper Picker ---------- */
+
+function WallpaperPicker() {
+  const [activeId, setActiveId] = useState(getSavedWallpaperId());
+
+  const select = (id: string) => {
+    setActiveId(id);
+    saveWallpaperId(id);
+  };
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-2">
+        {wallpapers.map(wp => (
+          <button
+            key={wp.id}
+            onClick={() => select(wp.id)}
+            className={`relative rounded-xl overflow-hidden border-2 transition-colors ${
+              activeId === wp.id ? 'border-[#4F46E5] ring-1 ring-[#4F46E5]/50' : 'border-slate-700'
+            }`}
+          >
+            {/* Preview thumbnail */}
+            <div className="h-[80px] relative" style={wp.previewStyle}>
+              {/* Mini fake message bubbles */}
+              <div className="absolute left-2 top-3 bg-slate-700/60 rounded-lg rounded-tl-sm px-2 py-1 max-w-[60%]">
+                <div className="h-1.5 w-10 bg-slate-500/40 rounded-full" />
+                <div className="h-1.5 w-6 bg-slate-500/30 rounded-full mt-1" />
+              </div>
+              <div className="absolute right-2 top-[38px] bg-indigo-600/40 rounded-lg rounded-tr-sm px-2 py-1">
+                <div className="h-1.5 w-8 bg-indigo-400/40 rounded-full" />
+              </div>
+              {activeId === wp.id && (
+                <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#4F46E5] flex items-center justify-center">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+              )}
+            </div>
+            {/* Label */}
+            <div className="px-2 py-1.5 bg-slate-800">
+              <p className="text-[10px] text-slate-400 text-center truncate">{wp.emoji} {wp.name}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+      <p className="text-xs text-[#9CA3AF] mt-2">Tap to apply. Reopen chat to see the change.</p>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const { profile, organization, user } = useAuth();
   const { t, lang, setLang } = useI18n();
@@ -228,6 +279,15 @@ export default function SettingsPage() {
   // Chat Lock state
   const { enabled: chatLockEnabled, enableLock, disableLock } = useChatLock();
   const [showLockSetup, setShowLockSetup] = useState(false);
+
+  // Sound prefs
+  const [soundPrefs, setSoundPrefsState] = useState(getSoundPrefs);
+  const [showStylePicker, setShowStylePicker] = useState(false);
+  const updateSoundPref = (update: Partial<typeof soundPrefs>) => {
+    const next = { ...soundPrefs, ...update };
+    setSoundPrefsState(next);
+    saveSoundPrefs(update);
+  };
 
   function handleChatLockToggle(val: boolean) {
     if (val) {
@@ -590,18 +650,69 @@ export default function SettingsPage() {
           </SettingsRow>
         </div>
 
-        {/* NOTIFICATIONS */}
+        {/* SOUNDS & NOTIFICATIONS */}
         <div>
-          <SectionLabel>Notifications</SectionLabel>
+          <SectionLabel>Sounds & Notifications</SectionLabel>
           <SettingsRow first>
             <span className="text-[14px] text-[var(--text-2)]">Message notifications</span>
             <Toggle on={messageNotifs} onChange={setMessageNotifs} />
           </SettingsRow>
           <SettingsRow>
-            <span className="text-[14px] text-[var(--text-2)]">Translation sounds</span>
-            <Toggle on={translationSounds} onChange={setTranslationSounds} />
+            <span className="text-[14px] text-[var(--text-2)]">Message sounds</span>
+            <Toggle on={soundPrefs.messageEnabled} onChange={v => updateSoundPref({ messageEnabled: v })} />
+          </SettingsRow>
+          <SettingsRow>
+            <span className="text-[14px] text-[var(--text-2)]">Send sound</span>
+            <Toggle on={soundPrefs.sendEnabled} onChange={v => updateSoundPref({ sendEnabled: v })} />
+          </SettingsRow>
+          <SettingsRow>
+            <span className="text-[14px] text-[var(--text-2)]">Call ringtone</span>
+            <Toggle on={soundPrefs.callEnabled} onChange={v => updateSoundPref({ callEnabled: v })} />
           </SettingsRow>
           <SettingsRow last>
+            <span className="text-[14px] text-[var(--text-2)]">Message sound style</span>
+            <button
+              onClick={() => setShowStylePicker(v => !v)}
+              className="text-[14px] text-indigo-400 font-medium flex items-center gap-1"
+            >
+              {{ chime: '🔔 Chime', bubble: '🫧 Bubble', melody: '🎵 Melody', silent: '🔕 Silent' }[soundPrefs.messageStyle]}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+            </button>
+          </SettingsRow>
+
+          {/* Sound style picker */}
+          {showStylePicker && (
+            <div className="mt-1 rounded-xl overflow-hidden border border-slate-700 bg-slate-800">
+              {([
+                { id: 'chime' as const, emoji: '🔔', name: 'Chime', desc: 'Gentle two-tone chime' },
+                { id: 'bubble' as const, emoji: '🫧', name: 'Bubble', desc: 'Bubbly pop sound' },
+                { id: 'melody' as const, emoji: '🎵', name: 'Melody', desc: 'Three-note ascending' },
+                { id: 'silent' as const, emoji: '🔕', name: 'Silent', desc: 'Vibration only' },
+              ] as const).map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => { updateSoundPref({ messageStyle: s.id }); previewMessageSound(s.id); }}
+                  className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-700 transition-colors text-left"
+                >
+                  <span className="text-xl w-8 text-center">{s.emoji}</span>
+                  <div className="flex-1">
+                    <p className={`text-[14px] font-semibold ${soundPrefs.messageStyle === s.id ? 'text-indigo-400' : 'text-slate-200'}`}>{s.name}</p>
+                    <p className="text-[12px] text-slate-500">{s.desc}</p>
+                  </div>
+                  <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                    soundPrefs.messageStyle === s.id ? 'border-[#4F46E5] bg-[#4F46E5]' : 'border-slate-600 bg-slate-800'
+                  }`}>
+                    {soundPrefs.messageStyle === s.id && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Existing notification sound picker */}
+          <SettingsRow first last>
             <span className="text-[14px] text-[var(--text-2)]">Notification sound</span>
             <button
               onClick={() => setShowSoundPicker(v => !v)}
@@ -612,7 +723,6 @@ export default function SettingsPage() {
             </button>
           </SettingsRow>
 
-          {/* Sound picker inline panel */}
           {showSoundPicker && (
             <div className="mt-1 rounded-xl overflow-hidden border border-slate-700">
               <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800 border-b border-slate-700">
@@ -641,28 +751,7 @@ export default function SettingsPage() {
         <div>
           <SectionLabel>Chat Wallpaper</SectionLabel>
           <div className="bg-slate-800 rounded-lg p-4">
-            <div className="flex gap-2 flex-wrap">
-              {[
-                { label: 'Default', value: '' },
-                { label: 'White', value: '#FFFFFF' },
-                { label: 'Cream', value: '#FFFBEB' },
-                { label: 'Sky', value: '#F0F9FF' },
-                { label: 'Mint', value: '#F0FDF4' },
-                { label: 'Lavender', value: '#F5F3FF' },
-                { label: 'Dots', value: 'radial-gradient(circle, #E5E7EB 1px, transparent 1px)' },
-              ].map(wp => (
-                <button
-                  key={wp.value}
-                  onClick={() => {
-                    if (typeof window !== 'undefined') localStorage.setItem('chat_wallpaper', wp.value);
-                  }}
-                  className="h-12 w-12 rounded-xl border-2 border-slate-700 hover:border-[#4F46E5] transition-colors"
-                  style={{ backgroundColor: wp.value.startsWith('#') ? wp.value : '#FAFAFA', backgroundImage: wp.value && !wp.value.startsWith('#') ? wp.value : undefined, backgroundSize: '20px 20px' }}
-                  title={wp.label}
-                />
-              ))}
-            </div>
-            <p className="text-xs text-[#9CA3AF] mt-2">Tap to preview. Reopen chat to see the change.</p>
+            <WallpaperPicker />
           </div>
         </div>
 
