@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { getBrandFromHost } from '@/lib/brand'
 
 export async function POST() {
   const cookieStore = await cookies()
@@ -52,7 +52,10 @@ export async function POST() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://evrywher.io'
+  const headersList = await headers()
+  const host = headersList.get('host') || ''
+  const brand = getBrandFromHost(host)
+  const baseUrl = brand === 'evrywher' ? 'https://evrywher.io' : 'https://www.bizpocket.io'
   return NextResponse.json({
     code,
     invite_url: `${baseUrl}/invite/${code}`,
