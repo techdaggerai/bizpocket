@@ -38,12 +38,8 @@ export default function TopNav() {
             </>
           ) : (
             <>
-              <div className="h-7 w-7 rounded-lg bg-[#4F46E5] flex items-center justify-center">
-                <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                </svg>
-              </div>
-              <span className="text-base font-bold text-indigo-400">BizPocket</span>
+              <PocketMark variant="xl" />
+              <span className="text-base font-bold"><span className="text-white">Biz</span><span className="text-indigo-400">Pocket</span></span>
             </>
           )}
         </Link>
