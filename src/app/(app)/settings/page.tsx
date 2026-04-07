@@ -623,10 +623,20 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
-          <SettingsRow>
-            <span className="text-[14px] text-[var(--text-2)]">Email</span>
-            <span className="text-[14px] text-[var(--text-3)]">{user.email}</span>
-          </SettingsRow>
+          {user.phone && (
+            <SettingsRow>
+              <span className="text-[14px] text-[var(--text-2)]">Phone</span>
+              <span className="text-[14px] text-[var(--text-3)]">
+                {user.phone.slice(0, -4).replace(/./g, (c: string, i: number) => i < 4 ? c : '*')}{user.phone.slice(-4)}
+              </span>
+            </SettingsRow>
+          )}
+          {user.email && (
+            <SettingsRow>
+              <span className="text-[14px] text-[var(--text-2)]">Email</span>
+              <span className="text-[14px] text-[var(--text-3)]">{user.email}</span>
+            </SettingsRow>
+          )}
           <InviteLinkRow />
         </div>
 

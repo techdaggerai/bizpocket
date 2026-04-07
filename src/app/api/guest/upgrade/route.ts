@@ -2,9 +2,20 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const { guestId, email, password, name } = await request.json()
+  const body = await request.json()
+  const { guestId, name } = body
 
-  if (!guestId || !email || !password) {
+  // Support both phone-based (userId already exists) and legacy email+password
+  const isPhoneAuth = !!body.userId && !!body.phone
+  const email = body.email
+  const password = body.password
+  const phone = body.phone
+  const existingUserId = body.userId
+
+  if (!guestId) {
+    return NextResponse.json({ error: 'Missing guestId' }, { status: 400 })
+  }
+  if (!isPhoneAuth && (!email || !password)) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
@@ -26,23 +37,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Guest session not found or already converted' }, { status: 404 })
   }
 
-  // ─── Create real auth user ───
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: name || guest.name },
-  })
+  let newUserId: string
 
-  if (authError || !authData.user) {
-    const msg = authError?.message || 'Failed to create account'
-    if (msg.includes('already') || msg.includes('exists')) {
-      return NextResponse.json({ error: 'An account with this email already exists. Log in instead.' }, { status: 409 })
+  if (isPhoneAuth) {
+    // Phone auth: user already verified via Supabase OTP — use their existing userId
+    newUserId = existingUserId
+
+    // Check if they already have a profile (returning user)
+    const { data: existingProfile } = await admin
+      .from('profiles')
+      .select('id, organization_id')
+      .eq('user_id', newUserId)
+      .maybeSingle()
+
+    if (existingProfile) {
+      // Already has account — just convert guest, update contact, done
+      if (guest.chat_id) {
+        const { data: inviterConvo } = await admin
+          .from('conversations')
+          .select('contact_id')
+          .eq('id', guest.chat_id)
+          .single()
+        if (inviterConvo?.contact_id) {
+          await admin.from('contacts').update({
+            phone,
+            notes: null,
+          }).eq('id', inviterConvo.contact_id)
+        }
+      }
+      await admin.from('guests').update({ converted_to: newUserId }).eq('id', guestId).catch(() => {})
+      return NextResponse.json({ success: true, userId: newUserId, chatId: guest.chat_id })
     }
-    return NextResponse.json({ error: msg }, { status: 400 })
+  } else {
+    // Legacy email+password: create auth user
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { full_name: name || guest.name },
+    })
+
+    if (authError || !authData.user) {
+      const msg = authError?.message || 'Failed to create account'
+      if (msg.includes('already') || msg.includes('exists')) {
+        return NextResponse.json({ error: 'An account with this email already exists. Log in instead.' }, { status: 409 })
+      }
+      return NextResponse.json({ error: msg }, { status: 400 })
+    }
+
+    newUserId = authData.user.id
   }
 
-  const newUserId = authData.user.id
   const guestName = name || guest.name
 
   // ─── Create org + profile ───
@@ -68,7 +113,8 @@ export async function POST(request: Request) {
     role: 'owner',
     name: guestName,
     full_name: guestName,
-    email,
+    email: email || null,
+    phone: phone || null,
     language: 'en',
     onboarding_completed: true,
     username,
@@ -79,7 +125,7 @@ export async function POST(request: Request) {
   if (inviterId) {
     const { data: inviterProfile } = await admin
       .from('profiles')
-      .select('full_name, name, email, language, organization_id')
+      .select('full_name, name, email, phone, language, organization_id')
       .eq('user_id', inviterId)
       .single()
 
@@ -89,23 +135,23 @@ export async function POST(request: Request) {
         organization_id: org.id,
         name: inviterProfile.full_name || inviterProfile.name || 'Contact',
         email: inviterProfile.email,
+        phone: inviterProfile.phone || '',
         contact_type: 'friend',
         language: inviterProfile.language || 'en',
       }).select('id').single()
 
       // Create conversation in new user's org
-      const { data: newConvo } = await admin.from('conversations').insert({
+      await admin.from('conversations').insert({
         organization_id: org.id,
         contact_id: inviterContact?.id || null,
         title: inviterProfile.full_name || inviterProfile.name || 'Chat',
         last_message: 'You signed up! Start chatting.',
         last_message_at: new Date().toISOString(),
         unread_count: 0,
-      }).select('id').single()
+      })
 
-      // Update the guest contact in inviter's org to remove "Guest" note
+      // Update the guest contact in inviter's org
       if (guest.chat_id) {
-        // Find the guest contact in inviter's conversations and update
         const { data: inviterConvo } = await admin
           .from('conversations')
           .select('contact_id')
@@ -114,7 +160,8 @@ export async function POST(request: Request) {
 
         if (inviterConvo?.contact_id) {
           await admin.from('contacts').update({
-            email,
+            email: email || null,
+            phone: phone || null,
             notes: null,
           }).eq('id', inviterConvo.contact_id)
         }

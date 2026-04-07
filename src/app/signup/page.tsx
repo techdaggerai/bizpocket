@@ -3,9 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 import { getBrandMode } from '@/lib/brand';
+import PhoneInput from '@/components/PhoneInput';
+import OTPInput from '@/components/OTPInput';
 
 export default function SignupPage() {
   return (
@@ -17,159 +19,169 @@ export default function SignupPage() {
 
 function SignupInner() {
   const supabase = createClient();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const plan = searchParams.get('plan') || 'free';
   const mode = searchParams.get('mode');
   const refOrgId = searchParams.get('ref');
+  const phoneVerified = searchParams.get('phone') === 'verified';
   const isPocketChat = mode === 'pocketchat' || getBrandMode() === 'evrywher';
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  // If redirected from login after phone verify, skip to name step
+  const [step, setStep] = useState<'phone' | 'otp' | 'name'>(phoneVerified ? 'name' : 'phone');
+  const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
-  const [language, setLanguage] = useState('en');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = isPocketChat ? 'Sign up — Evrywher' : 'Sign up — BizPocket';
+    document.title = isPocketChat ? 'Sign up \u2014 Evrywher' : 'Sign up \u2014 BizPocket';
   }, [isPocketChat]);
 
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
+  // ─── Step 1: Send OTP ───
+  async function handlePhoneSubmit(fullPhone: string) {
+    setLoading(true);
+    setError('');
+    setPhone(fullPhone);
+
+    const { error: authError } = await supabase.auth.signUp({ phone: fullPhone });
+
+    if (authError) {
+      // If user already exists, try OTP login instead
+      if (authError.message.includes('already') || authError.message.includes('exists')) {
+        const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
+        if (otpErr) {
+          setError(otpErr.message);
+          setLoading(false);
+          return;
+        }
+      } else {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+    }
+
+    setStep('otp');
+    setLoading(false);
+  }
+
+  // ─── Step 2: Verify OTP ───
+  async function handleVerify(code: string) {
     setLoading(true);
     setError('');
 
-    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name, preferred_language: isPocketChat ? language : 'en' },
-        emailRedirectTo: `${siteUrl}/auth/callback?source=${isPocketChat ? 'pocketchat' : 'bizpocket'}${isPocketChat ? `&lang=${language}` : ''}${refOrgId ? `&ref=${refOrgId}` : ''}`,
-      },
+    const { data, error: authError } = await supabase.auth.verifyOtp({
+      phone,
+      token: code,
+      type: 'sms',
     });
 
     if (authError) {
-      const msg = authError.message.toLowerCase();
-      if (msg.includes('already') || msg.includes('exists') || msg.includes('invalid login') || msg.includes('credentials') || msg.includes('registered')) {
-        setError('An account with this email already exists.');
-      } else {
-        setError(authError.message);
-      }
+      setError(authError.message);
       setLoading(false);
       return;
     }
 
-    // PocketChat: create org + profile immediately (they skip onboarding)
-    if (isPocketChat) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Check if profile already exists (e.g. from auth callback)
-        const { data: existingProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
+    if (!data.session) {
+      setError('Verification failed. Please try again.');
+      setLoading(false);
+      return;
+    }
 
-        if (!existingProfile) {
-          const { data: org } = await supabase.from('organizations').insert({
-            name: name || 'My Evrywher',
-            created_by: user.id,
-            plan: 'free',
-            language: language,
-            currency: 'JPY',
-            signup_source: 'pocketchat',
-          }).select().single();
+    // Check if user already has a profile (returning user)
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', data.user!.id)
+      .maybeSingle();
 
-          if (org) {
-            await supabase.from('profiles').insert({
-              user_id: user.id,
-              organization_id: org.id,
-              role: 'owner',
-              name: name || user.email?.split('@')[0] || 'Owner',
-              email: user.email!,
-              language: language,
-            });
+    if (existing) {
+      // Returning user — go straight to app
+      window.location.href = isPocketChat ? '/chat' : '/dashboard';
+      return;
+    }
 
-            // If referred, create mutual contacts + referral record
-            if (refOrgId) {
-              // ref can be an org ID (legacy) or a share_token (new invite links)
-              // Try share_token lookup first
-              let actualOrgId = refOrgId;
-              const { data: gpLookup } = await supabase
-                .from('global_profiles')
-                .select('organization_id')
-                .eq('share_token', refOrgId)
-                .single();
-              if (gpLookup) {
-                actualOrgId = gpLookup.organization_id;
-              }
+    setStep('name');
+    setLoading(false);
+  }
 
-              // Get inviter's owner profile
-              const { data: inviterProfile } = await supabase
-                .from('profiles')
-                .select('name, full_name, email, language')
-                .eq('organization_id', actualOrgId)
-                .eq('role', 'owner')
-                .single();
+  // ─── Step 3: Enter name + create profile ───
+  async function handleNameSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setLoading(true);
+    setError('');
 
-              if (inviterProfile) {
-                // Add inviter as contact for the new user
-                await supabase.from('contacts').insert({
-                  organization_id: org.id,
-                  name: inviterProfile.full_name || inviterProfile.name || 'Contact',
-                  email: inviterProfile.email,
-                  contact_type: 'friend',
-                  language: inviterProfile.language || 'en',
-                });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError('Session expired. Please try again.');
+      setLoading(false);
+      return;
+    }
 
-                // Add new user as contact for the inviter
-                await supabase.from('contacts').insert({
-                  organization_id: actualOrgId,
-                  name: name || user.email?.split('@')[0] || 'Contact',
-                  email: user.email,
-                  contact_type: 'friend',
-                  language: language,
-                });
+    // Check if profile already exists
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle();
 
-                // Create referral record for trust reward
-                // Look up inviter user_id from their org
-                const { data: inviterOwner } = await supabase
-                  .from('profiles')
-                  .select('user_id')
-                  .eq('organization_id', actualOrgId)
-                  .eq('role', 'owner')
-                  .single();
+    if (!existingProfile) {
+      const { data: org } = await supabase.from('organizations').insert({
+        name: name.trim(),
+        created_by: user.id,
+        plan: 'free',
+        language: 'en',
+        currency: 'JPY',
+        signup_source: isPocketChat ? 'pocketchat' : 'bizpocket',
+      }).select().single();
 
-                if (inviterOwner && inviterOwner.user_id !== user.id) {
-                  // Check for existing referral to prevent duplicates
-                  const { data: existingRef } = await supabase
-                    .from('referrals')
-                    .select('id')
-                    .eq('invitee_id', user.id)
-                    .single();
+      if (org) {
+        await supabase.from('profiles').insert({
+          user_id: user.id,
+          organization_id: org.id,
+          role: 'owner',
+          name: name.trim(),
+          full_name: name.trim(),
+          phone: user.phone || phone || null,
+          language: 'en',
+          onboarding_completed: isPocketChat,
+        });
 
-                  if (!existingRef) {
-                    await supabase.from('referrals').insert({
-                      inviter_id: inviterOwner.user_id,
-                      invitee_id: user.id,
-                      trust_awarded: false,
-                    });
-                  }
-                }
-              }
-            }
+        // Handle referral if present
+        if (refOrgId && isPocketChat) {
+          const { data: inviterProfile } = await supabase
+            .from('profiles')
+            .select('name, full_name, email, language')
+            .eq('organization_id', refOrgId)
+            .eq('role', 'owner')
+            .single();
+
+          if (inviterProfile) {
+            await supabase.from('contacts').insert([
+              {
+                organization_id: org.id,
+                name: inviterProfile.full_name || inviterProfile.name || 'Contact',
+                email: inviterProfile.email,
+                contact_type: 'friend',
+                language: inviterProfile.language || 'en',
+              },
+              {
+                organization_id: refOrgId,
+                name: name.trim(),
+                phone: user.phone || phone || null,
+                contact_type: 'friend',
+                language: 'en',
+              },
+            ]);
           }
         }
       }
     }
 
-    // Process pending invite code (from /invite/[code] flow)
+    // Process pending invite code
     if (isPocketChat) {
-      const inviteCode = localStorage.getItem('pending_invite_code')
-        || searchParams.get('invite');
-
+      const inviteCode = localStorage.getItem('pending_invite_code') || searchParams.get('invite');
       if (inviteCode) {
         try {
           const res = await fetch('/api/invites/accept', {
@@ -177,136 +189,112 @@ function SignupInner() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: inviteCode }),
           });
-          const data = await res.json();
+          await res.json();
           localStorage.removeItem('pending_invite_code');
-
-          if (data.success && data.conversation_id) {
-            window.location.href = '/chat';
-            return;
-          }
-        } catch (err) {
-          console.error('[signup] invite accept failed:', err);
+        } catch {
           localStorage.removeItem('pending_invite_code');
         }
       }
     }
 
-    router.push(isPocketChat ? '/chat' : `/onboarding?plan=${plan}`);
+    window.location.href = isPocketChat ? '/chat' : `/onboarding?plan=${plan}`;
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
       <div className="w-full max-w-sm">
+        {/* Logo */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex flex-col items-center gap-3">
             {isPocketChat ? <PocketChatMark size={64} /> : <PocketMark variant="lg" />}
             {!isPocketChat && <LogoWordmark />}
           </div>
-          <h1 className="text-xl font-semibold text-[var(--text-1)]">{isPocketChat ? 'Sign up for Evrywher' : 'Create your account'}</h1>
-          <p className="mt-1.5 text-sm text-[var(--text-3)]">{isPocketChat ? 'Chat in any language. Free.' : 'Start managing your business'}</p>
+          <h1 className="text-xl font-semibold text-[var(--text-1)]">
+            {step === 'name' ? "What\u2019s your name?" : isPocketChat ? 'Welcome to Evrywher' : 'Create your account'}
+          </h1>
+          <p className="mt-1.5 text-sm text-[var(--text-3)]">
+            {step === 'phone' && (isPocketChat ? 'Chat in any language. Free.' : 'Enter your phone to start')}
+            {step === 'name' && 'One last thing \u2014 your name for chats'}
+          </p>
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          {error && (
-            <div className="rounded-input border border-[var(--red)]/20 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)]">
-              {error}
-              {error.includes('already') && (
-                <Link href={isPocketChat ? '/login?mode=pocketchat' : '/login'} className="mt-1 block text-[var(--accent)] font-medium hover:underline">
-                  Log in here &rarr;
-                </Link>
-              )}
-            </div>
-          )}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Full Name</label>
+        {error && step !== 'otp' && (
+          <div className="rounded-lg border border-[var(--red)]/20 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)] mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* ─── Step 1: Phone ─── */}
+        {step === 'phone' && (
+          <>
+            <PhoneInput
+              onSubmit={handlePhoneSubmit}
+              loading={loading}
+              buttonText="Continue \u2192"
+              dark={false}
+            />
+
+            <p className="mt-3 text-center text-xs text-[var(--text-4)]">
+              By signing up you agree to our{' '}
+              <Link href="/terms" className="text-indigo-400">Terms</Link> and{' '}
+              <Link href="/privacy" className="text-indigo-400">Privacy Policy</Link>
+            </p>
+
+            <p className="mt-6 text-center text-sm text-[var(--text-3)]">
+              Already have an account?{' '}
+              <Link href={isPocketChat ? '/login?mode=pocketchat' : '/login'} className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
+                Log In
+              </Link>
+            </p>
+          </>
+        )}
+
+        {/* ─── Step 2: OTP ─── */}
+        {step === 'otp' && (
+          <>
+            <OTPInput
+              phone={phone}
+              onVerify={handleVerify}
+              onResend={() => handlePhoneSubmit(phone)}
+              loading={loading}
+              error={error}
+              dark={false}
+            />
+
+            <button
+              onClick={() => { setStep('phone'); setError(''); }}
+              className="mt-6 w-full text-center text-sm text-[var(--accent)] font-medium active:opacity-60"
+            >
+              Change phone number
+            </button>
+          </>
+        )}
+
+        {/* ─── Step 3: Name ─── */}
+        {step === 'name' && (
+          <form onSubmit={handleNameSubmit} className="space-y-4">
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              onChange={e => setName(e.target.value)}
               placeholder="Your name"
+              autoFocus
+              className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3.5 text-lg text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none text-center"
               required
             />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          {isPocketChat && (
-            <div>
-              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[var(--text-2)]">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A8.966 8.966 0 0 1 3 12c0-1.264.26-2.467.73-3.558" /></svg>
-                Your language
-              </label>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              >
-                <option value="en">English</option>
-                <option value="ja">日本語</option>
-                <option value="ur">اردو</option>
-                <option value="ar">العربية</option>
-                <option value="bn">বাংলা</option>
-                <option value="pt">Português</option>
-                <option value="fil">Filipino</option>
-                <option value="vi">Tiếng Việt</option>
-                <option value="tr">Türkçe</option>
-                <option value="zh">中文</option>
-                <option value="fr">Français</option>
-                <option value="nl">Nederlands</option>
-                <option value="es">Español</option>
-                <option value="ps">پښتو</option>
-                <option value="fa">فارسی</option>
-                <option value="hi">हिन्दी</option>
-                <option value="ko">한국어</option>
-                <option value="th">ไทย</option>
-                <option value="id">Bahasa Indonesia</option>
-                <option value="ne">नेपाली</option>
-                <option value="si">සිංහල</option>
-              </select>
-            </div>
-          )}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-[var(--text-2)]">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-input border border-[var(--border-strong)] bg-[var(--bg)] px-3.5 py-2.5 text-base text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              placeholder="Minimum 6 characters"
-              minLength={6}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-btn bg-[var(--accent)] py-2.5 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] hover:-translate-y-px disabled:opacity-50 disabled:hover:translate-y-0"
-          >
-            {loading ? 'Creating account...' : isPocketChat ? 'Get Evrywher free' : 'Open Your Pocket'}
-          </button>
-        </form>
-
-        <p className="mt-3 text-center text-xs text-[#9ca3af]">
-          By signing up you agree to our{' '}
-          <Link href="/terms" className="text-indigo-400">Terms</Link> and{' '}
-          <Link href="/privacy" className="text-indigo-400">Privacy Policy</Link>
-        </p>
-
-        <p className="mt-6 text-center text-sm text-[var(--text-3)]">
-          Already have an account?{' '}
-          <Link href={isPocketChat ? '/login?mode=pocketchat' : '/login'} className="text-[var(--accent)] hover:text-[var(--accent-hover)]">
-            Log In
-          </Link>
-        </p>
+            <button
+              type="submit"
+              disabled={loading || !name.trim()}
+              className="w-full bg-indigo-600 text-white text-lg font-semibold rounded-xl py-4 active:bg-indigo-700 disabled:opacity-40 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                'Start Chatting \u2192'
+              )}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
