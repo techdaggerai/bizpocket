@@ -50,19 +50,24 @@ export const viewport: Viewport = {
   themeColor: '#0F172A',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const host = headersList.get('host') || '';
+  const brand = getBrandFromHost(host);
+  const isEvrywher = brand === 'evrywher';
+
   return (
     <html lang="en" className="dark" data-theme="dark">
       <head>
         <link rel="manifest" href="/api/manifest" />
         <meta name="theme-color" content="#0F172A" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Evrywher" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-title" content={isEvrywher ? 'Evrywher' : 'BizPocket'} />
+        <link rel="apple-touch-icon" href={isEvrywher ? '/icons/evrywher-icon-192.png' : '/icons/bizpocket-icon-192.png'} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600&family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;700&family=Noto+Sans+Sinhala:wght@400;500;700&display=swap" rel="stylesheet" />
