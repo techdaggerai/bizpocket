@@ -239,7 +239,7 @@ export default function DashboardPage() {
               {greeting}{firstName ? `, ${firstName}` : ''} {emoji}
             </h1>
             {showJa && <p className="text-sm text-slate-200 mt-0.5">{jaGreeting}</p>}
-            <p className="text-sm text-slate-200 mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <p className="text-sm text-slate-300 mt-0.5">{organization.name} {'\u00B7'} {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
         );
       })()}
@@ -341,13 +341,13 @@ export default function DashboardPage() {
 
       {/* Smart Actions — API-driven tiles */}
       {smartTiles && smartTiles.length > 0 && (
-        <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex flex-wrap gap-2.5 justify-center">
           {smartTiles.map((t: any, i: number) => (
-            <Link key={i} href={t.route} className="no-underline shrink-0 w-[100px] min-w-[100px]">
+            <Link key={i} href={t.route} className="no-underline flex-1 min-w-[75px] max-w-[120px]">
               <GlassCard elevated className={`text-center h-[90px] flex flex-col items-center justify-center px-2 ${t.highlight ? 'animate-[predictPulse_2s_infinite]' : ''}`}>
                 <span className="text-lg">{t.icon}</span>
                 <p className="text-[12px] font-semibold text-white mt-1 truncate max-w-[80px]">{t.label}</p>
-                {t.points && <p className="text-[10px] text-slate-400">+{t.points}</p>}
+                {t.points && <p className="text-[10px] text-slate-300">+{t.points}</p>}
               </GlassCard>
             </Link>
           ))}
@@ -520,14 +520,14 @@ export default function DashboardPage() {
               <div key={i} className="flex items-center shrink-0">
                 <div className="rounded-lg px-4 py-3 text-center min-w-[90px] border" style={{ borderColor: stage.color + '40', backgroundColor: stage.color + '08' }}>
                   <p className="text-xs font-bold" style={{ color: stage.color }}>{stage.stage_order}</p>
-                  <p className="text-[11px] font-medium text-slate-400 whitespace-nowrap">{stage.name}</p>
+                  <p className="text-[11px] font-medium text-slate-300 whitespace-nowrap">{stage.name}</p>
                 </div>
                 {i < cycleStages.length - 1 && <svg className="h-4 w-4 text-slate-400 shrink-0 mx-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>}
               </div>
             ))}
           </div>
           <div className="mt-3 flex gap-2">
-            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-slate-700 py-2.5 text-center text-[11px] font-medium text-slate-400 hover:bg-slate-700">Edit Cycle</Link>
+            <Link href="/cycle-setup" className="flex-1 rounded-lg border border-slate-700 py-2.5 text-center text-[11px] font-medium text-slate-300 hover:bg-slate-700">Edit Cycle</Link>
             <Link href="/ops-radar" className="flex-1 rounded-lg bg-[#0A0A0A] py-2.5 text-center text-[11px] font-medium text-white hover:bg-[#333]">Ops Radar &rarr;</Link>
           </div>
         </div>
@@ -539,7 +539,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-white">Set up your business cycle</p>
-              <p className="text-[11px] text-slate-400">AI creates your custom pipeline in 2 minutes</p>
+              <p className="text-[11px] text-slate-300">AI creates your custom pipeline in 2 minutes</p>
             </div>
             <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
           </div>
@@ -555,7 +555,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-white">Unlock the full autopilot</p>
-              <p className="text-xs text-slate-400">Unlimited invoices, AI Briefing, 21 languages</p>
+              <p className="text-xs text-slate-300">Unlimited invoices, AI Briefing, 21 languages</p>
             </div>
             <span className="rounded-full border border-[#F59E0B] px-3 py-1.5 text-xs font-bold text-[#F59E0B]">Go Pro &rarr;</span>
           </div>
