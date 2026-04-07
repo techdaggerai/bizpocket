@@ -413,7 +413,7 @@ export default function ContactsPage() {
             {contacts.length} contact{contacts.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex items-center gap-2 flex-wrap">
           <OutlinePillButton
             label="Find"
             icon={<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>}
