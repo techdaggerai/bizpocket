@@ -106,14 +106,36 @@ export default function VoiceTranslatePage() {
     }
   }, [speakText]);
 
-  // ─── TTS ───
-  const speakText = useCallback((text: string, lang: string) => {
+  // ─── TTS (ElevenLabs with browser fallback) ───
+  const speakText = useCallback(async (text: string, lang: string) => {
     if (!text) return;
     speechSynthesis.cancel();
+    setIsSpeaking(true);
+
+    try {
+      const res = await fetch('/api/ai/voice-speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, language: lang }),
+      });
+
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => setIsSpeaking(false);
+        audio.onerror = () => setIsSpeaking(false);
+        audio.play();
+        return;
+      }
+    } catch {
+      // Fall through to browser TTS
+    }
+
+    // Fallback to browser TTS
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = SPEECH_LANG_MAP[lang] || lang;
     utterance.rate = 0.9;
-    utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
     speechSynthesis.speak(utterance);

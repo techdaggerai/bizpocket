@@ -11,6 +11,7 @@ import {
   Globe,
   ScanLine,
   FileText,
+  ClipboardList,
   Download,
   GraduationCap,
   Globe2,
@@ -65,6 +66,13 @@ const FEATURES = [
     icon: FileText,
     bg: 'bg-orange-600',
     route: '/ai/documents',
+  },
+  {
+    title: 'Form Helper',
+    desc: 'Fill Japanese forms with confidence',
+    icon: ClipboardList,
+    bg: 'bg-amber-600',
+    route: '/ai/form-fill',
   },
   {
     title: 'PDF Export',

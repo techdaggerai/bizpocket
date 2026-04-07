@@ -80,6 +80,105 @@ Rules:
       return NextResponse.json({ fields, fieldCount: fields.length })
     }
 
+    // ── ACTION: guide — Japanese form expert analysis ────────────────────────
+    if (action === 'guide') {
+      const file = formData.get('file') as File
+      const formType = (formData.get('formType') as string) || 'unknown'
+
+      if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'File must be under 10MB' }, { status: 400 })
+
+      const bytes = await file.arrayBuffer()
+      const base64 = Buffer.from(bytes).toString('base64')
+      const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+
+      const guidePrompt = `You are a Japanese form expert helping foreigners fill out Japanese forms. Analyze this form image carefully.
+
+Form type hint: ${formType}
+
+Return ONLY valid JSON with this exact structure — no explanation, no markdown, no backticks:
+{
+  "formTitle": "The Japanese title of the form exactly as written",
+  "formTitleTranslated": "English translation of the form title",
+  "fields": [
+    {
+      "number": 1,
+      "japaneseLabel": "Exact Japanese label as written on the form",
+      "englishLabel": "English translation",
+      "guidance": "Clear guidance in English on what to write, including format requirements",
+      "example": "Example value that would be correct",
+      "required": true,
+      "type": "text"
+    }
+  ]
+}
+
+Rules:
+- Identify EVERY field, checkbox, radio button, and section
+- For checkboxes/radio buttons, explain what each option means in English
+- Mark fields as required if they have ※ or 必須 or appear mandatory
+- type can be: text, date, checkbox, radio, select, address, phone, name
+- If form type is "${formType}", use your deep knowledge of that specific Japanese form to give extra-precise guidance
+- For name fields, note if furigana (フリガナ) is needed
+- For date fields, specify Japanese format (令和/Year format)
+- For address fields, note the order (prefecture → city → street)
+- Include seal/stamp (印鑑) fields if present
+- Return ONLY the JSON, nothing else`
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: guidePrompt },
+          ],
+        }],
+      })
+
+      const rawText = response.content[0].type === 'text' ? response.content[0].text : '{}'
+      const clean = rawText.replace(/```json|```/g, '').trim()
+
+      try {
+        const result = JSON.parse(clean)
+        return NextResponse.json(result)
+      } catch {
+        return NextResponse.json({ error: 'Failed to parse form analysis' }, { status: 500 })
+      }
+    }
+
+    // ── ACTION: follow-up — ask about a specific field ─────────────────────
+    if (action === 'follow-up') {
+      const question = formData.get('question') as string
+      const fieldJson = formData.get('field') as string
+      if (!question) return NextResponse.json({ error: 'Missing question' }, { status: 400 })
+
+      let fieldContext = ''
+      if (fieldJson) {
+        try {
+          const f = JSON.parse(fieldJson)
+          fieldContext = `Field: "${f.japaneseLabel}" (${f.englishLabel}). Guidance: ${f.guidance}. Example: ${f.example}.`
+        } catch { /* ignore */ }
+      }
+
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: `You are a Japanese form expert helping a foreigner. ${fieldContext}
+
+Their question: "${question}"
+
+Give a clear, helpful answer in English. Be specific about Japanese conventions, formats, and requirements. Keep it concise (2-4 sentences).`,
+        }],
+      })
+
+      const answer = response.content[0].type === 'text' ? response.content[0].text.trim() : 'Sorry, I could not answer that.'
+      return NextResponse.json({ answer })
+    }
+
     // ── ACTION: ask ────────────────────────────────────────────────────────────
     if (action === 'ask') {
       const fieldRaw = formData.get('field') as string

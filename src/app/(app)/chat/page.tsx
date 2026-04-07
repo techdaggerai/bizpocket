@@ -79,6 +79,7 @@ interface Conversation {
   disappearing_timer?: string;
   label?: string | null;
   label_color?: string | null;
+  translation_mode?: string | null;
   contact?: Contact | null;
 }
 
@@ -164,6 +165,12 @@ function avatarColor(name: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
+function resolveTranslationMode(mode: string | null | undefined, myLang: string, contactLang: string | undefined): 'translate_all' | 'direct' | 'text_only' {
+  if (mode === 'translate_all' || mode === 'direct' || mode === 'text_only') return mode;
+  // 'auto' or null/undefined: same language = direct, different = translate_all
+  return myLang === (contactLang || 'ja') ? 'direct' : 'translate_all';
+}
+
 /* ---------- Component ---------- */
 
 export default function PocketChatPage() {
@@ -227,6 +234,7 @@ export default function PocketChatPage() {
   const [showBizCardGateSheet, setShowBizCardGateSheet] = useState(false);
   const [showCameraTranslate, setShowCameraTranslate] = useState(false);
   const [showVoiceTranslator, setShowVoiceTranslator] = useState(false);
+  const [showTranslationMode, setShowTranslationMode] = useState(false);
   const [showBizCardGate, setShowBizCardGate] = useState(false);
   const [bizCardGateData, setBizCardGateData] = useState<any>(null);
   const [chatSearch, setChatSearch] = useState('');
@@ -1220,8 +1228,9 @@ export default function PocketChatPage() {
         playSound('send');
         supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
 
-        // Background translation — don't block UI
-        if (msg && recipientLang !== senderLang) {
+        // Background translation — don't block UI (respect translation mode)
+        const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, senderLang, activeConvo?.contact?.language);
+        if (msg && recipientLang !== senderLang && effTransMode !== 'direct') {
           fetch('/api/ai/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1257,12 +1266,14 @@ export default function PocketChatPage() {
     const recipientLang = activeConvo?.contact?.language || 'ja';
     const wordCount = text.split(/\s+/).length;
 
+    const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, senderLang, activeConvo?.contact?.language);
     if (
       activeConvo?.is_bot_chat ||
       editingMsg ||
       !culturalCoachEnabled ||
       wordCount <= 10 ||
-      senderLang === recipientLang
+      senderLang === recipientLang ||
+      effTransMode === 'direct'
     ) {
       sendMessage();
       return;
@@ -1761,6 +1772,21 @@ export default function PocketChatPage() {
             {isGroup && !activeConvo.is_bot_chat && (
               <button onClick={() => setShowGroupInfo(true)} className="text-[11px] text-indigo-400 hover:underline">Tap for group info</button>
             )}
+            {!activeConvo.is_bot_chat && (() => {
+              const effMode = resolveTranslationMode(activeConvo.translation_mode, chatLang || profile?.language || 'en', activeConvo.contact?.language);
+              return (
+                <button
+                  onClick={() => setShowTranslationMode(true)}
+                  className={`mt-0.5 text-[10px] px-2 py-0.5 rounded-full font-medium min-h-[22px] ${
+                    effMode === 'direct'
+                      ? 'bg-slate-700 text-slate-400'
+                      : 'bg-indigo-600/20 text-indigo-400'
+                  }`}
+                >
+                  {effMode === 'direct' ? 'Direct' : effMode === 'text_only' ? 'Text Only' : `${(chatLang || profile?.language || 'en').toUpperCase()}⇄${(activeConvo.contact?.language || 'ja').toUpperCase()}`}
+                </button>
+              );
+            })()}
           </div>
 
           {/* Right: phone + video ONLY (search + labels + memory moved to ⋮ menu) */}
@@ -2460,6 +2486,55 @@ export default function PocketChatPage() {
               }}
             />
           )}
+        </BottomSheet>
+
+        {/* Translation Mode bottom sheet */}
+        <BottomSheet isOpen={showTranslationMode} onClose={() => setShowTranslationMode(false)} title="Chat Mode" snapPoints={[0.45]}>
+          {(() => {
+            const effMode = resolveTranslationMode(activeConvo?.translation_mode, chatLang || profile?.language || 'en', activeConvo?.contact?.language);
+            const setMode = async (mode: 'translate_all' | 'direct' | 'text_only') => {
+              if (!activeConvoId) return;
+              await supabase.from('conversations').update({ translation_mode: mode }).eq('id', activeConvoId);
+              setConversations(prev => prev.map(c => c.id === activeConvoId ? { ...c, translation_mode: mode } : c));
+              // Send system message
+              const modeLabel = mode === 'translate_all' ? 'Translate All' : mode === 'direct' ? 'Direct Chat' : 'Text Only';
+              await supabase.from('messages').insert({
+                conversation_id: activeConvoId,
+                organization_id: organization!.id,
+                sender_type: 'owner',
+                sender_name: 'System',
+                message: `Translation mode changed to ${modeLabel}`,
+                message_type: 'text',
+              });
+              setShowTranslationMode(false);
+            };
+            const options: { key: 'translate_all' | 'direct' | 'text_only'; title: string; desc: string }[] = [
+              { key: 'translate_all', title: 'Translate All', desc: 'Messages, voice & calls translated' },
+              { key: 'direct', title: 'Direct Chat', desc: 'No translation — like WhatsApp' },
+              { key: 'text_only', title: 'Text Only', desc: 'Translate text, voice stays original' },
+            ];
+            return (
+              <div className="space-y-2">
+                {options.map(opt => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setMode(opt.key)}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl bg-slate-700/50 border-2 transition-colors ${
+                      effMode === opt.key ? 'border-indigo-500' : 'border-transparent'
+                    }`}
+                  >
+                    <div className="text-left">
+                      <p className="text-white font-medium">{opt.title}</p>
+                      <p className="text-slate-400 text-sm">{opt.desc}</p>
+                    </div>
+                    {effMode === opt.key && (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818CF8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
         </BottomSheet>
 
         {/* Upload progress */}

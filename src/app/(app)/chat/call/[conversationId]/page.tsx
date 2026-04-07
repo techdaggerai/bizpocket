@@ -25,7 +25,11 @@ export default function VoiceCallPage() {
   const [translatedText, setTranslatedText] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactLang, setContactLang] = useState('ja');
+  const [translationMode, setTranslationMode] = useState<string>('auto');
   const myLang = profile?.language || 'en';
+  const effectiveMode = translationMode === 'translate_all' || translationMode === 'direct' || translationMode === 'text_only'
+    ? translationMode
+    : myLang === contactLang ? 'direct' : 'translate_all';
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
@@ -35,32 +39,60 @@ export default function VoiceCallPage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from('conversations').select('title, contact:contacts(name, language)').eq('id', conversationId).single();
+      const { data } = await supabase.from('conversations').select('title, translation_mode, contact:contacts(name, language)').eq('id', conversationId).single();
       if (data) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const c = data.contact as any;
         setContactName(c?.name || data.title || 'Contact');
         setContactLang(c?.language || 'ja');
+        if (data.translation_mode) setTranslationMode(data.translation_mode);
       }
     };
     load();
   }, [conversationId]); // eslint-disable-line
+
+  const speakWithElevenLabs = async (text: string, lang: string, voiceId?: string) => {
+    try {
+      const res = await fetch('/api/ai/voice-speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, language: lang, ...(voiceId && { voiceId }) }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        await audio.play();
+      } else {
+        throw new Error('ElevenLabs failed');
+      }
+    } catch {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = LANG_VOICES[lang] || 'en-US';
+      utterance.rate = 0.9;
+      speechSynthesis.speak(utterance);
+    }
+  };
 
   useEffect(() => {
     const ch = supabase.channel(`call:${conversationId}`);
     ch.on('broadcast', { event: 'speech' }, ({ payload }) => {
       if (payload.userId !== user?.id) {
         setTheirText(payload.original);
-        setTranslatedText(payload.translated);
-        const u = new SpeechSynthesisUtterance(payload.translated);
-        u.lang = LANG_VOICES[myLang] || 'en-US';
-        u.rate = 0.95;
-        speechSynthesis.speak(u);
+        if (effectiveMode === 'direct') {
+          setTranslatedText(payload.original);
+        } else if (effectiveMode === 'text_only') {
+          setTranslatedText(payload.translated);
+          // Text subtitles only — no spoken TTS
+        } else {
+          setTranslatedText(payload.translated);
+          speakWithElevenLabs(payload.translated, myLang);
+        }
       }
     }).subscribe();
     channelRef.current = ch;
     return () => { ch.unsubscribe(); };
-  }, [conversationId, myLang, user?.id]);
+  }, [conversationId, myLang, user?.id, effectiveMode]);
 
   const startListening = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,13 +113,18 @@ export default function VoiceCallPage() {
       setMyText(interim || final);
       if (final.trim()) {
         setMyText(final);
-        try {
-          const res = await fetch('/api/ai/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: final, fromLanguage: myLang, toLanguage: contactLang }) });
-          if (res.ok) {
-            const data = await res.json();
-            channelRef.current?.send({ type: 'broadcast', event: 'speech', payload: { userId: user?.id, original: final, translated: data.translatedText, fromLang: myLang, toLang: contactLang } });
-          }
-        } catch { /* ignore */ }
+        if (effectiveMode === 'direct') {
+          // No translation — broadcast raw
+          channelRef.current?.send({ type: 'broadcast', event: 'speech', payload: { userId: user?.id, original: final, translated: final, fromLang: myLang, toLang: contactLang } });
+        } else {
+          try {
+            const res = await fetch('/api/ai/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: final, fromLanguage: myLang, toLanguage: contactLang }) });
+            if (res.ok) {
+              const data = await res.json();
+              channelRef.current?.send({ type: 'broadcast', event: 'speech', payload: { userId: user?.id, original: final, translated: data.translatedText, fromLang: myLang, toLang: contactLang } });
+            }
+          } catch { /* ignore */ }
+        }
       }
     };
     recognition.onend = () => { if (callActive) try { recognition.start(); } catch { /* ignore */ } };
