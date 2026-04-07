@@ -120,6 +120,15 @@ const LANG_NAMES: Record<string, string> = {
   fil: 'Filipino', ps: 'Pashto', fa: 'Persian', hi: 'Hindi', ko: 'Korean', th: 'Thai', id: 'Indonesian', ne: 'Nepali', si: 'Sinhala',
 };
 
+const LANG_CODES_3: Record<string, string> = {
+  en: 'ENG', ja: 'JPN', ur: 'URD', ar: 'ARB', hi: 'HIN', bn: 'BEN', ne: 'NEP',
+  zh: 'CHN', ko: 'KOR', fr: 'FRA', es: 'ESP', pt: 'POR', vi: 'VIE', fil: 'FIL',
+  tr: 'TUR', id: 'IND', th: 'THA', nl: 'NLD', si: 'SIN', ps: 'PAS', fa: 'PER',
+  tl: 'TGL',
+};
+
+const SEND_AS_LANGS = ['en','ja','ur','ar','hi','bn','ne','zh','ko','fr','es','pt','vi','fil','tr','id','th','nl'];
+
 type FilterType = 'all' | 'customer' | 'supplier' | 'invoice';
 
 /* ---------- Helpers ---------- */
@@ -227,6 +236,7 @@ export default function PocketChatPage() {
   const [pickerTab, setPickerTab] = useState<'emoji' | 'stickers' | 'gifs'>('emoji');
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [showSendLangPicker, setShowSendLangPicker] = useState(false);
   const [showAIMenu, setShowAIMenu] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [matchPillDismissed, setMatchPillDismissed] = useState(false);
@@ -2510,7 +2520,7 @@ export default function PocketChatPage() {
             };
             const options: { key: 'translate_all' | 'direct' | 'text_only'; title: string; desc: string }[] = [
               { key: 'translate_all', title: 'Translate All', desc: 'Messages, voice & calls translated' },
-              { key: 'direct', title: 'Direct Chat', desc: 'No translation — like WhatsApp' },
+              { key: 'direct', title: 'Direct Chat', desc: 'No translation — send messages as-is' },
               { key: 'text_only', title: 'Text Only', desc: 'Translate text, voice stays original' },
             ];
             return (
@@ -2730,23 +2740,39 @@ export default function PocketChatPage() {
 
           {/* Translation info + Send As — compact single line */}
           {!activeConvo?.is_bot_chat && (
-            <div className="flex items-center justify-between px-1 mb-1">
+            <div className="relative flex items-center justify-between px-1 mb-1">
               <span className="text-[11px] text-slate-400">
                 {isFreePlan ? `${Math.max(0, 10 - translationsUsed)}/10 translations left` : 'Unlimited translations'}
                 {' · Send as: '}
                 <span
                   role="button"
-                  onClick={() => {
-                    const langs = ['en','ja','ur','ar','bn','pt','tl','vi','tr','zh','fr','nl','es','ko','hi','th','id'];
-                    const idx = langs.indexOf(chatLang);
-                    setChatLang(langs[(idx + 1) % langs.length]);
-                  }}
+                  onClick={() => setShowSendLangPicker(prev => !prev)}
                   className="text-[11px] text-slate-300 font-medium cursor-pointer underline decoration-dotted underline-offset-2"
                 >
-                  {chatLang.toUpperCase()}
+                  {LANG_CODES_3[chatLang] || chatLang.toUpperCase()}
                 </span>
               </span>
               <span className="text-[10px] text-slate-500">AI translates automatically</span>
+
+              {/* Language picker dropdown */}
+              {showSendLangPicker && (
+                <div className="absolute bottom-full left-0 mb-1 w-56 max-h-60 overflow-y-auto bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 py-1">
+                  {SEND_AS_LANGS.map(code => (
+                    <button
+                      key={code}
+                      onClick={() => { setChatLang(code); setShowSendLangPicker(false); }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-left text-sm hover:bg-slate-700/60 ${
+                        code === chatLang ? 'text-indigo-400' : 'text-slate-300'
+                      }`}
+                    >
+                      <span>{LANG_CODES_3[code] || code.toUpperCase()} — {LANG_NAMES[code] || code}</span>
+                      {code === chatLang && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
