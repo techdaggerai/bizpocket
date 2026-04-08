@@ -46,6 +46,7 @@ export default function GuestChatPage() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -56,61 +57,56 @@ export default function GuestChatPage() {
   useEffect(() => {
     const stored = localStorage.getItem('evrywher_guest_session');
     if (stored) {
-      const parsed = JSON.parse(stored) as GuestSession;
-      if (parsed.chatId === chatId) {
-        setSession(parsed);
-        return;
-      }
+      try {
+        const parsed = JSON.parse(stored) as GuestSession;
+        if (parsed.chatId === chatId) {
+          setSession(parsed);
+          return;
+        }
+      } catch { /* invalid JSON */ }
     }
-    // No valid session for this chat — redirect to invite
     router.push('/');
   }, [chatId, router]);
 
-  // ─── Fetch messages ───
+  // ─── Fetch messages via API (bypasses RLS) ───
   const fetchMessages = useCallback(async () => {
     if (!session) return;
-    const { data } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', chatId)
-      .order('created_at', { ascending: true })
-      .limit(200);
-    if (data) setMessages(data as Message[]);
-  }, [chatId, session, supabase]);
+    try {
+      const res = await fetch(`/api/guest/messages?chatId=${chatId}&guestToken=${session.guestToken}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.messages) {
+          setMessages(prev => {
+            // Merge: keep optimistic temp messages, replace with real ones
+            const realIds = new Set(data.messages.map((m: Message) => m.id));
+            const temps = prev.filter(m => m.id.startsWith('temp-') && !realIds.has(m.id));
+            // Only update if there are new messages
+            if (data.messages.length !== prev.filter((m: Message) => !m.id.startsWith('temp-')).length) {
+              return [...data.messages, ...temps];
+            }
+            return prev;
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[guest-chat] fetch error:', err);
+    }
+  }, [chatId, session]);
 
-  useEffect(() => {
-    if (session) fetchMessages();
-  }, [session, fetchMessages]);
-
-  // ─── Realtime subscription ───
+  // Initial fetch + polling every 3s (replaces realtime which requires auth)
   useEffect(() => {
     if (!session) return;
-
-    const channel = supabase
-      .channel(`guest-chat-${chatId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${chatId}`,
-      }, (payload) => {
-        const newMsg = payload.new as Message;
-        setMessages(prev => {
-          if (prev.some(m => m.id === newMsg.id)) return prev;
-          return [...prev, newMsg];
-        });
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [chatId, session, supabase]);
+    fetchMessages();
+    pollRef.current = setInterval(fetchMessages, 3000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [session, fetchMessages]);
 
   // ─── Scroll to bottom ───
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
-  // ─── Send message ───
+  // ─── Send message via API (bypasses RLS) ───
   const sendMessage = useCallback(async () => {
     if (!newMessage.trim() || !session || sending) return;
     const text = newMessage.trim();
@@ -118,8 +114,9 @@ export default function GuestChatPage() {
     setSending(true);
 
     // Optimistic add
+    const tempId = `temp-${Date.now()}`;
     const tempMsg: Message = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       conversation_id: chatId,
       sender_type: 'contact',
       sender_name: session.guestName,
@@ -131,23 +128,30 @@ export default function GuestChatPage() {
     setMessages(prev => [...prev, tempMsg]);
     setMsgCount(c => c + 1);
 
-    await supabase.from('messages').insert({
-      conversation_id: chatId,
-      organization_id: session.inviterOrgId,
-      sender_type: 'contact',
-      sender_name: session.guestName,
-      message: text,
-      message_type: 'text',
-    });
-
-    // Update conversation
-    await supabase.from('conversations').update({
-      last_message: text,
-      last_message_at: new Date().toISOString(),
-    }).eq('id', chatId);
+    try {
+      const res = await fetch('/api/guest/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chatId,
+          guestToken: session.guestToken,
+          guestName: session.guestName,
+          guestId: session.guestId,
+          inviterOrgId: session.inviterOrgId,
+          message: text,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.message) {
+        // Replace temp message with real one
+        setMessages(prev => prev.map(m => m.id === tempId ? data.message : m));
+      }
+    } catch (err) {
+      console.error('[guest-chat] send error:', err);
+    }
 
     setSending(false);
-  }, [newMessage, session, sending, chatId, supabase]);
+  }, [newMessage, session, sending, chatId]);
 
   // ─── Phone signup: send OTP ───
   const handlePhoneSubmit = useCallback(async (fullPhone: string) => {
