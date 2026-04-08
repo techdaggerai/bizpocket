@@ -13,6 +13,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
     }
 
+    const RESERVED = ['admin','system','root','support','evrywher','bizpocket','help','staff','moderator','owner','bot','official']
+    const sanitized = username.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+    if (!sanitized) {
+      return NextResponse.json({ error: 'Username must contain letters or numbers' }, { status: 400 })
+    }
+    if (RESERVED.includes(sanitized)) {
+      return NextResponse.json({ error: 'This username is not available' }, { status: 400 })
+    }
+
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

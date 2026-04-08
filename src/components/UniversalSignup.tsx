@@ -195,7 +195,9 @@ export default function UniversalSignup({
     setLoading(true);
     setError('');
 
-    const fullPhone = `${countryCode}${digits}`;
+    // Strip leading 0 (domestic trunk prefix) before prepending country code
+    const normalized = digits.replace(/^0+/, '');
+    const fullPhone = `${countryCode}${normalized}`;
 
     try {
       const authRes = await fetch('/api/auth/phone-signup', {

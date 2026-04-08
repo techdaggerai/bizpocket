@@ -176,6 +176,15 @@ export async function POST(request: Request) {
     }
   }
 
+  // ─── Re-attribute guest messages to the new user ───
+  if (guest.chat_id) {
+    await admin.from('messages')
+      .update({ sender_id: newUserId })
+      .eq('sender_id', guestId)
+      .eq('conversation_id', guest.chat_id)
+      .catch(() => {})
+  }
+
   // ─── Mark guest as converted ───
   await admin.from('guests').update({
     converted_to: newUserId,
