@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { PocketChatMark } from '@/components/Logo';
+import PocketAvatar from '@/components/PocketAvatar';
 import PhoneInput from '@/components/PhoneInput';
 import OTPInput from '@/components/OTPInput';
 
@@ -27,6 +28,21 @@ interface Message {
   sender_id?: string;
 }
 
+// ─── Helpers matching auth chat styling ───
+
+function formatTime(iso: string) {
+  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDateSep(iso: string) {
+  const d = new Date(iso);
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (d.toDateString() === today) return 'Today';
+  if (d.toDateString() === yesterday) return 'Yesterday';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 export default function GuestChatPage() {
   const params = useParams();
   const router = useRouter();
@@ -39,13 +55,14 @@ export default function GuestChatPage() {
   const [msgCount, setMsgCount] = useState(0);
   const [showSignup, setShowSignup] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [signupStep, setSignupStep] = useState<'phone' | 'otp'>('phone');
+  const [signupStep, setSignupStep] = useState<'phone' | 'otp' | 'email'>('phone');
   const [signupPhone, setSignupPhone] = useState('');
   const [signingUp, setSigningUp] = useState(false);
   const [signupError, setSignupError] = useState('');
+  const [emailForm, setEmailForm] = useState({ email: '', password: '', name: '' });
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const supabase = createBrowserClient(
@@ -53,17 +70,14 @@ export default function GuestChatPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // ─── Load session from localStorage ───
+  // ─── Load session ───
   useEffect(() => {
     const stored = localStorage.getItem('evrywher_guest_session');
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as GuestSession;
-        if (parsed.chatId === chatId) {
-          setSession(parsed);
-          return;
-        }
-      } catch { /* invalid JSON */ }
+        if (parsed.chatId === chatId) { setSession(parsed); return; }
+      } catch { /* invalid */ }
     }
     router.push('/');
   }, [chatId, router]);
@@ -77,10 +91,8 @@ export default function GuestChatPage() {
         const data = await res.json();
         if (data.messages) {
           setMessages(prev => {
-            // Merge: keep optimistic temp messages, replace with real ones
             const realIds = new Set(data.messages.map((m: Message) => m.id));
             const temps = prev.filter(m => m.id.startsWith('temp-') && !realIds.has(m.id));
-            // Only update if there are new messages
             if (data.messages.length !== prev.filter((m: Message) => !m.id.startsWith('temp-')).length) {
               return [...data.messages, ...temps];
             }
@@ -88,12 +100,9 @@ export default function GuestChatPage() {
           });
         }
       }
-    } catch (err) {
-      console.error('[guest-chat] fetch error:', err);
-    }
+    } catch (err) { console.error('[guest-chat] fetch:', err); }
   }, [chatId, session]);
 
-  // Initial fetch + polling every 3s (replaces realtime which requires auth)
   useEffect(() => {
     if (!session) return;
     fetchMessages();
@@ -106,26 +115,20 @@ export default function GuestChatPage() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
-  // ─── Send message via API (bypasses RLS) ───
+  // ─── Send message via API ───
   const sendMessage = useCallback(async () => {
-    if (!newMessage.trim() || !session || sending) return;
-    const text = newMessage.trim();
+    const text = inputRef.current?.textContent?.trim();
+    if (!text || !session || sending) return;
+    if (inputRef.current) inputRef.current.textContent = '';
     setNewMessage('');
     setSending(true);
 
-    // Optimistic add
     const tempId = `temp-${Date.now()}`;
-    const tempMsg: Message = {
-      id: tempId,
-      conversation_id: chatId,
-      sender_type: 'contact',
-      sender_name: session.guestName,
-      message: text,
-      message_type: 'text',
-      created_at: new Date().toISOString(),
-      sender_id: session.guestId,
-    };
-    setMessages(prev => [...prev, tempMsg]);
+    setMessages(prev => [...prev, {
+      id: tempId, conversation_id: chatId, sender_type: 'contact',
+      sender_name: session.guestName, message: text, message_type: 'text',
+      created_at: new Date().toISOString(), sender_id: session.guestId,
+    }]);
     setMsgCount(c => c + 1);
 
     try {
@@ -133,108 +136,118 @@ export default function GuestChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chatId,
-          guestToken: session.guestToken,
-          guestName: session.guestName,
-          guestId: session.guestId,
-          inviterOrgId: session.inviterOrgId,
-          message: text,
+          chatId, guestToken: session.guestToken, guestName: session.guestName,
+          guestId: session.guestId, inviterOrgId: session.inviterOrgId, message: text,
         }),
       });
       const data = await res.json();
       if (data.success && data.message) {
-        // Replace temp message with real one
         setMessages(prev => prev.map(m => m.id === tempId ? data.message : m));
       }
-    } catch (err) {
-      console.error('[guest-chat] send error:', err);
-    }
-
+    } catch (err) { console.error('[guest-chat] send:', err); }
     setSending(false);
-  }, [newMessage, session, sending, chatId]);
+  }, [session, sending, chatId]);
 
   // ─── Phone signup: send OTP ───
   const handlePhoneSubmit = useCallback(async (fullPhone: string) => {
-    console.log('[guest-signup] handlePhoneSubmit called:', fullPhone);
+    console.log('[guest-signup] handlePhoneSubmit:', fullPhone);
     setSigningUp(true);
     setSignupError('');
     setSignupPhone(fullPhone);
 
     try {
-      // Try signUp first — creates user + sends OTP
       const { error } = await supabase.auth.signUp({ phone: fullPhone });
-      console.log('[guest-signup] signUp result:', error?.message || 'success');
+      console.log('[guest-signup] signUp:', error?.message || 'ok');
 
       if (error) {
-        // User may already exist — try OTP login instead
-        console.log('[guest-signup] Trying signInWithOtp fallback');
         const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-        console.log('[guest-signup] signInWithOtp result:', otpErr?.message || 'success');
+        console.log('[guest-signup] signInWithOtp:', otpErr?.message || 'ok');
         if (otpErr) {
-          setSignupError(otpErr.message);
+          // Check for Twilio / unverified number errors
+          const msg = otpErr.message.toLowerCase();
+          if (msg.includes('unverified') || msg.includes('twilio') || msg.includes('sms') || msg.includes('phone') || msg.includes('not enabled')) {
+            setSignupError('SMS service is being set up. Please try email sign up instead.');
+          } else {
+            setSignupError(otpErr.message);
+          }
           setSigningUp(false);
           return;
         }
       }
-
       setSignupStep('otp');
     } catch (err) {
-      console.error('[guest-signup] Unexpected error:', err);
+      console.error('[guest-signup] error:', err);
       setSignupError('Something went wrong. Please try again.');
     }
     setSigningUp(false);
   }, [supabase]);
 
-  // ─── Phone signup: verify OTP + upgrade guest ───
+  // ─── Phone signup: verify OTP ───
   const handleVerifyOTP = useCallback(async (code: string) => {
     if (!session) return;
     setSigningUp(true);
     setSignupError('');
 
     const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-      phone: signupPhone,
-      token: code,
-      type: 'sms',
+      phone: signupPhone, token: code, type: 'sms',
     });
 
-    if (authError) {
-      setSignupError(authError.message);
-      setSigningUp(false);
-      return;
-    }
+    if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
+    if (!authData.session || !authData.user) { setSignupError('Verification failed.'); setSigningUp(false); return; }
 
-    if (!authData.session || !authData.user) {
-      setSignupError('Verification failed. Try again.');
-      setSigningUp(false);
-      return;
-    }
-
-    // Now upgrade guest → real user via API
     try {
       const res = await fetch('/api/guest/upgrade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          guestId: session.guestId,
-          phone: signupPhone,
-          userId: authData.user.id,
-          name: session.guestName,
-        }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestId: session.guestId, phone: signupPhone, userId: authData.user.id, name: session.guestName }),
       });
       const data = await res.json();
-
-      if (data.success) {
-        localStorage.removeItem('evrywher_guest_session');
-        window.location.href = '/chat';
-      } else {
-        setSignupError(data.error || 'Upgrade failed');
-      }
-    } catch {
-      setSignupError('Network error \u2014 try again');
-    }
+      if (data.success) { localStorage.removeItem('evrywher_guest_session'); window.location.href = '/chat'; }
+      else setSignupError(data.error || 'Upgrade failed');
+    } catch { setSignupError('Network error — try again'); }
     setSigningUp(false);
   }, [session, signupPhone, supabase]);
 
+  // ─── Email signup fallback ───
+  const handleEmailSignup = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session || !emailForm.email || !emailForm.password) return;
+    setSigningUp(true);
+    setSignupError('');
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: emailForm.email, password: emailForm.password,
+      });
+
+      if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
+      if (!authData.user) { setSignupError('Signup failed. Try again.'); setSigningUp(false); return; }
+
+      // Auto sign in
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: emailForm.email, password: emailForm.password,
+      });
+      if (signInErr) { setSignupError(signInErr.message); setSigningUp(false); return; }
+
+      const res = await fetch('/api/guest/upgrade', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestId: session.guestId, userId: authData.user.id,
+          name: emailForm.name || session.guestName, email: emailForm.email,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) { localStorage.removeItem('evrywher_guest_session'); window.location.href = '/chat'; }
+      else setSignupError(data.error || 'Upgrade failed');
+    } catch { setSignupError('Network error — try again'); }
+    setSigningUp(false);
+  }, [session, emailForm, supabase]);
+
+  // ─── Cleanup ───
+  useEffect(() => {
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []);
+
+  // ─── Loading state ───
   if (!session) {
     return (
       <div className="min-h-[100dvh] bg-slate-900 flex items-center justify-center">
@@ -244,136 +257,213 @@ export default function GuestChatPage() {
   }
 
   const showBanner = !bannerDismissed || msgCount >= 5;
-  const bannerPersistent = msgCount >= 5;
+
+  // ═══════════════════════════════════════
+  // RENDER — matches authenticated chat UI
+  // ═══════════════════════════════════════
 
   return (
     <div className="fixed top-0 left-0 right-0 h-[100dvh] bg-slate-900 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-[env(safe-area-inset-top)] border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm">
-        <div className="pt-3 pb-3 flex items-center gap-3 flex-1">
-          <PocketChatMark size={28} />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">{session.inviterName}</p>
-            <p className="text-[10px] text-slate-500">Evrywher Chat</p>
-          </div>
+
+      {/* ─── Header — matches auth chat header ─── */}
+      <div className="px-2 py-2.5 border-b border-slate-700 flex items-center gap-2 shrink-0">
+        {/* Left: back */}
+        <button
+          onClick={() => router.back()}
+          className="min-w-[40px] min-h-[40px] p-2 -ml-1 flex items-center justify-center hover:bg-slate-700 rounded-lg transition-colors shrink-0"
+        >
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        {/* Avatar */}
+        <div className="shrink-0">
+          <PocketAvatar name={session.inviterName} size={36} />
         </div>
+
+        {/* Center: name */}
+        <div className="flex-1 min-w-0 text-center px-1">
+          <p className="text-base font-semibold text-white truncate leading-tight">
+            {session.inviterName}
+          </p>
+          <p className="text-[10px] text-slate-500 mt-0.5">Evrywher Chat</p>
+        </div>
+
+        {/* Right: sign up */}
         <button
           onClick={() => setShowSignup(true)}
-          className="pt-3 pb-3 text-xs font-semibold text-indigo-400 active:opacity-60"
+          className="shrink-0 text-xs font-semibold text-indigo-400 px-3 py-2 rounded-full hover:bg-indigo-600/10 transition-colors active:opacity-60"
         >
           Sign Up
         </button>
       </div>
 
-      {/* Signup banner */}
+      {/* ─── Signup banner ─── */}
       {showBanner && !showSignup && (
-        <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-4 py-2.5 flex items-center gap-2">
+        <div className="bg-indigo-600/10 border-b border-indigo-500/20 px-4 py-2.5 flex items-center gap-2 shrink-0">
           <p className="text-xs text-indigo-300 flex-1">
-            {msgCount >= 5
-              ? 'Enter your phone to keep your messages'
-              : 'Save your chat \u2014 enter your phone number'}
+            {msgCount >= 5 ? 'Enter your phone to keep your messages' : 'Save your chat — enter your phone number'}
           </p>
-          {!bannerPersistent && (
+          {msgCount < 5 && (
             <button onClick={() => setBannerDismissed(true)} className="text-indigo-500/50 p-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           )}
-          <button
-            onClick={() => setShowSignup(true)}
-            className="shrink-0 text-[10px] font-bold text-indigo-400 bg-indigo-600/20 px-2.5 py-1 rounded-full"
-          >
+          <button onClick={() => setShowSignup(true)} className="shrink-0 text-[10px] font-bold text-indigo-400 bg-indigo-600/20 px-2.5 py-1 rounded-full">
             Sign Up
           </button>
         </div>
       )}
 
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 chat-bg-pattern">
-        {messages.map(msg => {
-          const isMe = msg.sender_type === 'contact' && (msg.sender_name === session.guestName || msg.sender_id === session.guestId);
-          const isSystem = msg.sender_type === 'system';
+      {/* ─── Messages — matches auth chat bubbles ─── */}
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto px-3 py-3 chat-bg-pattern"
+        style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+      >
+        <div className="space-y-1">
+          {messages.map((msg, idx) => {
+            const isMe = msg.sender_type === 'contact' && (msg.sender_name === session.guestName || msg.sender_id === session.guestId);
+            const isSystem = msg.sender_type === 'system';
+            const prevMsg = messages[idx - 1];
+            const msgDate = new Date(msg.created_at).toDateString();
+            const prevDate = prevMsg ? new Date(prevMsg.created_at).toDateString() : '';
+            const showDateSep = idx === 0 || msgDate !== prevDate;
 
-          if (isSystem) {
+            if (isSystem) {
+              return (
+                <div key={msg.id}>
+                  {showDateSep && (
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="flex-1 h-px bg-slate-700" />
+                      <span className="text-[11px] font-medium text-slate-400 shrink-0">{formatDateSep(msg.created_at)}</span>
+                      <div className="flex-1 h-px bg-slate-700" />
+                    </div>
+                  )}
+                  <div className="flex justify-center py-1">
+                    <p className="text-[11px] text-slate-400 bg-slate-800/70 px-3 py-1 rounded-full">{msg.message}</p>
+                  </div>
+                </div>
+              );
+            }
+
             return (
-              <div key={msg.id} className="flex justify-center">
-                <p className="text-[10px] text-slate-500 bg-slate-800/60 px-3 py-1 rounded-full">{msg.message}</p>
+              <div key={msg.id}>
+                {showDateSep && (
+                  <div className="flex items-center gap-3 py-2">
+                    <div className="flex-1 h-px bg-slate-700" />
+                    <span className="text-[11px] font-medium text-slate-400 shrink-0">{formatDateSep(msg.created_at)}</span>
+                    <div className="flex-1 h-px bg-slate-700" />
+                  </div>
+                )}
+                <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[75vw] sm:max-w-[80%] min-w-0 ${isMe ? 'ml-auto' : ''}`}>
+                    {!isMe && (
+                      <p className="text-[12px] mb-1 ml-1 font-medium text-indigo-400">{msg.sender_name}</p>
+                    )}
+                    <div className={`rounded-2xl px-3.5 py-2.5 ${
+                      isMe
+                        ? 'bg-[#4F46E5] text-white'
+                        : 'bg-slate-800/80 text-slate-200 backdrop-blur-[12px] border border-white/[0.06]'
+                    }`}>
+                      <p className="text-[15px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>{msg.message}</p>
+                    </div>
+                    <div className={`flex items-center gap-1.5 mt-1 ${isMe ? 'justify-end mr-1' : 'ml-1'}`}>
+                      <span className="text-[11px] text-slate-400">{formatTime(msg.created_at)}</span>
+                      {isMe && (
+                        <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                          <path d="M1 6l3.5 4L11 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             );
-          }
-
-          return (
-            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 ${
-                isMe
-                  ? 'bg-indigo-600 rounded-tr-md'
-                  : 'bg-slate-800/80 rounded-tl-md'
-              }`}>
-                {!isMe && (
-                  <p className="text-[10px] text-slate-400 mb-0.5">{msg.sender_name}</p>
-                )}
-                <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words">{msg.message}</p>
-                <p className={`text-[9px] mt-1 ${isMe ? 'text-indigo-200/50' : 'text-slate-500'}`}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Input */}
-      <div className="shrink-0 border-t border-slate-800 px-4 py-2 bg-slate-900/95 backdrop-blur-sm" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
-        <div className="flex items-center gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={newMessage}
-            onChange={e => setNewMessage(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder="Type a message..."
-            className="flex-1 bg-slate-800/60 text-white text-sm rounded-xl px-4 py-2.5 outline-none border border-slate-700/50 focus:border-indigo-500/50 placeholder:text-slate-600"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!newMessage.trim() || sending}
-            className="p-2.5 bg-indigo-600 rounded-xl text-white disabled:opacity-30 active:bg-indigo-700"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-          </button>
+          })}
         </div>
       </div>
 
-      {/* Inline phone signup modal */}
+      {/* ─── Input bar — matches auth chat input ─── */}
+      <div className="shrink-0 border-t border-slate-700 bg-slate-900/95 backdrop-blur-sm" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
+        <div className="flex items-center gap-2 px-2 py-2">
+          {/* Input */}
+          <div
+            ref={inputRef}
+            contentEditable
+            role="textbox"
+            aria-label="Message input"
+            data-placeholder="Type a message..."
+            suppressContentEditableWarning
+            onInput={(e) => setNewMessage(e.currentTarget.textContent || '')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            }}
+            className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white max-h-24 overflow-y-auto whitespace-pre-wrap break-words focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-500"
+          />
+
+          {/* Send button — PocketChatMark logo like auth chat */}
+          {newMessage.trim() ? (
+            <button onClick={sendMessage} disabled={sending} className="shrink-0 disabled:opacity-60">
+              <PocketChatMark size={36} />
+            </button>
+          ) : (
+            <button
+              onClick={() => { setShowSignup(true); }}
+              className="h-[42px] w-[42px] shrink-0 flex items-center justify-center text-slate-500 hover:text-indigo-400 transition-colors"
+              title="Sign up to unlock voice messages"
+            >
+              <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Signup modal with OTP + email fallback ─── */}
       {showSignup && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('phone'); }}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('phone'); setSignupError(''); }}>
           <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white">
-                {signupStep === 'phone' ? 'Save Your Chat' : 'Enter the code'}
+                {signupStep === 'phone' ? 'Save Your Chat' : signupStep === 'otp' ? 'Enter the code' : 'Sign up with email'}
               </h3>
-              <button onClick={() => { setShowSignup(false); setSignupStep('phone'); }} className="text-slate-500 p-1">
+              <button onClick={() => { setShowSignup(false); setSignupStep('phone'); setSignupError(''); }} className="text-slate-500 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
-            {signupStep === 'phone' && (
-              <p className="text-xs text-slate-400">Enter your phone to keep your messages + unlock AI translation, voice, and more.</p>
+
+            {signupError && (
+              <div className="rounded-lg border border-red-500/20 bg-red-950/30 px-4 py-2.5 text-sm text-red-400">
+                {signupError}
+              </div>
             )}
 
-            {signupStep === 'phone' ? (
-              <PhoneInput
-                onSubmit={handlePhoneSubmit}
-                loading={signingUp}
-                buttonText="Send Code →"
-                dark={true}
-              />
-            ) : (
+            {/* ─── Phone step ─── */}
+            {signupStep === 'phone' && (
+              <>
+                <p className="text-xs text-slate-400">Enter your phone to keep your messages + unlock AI translation, voice, and more.</p>
+                <PhoneInput onSubmit={handlePhoneSubmit} loading={signingUp} buttonText="Send Code →" dark={true} />
+                <button
+                  onClick={() => { setSignupStep('email'); setSignupError(''); }}
+                  className="w-full text-center text-sm text-slate-500 active:text-slate-300 mt-1"
+                >
+                  Use email instead
+                </button>
+              </>
+            )}
+
+            {/* ─── OTP step ─── */}
+            {signupStep === 'otp' && (
               <>
                 <OTPInput
                   phone={signupPhone}
                   onVerify={handleVerifyOTP}
                   onResend={() => handlePhoneSubmit(signupPhone)}
                   loading={signingUp}
-                  error={signupError}
+                  error=""
                   dark={true}
                 />
                 <button
@@ -383,6 +473,51 @@ export default function GuestChatPage() {
                   Change phone number
                 </button>
               </>
+            )}
+
+            {/* ─── Email fallback step ─── */}
+            {signupStep === 'email' && (
+              <form onSubmit={handleEmailSignup} className="space-y-3">
+                <p className="text-xs text-slate-400">Create an account with your email.</p>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={emailForm.name}
+                  onChange={e => setEmailForm(f => ({ ...f, name: e.target.value }))}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
+                />
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  required
+                  value={emailForm.email}
+                  onChange={e => setEmailForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
+                />
+                <input
+                  type="password"
+                  placeholder="Password (min 6 characters)"
+                  required
+                  minLength={6}
+                  value={emailForm.password}
+                  onChange={e => setEmailForm(f => ({ ...f, password: e.target.value }))}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
+                />
+                <button
+                  type="submit"
+                  disabled={signingUp || !emailForm.email || !emailForm.password}
+                  className="w-full bg-indigo-600 text-white text-base font-semibold rounded-xl py-3.5 active:bg-indigo-700 disabled:opacity-40 flex items-center justify-center gap-2"
+                >
+                  {signingUp ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Create Account →'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setSignupStep('phone'); setSignupError(''); }}
+                  className="w-full text-center text-sm text-slate-500 active:text-slate-300"
+                >
+                  Use phone instead
+                </button>
+              </form>
             )}
           </div>
         </div>
