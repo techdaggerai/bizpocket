@@ -254,7 +254,7 @@ export default async function OGImage({ params }: { params: { shareToken: string
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 24 }}>{'\u{1F30D}'}</span>
             <span style={{ fontSize: 20, fontWeight: 700, color: '#4F46E5' }}>Evrywher</span>
-            <span style={{ fontSize: 14, color: '#9CA3AF', marginLeft: 8 }}>Connect on Evrywher {'\u2192'} evrywher.io</span>
+            <span style={{ fontSize: 14, color: '#9CA3AF', marginLeft: 8 }}>Connect on Evrywher → evrywher.io</span>
           </div>
           <span style={{ fontSize: 13, color: '#9CA3AF' }}>{`evrywher.io/p/${shareToken}`}</span>
         </div>

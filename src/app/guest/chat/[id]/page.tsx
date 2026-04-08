@@ -151,25 +151,33 @@ export default function GuestChatPage() {
 
   // ─── Phone signup: send OTP ───
   const handlePhoneSubmit = useCallback(async (fullPhone: string) => {
+    console.log('[guest-signup] handlePhoneSubmit called:', fullPhone);
     setSigningUp(true);
     setSignupError('');
     setSignupPhone(fullPhone);
 
-    const { error } = await supabase.auth.signUp({ phone: fullPhone });
-    if (error && !error.message.includes('already') && !error.message.includes('exists')) {
-      // If user exists, try OTP login instead
-      const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-      if (otpErr) {
-        setSignupError(otpErr.message);
-        setSigningUp(false);
-        return;
-      }
-    } else if (error) {
-      // Try OTP login as fallback
-      await supabase.auth.signInWithOtp({ phone: fullPhone });
-    }
+    try {
+      // Try signUp first — creates user + sends OTP
+      const { error } = await supabase.auth.signUp({ phone: fullPhone });
+      console.log('[guest-signup] signUp result:', error?.message || 'success');
 
-    setSignupStep('otp');
+      if (error) {
+        // User may already exist — try OTP login instead
+        console.log('[guest-signup] Trying signInWithOtp fallback');
+        const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
+        console.log('[guest-signup] signInWithOtp result:', otpErr?.message || 'success');
+        if (otpErr) {
+          setSignupError(otpErr.message);
+          setSigningUp(false);
+          return;
+        }
+      }
+
+      setSignupStep('otp');
+    } catch (err) {
+      console.error('[guest-signup] Unexpected error:', err);
+      setSignupError('Something went wrong. Please try again.');
+    }
     setSigningUp(false);
   }, [supabase]);
 
@@ -235,7 +243,7 @@ export default function GuestChatPage() {
   const bannerPersistent = msgCount >= 5;
 
   return (
-    <div className="fixed inset-0 bg-slate-900 flex flex-col">
+    <div className="fixed top-0 left-0 right-0 h-[100dvh] bg-slate-900 flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-[env(safe-area-inset-top)] border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm">
         <div className="pt-3 pb-3 flex items-center gap-3 flex-1">
@@ -276,7 +284,7 @@ export default function GuestChatPage() {
       )}
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3 chat-bg-pattern">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 chat-bg-pattern">
         {messages.map(msg => {
           const isMe = msg.sender_type === 'contact' && (msg.sender_name === session.guestName || msg.sender_id === session.guestId);
           const isSystem = msg.sender_type === 'system';
@@ -351,7 +359,7 @@ export default function GuestChatPage() {
               <PhoneInput
                 onSubmit={handlePhoneSubmit}
                 loading={signingUp}
-                buttonText="Send Code \u2192"
+                buttonText="Send Code →"
                 dark={true}
               />
             ) : (

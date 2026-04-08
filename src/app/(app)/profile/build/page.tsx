@@ -150,7 +150,7 @@ export default function ProfileBuildPage() {
           onClick={handleBuild}
           className="w-full"
         >
-          Build My Profile {'\u2192'}
+          Build My Profile →
         </Button>
         <p className="text-sm text-[var(--pm-text-secondary)] text-center">
           Average build time: 30 seconds {'\u26A1'}

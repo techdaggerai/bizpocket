@@ -202,7 +202,7 @@ export default function MatchCard({ match, index = 0, onConnect, onDismiss }: Ma
                 ) : phase === 'glowing' ? (
                   <>{'\u{1F389}'} Connected!</>
                 ) : (
-                  <>Connect {'\u2192'}</>
+                  <>Connect →</>
                 )}
               </button>
             </div>

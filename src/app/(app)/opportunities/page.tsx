@@ -157,7 +157,7 @@ export default function OpportunitiesPage() {
           icon={<span>{'\u{1F30D}'}</span>}
           title="Build Your Profile First"
           description="Create your global professional profile so AI can match you with the right partners."
-          action={{ label: 'Build My Profile \u2192', onClick: () => router.push('/profile/build') }}
+          action={{ label: 'Build My Profile →', onClick: () => router.push('/profile/build') }}
         />
       </div>
     );
@@ -245,7 +245,7 @@ export default function OpportunitiesPage() {
             title={emptyMessage ? 'No matches right now' : 'Find your partners'}
             description={emptyMessage || 'No matches yet. Let AI find business partners for you.'}
             action={{
-              label: emptyMessage ? 'Try Again' : 'Find Partners \u2192',
+              label: emptyMessage ? 'Try Again' : 'Find Partners →',
               onClick: generateMatches,
             }}
           />

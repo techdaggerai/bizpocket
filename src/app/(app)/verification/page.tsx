@@ -153,7 +153,7 @@ export default function VerificationPage() {
             icon={<span>{'\u{1F512}'}</span>}
             title="Unlock ID Verification at Growing Tier"
             description="Reach Growing tier to verify your identity and earn the green badge (+8 Trust)."
-            action={{ label: 'View Your Profile \u2192', onClick: () => router.push('/profile/preview') }}
+            action={{ label: 'View Your Profile →', onClick: () => router.push('/profile/preview') }}
           />
           <GlassCard tier="starter">
             <div className="space-y-2">
@@ -231,7 +231,7 @@ export default function VerificationPage() {
           onClick={() => setStep('upload_id')}
           className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold py-4 rounded-xl transition-colors"
         >
-          Start Verification {'\u2192'}
+          Start Verification →
         </button>
       </div>
     )
@@ -287,7 +287,7 @@ export default function VerificationPage() {
           disabled={!idFile}
           className="w-full bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-colors"
         >
-          Next: Take Selfie {'\u2192'}
+          Next: Take Selfie →
         </button>
       </div>
     )
@@ -351,7 +351,7 @@ export default function VerificationPage() {
           {'\u23F3'} Pending Review
         </span>
         <button onClick={() => router.push('/profile/preview')} className="mt-8 text-sm font-semibold text-indigo-400">
-          Back to Profile {'\u2192'}
+          Back to Profile →
         </button>
       </div>
     </div>

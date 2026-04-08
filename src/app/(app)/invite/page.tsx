@@ -118,7 +118,7 @@ We both get +15 Trust Score when you publish.`;
     <div className="min-h-screen">
       <PageHeader title={'\u{1F4E4} Grow Your Network'} />
 
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 py-4 pb-28 space-y-4">
         {/* No profile warning */}
         {!shareToken && (
           <GlassCard tier="starter" glow>
@@ -126,7 +126,7 @@ We both get +15 Trust Score when you publish.`;
               Build and publish your Global Profile first to get your invite link.
             </p>
             <Button variant="primary" size="sm" onClick={() => router.push('/profile/build')} className="mt-2">
-              Build Profile {'\u2192'}
+              Build Profile →
             </Button>
           </GlassCard>
         )}

@@ -154,7 +154,7 @@ export default function ProfilePublishedPage() {
           onClick={() => router.push('/opportunities')}
           className="w-full"
         >
-          Find Partners {'\u2192'}
+          Find Partners →
         </Button>
         <Button
           variant="ghost"
