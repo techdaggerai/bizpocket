@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { PocketChatMark } from '@/components/Logo';
 import PocketAvatar from '@/components/PocketAvatar';
+import PhoneInput from '@/components/PhoneInput';
 
 interface GuestSession {
   guestId: string;
@@ -54,11 +55,8 @@ export default function GuestChatPage() {
   const [msgCount, setMsgCount] = useState(0);
   const [showSignup, setShowSignup] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [signupStep, setSignupStep] = useState<'signup' | 'login'>('signup');
   const [signingUp, setSigningUp] = useState(false);
   const [signupError, setSignupError] = useState('');
-  const [emailForm, setEmailForm] = useState({ email: '', password: '', name: '' });
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -147,70 +145,57 @@ export default function GuestChatPage() {
     setSending(false);
   }, [session, sending, chatId]);
 
-  // ─── Email signup ───
-  const handleEmailSignup = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!session || !emailForm.email || !emailForm.password) return;
+  // ─── Phone signup (WhatsApp-style: phone number = account, zero verification) ───
+  const handlePhoneContinue = useCallback(async (fullPhone: string) => {
+    if (!session) return;
     setSigningUp(true);
     setSignupError('');
 
+    const fakeEmail = `${fullPhone.replace(/\+/g, '')}@evrywher.io`;
+    const fakePass = fullPhone;
+
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: emailForm.email, password: emailForm.password,
+      // Try sign in first (existing account)
+      let { data: authData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: fakeEmail, password: fakePass,
       });
 
-      if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
-      if (!authData.user) { setSignupError('Signup failed. Try again.'); setSigningUp(false); return; }
+      if (signInErr) {
+        // Account doesn't exist — create it
+        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+          email: fakeEmail, password: fakePass,
+        });
+        if (signUpErr) { setSignupError(signUpErr.message); setSigningUp(false); return; }
+        if (!signUpData.user) { setSignupError('Could not create account.'); setSigningUp(false); return; }
 
-      // Auto sign in
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: emailForm.email, password: emailForm.password,
-      });
-      if (signInErr) { setSignupError(signInErr.message); setSigningUp(false); return; }
+        // Auto sign in after signup
+        const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
+          email: fakeEmail, password: fakePass,
+        });
+        if (loginErr) { setSignupError(loginErr.message); setSigningUp(false); return; }
+        authData = loginData;
+      }
 
+      if (!authData?.user) { setSignupError('Something went wrong.'); setSigningUp(false); return; }
+
+      // Upgrade guest → real user
       const res = await fetch('/api/guest/upgrade', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: session.guestId, userId: authData.user.id,
-          name: emailForm.name || session.guestName, email: emailForm.email,
+          name: session.guestName, phone: fullPhone,
         }),
-      });
-      const data = await res.json();
-      if (data.success) { localStorage.removeItem('evrywher_guest_session'); window.location.href = '/chat'; }
-      else setSignupError(data.error || 'Upgrade failed');
-    } catch { setSignupError('Network error — try again'); }
-    setSigningUp(false);
-  }, [session, emailForm, supabase]);
-
-  // ─── Email login (existing account) ───
-  const handleEmailLogin = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!session || !loginForm.email || !loginForm.password) return;
-    setSigningUp(true);
-    setSignupError('');
-
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: loginForm.email, password: loginForm.password,
-      });
-
-      if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
-      if (!authData.user) { setSignupError('Login failed.'); setSigningUp(false); return; }
-
-      const res = await fetch('/api/guest/upgrade', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guestId: session.guestId, userId: authData.user.id, name: session.guestName }),
       });
       const data = await res.json();
       if (data.success || data.already_connected) {
         localStorage.removeItem('evrywher_guest_session');
         window.location.href = '/chat';
       } else {
-        setSignupError(data.error || 'Could not link account');
+        setSignupError(data.error || 'Could not save account');
       }
     } catch { setSignupError('Network error — try again'); }
     setSigningUp(false);
-  }, [session, loginForm, supabase]);
+  }, [session, supabase]);
 
   // ─── Cleanup ───
   useEffect(() => {
@@ -465,18 +450,18 @@ export default function GuestChatPage() {
         </div>
       </div>
 
-      {/* ─── Signup / Login modal (email only — no phone OTP) ─── */}
+      {/* ─── Save Your Chat modal (phone number only — WhatsApp-style) ─── */}
       {showSignup && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('signup'); setSignupError(''); }}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupError(''); }}>
           <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">
-                {signupStep === 'signup' ? 'Save Your Chat' : 'Welcome Back'}
-              </h3>
-              <button onClick={() => { setShowSignup(false); setSignupStep('signup'); setSignupError(''); }} className="text-slate-500 p-1">
+              <h3 className="text-base font-bold text-white">Save Your Chat</h3>
+              <button onClick={() => { setShowSignup(false); setSignupError(''); }} className="text-slate-500 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
+
+            <p className="text-xs text-slate-400">Enter your phone number to keep your messages and unlock AI translation, voice, and more.</p>
 
             {signupError && (
               <div className="rounded-lg border border-red-500/20 bg-red-950/30 px-4 py-2.5 text-sm text-red-400">
@@ -484,85 +469,12 @@ export default function GuestChatPage() {
               </div>
             )}
 
-            {/* ─── Create account ─── */}
-            {signupStep === 'signup' && (
-              <form onSubmit={handleEmailSignup} className="space-y-3">
-                <p className="text-xs text-slate-400">Create an account to keep your messages, unlock AI translation, voice, and more.</p>
-                <input
-                  type="text"
-                  placeholder="Your name"
-                  value={emailForm.name}
-                  onChange={e => setEmailForm(f => ({ ...f, name: e.target.value }))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
-                />
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  required
-                  value={emailForm.email}
-                  onChange={e => setEmailForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
-                />
-                <input
-                  type="password"
-                  placeholder="Password (min 6 characters)"
-                  required
-                  minLength={6}
-                  value={emailForm.password}
-                  onChange={e => setEmailForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
-                />
-                <button
-                  type="submit"
-                  disabled={signingUp || !emailForm.email || !emailForm.password}
-                  className="w-full bg-indigo-600 text-white text-base font-semibold rounded-xl py-3.5 active:bg-indigo-700 disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {signingUp ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Create Account →'}
-                </button>
-                <p className="text-center text-sm text-slate-500">
-                  Already have an account?{' '}
-                  <button type="button" onClick={() => { setSignupStep('login'); setSignupError(''); }} className="text-indigo-400 font-medium active:opacity-60">
-                    Log in
-                  </button>
-                </p>
-              </form>
-            )}
-
-            {/* ─── Log in (existing account) ─── */}
-            {signupStep === 'login' && (
-              <form onSubmit={handleEmailLogin} className="space-y-3">
-                <p className="text-xs text-slate-400">Log in to link this chat to your account.</p>
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  required
-                  value={loginForm.email}
-                  onChange={e => setLoginForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  required
-                  value={loginForm.password}
-                  onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
-                />
-                <button
-                  type="submit"
-                  disabled={signingUp || !loginForm.email || !loginForm.password}
-                  className="w-full bg-indigo-600 text-white text-base font-semibold rounded-xl py-3.5 active:bg-indigo-700 disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {signingUp ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Log In →'}
-                </button>
-                <p className="text-center text-sm text-slate-500">
-                  Don&apos;t have an account?{' '}
-                  <button type="button" onClick={() => { setSignupStep('signup'); setSignupError(''); }} className="text-indigo-400 font-medium active:opacity-60">
-                    Sign up
-                  </button>
-                </p>
-              </form>
-            )}
+            <PhoneInput
+              onSubmit={handlePhoneContinue}
+              loading={signingUp}
+              buttonText="Continue →"
+              dark={true}
+            />
           </div>
         </div>
       )}

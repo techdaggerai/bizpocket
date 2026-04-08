@@ -7,7 +7,6 @@ import { useSearchParams } from 'next/navigation';
 import { PocketMark, LogoWordmark, PocketChatMark } from '@/components/Logo';
 import { getBrandMode } from '@/lib/brand';
 import PhoneInput from '@/components/PhoneInput';
-import OTPInput from '@/components/OTPInput';
 
 export default function SignupPage() {
   return (
@@ -27,67 +26,45 @@ function SignupInner() {
   const isPocketChat = mode === 'pocketchat' || getBrandMode() === 'evrywher';
 
   // If redirected from login after phone verify, skip to name step
-  const [step, setStep] = useState<'phone' | 'otp' | 'name' | 'email'>(phoneVerified ? 'name' : 'phone');
+  const [step, setStep] = useState<'phone' | 'name'>(phoneVerified ? 'name' : 'phone');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [emailSignup, setEmailSignup] = useState({ email: '', password: '', name: '' });
 
   useEffect(() => {
-    document.title = isPocketChat ? 'Sign up \u2014 Evrywher' : 'Sign up \u2014 BizPocket';
+    document.title = isPocketChat ? 'Sign up — Evrywher' : 'Sign up — BizPocket';
   }, [isPocketChat]);
 
-  // ─── Step 1: Send OTP ───
+  // ─── Phone: instant signup (no OTP — WhatsApp-style) ───
   async function handlePhoneSubmit(fullPhone: string) {
     setLoading(true);
     setError('');
     setPhone(fullPhone);
 
-    const { error: authError } = await supabase.auth.signUp({ phone: fullPhone });
+    const fakeEmail = `${fullPhone.replace(/\+/g, '')}@evrywher.io`;
+    const fakePass = fullPhone;
 
-    if (authError) {
-      // If user already exists, try OTP login instead
-      if (authError.message.includes('already') || authError.message.includes('exists')) {
-        const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-        if (otpErr) {
-          setError(otpErr.message);
-          setLoading(false);
-          return;
-        }
-      } else {
-        setError(authError.message);
-        setLoading(false);
-        return;
-      }
-    }
-
-    setStep('otp');
-    setLoading(false);
-  }
-
-  // ─── Step 2: Verify OTP ───
-  async function handleVerify(code: string) {
-    setLoading(true);
-    setError('');
-
-    const { data, error: authError } = await supabase.auth.verifyOtp({
-      phone,
-      token: code,
-      type: 'sms',
+    // Try login first (existing account)
+    let { data, error: signInErr } = await supabase.auth.signInWithPassword({
+      email: fakeEmail, password: fakePass,
     });
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
+    if (signInErr) {
+      // Account doesn't exist — create it
+      const { error: signUpErr } = await supabase.auth.signUp({
+        email: fakeEmail, password: fakePass,
+      });
+      if (signUpErr) { setError(signUpErr.message); setLoading(false); return; }
+
+      const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
+        email: fakeEmail, password: fakePass,
+      });
+      if (loginErr) { setError(loginErr.message); setLoading(false); return; }
+      data = loginData;
     }
 
-    if (!data.session) {
-      setError('Verification failed. Please try again.');
-      setLoading(false);
-      return;
-    }
+    if (!data?.session) { setError('Could not create account. Try again.'); setLoading(false); return; }
 
     // Check if user already has a profile (returning user)
     const { data: existing } = await supabase
@@ -97,7 +74,6 @@ function SignupInner() {
       .maybeSingle();
 
     if (existing) {
-      // Returning user — go straight to app
       window.location.href = isPocketChat ? '/chat' : '/dashboard';
       return;
     }
@@ -219,7 +195,7 @@ function SignupInner() {
           </p>
         </div>
 
-        {error && step !== 'otp' && (
+        {error && (
           <div className="rounded-lg border border-[var(--red)]/20 bg-[var(--red-bg)] px-4 py-3 text-sm text-[var(--red)] mb-4">
             {error}
           </div>
@@ -247,109 +223,10 @@ function SignupInner() {
                 Log In
               </Link>
             </p>
-
-            <button
-              onClick={() => { setStep('email'); setError(''); }}
-              className="mt-3 w-full text-center text-xs text-[var(--text-4)] active:text-[var(--text-3)]"
-            >
-              Use email instead
-            </button>
           </>
         )}
 
-        {/* ─── Step: Email signup ─── */}
-        {step === 'email' && (
-          <>
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              if (!emailSignup.email || !emailSignup.password) return;
-              setLoading(true);
-              setError('');
-
-              const { data: authData, error: authErr } = await supabase.auth.signUp({
-                email: emailSignup.email, password: emailSignup.password,
-              });
-              if (authErr) { setError(authErr.message); setLoading(false); return; }
-              if (!authData.user) { setError('Signup failed.'); setLoading(false); return; }
-
-              // Auto sign in
-              await supabase.auth.signInWithPassword({ email: emailSignup.email, password: emailSignup.password });
-
-              // Set name for next step
-              if (emailSignup.name) setName(emailSignup.name);
-              setStep('name');
-              setLoading(false);
-            }} className="space-y-3">
-              <input
-                type="text"
-                placeholder="Your name"
-                value={emailSignup.name}
-                onChange={e => setEmailSignup(f => ({ ...f, name: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
-              />
-              <input
-                type="email"
-                placeholder="Email address"
-                required
-                value={emailSignup.email}
-                onChange={e => setEmailSignup(f => ({ ...f, email: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
-              />
-              <input
-                type="password"
-                placeholder="Password (min 6 characters)"
-                required
-                minLength={6}
-                value={emailSignup.password}
-                onChange={e => setEmailSignup(f => ({ ...f, password: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={loading || !emailSignup.email || !emailSignup.password}
-                className="w-full rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Continue →'}
-              </button>
-            </form>
-
-            <p className="mt-3 text-center text-xs text-[var(--text-4)]">
-              By signing up you agree to our{' '}
-              <Link href="/terms" className="text-indigo-400">Terms</Link> and{' '}
-              <Link href="/privacy" className="text-indigo-400">Privacy Policy</Link>
-            </p>
-
-            <button
-              onClick={() => { setStep('phone'); setError(''); }}
-              className="mt-3 w-full text-center text-xs text-[var(--text-4)] active:text-[var(--text-3)]"
-            >
-              Use phone instead
-            </button>
-          </>
-        )}
-
-        {/* ─── Step 2: OTP ─── */}
-        {step === 'otp' && (
-          <>
-            <OTPInput
-              phone={phone}
-              onVerify={handleVerify}
-              onResend={() => handlePhoneSubmit(phone)}
-              loading={loading}
-              error={error}
-              dark={false}
-            />
-
-            <button
-              onClick={() => { setStep('phone'); setError(''); }}
-              className="mt-6 w-full text-center text-sm text-[var(--accent)] font-medium active:opacity-60"
-            >
-              Change phone number
-            </button>
-          </>
-        )}
-
-        {/* ─── Step 3: Name ─── */}
+        {/* ─── Step 2: Name ─── */}
         {step === 'name' && (
           <form onSubmit={handleNameSubmit} className="space-y-4">
             <input
