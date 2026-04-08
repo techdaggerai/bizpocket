@@ -1257,63 +1257,30 @@ export default function PocketChatPage() {
     clearInput();
 
     try {
-      // INSTANT SEND — save message immediately, translate in background
       // profileLang = language user actually types in (their profile language)
       // sendAsLang  = target language selected in "Send as" dropdown
       // recipientLang = contact's language
       const profileLang = profile?.language || 'en';
       const sendAsLang = chatLang || profileLang;
       const recipientLang = activeConvo?.contact?.language || 'ja';
+      const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, profileLang, activeConvo?.contact?.language);
 
-      const { data: msg, error } = await supabase.from('messages').insert({
-        conversation_id: activeConvoId,
-        organization_id: organization.id,
-        sender_type: 'owner',
-        sender_name: profile?.full_name || profile?.name || 'You',
-        message: text,
-        message_type: 'text',
-        original_text: text,
-        original_language: profileLang,
-        translations: { [profileLang]: text },
-        ...(replyTo && { reply_to_id: replyTo.id }),
-      }).select().single();
-      setReplyTo(null);
+      // Determine translation target:
+      // 1. Explicit "Send as" override takes priority
+      // 2. Otherwise, auto-translate to recipient language if conversation mode requires it
+      const translateTo = sendAsLang !== profileLang
+        ? sendAsLang
+        : (recipientLang !== profileLang && effTransMode !== 'direct' ? recipientLang : null);
 
-      console.log('[SendMessage] insert result:', { msgId: msg?.id, profileLang, sendAsLang, recipientLang, error: error?.message || null });
+      // ─── TRANSLATE BEFORE SEND (with 8s timeout) ───
+      let displayText = text;
+      let translatedLang: string | null = null;
 
-      if (error) {
-        toast('Failed to send message', 'error');
-        setNewMessage(text);
-      } else {
-        playSound('send');
-        supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
-
-        // Relay message to peer's conversation (cross-org delivery)
-        if (!activeConvo?.is_bot_chat) {
-          fetch('/api/messages/relay', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              conversationId: activeConvoId,
-              organizationId: organization.id,
-              messageText: text,
-              messageType: 'text',
-              senderName: profile?.full_name || profile?.name || 'Contact',
-            }),
-          }).catch(() => { /* relay is best-effort */ });
-        }
-
-        // Background translation — translate if send-as differs from profile lang,
-        // OR if recipient language differs from profile lang (and mode isn't direct)
-        const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, profileLang, activeConvo?.contact?.language);
-        // Primary target: send-as language if user explicitly chose a different one, otherwise recipient language
-        const translateTo = sendAsLang !== profileLang
-          ? sendAsLang
-          : (recipientLang !== profileLang && effTransMode !== 'direct' ? recipientLang : null);
-
-        if (msg && translateTo) {
-          console.log('[SendMessage] translating:', profileLang, '->', translateTo);
-          fetch('/api/ai/translate', {
+      if (translateTo) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 8000);
+          const res = await fetch('/api/ai/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1322,17 +1289,63 @@ export default function PocketChatPage() {
               toLanguage: translateTo,
               ...(convoSummary ? { context: `Relationship: ${convoSummary.relationship_context}. ${convoSummary.summary}` } : {}),
             }),
-          }).then(r => r.json()).then(data => {
-            if (data.translatedText) {
-              // Update message with translated text — recipient sees translated version
-              supabase.from('messages').update({
-                message: data.translatedText,
-                translations: { [profileLang]: text, [translateTo]: data.translatedText },
-              }).eq('id', msg.id);
-              // Also update conversation last_message to translated version
-              supabase.from('conversations').update({ last_message: data.translatedText }).eq('id', activeConvoId);
-            }
-          }).catch((err) => { console.error('[SendMessage] translation failed:', err); });
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          const data = await res.json();
+          if (data.translatedText) {
+            displayText = data.translatedText;
+            translatedLang = translateTo;
+          } else if (data.error === 'limit_reached') {
+            toast('Translation limit reached — sending original text', 'info');
+          }
+        } catch (e: unknown) {
+          if (e instanceof DOMException && e.name === 'AbortError') {
+            toast('Translation timed out — sending original text', 'info');
+          } else {
+            toast('Translation failed — sending original text', 'info');
+          }
+        }
+      }
+
+      const wasTranslated = !!translatedLang;
+
+      const { data: msg, error } = await supabase.from('messages').insert({
+        conversation_id: activeConvoId,
+        organization_id: organization.id,
+        sender_type: 'owner',
+        sender_name: profile?.full_name || profile?.name || 'You',
+        message: displayText,
+        message_type: 'text',
+        original_text: wasTranslated ? text : null,
+        original_language: profileLang,
+        translations: translatedLang
+          ? { [profileLang]: text, [translatedLang]: displayText }
+          : { [profileLang]: text },
+        ...(replyTo && { reply_to_id: replyTo.id }),
+      }).select().single();
+      setReplyTo(null);
+
+      if (error) {
+        toast('Failed to send message', 'error');
+        setNewMessage(text);
+      } else {
+        playSound('send');
+        supabase.from('conversations').update({ last_message: displayText, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
+
+        // Relay translated message to peer's conversation (cross-org delivery)
+        if (!activeConvo?.is_bot_chat) {
+          fetch('/api/messages/relay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversationId: activeConvoId,
+              organizationId: organization.id,
+              messageText: displayText,
+              messageType: 'text',
+              senderName: profile?.full_name || profile?.name || 'Contact',
+            }),
+          }).catch(() => { /* relay is best-effort */ });
         }
       }
     } catch {
@@ -2342,6 +2355,19 @@ export default function PocketChatPage() {
                       </div>
                     ) : null; })()}
                     <p className="text-[15px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere', ...(/[\u0600-\u06FF\u0750-\u077F\uFB50-\uFDFF\uFE70-\uFEFF]/.test(displayText) ? { direction: 'rtl', textAlign: 'right', fontFamily: "'Noto Sans Arabic', 'Noto Sans', sans-serif" } : {}) } as React.CSSProperties}>{displayText}</p>
+                    {/* Original text + language badge for translated messages */}
+                    {msg.original_text && msg.original_text !== msg.message && (
+                      <div className="mt-1.5 flex items-start gap-1.5">
+                        {msg.original_language && msg.original_language !== (Object.keys(msg.translations || {}).find(k => k !== msg.original_language) || '') && (
+                          <span className={`shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-0.5 ${isOwner ? 'bg-white/15 text-white/60' : 'bg-slate-700 text-slate-400'}`}>
+                            {(Object.keys(msg.translations || {}).find(k => k !== msg.original_language) || '').toUpperCase() || 'TR'}
+                          </span>
+                        )}
+                        <p className={`text-[11px] italic ${isOwner ? 'text-white/50' : 'text-[#64748b]'}`} style={{ overflowWrap: 'anywhere' }}>
+                          {msg.original_text}
+                        </p>
+                      </div>
+                    )}
                     {msg.edited_at && <p className={`text-[10px] mt-0.5 ${isOwner ? 'text-white/40' : 'text-slate-400'}`}>(edited)</p>}
                     {(() => { const urlMatch = displayText.match(/https?:\/\/[^\s]+/); return urlMatch ? <LinkPreview url={urlMatch[0]} /> : null; })()}
                   </div>
