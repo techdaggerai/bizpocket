@@ -27,11 +27,12 @@ function SignupInner() {
   const isPocketChat = mode === 'pocketchat' || getBrandMode() === 'evrywher';
 
   // If redirected from login after phone verify, skip to name step
-  const [step, setStep] = useState<'phone' | 'otp' | 'name'>(phoneVerified ? 'name' : 'phone');
+  const [step, setStep] = useState<'phone' | 'otp' | 'name' | 'email'>(phoneVerified ? 'name' : 'phone');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailSignup, setEmailSignup] = useState({ email: '', password: '', name: '' });
 
   useEffect(() => {
     document.title = isPocketChat ? 'Sign up \u2014 Evrywher' : 'Sign up \u2014 BizPocket';
@@ -246,6 +247,84 @@ function SignupInner() {
                 Log In
               </Link>
             </p>
+
+            <button
+              onClick={() => { setStep('email'); setError(''); }}
+              className="mt-3 w-full text-center text-xs text-[var(--text-4)] active:text-[var(--text-3)]"
+            >
+              Use email instead
+            </button>
+          </>
+        )}
+
+        {/* ─── Step: Email signup ─── */}
+        {step === 'email' && (
+          <>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!emailSignup.email || !emailSignup.password) return;
+              setLoading(true);
+              setError('');
+
+              const { data: authData, error: authErr } = await supabase.auth.signUp({
+                email: emailSignup.email, password: emailSignup.password,
+              });
+              if (authErr) { setError(authErr.message); setLoading(false); return; }
+              if (!authData.user) { setError('Signup failed.'); setLoading(false); return; }
+
+              // Auto sign in
+              await supabase.auth.signInWithPassword({ email: emailSignup.email, password: emailSignup.password });
+
+              // Set name for next step
+              if (emailSignup.name) setName(emailSignup.name);
+              setStep('name');
+              setLoading(false);
+            }} className="space-y-3">
+              <input
+                type="text"
+                placeholder="Your name"
+                value={emailSignup.name}
+                onChange={e => setEmailSignup(f => ({ ...f, name: e.target.value }))}
+                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
+              />
+              <input
+                type="email"
+                placeholder="Email address"
+                required
+                value={emailSignup.email}
+                onChange={e => setEmailSignup(f => ({ ...f, email: e.target.value }))}
+                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
+              />
+              <input
+                type="password"
+                placeholder="Password (min 6 characters)"
+                required
+                minLength={6}
+                value={emailSignup.password}
+                onChange={e => setEmailSignup(f => ({ ...f, password: e.target.value }))}
+                className="w-full rounded-xl border border-[var(--border-strong)] bg-[var(--bg)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-4)] focus:border-[var(--accent)] focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={loading || !emailSignup.email || !emailSignup.password}
+                className="w-full rounded-btn bg-[var(--accent)] py-3 text-sm font-medium text-white transition-all hover:bg-[var(--accent-hover)] disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Continue →'}
+              </button>
+            </form>
+
+            <p className="mt-3 text-center text-xs text-[var(--text-4)]">
+              By signing up you agree to our{' '}
+              <Link href="/terms" className="text-indigo-400">Terms</Link> and{' '}
+              <Link href="/privacy" className="text-indigo-400">Privacy Policy</Link>
+            </p>
+
+            <button
+              onClick={() => { setStep('phone'); setError(''); }}
+              className="mt-3 w-full text-center text-xs text-[var(--text-4)] active:text-[var(--text-3)]"
+            >
+              Use phone instead
+            </button>
           </>
         )}
 

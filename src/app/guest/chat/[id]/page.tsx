@@ -5,8 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { PocketChatMark } from '@/components/Logo';
 import PocketAvatar from '@/components/PocketAvatar';
-import PhoneInput from '@/components/PhoneInput';
-import OTPInput from '@/components/OTPInput';
 
 interface GuestSession {
   guestId: string;
@@ -56,11 +54,11 @@ export default function GuestChatPage() {
   const [msgCount, setMsgCount] = useState(0);
   const [showSignup, setShowSignup] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [signupStep, setSignupStep] = useState<'phone' | 'otp' | 'email'>('email');
-  const [signupPhone, setSignupPhone] = useState('');
+  const [signupStep, setSignupStep] = useState<'signup' | 'login'>('signup');
   const [signingUp, setSigningUp] = useState(false);
   const [signupError, setSignupError] = useState('');
   const [emailForm, setEmailForm] = useState({ email: '', password: '', name: '' });
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -149,66 +147,7 @@ export default function GuestChatPage() {
     setSending(false);
   }, [session, sending, chatId]);
 
-  // ─── Phone signup: send OTP ───
-  const handlePhoneSubmit = useCallback(async (fullPhone: string) => {
-    console.log('[guest-signup] handlePhoneSubmit:', fullPhone);
-    setSigningUp(true);
-    setSignupError('');
-    setSignupPhone(fullPhone);
-
-    try {
-      const { error } = await supabase.auth.signUp({ phone: fullPhone });
-      console.log('[guest-signup] signUp:', error?.message || 'ok');
-
-      if (error) {
-        const { error: otpErr } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-        console.log('[guest-signup] signInWithOtp:', otpErr?.message || 'ok');
-        if (otpErr) {
-          // Check for Twilio / unverified number errors
-          const msg = otpErr.message.toLowerCase();
-          if (msg.includes('unverified') || msg.includes('twilio') || msg.includes('sms') || msg.includes('phone') || msg.includes('not enabled')) {
-            setSignupError('SMS service is being set up. Please try email sign up instead.');
-          } else {
-            setSignupError(otpErr.message);
-          }
-          setSigningUp(false);
-          return;
-        }
-      }
-      setSignupStep('otp');
-    } catch (err) {
-      console.error('[guest-signup] error:', err);
-      setSignupError('Something went wrong. Please try again.');
-    }
-    setSigningUp(false);
-  }, [supabase]);
-
-  // ─── Phone signup: verify OTP ───
-  const handleVerifyOTP = useCallback(async (code: string) => {
-    if (!session) return;
-    setSigningUp(true);
-    setSignupError('');
-
-    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-      phone: signupPhone, token: code, type: 'sms',
-    });
-
-    if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
-    if (!authData.session || !authData.user) { setSignupError('Verification failed.'); setSigningUp(false); return; }
-
-    try {
-      const res = await fetch('/api/guest/upgrade', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guestId: session.guestId, phone: signupPhone, userId: authData.user.id, name: session.guestName }),
-      });
-      const data = await res.json();
-      if (data.success) { localStorage.removeItem('evrywher_guest_session'); window.location.href = '/chat'; }
-      else setSignupError(data.error || 'Upgrade failed');
-    } catch { setSignupError('Network error — try again'); }
-    setSigningUp(false);
-  }, [session, signupPhone, supabase]);
-
-  // ─── Email signup fallback ───
+  // ─── Email signup ───
   const handleEmailSignup = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session || !emailForm.email || !emailForm.password) return;
@@ -242,6 +181,36 @@ export default function GuestChatPage() {
     } catch { setSignupError('Network error — try again'); }
     setSigningUp(false);
   }, [session, emailForm, supabase]);
+
+  // ─── Email login (existing account) ───
+  const handleEmailLogin = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session || !loginForm.email || !loginForm.password) return;
+    setSigningUp(true);
+    setSignupError('');
+
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: loginForm.email, password: loginForm.password,
+      });
+
+      if (authError) { setSignupError(authError.message); setSigningUp(false); return; }
+      if (!authData.user) { setSignupError('Login failed.'); setSigningUp(false); return; }
+
+      const res = await fetch('/api/guest/upgrade', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestId: session.guestId, userId: authData.user.id, name: session.guestName }),
+      });
+      const data = await res.json();
+      if (data.success || data.already_connected) {
+        localStorage.removeItem('evrywher_guest_session');
+        window.location.href = '/chat';
+      } else {
+        setSignupError(data.error || 'Could not link account');
+      }
+    } catch { setSignupError('Network error — try again'); }
+    setSigningUp(false);
+  }, [session, loginForm, supabase]);
 
   // ─── Cleanup ───
   useEffect(() => {
@@ -496,15 +465,15 @@ export default function GuestChatPage() {
         </div>
       </div>
 
-      {/* ─── Signup modal with OTP + email fallback ─── */}
+      {/* ─── Signup / Login modal (email only — no phone OTP) ─── */}
       {showSignup && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('email'); setSignupError(''); }}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('signup'); setSignupError(''); }}>
           <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white">
-                {signupStep === 'email' ? 'Save Your Chat' : signupStep === 'otp' ? 'Enter the code' : 'Sign up with phone'}
+                {signupStep === 'signup' ? 'Save Your Chat' : 'Welcome Back'}
               </h3>
-              <button onClick={() => { setShowSignup(false); setSignupStep('email'); setSignupError(''); }} className="text-slate-500 p-1">
+              <button onClick={() => { setShowSignup(false); setSignupStep('signup'); setSignupError(''); }} className="text-slate-500 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
@@ -515,10 +484,10 @@ export default function GuestChatPage() {
               </div>
             )}
 
-            {/* ─── Email step (default) ─── */}
-            {signupStep === 'email' && (
+            {/* ─── Create account ─── */}
+            {signupStep === 'signup' && (
               <form onSubmit={handleEmailSignup} className="space-y-3">
-                <p className="text-xs text-slate-400">Keep your messages + unlock AI translation, voice, and more.</p>
+                <p className="text-xs text-slate-400">Create an account to keep your messages, unlock AI translation, voice, and more.</p>
                 <input
                   type="text"
                   placeholder="Your name"
@@ -550,48 +519,49 @@ export default function GuestChatPage() {
                 >
                   {signingUp ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Create Account →'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => { setSignupStep('phone'); setSignupError(''); }}
-                  className="w-full text-center text-sm text-slate-500 active:text-slate-300"
-                >
-                  Use phone instead
-                </button>
+                <p className="text-center text-sm text-slate-500">
+                  Already have an account?{' '}
+                  <button type="button" onClick={() => { setSignupStep('login'); setSignupError(''); }} className="text-indigo-400 font-medium active:opacity-60">
+                    Log in
+                  </button>
+                </p>
               </form>
             )}
 
-            {/* ─── Phone step ─── */}
-            {signupStep === 'phone' && (
-              <>
-                <p className="text-xs text-slate-400">Enter your phone number to receive a verification code.</p>
-                <PhoneInput onSubmit={handlePhoneSubmit} loading={signingUp} buttonText="Send Code →" dark={true} />
-                <button
-                  onClick={() => { setSignupStep('email'); setSignupError(''); }}
-                  className="w-full text-center text-sm text-slate-500 active:text-slate-300 mt-1"
-                >
-                  Use email instead
-                </button>
-              </>
-            )}
-
-            {/* ─── OTP step ─── */}
-            {signupStep === 'otp' && (
-              <>
-                <OTPInput
-                  phone={signupPhone}
-                  onVerify={handleVerifyOTP}
-                  onResend={() => handlePhoneSubmit(signupPhone)}
-                  loading={signingUp}
-                  error=""
-                  dark={true}
+            {/* ─── Log in (existing account) ─── */}
+            {signupStep === 'login' && (
+              <form onSubmit={handleEmailLogin} className="space-y-3">
+                <p className="text-xs text-slate-400">Log in to link this chat to your account.</p>
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  required
+                  value={loginForm.email}
+                  onChange={e => setLoginForm(f => ({ ...f, email: e.target.value }))}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  required
+                  value={loginForm.password}
+                  onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
+                  className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500/50"
                 />
                 <button
-                  onClick={() => { setSignupStep('phone'); setSignupError(''); }}
-                  className="w-full text-center text-sm text-indigo-400 font-medium active:opacity-60 mt-2"
+                  type="submit"
+                  disabled={signingUp || !loginForm.email || !loginForm.password}
+                  className="w-full bg-indigo-600 text-white text-base font-semibold rounded-xl py-3.5 active:bg-indigo-700 disabled:opacity-40 flex items-center justify-center gap-2"
                 >
-                  Change phone number
+                  {signingUp ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Log In →'}
                 </button>
-              </>
+                <p className="text-center text-sm text-slate-500">
+                  Don&apos;t have an account?{' '}
+                  <button type="button" onClick={() => { setSignupStep('signup'); setSignupError(''); }} className="text-indigo-400 font-medium active:opacity-60">
+                    Sign up
+                  </button>
+                </p>
+              </form>
             )}
           </div>
         </div>
