@@ -1212,7 +1212,11 @@ export default function PocketChatPage() {
 
     try {
       // INSTANT SEND — save message immediately, translate in background
-      const senderLang = chatLang || profile?.language || 'en';
+      // profileLang = language user actually types in (their profile language)
+      // sendAsLang  = target language selected in "Send as" dropdown
+      // recipientLang = contact's language
+      const profileLang = profile?.language || 'en';
+      const sendAsLang = chatLang || profileLang;
       const recipientLang = activeConvo?.contact?.language || 'ja';
 
       const { data: msg, error } = await supabase.from('messages').insert({
@@ -1223,13 +1227,13 @@ export default function PocketChatPage() {
         message: text,
         message_type: 'text',
         original_text: text,
-        original_language: senderLang,
-        translations: { [senderLang]: text },
+        original_language: profileLang,
+        translations: { [profileLang]: text },
         ...(replyTo && { reply_to_id: replyTo.id }),
       }).select().single();
       setReplyTo(null);
 
-      console.log('[SendMessage] insert result:', { msgId: msg?.id, convoId: activeConvoId, orgId: organization.id, senderType: 'owner', error: error?.message || null });
+      console.log('[SendMessage] insert result:', { msgId: msg?.id, profileLang, sendAsLang, recipientLang, error: error?.message || null });
 
       if (error) {
         toast('Failed to send message', 'error');
@@ -1238,25 +1242,36 @@ export default function PocketChatPage() {
         playSound('send');
         supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
 
-        // Background translation — don't block UI (respect translation mode)
-        const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, senderLang, activeConvo?.contact?.language);
-        if (msg && recipientLang !== senderLang && effTransMode !== 'direct') {
+        // Background translation — translate if send-as differs from profile lang,
+        // OR if recipient language differs from profile lang (and mode isn't direct)
+        const effTransMode = resolveTranslationMode(activeConvo?.translation_mode, profileLang, activeConvo?.contact?.language);
+        // Primary target: send-as language if user explicitly chose a different one, otherwise recipient language
+        const translateTo = sendAsLang !== profileLang
+          ? sendAsLang
+          : (recipientLang !== profileLang && effTransMode !== 'direct' ? recipientLang : null);
+
+        if (msg && translateTo) {
+          console.log('[SendMessage] translating:', profileLang, '->', translateTo);
           fetch('/api/ai/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               text,
-              fromLanguage: senderLang,
-              toLanguage: recipientLang,
+              fromLanguage: profileLang,
+              toLanguage: translateTo,
               ...(convoSummary ? { context: `Relationship: ${convoSummary.relationship_context}. ${convoSummary.summary}` } : {}),
             }),
           }).then(r => r.json()).then(data => {
             if (data.translatedText) {
+              // Update message with translated text — recipient sees translated version
               supabase.from('messages').update({
-                translations: { [senderLang]: text, [recipientLang]: data.translatedText },
+                message: data.translatedText,
+                translations: { [profileLang]: text, [translateTo]: data.translatedText },
               }).eq('id', msg.id);
+              // Also update conversation last_message to translated version
+              supabase.from('conversations').update({ last_message: data.translatedText }).eq('id', activeConvoId);
             }
-          }).catch(() => {});
+          }).catch((err) => { console.error('[SendMessage] translation failed:', err); });
         }
       }
     } catch {
