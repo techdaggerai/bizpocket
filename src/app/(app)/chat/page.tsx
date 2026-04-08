@@ -397,6 +397,13 @@ export default function PocketChatPage() {
       setConversations((prev) =>
         prev.map((c) => (c.id === convoId ? { ...c, unread_count: 0 } : c))
       );
+
+      // Notify peer that messages are read (so sender sees "Read" status)
+      fetch('/api/messages/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: convoId }),
+      }).catch(() => {});
     },
     [organization?.id]
   );
@@ -618,7 +625,15 @@ export default function PocketChatPage() {
     return () => { ch.unsubscribe(); if (typingTimeout.current) clearTimeout(typingTimeout.current); setTypingUser(null); };
   }, [activeConvoId, user?.id]); // eslint-disable-line
 
+  const lastTypingBroadcast = useRef<{ time: number; convo: string | null }>({ time: 0, convo: null });
   const broadcastTyping = useCallback(() => {
+    const now = Date.now();
+    // Reset debounce when switching conversations
+    if (lastTypingBroadcast.current.convo !== activeConvoId) {
+      lastTypingBroadcast.current = { time: 0, convo: activeConvoId || null };
+    }
+    if (now - lastTypingBroadcast.current.time < 2000) return; // Debounce: max once per 2s
+    lastTypingBroadcast.current = { time: now, convo: activeConvoId || null };
     typingChannelRef.current?.send({ type: 'broadcast', event: 'typing', payload: { user_id: user?.id, name: profile?.full_name || profile?.name || 'Someone' } });
   }, [user?.id, profile?.name]);
 
@@ -2352,28 +2367,17 @@ export default function PocketChatPage() {
                     <span className="text-[11px] text-slate-400">
                       {formatTimestamp(msg.created_at)}
                     </span>
-                    {isOwner && (
-                      <span className="inline-flex ml-0.5">
-                        {msg.read_at ? (
-                          /* Read: double blue checks */
-                          <svg className="h-3 w-[18px]" viewBox="0 0 18 12" fill="none">
-                            <path d="M1 6l3.5 4L14 1" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M5 6l3.5 4L18 1" stroke="#3B82F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        ) : msg.delivered_at ? (
-                          /* Delivered: double gray checks */
-                          <svg className="h-3 w-[18px]" viewBox="0 0 18 12" fill="none">
-                            <path d="M1 6l3.5 4L14 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M5 6l3.5 4L18 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        ) : (
-                          /* Sent: single gray check */
-                          <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                            <path d="M1 6l3.5 4L11 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        )}
-                      </span>
-                    )}
+                    {/* LINE-style "Sent"/"Read" — only on last owner message in sequence */}
+                    {isOwner && (() => {
+                      // Check if this is the last message from owner (no later owner message exists)
+                      const laterOwnerMsg = messages.slice(idx + 1).find(m => m.sender_type === 'owner' && !m.deleted_at);
+                      if (laterOwnerMsg) return null;
+                      return (
+                        <span className={`text-[10px] ml-1 font-medium ${msg.read_at ? 'text-[#818cf8]' : 'text-slate-500'}`}>
+                          {msg.read_at ? 'Read' : 'Sent'}
+                        </span>
+                      );
+                    })()}
                   </div>
                   {/* Reactions */}
                   {msg.reactions && Object.keys(msg.reactions).length > 0 && (
