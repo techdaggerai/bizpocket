@@ -15,6 +15,7 @@ import {
   Download,
   GraduationCap,
   Globe2,
+  Video,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -82,10 +83,17 @@ const FEATURES = [
     route: '/ai/pdf',
   },
   {
+    title: 'Live Video Guide',
+    desc: 'AI walks you through any machine',
+    icon: Video,
+    bg: 'bg-emerald-600',
+    route: '/chat/live-guide',
+  },
+  {
     title: 'Language Learning',
     desc: 'Learn from your real conversations',
     icon: GraduationCap,
-    bg: 'bg-emerald-600',
+    bg: 'bg-teal-600',
     route: '/ai/learn',
   },
   {
