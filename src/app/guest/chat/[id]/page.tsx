@@ -145,14 +145,14 @@ export default function GuestChatPage() {
     setSending(false);
   }, [session, sending, chatId]);
 
-  // ─── Phone signup (WhatsApp-style — server creates user, bypasses rate limits) ───
+  // ─── Phone signup (server creates user + signs in, returns session tokens) ───
   const handlePhoneContinue = useCallback(async (fullPhone: string) => {
     if (!session) return;
     setSigningUp(true);
     setSignupError('');
 
     try {
-      // Step 1: Create or find user via server API (admin key, no rate limits)
+      // Single API call: server creates user + signs in + returns session
       const authRes = await fetch('/api/auth/phone-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -166,19 +166,13 @@ export default function GuestChatPage() {
         return;
       }
 
-      // Step 2: Sign in on client side
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: authData.email,
-        password: fullPhone,
+      // Set session directly from server tokens — no client-side signIn needed
+      await supabase.auth.setSession({
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token,
       });
 
-      if (signInErr) {
-        setSignupError('Account ready! Tap Continue once more.');
-        setSigningUp(false);
-        return;
-      }
-
-      // Step 3: Upgrade guest → real user
+      // Upgrade guest → real user
       const res = await fetch('/api/guest/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -11,7 +11,8 @@ export async function POST(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !serviceKey) {
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!url || !serviceKey || !anonKey) {
       return NextResponse.json({ error: 'Server config error' }, { status: 500 })
     }
 
@@ -22,38 +23,40 @@ export async function POST(req: NextRequest) {
     const fakeEmail = `${phone.replace(/\+/g, '')}@evrywher.io`
     const fakePass = phone
 
-    // Check if user already exists
-    const { data: existingUsers } = await admin.auth.admin.listUsers()
-    const existing = existingUsers?.users?.find(u => u.email === fakeEmail)
-
-    if (existing) {
-      // User exists — return their ID for client-side signIn
-      return NextResponse.json({
-        success: true,
-        userId: existing.id,
-        exists: true,
-        email: fakeEmail,
-      })
-    }
-
-    // Create new user via admin API (bypasses rate limits + email verification)
-    const { data: newUser, error: createErr } = await admin.auth.admin.createUser({
+    // Try to create user — if already exists, that's fine
+    const { error: createErr } = await admin.auth.admin.createUser({
       email: fakeEmail,
       password: fakePass,
-      email_confirm: true, // Auto-confirm — no verification email
+      email_confirm: true,
       user_metadata: { phone, name: name || 'User' },
     })
 
-    if (createErr) {
-      console.error('[phone-signup] createUser error:', createErr)
+    // Ignore "already exists" errors
+    if (createErr && !createErr.message.includes('already') && !createErr.message.includes('exists') && !createErr.message.includes('unique')) {
+      console.error('[phone-signup] createUser:', createErr.message)
       return NextResponse.json({ error: createErr.message }, { status: 400 })
+    }
+
+    // Sign in using a server-side anon client — returns real session tokens
+    const anonClient = createClient(url, anonKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+
+    const { data: signInData, error: signInErr } = await anonClient.auth.signInWithPassword({
+      email: fakeEmail,
+      password: fakePass,
+    })
+
+    if (signInErr || !signInData.session) {
+      console.error('[phone-signup] signIn:', signInErr?.message)
+      return NextResponse.json({ error: 'Could not sign in. Try again.' }, { status: 500 })
     }
 
     return NextResponse.json({
       success: true,
-      userId: newUser.user.id,
-      exists: false,
-      email: fakeEmail,
+      userId: signInData.user.id,
+      access_token: signInData.session.access_token,
+      refresh_token: signInData.session.refresh_token,
     })
   } catch (err) {
     console.error('[phone-signup]', err)

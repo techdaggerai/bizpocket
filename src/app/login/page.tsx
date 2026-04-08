@@ -35,13 +35,12 @@ function LoginInner() {
     document.title = isPocketChat ? 'Log in — Evrywher' : 'Log in — BizPocket';
   }, [isPocketChat]);
 
-  // ─── Phone: instant login (server creates user if needed, no rate limits) ───
+  // ─── Phone: instant login (server creates user + signs in, returns session) ───
   async function handlePhoneSubmit(fullPhone: string) {
     setLoading(true);
     setError('');
 
     try {
-      // Step 1: Create or find user via server API
       const authRes = await fetch('/api/auth/phone-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,28 +49,22 @@ function LoginInner() {
       const authData = await authRes.json();
 
       if (!authRes.ok || !authData.success) {
-        setError(authData.error || 'Could not create account.');
+        setError(authData.error || 'Could not sign in.');
         setLoading(false);
         return;
       }
 
-      // Step 2: Sign in on client side
-      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: authData.email,
-        password: fullPhone,
+      // Set session directly from server tokens
+      await supabase.auth.setSession({
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token,
       });
 
-      if (signInErr || !data?.session) {
-        setError('Account ready! Tap Continue once more.');
-        setLoading(false);
-        return;
-      }
-
-      // Step 3: Check for profile and redirect
+      // Check for profile and redirect
       const { data: profile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', data.user!.id)
+        .eq('user_id', authData.userId)
         .maybeSingle();
 
       if (profile) {
