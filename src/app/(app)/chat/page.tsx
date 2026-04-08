@@ -833,6 +833,7 @@ export default function PocketChatPage() {
         message_type: 'text', original_text: mapUrl,
       });
       await supabase.from('conversations').update({ last_message: '📍 Shared location', last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
+      fetch('/api/messages/relay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversationId: activeConvoId, organizationId: organization.id, messageText: `📍 Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, messageType: 'text', senderName: profile?.full_name || profile?.name || 'Contact' }) }).catch(() => {});
       toast('Location shared', 'success');
     }, () => { toast('Location access denied', 'error'); });
     setShowAttachMenu(false);
@@ -859,6 +860,7 @@ export default function PocketChatPage() {
           original_text: broadcastMsg.trim(), original_language: profile?.language || 'en',
         });
         await supabase.from('conversations').update({ last_message: broadcastMsg.trim(), last_message_at: new Date().toISOString() }).eq('id', targetConvoId);
+        fetch('/api/messages/relay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversationId: targetConvoId, organizationId: organization.id, messageText: broadcastMsg.trim(), messageType: 'text', senderName: profile?.full_name || profile?.name || 'Contact' }) }).catch(() => {});
       }
     }
     toast(`Broadcast sent to ${broadcastContacts.length} contacts`, 'success');
@@ -1019,10 +1021,25 @@ export default function PocketChatPage() {
 
     if (error) toast('Failed to send voice note', 'error');
     else {
+      const voiceLabel = `🎤 Voice note (${formatDuration(duration)})`;
       await supabase
         .from('conversations')
-        .update({ last_message: `🎤 Voice note (${formatDuration(duration)})`, last_message_at: new Date().toISOString() })
+        .update({ last_message: voiceLabel, last_message_at: new Date().toISOString() })
         .eq('id', activeConvoId);
+
+      // Relay voice to peer
+      fetch('/api/messages/relay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: activeConvoId,
+          organizationId: organization!.id,
+          messageText: `Voice note (${formatDuration(duration)})`,
+          messageType: 'voice',
+          senderName: profile?.name || 'Contact',
+          attachmentUrl: urlData.publicUrl,
+        }),
+      }).catch(() => {});
     }
     setUploading(false);
   }, [activeConvoId, organization?.id, chatLang, recordingDuration]);
@@ -1104,6 +1121,20 @@ export default function PocketChatPage() {
         .from('conversations')
         .update({ last_message: `📎 ${file.name}`, last_message_at: new Date().toISOString() })
         .eq('id', activeConvoId);
+
+      // Relay attachment to peer
+      fetch('/api/messages/relay', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: activeConvoId,
+          organizationId: organization!.id,
+          messageText: file.name,
+          messageType: msgType,
+          senderName: profile?.name || 'Contact',
+          attachmentUrl: urlData.publicUrl,
+        }),
+      }).catch(() => {});
     }
 
     setUploading(false);
@@ -1241,6 +1272,21 @@ export default function PocketChatPage() {
       } else {
         playSound('send');
         supabase.from('conversations').update({ last_message: text, last_message_at: new Date().toISOString() }).eq('id', activeConvoId);
+
+        // Relay message to peer's conversation (cross-org delivery)
+        if (!activeConvo?.is_bot_chat) {
+          fetch('/api/messages/relay', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversationId: activeConvoId,
+              organizationId: organization.id,
+              messageText: text,
+              messageType: 'text',
+              senderName: profile?.full_name || profile?.name || 'Contact',
+            }),
+          }).catch(() => { /* relay is best-effort */ });
+        }
 
         // Background translation — translate if send-as differs from profile lang,
         // OR if recipient language differs from profile lang (and mode isn't direct)
