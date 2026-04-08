@@ -23,12 +23,23 @@ export default function InviteClient({ inviter, code }: Props) {
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Check auth state
+  // Check for existing guest session first, then auth state
   useEffect(() => {
+    // If guest already has a session, go straight to chat (prevents duplicates)
+    const existing = localStorage.getItem('evrywher_guest_session');
+    if (existing) {
+      try {
+        const parsed = JSON.parse(existing);
+        if (parsed.chatId && parsed.guestToken) {
+          router.push(`/guest/chat/${parsed.chatId}`);
+          return;
+        }
+      } catch { /* invalid, continue */ }
+    }
+
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
-        // Logged in → instant connect
         setIsLoggedIn(true);
         handleLoggedInConnect();
       } else {

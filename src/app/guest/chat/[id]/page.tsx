@@ -83,7 +83,7 @@ export default function GuestChatPage() {
   const fetchMessages = useCallback(async () => {
     if (!session) return;
     try {
-      const res = await fetch(`/api/guest/messages?chatId=${chatId}&guestToken=${session.guestToken}`);
+      const res = await fetch(`/api/guest/messages?chatId=${chatId}&guestId=${session.guestId}&guestToken=${session.guestToken}`);
       if (res.ok) {
         const data = await res.json();
         if (data.messages) {
@@ -103,7 +103,7 @@ export default function GuestChatPage() {
   useEffect(() => {
     if (!session) return;
     fetchMessages();
-    pollRef.current = setInterval(fetchMessages, 3000);
+    pollRef.current = setInterval(fetchMessages, 1500);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [session, fetchMessages]);
 

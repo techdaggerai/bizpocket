@@ -1347,6 +1347,7 @@ export default function PocketChatPage() {
             }),
           }).catch(() => { /* relay is best-effort */ });
         }
+
       }
     } catch {
       toast('Failed to send message', 'error');

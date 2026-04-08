@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -94,35 +95,8 @@ export async function POST(request: Request) {
 
     inviterName = inviterProfile?.full_name || inviterProfile?.name || 'Someone'
 
-    // ─── Check for existing conversation with same guest name ───
-    // Prevents duplicate chat threads when same person opens invite link again
-    const { data: existingConvo } = await admin
-      .from('conversations')
-      .select('id')
-      .eq('organization_id', inviterOrgId)
-      .eq('title', name.trim())
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-
-    if (existingConvo) {
-      // Reuse existing conversation — don't create a duplicate
-      const guestId = crypto.randomUUID()
-      const guestToken = crypto.randomUUID().replace(/-/g, '').slice(0, 32)
-
-      return NextResponse.json({
-        success: true,
-        guestId,
-        guestToken,
-        chatId: existingConvo.id,
-        inviterName,
-        inviterOrgId,
-      })
-    }
-
     // ─── Create guest record ───
     const guestId = crypto.randomUUID()
-    const guestToken = crypto.randomUUID().replace(/-/g, '').slice(0, 32)
 
     try {
       await admin.from('guests').insert({
@@ -180,6 +154,12 @@ export async function POST(request: Request) {
       message: welcomeMsg,
       message_type: 'text',
     })
+
+    // Generate HMAC-signed token tied to guestId + chatId (verified on every API call)
+    const guestToken = createHmac('sha256', key)
+      .update(`${guestId}:${chatId}`)
+      .digest('hex')
+      .slice(0, 32)
 
     return NextResponse.json({
       success: true,

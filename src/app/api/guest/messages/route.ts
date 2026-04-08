@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createHmac } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
 function getAdmin() {
@@ -8,31 +9,36 @@ function getAdmin() {
   return createClient(url, key)
 }
 
+/** Verify HMAC-signed guest token: token = HMAC(serviceKey, guestId:chatId) */
+function verifyGuestToken(guestId: string, chatId: string, guestToken: string): boolean {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!key) return false
+  const expected = createHmac('sha256', key)
+    .update(`${guestId}:${chatId}`)
+    .digest('hex')
+    .slice(0, 32)
+  return guestToken === expected
+}
+
 // ─── GET: Fetch messages for a guest conversation ───
 export async function GET(req: NextRequest) {
   try {
     const chatId = req.nextUrl.searchParams.get('chatId')
     const guestToken = req.nextUrl.searchParams.get('guestToken')
+    const guestId = req.nextUrl.searchParams.get('guestId')
 
-    if (!chatId || !guestToken) {
-      return NextResponse.json({ error: 'Missing chatId or guestToken' }, { status: 400 })
+    if (!chatId || !guestToken || !guestId) {
+      return NextResponse.json({ error: 'Missing chatId, guestId, or guestToken' }, { status: 400 })
+    }
+
+    // Verify HMAC token — proves this guest owns this conversation
+    if (!verifyGuestToken(guestId, chatId, guestToken)) {
+      return NextResponse.json({ error: 'Invalid guest session' }, { status: 403 })
     }
 
     const admin = getAdmin()
     if (!admin) {
       return NextResponse.json({ error: 'Server config error' }, { status: 500 })
-    }
-
-    // Validate guest token by checking localStorage-stored session matches a real conversation
-    // We verify the conversation exists and the guestToken is plausible (non-empty)
-    const { data: convo } = await admin
-      .from('conversations')
-      .select('id')
-      .eq('id', chatId)
-      .single()
-
-    if (!convo) {
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
     const { data: messages } = await admin
@@ -54,8 +60,13 @@ export async function POST(req: NextRequest) {
   try {
     const { chatId, guestToken, guestName, guestId, inviterOrgId, message } = await req.json()
 
-    if (!chatId || !guestToken || !message?.trim()) {
+    if (!chatId || !guestToken || !guestId || !message?.trim()) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    // Verify HMAC token — proves this guest owns this conversation
+    if (!verifyGuestToken(guestId, chatId, guestToken)) {
+      return NextResponse.json({ error: 'Invalid guest session' }, { status: 403 })
     }
 
     const admin = getAdmin()
@@ -77,7 +88,7 @@ export async function POST(req: NextRequest) {
     const orgId = inviterOrgId || convo.organization_id
     const text = message.trim()
 
-    // Insert message
+    // Insert message — sender_type hardcoded to 'contact' (cannot be overridden by client)
     const { data: msg, error: msgErr } = await admin.from('messages').insert({
       conversation_id: chatId,
       organization_id: orgId,
