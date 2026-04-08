@@ -56,7 +56,7 @@ export default function GuestChatPage() {
   const [msgCount, setMsgCount] = useState(0);
   const [showSignup, setShowSignup] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
-  const [signupStep, setSignupStep] = useState<'phone' | 'otp' | 'email'>('phone');
+  const [signupStep, setSignupStep] = useState<'phone' | 'otp' | 'email'>('email');
   const [signupPhone, setSignupPhone] = useState('');
   const [signingUp, setSigningUp] = useState(false);
   const [signupError, setSignupError] = useState('');
@@ -498,13 +498,13 @@ export default function GuestChatPage() {
 
       {/* ─── Signup modal with OTP + email fallback ─── */}
       {showSignup && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('phone'); setSignupError(''); }}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupStep('email'); setSignupError(''); }}>
           <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white">
-                {signupStep === 'phone' ? 'Save Your Chat' : signupStep === 'otp' ? 'Enter the code' : 'Sign up with email'}
+                {signupStep === 'email' ? 'Save Your Chat' : signupStep === 'otp' ? 'Enter the code' : 'Sign up with phone'}
               </h3>
-              <button onClick={() => { setShowSignup(false); setSignupStep('phone'); setSignupError(''); }} className="text-slate-500 p-1">
+              <button onClick={() => { setShowSignup(false); setSignupStep('email'); setSignupError(''); }} className="text-slate-500 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
@@ -515,44 +515,10 @@ export default function GuestChatPage() {
               </div>
             )}
 
-            {/* ─── Phone step ─── */}
-            {signupStep === 'phone' && (
-              <>
-                <p className="text-xs text-slate-400">Enter your phone to keep your messages + unlock AI translation, voice, and more.</p>
-                <PhoneInput onSubmit={handlePhoneSubmit} loading={signingUp} buttonText="Send Code →" dark={true} />
-                <button
-                  onClick={() => { setSignupStep('email'); setSignupError(''); }}
-                  className="w-full text-center text-sm text-slate-500 active:text-slate-300 mt-1"
-                >
-                  Use email instead
-                </button>
-              </>
-            )}
-
-            {/* ─── OTP step ─── */}
-            {signupStep === 'otp' && (
-              <>
-                <OTPInput
-                  phone={signupPhone}
-                  onVerify={handleVerifyOTP}
-                  onResend={() => handlePhoneSubmit(signupPhone)}
-                  loading={signingUp}
-                  error=""
-                  dark={true}
-                />
-                <button
-                  onClick={() => { setSignupStep('phone'); setSignupError(''); }}
-                  className="w-full text-center text-sm text-indigo-400 font-medium active:opacity-60 mt-2"
-                >
-                  Change phone number
-                </button>
-              </>
-            )}
-
-            {/* ─── Email fallback step ─── */}
+            {/* ─── Email step (default) ─── */}
             {signupStep === 'email' && (
               <form onSubmit={handleEmailSignup} className="space-y-3">
-                <p className="text-xs text-slate-400">Create an account with your email.</p>
+                <p className="text-xs text-slate-400">Keep your messages + unlock AI translation, voice, and more.</p>
                 <input
                   type="text"
                   placeholder="Your name"
@@ -592,6 +558,40 @@ export default function GuestChatPage() {
                   Use phone instead
                 </button>
               </form>
+            )}
+
+            {/* ─── Phone step ─── */}
+            {signupStep === 'phone' && (
+              <>
+                <p className="text-xs text-slate-400">Enter your phone number to receive a verification code.</p>
+                <PhoneInput onSubmit={handlePhoneSubmit} loading={signingUp} buttonText="Send Code →" dark={true} />
+                <button
+                  onClick={() => { setSignupStep('email'); setSignupError(''); }}
+                  className="w-full text-center text-sm text-slate-500 active:text-slate-300 mt-1"
+                >
+                  Use email instead
+                </button>
+              </>
+            )}
+
+            {/* ─── OTP step ─── */}
+            {signupStep === 'otp' && (
+              <>
+                <OTPInput
+                  phone={signupPhone}
+                  onVerify={handleVerifyOTP}
+                  onResend={() => handlePhoneSubmit(signupPhone)}
+                  loading={signingUp}
+                  error=""
+                  dark={true}
+                />
+                <button
+                  onClick={() => { setSignupStep('phone'); setSignupError(''); }}
+                  className="w-full text-center text-sm text-indigo-400 font-medium active:opacity-60 mt-2"
+                >
+                  Change phone number
+                </button>
+              </>
             )}
           </div>
         </div>
