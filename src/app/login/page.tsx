@@ -44,22 +44,43 @@ function LoginInner() {
     const fakePass = fullPhone;
 
     // Try login first
-    let { data, error: signInErr } = await supabase.auth.signInWithPassword({
+    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
       email: fakeEmail, password: fakePass,
     });
 
     if (signInErr) {
-      // Account doesn't exist — create it, then login
-      const { error: signUpErr } = await supabase.auth.signUp({
+      // Account doesn't exist — create it
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: fakeEmail, password: fakePass,
+        options: { data: { phone: fullPhone } },
       });
-      if (signUpErr) { setError(signUpErr.message); setLoading(false); return; }
-
-      const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
-        email: fakeEmail, password: fakePass,
-      });
-      if (loginErr) { setError(loginErr.message); setLoading(false); return; }
-      data = loginData;
+      if (signUpErr) {
+        if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
+          setError('Please wait a moment and try again.');
+        } else {
+          setError(signUpErr.message);
+        }
+        setLoading(false); return;
+      }
+      // signUp may return a session directly — if so, use it
+      if (signUpData?.session) {
+        const uid = signUpData.user!.id;
+        const { data: prof } = await supabase.from('profiles').select('id').eq('user_id', uid).maybeSingle();
+        if (prof) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; }
+        else { window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified'; }
+        return;
+      }
+      // No session — need to sign in (with delay to avoid rate limit)
+      await new Promise(r => setTimeout(r, 1000));
+      const { error: retryErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: fakePass });
+      if (retryErr) { setError('Account created! Tap Continue again to log in.'); setLoading(false); return; }
+      // Re-fetch user after sign in
+      const { data: { user: u } } = await supabase.auth.getUser();
+      if (!u) { setError('Please tap Continue again.'); setLoading(false); return; }
+      const { data: prof2 } = await supabase.from('profiles').select('id').eq('user_id', u.id).maybeSingle();
+      if (prof2) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; }
+      else { window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified'; }
+      return;
     }
 
     if (!data?.session) { setError('Could not sign in. Try again.'); setLoading(false); return; }

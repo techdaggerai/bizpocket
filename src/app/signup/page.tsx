@@ -46,22 +46,41 @@ function SignupInner() {
     const fakePass = fullPhone;
 
     // Try login first (existing account)
-    let { data, error: signInErr } = await supabase.auth.signInWithPassword({
+    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
       email: fakeEmail, password: fakePass,
     });
 
     if (signInErr) {
       // Account doesn't exist — create it
-      const { error: signUpErr } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: fakeEmail, password: fakePass,
+        options: { data: { phone: fullPhone } },
       });
-      if (signUpErr) { setError(signUpErr.message); setLoading(false); return; }
+      if (signUpErr) {
+        if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
+          setError('Please wait a moment and try again.');
+        } else {
+          setError(signUpErr.message);
+        }
+        setLoading(false); return;
+      }
 
-      const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
-        email: fakeEmail, password: fakePass,
-      });
-      if (loginErr) { setError(loginErr.message); setLoading(false); return; }
-      data = loginData;
+      // signUp may return session directly
+      if (signUpData?.session && signUpData?.user) {
+        const { data: ex } = await supabase.from('profiles').select('id').eq('user_id', signUpData.user.id).maybeSingle();
+        if (ex) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; return; }
+        setStep('name');
+        setLoading(false);
+        return;
+      }
+
+      // No session — wait and retry login
+      await new Promise(r => setTimeout(r, 1000));
+      const { error: retryErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: fakePass });
+      if (retryErr) { setError('Account created! Tap Continue again.'); setLoading(false); return; }
+      setStep('name');
+      setLoading(false);
+      return;
     }
 
     if (!data?.session) { setError('Could not create account. Try again.'); setLoading(false); return; }

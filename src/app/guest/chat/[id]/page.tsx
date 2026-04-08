@@ -156,33 +156,51 @@ export default function GuestChatPage() {
 
     try {
       // Try sign in first (existing account)
-      let { data: authData, error: signInErr } = await supabase.auth.signInWithPassword({
+      let userId: string | null = null;
+
+      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
         email: fakeEmail, password: fakePass,
       });
 
-      if (signInErr) {
-        // Account doesn't exist — create it
+      if (!signInErr && signInData?.user) {
+        userId = signInData.user.id;
+      } else {
+        // Account doesn't exist — create it (signUp returns session directly, no need for separate login)
         const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
           email: fakeEmail, password: fakePass,
+          options: { data: { phone: fullPhone, name: session.guestName } },
         });
-        if (signUpErr) { setSignupError(signUpErr.message); setSigningUp(false); return; }
-        if (!signUpData.user) { setSignupError('Could not create account.'); setSigningUp(false); return; }
 
-        // Auto sign in after signup
-        const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({
-          email: fakeEmail, password: fakePass,
-        });
-        if (loginErr) { setSignupError(loginErr.message); setSigningUp(false); return; }
-        authData = loginData;
+        if (signUpErr) {
+          // Rate limit — wait and retry
+          if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
+            setSignupError('Please wait a moment and try again.');
+            setSigningUp(false);
+            return;
+          }
+          setSignupError(signUpErr.message); setSigningUp(false); return;
+        }
+
+        if (signUpData?.user) {
+          userId = signUpData.user.id;
+          // If signUp didn't create a session, sign in with a delay
+          if (!signUpData.session) {
+            await new Promise(r => setTimeout(r, 1000));
+            const { error: retryErr } = await supabase.auth.signInWithPassword({
+              email: fakeEmail, password: fakePass,
+            });
+            if (retryErr) { setSignupError('Account created! Tap Continue again to log in.'); setSigningUp(false); return; }
+          }
+        }
       }
 
-      if (!authData?.user) { setSignupError('Something went wrong.'); setSigningUp(false); return; }
+      if (!userId) { setSignupError('Something went wrong. Try again.'); setSigningUp(false); return; }
 
       // Upgrade guest → real user
       const res = await fetch('/api/guest/upgrade', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          guestId: session.guestId, userId: authData.user.id,
+          guestId: session.guestId, userId,
           name: session.guestName, phone: fullPhone,
         }),
       });
