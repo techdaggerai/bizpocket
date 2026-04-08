@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { PocketChatMark } from '@/components/Logo';
 import PocketAvatar from '@/components/PocketAvatar';
-import PhoneInput from '@/components/PhoneInput';
+import UniversalSignup from '@/components/UniversalSignup';
 
 interface GuestSession {
   guestId: string;
@@ -145,42 +145,23 @@ export default function GuestChatPage() {
     setSending(false);
   }, [session, sending, chatId]);
 
-  // ─── Phone signup (server creates user + signs in, returns session tokens) ───
-  const handlePhoneContinue = useCallback(async (fullPhone: string) => {
+  // ─── Signup success handler (any method: phone, email, password) ───
+  const handleSignupSuccess = useCallback(async ({ userId, phone, email }: { userId: string; phone?: string; email?: string; method: string }) => {
     if (!session) return;
     setSigningUp(true);
     setSignupError('');
 
     try {
-      // Single API call: server creates user + signs in + returns session
-      const authRes = await fetch('/api/auth/phone-signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: fullPhone, name: session.guestName }),
-      });
-      const authData = await authRes.json();
-
-      if (!authRes.ok || !authData.success) {
-        setSignupError(authData.error || 'Could not create account.');
-        setSigningUp(false);
-        return;
-      }
-
-      // Set session directly from server tokens — no client-side signIn needed
-      await supabase.auth.setSession({
-        access_token: authData.access_token,
-        refresh_token: authData.refresh_token,
-      });
-
       // Upgrade guest → real user
       const res = await fetch('/api/guest/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: session.guestId,
-          userId: authData.userId,
+          userId,
           name: session.guestName,
-          phone: fullPhone,
+          phone: phone || undefined,
+          email: email || undefined,
         }),
       });
       const data = await res.json();
@@ -193,7 +174,7 @@ export default function GuestChatPage() {
       }
     } catch { setSignupError('Network error — try again'); }
     setSigningUp(false);
-  }, [session, supabase]);
+  }, [session]);
 
   // ─── Cleanup ───
   useEffect(() => {
@@ -448,30 +429,26 @@ export default function GuestChatPage() {
         </div>
       </div>
 
-      {/* ─── Save Your Chat modal (phone number only — WhatsApp-style) ─── */}
+      {/* ─── Save Your Chat modal ─── */}
       {showSignup && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center" onClick={() => { setShowSignup(false); setSignupError(''); }}>
-          <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5 space-y-4" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Save Your Chat</h3>
+          <div className="w-full max-w-md bg-slate-800 rounded-t-2xl sm:rounded-2xl p-5" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-end mb-2">
               <button onClick={() => { setShowSignup(false); setSignupError(''); }} className="text-slate-500 p-1">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
 
-            <p className="text-xs text-slate-400">Enter your phone number to keep your messages and unlock AI translation, voice, and more.</p>
-
             {signupError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-950/30 px-4 py-2.5 text-sm text-red-400">
+              <div className="rounded-lg border border-red-500/20 bg-red-950/30 px-4 py-2.5 text-sm text-red-400 mb-3">
                 {signupError}
               </div>
             )}
 
-            <PhoneInput
-              onSubmit={handlePhoneContinue}
-              loading={signingUp}
-              buttonText="Continue →"
-              dark={true}
+            <UniversalSignup
+              compact
+              onSuccess={handleSignupSuccess}
+              isPocketChat={true}
             />
           </div>
         </div>
