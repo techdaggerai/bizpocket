@@ -37,7 +37,7 @@ interface PhoneInputProps {
   dark?: boolean;
 }
 
-export default function PhoneInput({ onSubmit, loading, buttonText = 'Send Code \u2192', dark = true }: PhoneInputProps) {
+export default function PhoneInput({ onSubmit, loading, buttonText = 'Send Code →', dark = true }: PhoneInputProps) {
   const [countryCode, setCountryCode] = useState('+81');
   const [phone, setPhone] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);

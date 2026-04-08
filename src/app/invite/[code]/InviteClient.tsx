@@ -76,6 +76,14 @@ export default function InviteClient({ inviter, code }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: guestName.trim(), inviteCode: code }),
       });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        setError(err?.error || 'Could not start chat — try again');
+        setLoading(false);
+        return;
+      }
+
       const data = await res.json();
 
       if (data.success && data.chatId) {

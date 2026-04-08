@@ -201,7 +201,7 @@ function SignupInner() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[var(--bg)] px-4 pb-[env(safe-area-inset-bottom,20px)]">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
@@ -230,7 +230,7 @@ function SignupInner() {
             <PhoneInput
               onSubmit={handlePhoneSubmit}
               loading={loading}
-              buttonText="Continue \u2192"
+              buttonText="Continue →"
               dark={false}
             />
 
@@ -290,7 +290,7 @@ function SignupInner() {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                'Start Chatting \u2192'
+                'Start Chatting →'
               )}
             </button>
           </form>

@@ -143,7 +143,7 @@ function LoginInner() {
   const syncPass = (e: React.SyntheticEvent<HTMLInputElement>) => setPassword(e.currentTarget.value);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[var(--bg)] px-4 pb-[env(safe-area-inset-bottom,20px)]">
       <div className="absolute top-4 right-4 z-10">
         <LandingLanguageDropdown />
       </div>
@@ -172,7 +172,7 @@ function LoginInner() {
             <PhoneInput
               onSubmit={handlePhoneSubmit}
               loading={loading}
-              buttonText="Send Code \u2192"
+              buttonText="Send Code →"
               dark={false}
             />
 
