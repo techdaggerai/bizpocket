@@ -63,7 +63,10 @@
       "Bash(sed -i 's/border-\\\\[#e5e7eb\\\\] dark:border-slate-700/BRDRE5_DONE/g; s/border-\\\\[#e5e7eb\\\\]/border-[#e5e7eb] dark:border-slate-700/g; s/BRDRE5_DONE/border-[#e5e7eb] dark:border-slate-700/g' src/app/page.tsx)",
       "Bash(sed -i 's/text-\\\\[#374151\\\\] dark:text-slate-300/TXT374_DONE/g; s/text-\\\\[#374151\\\\]/text-[#374151] dark:text-slate-300/g; s/TXT374_DONE/text-[#374151] dark:text-slate-300/g' src/app/page.tsx)",
       "Bash(sed -i 's/bg-\\\\[#faf9f7\\\\]/bg-[#faf9f7] dark:bg-slate-800\\\\/60/g' src/app/page.tsx)",
-      "Bash(wc -l C:/Users/drmal/AppData/Local/Temp/claude/C--TechDagger-BIZPOCKET/2cbf8b43-98d9-4174-a3be-2038543447d5/tasks/*.output)"
+      "Bash(npx --yes sharp-cli -i public/favicon.svg -o public/icons/bizpocket-icon-192.png resize 192 192)",
+      "Bash(git show:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm list:*)"
     ]
   }
 }

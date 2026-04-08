@@ -49,7 +49,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           user_id: user.id,
           organization_id: newOrg.id,
           role: 'owner',
-          name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Owner',
+          name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Owner',
+          phone: user.user_metadata?.phone || null,
           email: user.email!,
           language: userLang,
         });
