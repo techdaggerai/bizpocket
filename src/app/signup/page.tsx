@@ -36,69 +36,57 @@ function SignupInner() {
     document.title = isPocketChat ? 'Sign up — Evrywher' : 'Sign up — BizPocket';
   }, [isPocketChat]);
 
-  // ─── Phone: instant signup (no OTP — WhatsApp-style) ───
+  // ─── Phone: instant signup (server creates user, no rate limits) ───
   async function handlePhoneSubmit(fullPhone: string) {
     setLoading(true);
     setError('');
     setPhone(fullPhone);
 
-    const fakeEmail = `${fullPhone.replace(/\+/g, '')}@evrywher.io`;
-    const fakePass = fullPhone;
-
-    // Try login first (existing account)
-    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-      email: fakeEmail, password: fakePass,
-    });
-
-    if (signInErr) {
-      // Account doesn't exist — create it
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email: fakeEmail, password: fakePass,
-        options: { data: { phone: fullPhone } },
+    try {
+      // Step 1: Create or find user via server API
+      const authRes = await fetch('/api/auth/phone-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: fullPhone }),
       });
-      if (signUpErr) {
-        if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
-          setError('Please wait a moment and try again.');
-        } else {
-          setError(signUpErr.message);
-        }
-        setLoading(false); return;
-      }
+      const authData = await authRes.json();
 
-      // signUp may return session directly
-      if (signUpData?.session && signUpData?.user) {
-        const { data: ex } = await supabase.from('profiles').select('id').eq('user_id', signUpData.user.id).maybeSingle();
-        if (ex) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; return; }
-        setStep('name');
+      if (!authRes.ok || !authData.success) {
+        setError(authData.error || 'Could not create account.');
         setLoading(false);
         return;
       }
 
-      // No session — wait and retry login
-      await new Promise(r => setTimeout(r, 1000));
-      const { error: retryErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: fakePass });
-      if (retryErr) { setError('Account created! Tap Continue again.'); setLoading(false); return; }
+      // Step 2: Sign in on client side
+      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: authData.email,
+        password: fullPhone,
+      });
+
+      if (signInErr || !data?.session) {
+        setError('Account ready! Tap Continue once more.');
+        setLoading(false);
+        return;
+      }
+
+      // Step 3: Check for existing profile
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', data.user!.id)
+        .maybeSingle();
+
+      if (existing) {
+        window.location.href = isPocketChat ? '/chat' : '/dashboard';
+        return;
+      }
+
       setStep('name');
       setLoading(false);
-      return;
+    } catch {
+      setError('Network error — try again');
+      setLoading(false);
     }
-
-    if (!data?.session) { setError('Could not create account. Try again.'); setLoading(false); return; }
-
-    // Check if user already has a profile (returning user)
-    const { data: existing } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', data.user!.id)
-      .maybeSingle();
-
-    if (existing) {
-      window.location.href = isPocketChat ? '/chat' : '/dashboard';
-      return;
-    }
-
-    setStep('name');
-    setLoading(false);
   }
 
   // ─── Step 3: Enter name + create profile ───

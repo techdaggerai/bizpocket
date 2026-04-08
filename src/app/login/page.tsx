@@ -35,69 +35,53 @@ function LoginInner() {
     document.title = isPocketChat ? 'Log in — Evrywher' : 'Log in — BizPocket';
   }, [isPocketChat]);
 
-  // ─── Phone: instant login (no OTP — WhatsApp-style) ───
+  // ─── Phone: instant login (server creates user if needed, no rate limits) ───
   async function handlePhoneSubmit(fullPhone: string) {
     setLoading(true);
     setError('');
 
-    const fakeEmail = `${fullPhone.replace(/\+/g, '')}@evrywher.io`;
-    const fakePass = fullPhone;
-
-    // Try login first
-    const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-      email: fakeEmail, password: fakePass,
-    });
-
-    if (signInErr) {
-      // Account doesn't exist — create it
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email: fakeEmail, password: fakePass,
-        options: { data: { phone: fullPhone } },
+    try {
+      // Step 1: Create or find user via server API
+      const authRes = await fetch('/api/auth/phone-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: fullPhone }),
       });
-      if (signUpErr) {
-        if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
-          setError('Please wait a moment and try again.');
-        } else {
-          setError(signUpErr.message);
-        }
-        setLoading(false); return;
-      }
-      // signUp may return a session directly — if so, use it
-      if (signUpData?.session) {
-        const uid = signUpData.user!.id;
-        const { data: prof } = await supabase.from('profiles').select('id').eq('user_id', uid).maybeSingle();
-        if (prof) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; }
-        else { window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified'; }
+      const authData = await authRes.json();
+
+      if (!authRes.ok || !authData.success) {
+        setError(authData.error || 'Could not create account.');
+        setLoading(false);
         return;
       }
-      // No session — need to sign in (with delay to avoid rate limit)
-      await new Promise(r => setTimeout(r, 1000));
-      const { error: retryErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: fakePass });
-      if (retryErr) { setError('Account created! Tap Continue again to log in.'); setLoading(false); return; }
-      // Re-fetch user after sign in
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (!u) { setError('Please tap Continue again.'); setLoading(false); return; }
-      const { data: prof2 } = await supabase.from('profiles').select('id').eq('user_id', u.id).maybeSingle();
-      if (prof2) { window.location.href = isPocketChat ? '/chat' : '/dashboard'; }
-      else { window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified'; }
-      return;
-    }
 
-    if (!data?.session) { setError('Could not sign in. Try again.'); setLoading(false); return; }
+      // Step 2: Sign in on client side
+      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: authData.email,
+        password: fullPhone,
+      });
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+      if (signInErr || !data?.session) {
+        setError('Account ready! Tap Continue once more.');
+        setLoading(false);
+        return;
+      }
 
-    // Check if user has a profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('user_id', data.user!.id)
-      .maybeSingle();
+      // Step 3: Check for profile and redirect
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', data.user!.id)
+        .maybeSingle();
 
-    if (profile) {
-      window.location.href = isPocketChat ? '/chat' : '/dashboard';
-    } else {
-      window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified';
+      if (profile) {
+        window.location.href = isPocketChat ? '/chat' : '/dashboard';
+      } else {
+        window.location.href = isPocketChat ? '/signup?mode=pocketchat&phone=verified' : '/signup?phone=verified';
+      }
+    } catch {
+      setError('Network error — try again');
+      setLoading(false);
     }
   }
 

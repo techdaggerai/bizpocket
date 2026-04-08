@@ -145,66 +145,52 @@ export default function GuestChatPage() {
     setSending(false);
   }, [session, sending, chatId]);
 
-  // ─── Phone signup (WhatsApp-style: phone number = account, zero verification) ───
+  // ─── Phone signup (WhatsApp-style — server creates user, bypasses rate limits) ───
   const handlePhoneContinue = useCallback(async (fullPhone: string) => {
     if (!session) return;
     setSigningUp(true);
     setSignupError('');
 
-    const fakeEmail = `${fullPhone.replace(/\+/g, '')}@evrywher.io`;
-    const fakePass = fullPhone;
-
     try {
-      // Try sign in first (existing account)
-      let userId: string | null = null;
-
-      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: fakeEmail, password: fakePass,
+      // Step 1: Create or find user via server API (admin key, no rate limits)
+      const authRes = await fetch('/api/auth/phone-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: fullPhone, name: session.guestName }),
       });
+      const authData = await authRes.json();
 
-      if (!signInErr && signInData?.user) {
-        userId = signInData.user.id;
-      } else {
-        // Account doesn't exist — create it (signUp returns session directly, no need for separate login)
-        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-          email: fakeEmail, password: fakePass,
-          options: { data: { phone: fullPhone, name: session.guestName } },
-        });
-
-        if (signUpErr) {
-          // Rate limit — wait and retry
-          if (signUpErr.message.includes('security') || signUpErr.message.includes('after')) {
-            setSignupError('Please wait a moment and try again.');
-            setSigningUp(false);
-            return;
-          }
-          setSignupError(signUpErr.message); setSigningUp(false); return;
-        }
-
-        if (signUpData?.user) {
-          userId = signUpData.user.id;
-          // If signUp didn't create a session, sign in with a delay
-          if (!signUpData.session) {
-            await new Promise(r => setTimeout(r, 1000));
-            const { error: retryErr } = await supabase.auth.signInWithPassword({
-              email: fakeEmail, password: fakePass,
-            });
-            if (retryErr) { setSignupError('Account created! Tap Continue again to log in.'); setSigningUp(false); return; }
-          }
-        }
+      if (!authRes.ok || !authData.success) {
+        setSignupError(authData.error || 'Could not create account.');
+        setSigningUp(false);
+        return;
       }
 
-      if (!userId) { setSignupError('Something went wrong. Try again.'); setSigningUp(false); return; }
+      // Step 2: Sign in on client side
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email: authData.email,
+        password: fullPhone,
+      });
 
-      // Upgrade guest → real user
+      if (signInErr) {
+        setSignupError('Account ready! Tap Continue once more.');
+        setSigningUp(false);
+        return;
+      }
+
+      // Step 3: Upgrade guest → real user
       const res = await fetch('/api/guest/upgrade', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          guestId: session.guestId, userId,
-          name: session.guestName, phone: fullPhone,
+          guestId: session.guestId,
+          userId: authData.userId,
+          name: session.guestName,
+          phone: fullPhone,
         }),
       });
       const data = await res.json();
+
       if (data.success || data.already_connected) {
         localStorage.removeItem('evrywher_guest_session');
         window.location.href = '/chat';
