@@ -67,6 +67,19 @@ export default function InviteClient({ inviter, code }: Props) {
       setError('Please enter your name');
       return;
     }
+
+    // Check if guest already has a session for this invite (prevents duplicate chats)
+    const existingSession = localStorage.getItem('evrywher_guest_session');
+    if (existingSession) {
+      try {
+        const parsed = JSON.parse(existingSession);
+        if (parsed.chatId && parsed.inviterName) {
+          router.push(`/guest/chat/${parsed.chatId}`);
+          return;
+        }
+      } catch { /* invalid session, continue with new one */ }
+    }
+
     setLoading(true);
     setError('');
 
