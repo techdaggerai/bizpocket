@@ -26,6 +26,7 @@ interface Message {
   message_type: string;
   created_at: string;
   sender_id?: string;
+  attachment_url?: string | null;
 }
 
 // ─── Helpers matching auth chat styling ───
@@ -348,15 +349,95 @@ export default function GuestChatPage() {
               );
             }
 
+            const dateSep = showDateSep && (
+              <div className="flex items-center gap-3 py-2">
+                <div className="flex-1 h-px bg-slate-700" />
+                <span className="text-[11px] font-medium text-slate-400 shrink-0">{formatDateSep(msg.created_at)}</span>
+                <div className="flex-1 h-px bg-slate-700" />
+              </div>
+            );
+
+            const timestamp = (
+              <div className={`flex items-center gap-1.5 mt-1 ${isMe ? 'justify-end mr-1' : 'ml-1'}`}>
+                <span className="text-[11px] text-slate-400">{formatTime(msg.created_at)}</span>
+                {isMe && (
+                  <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                    <path d="M1 6l3.5 4L11 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            );
+
+            // ── Image message ──
+            if (msg.message_type === 'image' && msg.attachment_url) {
+              return (
+                <div key={msg.id}>
+                  {dateSep}
+                  <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <div className="max-w-[70%]">
+                      {!isMe && <p className="text-[12px] text-indigo-400 mb-1 ml-1 font-medium">{msg.sender_name}</p>}
+                      <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer" className="block rounded-[12px] overflow-hidden border border-slate-700">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={msg.attachment_url} alt={msg.message || 'Image'} className="max-h-[240px] w-full object-cover" loading="lazy" />
+                      </a>
+                      {timestamp}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // ── Document message ──
+            if (msg.message_type === 'document' && msg.attachment_url) {
+              const fileName = msg.message || 'Document';
+              const ext = fileName.split('.').pop()?.toLowerCase() || '';
+              return (
+                <div key={msg.id}>
+                  {dateSep}
+                  <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <div className="max-w-[80%]">
+                      {!isMe && <p className="text-[12px] text-indigo-400 mb-1 ml-1 font-medium">{msg.sender_name}</p>}
+                      <a href={msg.attachment_url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-3 rounded-[12px] border border-slate-700 bg-slate-800 px-3.5 py-2.5 hover:bg-slate-700 transition-colors">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-700">
+                          <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-white truncate">{fileName}</p>
+                          <p className="text-[10px] text-slate-400">{ext.toUpperCase()} — Tap to download</p>
+                        </div>
+                      </a>
+                      {timestamp}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // ── Voice message (show as audio link) ──
+            if (msg.message_type === 'voice' && msg.attachment_url) {
+              return (
+                <div key={msg.id}>
+                  {dateSep}
+                  <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[75vw] min-w-0`}>
+                      {!isMe && <p className="text-[12px] mb-1 ml-1 font-medium text-indigo-400">{msg.sender_name}</p>}
+                      <div className={`rounded-2xl px-3.5 py-2.5 ${isMe ? 'bg-[#4F46E5]' : 'bg-slate-800/80 backdrop-blur-[12px] border border-white/[0.06]'}`}>
+                        <audio src={msg.attachment_url} controls className="h-8 w-[200px]" />
+                      </div>
+                      {timestamp}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // ── Text message (default) ──
             return (
               <div key={msg.id}>
-                {showDateSep && (
-                  <div className="flex items-center gap-3 py-2">
-                    <div className="flex-1 h-px bg-slate-700" />
-                    <span className="text-[11px] font-medium text-slate-400 shrink-0">{formatDateSep(msg.created_at)}</span>
-                    <div className="flex-1 h-px bg-slate-700" />
-                  </div>
-                )}
+                {dateSep}
                 <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[75vw] sm:max-w-[80%] min-w-0 ${isMe ? 'ml-auto' : ''}`}>
                     {!isMe && (
@@ -369,14 +450,7 @@ export default function GuestChatPage() {
                     }`}>
                       <p className="text-[15px] whitespace-pre-wrap break-words" style={{ overflowWrap: 'anywhere' }}>{msg.message}</p>
                     </div>
-                    <div className={`flex items-center gap-1.5 mt-1 ${isMe ? 'justify-end mr-1' : 'ml-1'}`}>
-                      <span className="text-[11px] text-slate-400">{formatTime(msg.created_at)}</span>
-                      {isMe && (
-                        <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                          <path d="M1 6l3.5 4L11 1" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </div>
+                    {timestamp}
                   </div>
                 </div>
               </div>
