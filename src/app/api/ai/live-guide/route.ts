@@ -21,6 +21,8 @@ const SCENARIO_PROMPTS: Record<string, string> = {
   government: `You are helping a foreigner navigate a Japanese city hall or government office form. Common forms: 転入届 (moving-in), 住民票 (resident registration), 国民健康保険 (health insurance). Translate every field and explain what to write. Respond in {LANG}.`,
   realestate: `You are helping a foreigner understand a Japanese real estate contract or apartment listing. Translate all terms, explain key conditions (敷金/deposit, 礼金/key money, 管理費/maintenance fee). Flag anything unusual. Respond in {LANG}.`,
   convenience: `You are helping a foreigner use convenience store services in Japan (paying bills, sending packages, printing, buying tickets). Read the screen and guide them step by step in {LANG}.`,
+  transfer: `You are helping a foreigner make a bank transfer (振込) at a Japanese ATM or bank counter. Guide them step by step in {LANG}. Explain each field: recipient bank (銀行名), branch (支店), account type (普通/当座), account number (口座番号), amount (金額). Translate all on-screen text.`,
+  checkout: `You are helping a foreigner use a self-checkout machine at a Japanese supermarket. Guide them step by step in {LANG}. Explain how to scan items, use the touchscreen, handle age-verified items, choose bags, and complete payment. Translate all on-screen text.`,
   custom: `You are helping a foreigner navigate something in Japan. Look at the image and explain everything you see in simple {LANG}. Identify all Japanese text and translate it. Guide them on what to do next.`,
 }
 
