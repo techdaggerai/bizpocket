@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { checkUsageLimit, incrementUsage } from '@/lib/usage'
 
 const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic',
@@ -66,6 +67,16 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // ─── Rate limit (vision API is expensive) ───
+  const { data: userProfile } = await supabase.from('profiles').select('organization_id').eq('user_id', user.id).single()
+  if (userProfile) {
+    const { data: org } = await supabase.from('organizations').select('plan').eq('id', userProfile.organization_id).single()
+    const usage = await checkUsageLimit(supabase, userProfile.organization_id, 'document_scan', org?.plan || 'free')
+    if (!usage.allowed) {
+      return NextResponse.json({ error: 'limit_reached', message: `Free plan limit: ${usage.limit} document scans/day.`, used: usage.used, limit: usage.limit }, { status: 429 })
+    }
   }
 
   let body: { imageBase64: string; mediaType: string; language?: string; organizationId: string }
@@ -151,6 +162,7 @@ export async function POST(request: Request) {
       }).catch(() => {})
     }
 
+    if (userProfile) incrementUsage(supabase, userProfile.organization_id, 'document_scan')
     return NextResponse.json({ result })
   } catch (err) {
     console.error('[BizPocket AI] Document detection failed:', err)
