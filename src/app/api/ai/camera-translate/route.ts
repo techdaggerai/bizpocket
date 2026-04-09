@@ -1,5 +1,8 @@
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { checkUsageLimit, incrementUsage } from '@/lib/usage';
 
 const LANG_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic', bn: 'Bengali',
@@ -11,6 +14,34 @@ const LANG_NAMES: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    // ─── Auth check ───
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ─── Rate limit (camera translate is expensive — use 'camera_translate' usage type) ───
+    const { data: profile } = await supabase.from('profiles').select('organization_id').eq('user_id', user.id).single();
+    if (profile) {
+      const { data: org } = await supabase.from('organizations').select('plan').eq('id', profile.organization_id).single();
+      const plan = org?.plan || 'free';
+      const usage = await checkUsageLimit(supabase, profile.organization_id, 'camera_translate', plan);
+      if (!usage.allowed) {
+        return NextResponse.json({
+          error: 'limit_reached',
+          message: `Free plan limit: ${usage.limit} camera scans/day. Upgrade for more.`,
+          used: usage.used,
+          limit: usage.limit,
+        }, { status: 429 });
+      }
+    }
+
     const body = await req.json();
     const { image, userLanguage, userName, targetLanguage, sourceLang } = body;
 
@@ -92,6 +123,8 @@ Return ONLY valid JSON. No markdown, no explanation.`,
         return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
       }
 
+      // Increment usage after success
+      if (profile) incrementUsage(supabase, profile.organization_id, 'camera_translate');
       return NextResponse.json(result);
     }
 
@@ -171,6 +204,8 @@ Return ONLY valid JSON. No markdown, no extra text.`,
       return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
     }
 
+    // Increment usage after success
+    if (profile) incrementUsage(supabase, profile.organization_id, 'camera_translate');
     return NextResponse.json(result);
   } catch (error) {
     console.error('[camera-translate]', error);
