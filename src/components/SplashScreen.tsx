@@ -24,8 +24,8 @@ export default function SplashScreen({ children, brand = 'evrywher' }: { childre
   return (
     <>
       <div
-        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-800 transition-opacity duration-300 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
-        style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-800 transition-opacity duration-300 ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        style={{ fontFamily: "'DM Sans', system-ui, sans-serif", animation: 'splash-fallback 5s forwards' }}
       >
         {isEvrywher ? (
           <>
@@ -49,7 +49,7 @@ export default function SplashScreen({ children, brand = 'evrywher' }: { childre
           </>
         )}
       </div>
-      <div className="invisible">{children}</div>
+      <div>{children}</div>
     </>
   );
 }
