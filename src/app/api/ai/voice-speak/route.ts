@@ -1,3 +1,5 @@
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 const DEFAULT_VOICES: Record<string, string> = {
@@ -13,10 +15,21 @@ export async function POST(req: NextRequest) {
   try {
     if (!process.env.ELEVENLABS_API_KEY) return NextResponse.json({ error: 'Voice not configured' }, { status: 500 });
 
-    const { text, voiceId, language } = await req.json();
+    // ─── Auth ───
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    const { text, language } = await req.json();
     if (!text) return NextResponse.json({ error: 'Missing text' }, { status: 400 });
 
-    const resolvedVoiceId = voiceId || DEFAULT_VOICES[language] || FALLBACK_VOICE;
+    // Use hardcoded default voice only — ignore client-supplied voiceId to prevent injection
+    const resolvedVoiceId = DEFAULT_VOICES[language] || FALLBACK_VOICE;
 
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${resolvedVoiceId}`, {
       method: 'POST',
