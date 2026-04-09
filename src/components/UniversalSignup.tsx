@@ -220,7 +220,7 @@ export default function UniversalSignup({
 
       await handleAuthComplete({ userId: authData.userId, phone: fullPhone, method: 'phone' });
     } catch {
-      setError('Network error \u2014 try again');
+      setError('Network error — try again');
     }
     setLoading(false);
   }
@@ -246,7 +246,7 @@ export default function UniversalSignup({
       setMagicLinkSent(true);
       setResendCountdown(30);
     } catch {
-      setError('Network error \u2014 try again');
+      setError('Network error — try again');
     }
     setLoading(false);
   }
@@ -278,7 +278,7 @@ export default function UniversalSignup({
 
       await handleAuthComplete({ userId: authData.userId, email: `${username.trim()}@evrywher.local`, method: 'password' });
     } catch {
-      setError('Network error \u2014 try again');
+      setError('Network error — try again');
     }
     setLoading(false);
   }
@@ -337,7 +337,7 @@ export default function UniversalSignup({
                 padding: '6px 16px',
               }}
             >
-              All features free \u2014 upgrade anytime for more
+              All features free — upgrade anytime for more
             </span>
           </div>
         )}
@@ -372,7 +372,7 @@ export default function UniversalSignup({
                 {isSignIn ? 'Sign in with phone number' : 'Continue with phone number'}
               </p>
               <p className="text-[12px] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                {isSignIn ? 'Enter your number' : 'Fastest \u2014 one tap, no verification'}
+                {isSignIn ? 'Enter your number' : 'Fastest — one tap, no verification'}
               </p>
             </div>
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.6)" strokeWidth={2} className="shrink-0">
@@ -386,6 +386,7 @@ export default function UniversalSignup({
             className="w-full flex items-center gap-3.5 rounded-[14px] border-none cursor-pointer"
             style={{
               background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
+              boxShadow: '0 0 20px rgba(13,148,136,0.25)',
               padding: '16px 20px',
             }}
           >
@@ -399,7 +400,7 @@ export default function UniversalSignup({
                 {isSignIn ? 'Sign in with email' : 'Continue with email'}
               </p>
               <p className="text-[12px] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                {isSignIn ? 'Magic link to your inbox' : 'Magic link \u2014 no password needed'}
+                {isSignIn ? 'Magic link to your inbox' : 'Magic link — no password needed'}
               </p>
             </div>
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.6)" strokeWidth={2} className="shrink-0">

@@ -13,7 +13,7 @@ export default function OutlinePillButton({ label, icon, color, onClick }: Props
   return (
     <button
       onClick={onClick}
-      className="group flex items-center gap-1.5 rounded-[20px] px-3.5 py-[7px] text-[13px] font-medium transition-colors shrink-0 whitespace-nowrap"
+      className="group flex items-center gap-1 rounded-[20px] px-2.5 py-[6px] text-[12px] font-medium transition-colors shrink-0 whitespace-nowrap"
       style={{
         border: `1.5px solid ${color}`,
         color,

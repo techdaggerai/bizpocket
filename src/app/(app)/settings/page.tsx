@@ -703,7 +703,10 @@ export default function SettingsPage() {
 
   async function handleSaveName() {
     if (!nameValue.trim()) return;
-    await supabase.from('profiles').update({ name: nameValue.trim(), full_name: nameValue.trim() }).eq('id', profile.id);
+    const { error } = await supabase.from('profiles').update({ name: nameValue.trim(), full_name: nameValue.trim() }).eq('id', profile.id);
+    if (error) { toast('Failed to save name', 'error'); return; }
+    profile.name = nameValue.trim();
+    profile.full_name = nameValue.trim();
     setEditingName(false);
     toast('Name updated', 'success');
   }
@@ -785,7 +788,8 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="text" value={nameValue} onChange={(e) => setNameValue(e.target.value)}
-                  className="w-36 border border-[#475569] rounded-lg px-2 py-1 text-[14px] text-right focus:outline-none focus:border-[#4F46E5]"
+                  className="w-36 border border-slate-700 rounded-lg px-2 py-1 text-[14px] text-right focus:outline-none focus:border-[#4F46E5]"
+                  style={{ backgroundColor: '#1e293b', color: '#e2e8f0' }}
                   autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
                 />
                 <button onClick={handleSaveName} className="text-indigo-400 text-[13px] font-medium">Save</button>

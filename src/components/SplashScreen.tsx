@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PocketChatMark, PocketMark, LogoWordmark } from '@/components/Logo';
-import EvryWherMark from '@/components/EvryWherMark';
+import { PocketMark, LogoWordmark } from '@/components/Logo';
+import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 export default function SplashScreen({ children, brand = 'evrywher' }: { children: React.ReactNode; brand?: string }) {
   const [show, setShow] = useState(true);
@@ -28,15 +28,23 @@ export default function SplashScreen({ children, brand = 'evrywher' }: { childre
         style={{ fontFamily: "'DM Sans', system-ui, sans-serif", animation: 'splash-fallback 5s forwards' }}
       >
         {isEvrywher ? (
-          <>
-            <div className="animate-pulse">
-              <PocketChatMark size={80} />
+          <div className="flex flex-col items-center gap-3">
+            <AnimatedPocketChatLogo size={72} />
+            <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600, fontSize: 28 }}>
+              <span style={{ color: '#818cf8' }}>Evry</span>
+              <span style={{ color: '#f59e0b' }}>wher</span>
+            </span>
+            <div className="flex gap-1.5 items-center">
+              {[0, 1, 2].map(i => (
+                <span
+                  key={i}
+                  className="h-2 w-2 rounded-full bg-indigo-400"
+                  style={{ animation: `splash-dot 1s infinite ${i * 0.2}s` }}
+                />
+              ))}
             </div>
-            <div className="mt-4">
-              <EvryWherMark size="lg" />
-            </div>
-            <p className="mt-2 text-sm font-medium text-slate-400">You bring the missing <span className="italic text-[#10B981]" style={{ fontFamily: "Georgia, serif" }}>e</span>. We bring the world.</p>
-          </>
+            <style>{`@keyframes splash-dot { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }`}</style>
+          </div>
         ) : (
           <>
             <div className="animate-pulse">
