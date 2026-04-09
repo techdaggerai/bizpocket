@@ -2923,7 +2923,19 @@ export default function PocketChatPage() {
                         <EmojiMartPicker
                           data={emojiData}
                           theme="dark"
-                          onEmojiSelect={(emoji: { native: string }) => { setNewMessage(prev => prev + emoji.native); if (inputRef.current) inputRef.current.textContent = (inputRef.current.textContent || '') + emoji.native; setShowEmoji(false); }}
+                          onEmojiSelect={(emoji: { native: string }) => {
+                            const sel = window.getSelection();
+                            if (sel && sel.rangeCount > 0 && inputRef.current?.contains(sel.anchorNode)) {
+                              const range = sel.getRangeAt(0);
+                              range.deleteContents();
+                              range.insertNode(document.createTextNode(emoji.native));
+                              range.collapse(false);
+                            } else if (inputRef.current) {
+                              inputRef.current.textContent = (inputRef.current.textContent || '') + emoji.native;
+                            }
+                            setNewMessage(inputRef.current?.textContent || '');
+                            setShowEmoji(false);
+                          }}
                           previewPosition="none"
                           skinTonePosition="search"
                           set="native"
