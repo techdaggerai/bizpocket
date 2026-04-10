@@ -24,26 +24,46 @@ export default function SplashScreen({ children, brand = 'evrywher' }: { childre
   return (
     <>
       <div
-        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-800 transition-opacity duration-300 ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-        style={{ fontFamily: "'DM Sans', system-ui, sans-serif", animation: 'splash-fallback 5s forwards' }}
+        className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-[400ms] ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        style={{ background: '#0f172a', fontFamily: "'DM Sans', system-ui, sans-serif", animation: 'splash-fallback 5s forwards' }}
       >
         {isEvrywher ? (
-          <div className="flex flex-col items-center gap-3">
-            <AnimatedPocketChatLogo size={72} />
-            <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600, fontSize: 28 }}>
+          <div className="flex flex-col items-center">
+            {/* Breathing logo */}
+            <div style={{ animation: 'splash-breathe 3s ease-in-out infinite' }}>
+              <AnimatedPocketChatLogo size={88} />
+            </div>
+            {/* Wordmark */}
+            <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600, fontSize: 28, marginTop: 16, animation: 'splash-text-breathe 3s ease-in-out infinite 0.5s' }}>
               <span style={{ color: '#818cf8' }}>Evry</span>
               <span style={{ color: '#f59e0b' }}>wher</span>
             </span>
-            <div className="flex gap-1.5 items-center">
+            {/* Three dots */}
+            <div className="flex items-center" style={{ gap: 6, marginTop: 12 }}>
               {[0, 1, 2].map(i => (
                 <span
                   key={i}
-                  className="h-2 w-2 rounded-full bg-indigo-400"
-                  style={{ animation: `splash-dot 1s infinite ${i * 0.2}s` }}
+                  style={{
+                    width: 8, height: 8, borderRadius: '50%', backgroundColor: '#818cf8',
+                    animation: `splash-dot-pulse 1.5s ease-in-out infinite ${i * 0.3}s`,
+                  }}
                 />
               ))}
             </div>
-            <style>{`@keyframes splash-dot { 0%,80%,100%{opacity:.3;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }`}</style>
+            <style>{`
+              @keyframes splash-breathe {
+                0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 15px rgba(99,102,241,0.3)); }
+                50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 25px rgba(99,102,241,0.5)); }
+              }
+              @keyframes splash-text-breathe {
+                0%, 100% { opacity: 0.8; }
+                50% { opacity: 1; }
+              }
+              @keyframes splash-dot-pulse {
+                0%, 100% { opacity: 0.3; transform: scale(0.8); }
+                50% { opacity: 1; transform: scale(1); }
+              }
+            `}</style>
           </div>
         ) : (
           <>
