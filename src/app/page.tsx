@@ -508,15 +508,13 @@ function LandingPageInner() {
                 </div>
               </div>
             </div>
-            {/* PWA install */}
-            <div className="flex items-center gap-2 justify-center md:justify-start text-sm text-slate-400 mb-4">
-              <span className="w-12 h-px bg-slate-600" />
-              <span>or install now</span>
-              <span className="w-12 h-px bg-slate-600" />
+            {/* Download Now button */}
+            <div className="flex justify-center md:justify-start mb-4">
+              <Link href="/download" className="inline-flex items-center gap-2 bg-[#4F46E5] hover:bg-[#4338CA] transition-colors text-white rounded-xl px-6 py-3 text-sm font-semibold">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Now
+              </Link>
             </div>
-            <Link href="/download" className="inline-flex items-center gap-2 text-indigo-400 font-medium hover:underline">
-              Install as Web App →
-            </Link>
           </div>
         </div>
       </section>

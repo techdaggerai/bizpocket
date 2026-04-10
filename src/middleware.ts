@@ -2,8 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getBrandFromHost } from '@/lib/brand';
 
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/privacy', '/terms', '/pocketchat'];
-const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/', '/c/', '/guest/']; // Public invoice + published websites + order + invite + vanity + guest pages
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/auth/callback', '/privacy', '/terms', '/pocketchat', '/download'];
+const PUBLIC_PREFIXES = ['/i/', '/site/', '/order/', '/invite/', '/c/', '/guest/', '/downloads/']; // Public invoice + published websites + order + invite + vanity + guest + APK downloads
 const ACCOUNTANT_ALLOWED = ['/accountant', '/login', '/settings'];
 
 export async function middleware(request: NextRequest) {
