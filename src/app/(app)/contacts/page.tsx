@@ -105,6 +105,23 @@ const BIZPOCKET_TYPES: { value: ContactType; label: string }[] = [
   { value: 'partner', label: 'Partner' },
 ];
 
+function LongPressDeleteModal({ contactName, onCancel, onDelete }: { contactName: string; onCancel: () => void; onDelete: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <div className="relative bg-slate-800 rounded-2xl p-6 w-full max-w-xs mx-4 text-center">
+        <h3 className="text-white font-semibold text-base mb-2">Delete contact?</h3>
+        <p className="text-slate-400 text-sm mb-1">{contactName}</p>
+        <p className="text-slate-500 text-xs mb-5">This will hide the contact from your list. You can still find them via search.</p>
+        <div className="flex gap-2">
+          <button onClick={onCancel} className="flex-1 rounded-xl border border-slate-600 py-2.5 text-sm font-medium text-slate-300 active:bg-slate-700">Cancel</button>
+          <button onClick={onDelete} className="flex-1 rounded-xl bg-[#DC2626] py-2.5 text-sm font-semibold text-white active:bg-red-700">Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ContactsPage() {
   const { organization } = useAuth();
   const { toast } = useToast();
@@ -132,6 +149,11 @@ export default function ContactsPage() {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [swipedId, setSwipedId] = useState<string | null>(null);
+  const [longPressId, setLongPressId] = useState<string | null>(null);
+  const [undoId, setUndoId] = useState<string | null>(null);
+  const touchRef = useRef<{ startX: number; startY: number; id: string; timer: ReturnType<typeof setTimeout> | null } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -154,6 +176,7 @@ export default function ContactsPage() {
       .from('contacts')
       .select('*')
       .eq('organization_id', organization.id)
+      .is('hidden_at', null)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -233,10 +256,86 @@ export default function ContactsPage() {
   }
 
   async function handleDelete(id: string) {
-    const { error } = await supabase.from('contacts').delete().eq('id', id).eq('organization_id', organization!.id);
-    if (error) { toast(`Delete failed: ${error.message}`, 'error'); }
-    else { toast('Contact deleted', 'success'); setContacts((prev) => prev.filter((c) => c.id !== id)); }
+    // Clear any existing undo timer
+    if (undoTimerRef.current) { clearTimeout(undoTimerRef.current); }
+    setUndoId(null);
+
+    try {
+      const res = await fetch('/api/contacts/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: id }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Delete failed'); }
+
+      // Remove from UI immediately
+      setContacts((prev) => prev.filter((c) => c.id !== id));
+      setSwipedId(null);
+      setLongPressId(null);
+
+      // Show undo button for 3 seconds (state-driven so it rerenders)
+      setUndoId(id);
+      undoTimerRef.current = setTimeout(() => { setUndoId(null); undoTimerRef.current = null; }, 3000);
+
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Delete failed', 'error');
+    }
     setDeleteConfirmId(null);
+  }
+
+  async function handleUndo() {
+    if (!undoId) return;
+    if (undoTimerRef.current) { clearTimeout(undoTimerRef.current); undoTimerRef.current = null; }
+    const id = undoId;
+    setUndoId(null);
+
+    try {
+      const res = await fetch('/api/contacts/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: id, undo: true }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Undo failed'); }
+      toast('Contact restored', 'success');
+      fetchContacts();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Could not undo', 'error');
+    }
+  }
+
+  // Touch handlers for swipe-to-delete and long-press
+  function handleTouchStart(e: React.TouchEvent, contactId: string) {
+    const touch = e.touches[0];
+    const timer = setTimeout(() => {
+      setLongPressId(contactId);
+      if (navigator.vibrate) navigator.vibrate(30);
+      touchRef.current = null; // prevent swipe after long press
+    }, 500);
+    touchRef.current = { startX: touch.clientX, startY: touch.clientY, id: contactId, timer };
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (!touchRef.current) return;
+    const touch = e.touches[0];
+    const dx = touchRef.current.startX - touch.clientX;
+    const dy = Math.abs(touchRef.current.startY - touch.clientY);
+
+    // If vertical scroll, cancel swipe
+    if (dy > 30) { clearTimeout(touchRef.current.timer!); touchRef.current = null; return; }
+
+    // Cancel long-press if moving
+    if (Math.abs(dx) > 10) { clearTimeout(touchRef.current.timer!); }
+
+    // Swipe left threshold
+    if (dx > 80) {
+      setSwipedId(touchRef.current.id);
+      touchRef.current = null;
+    }
+  }
+
+  function handleTouchEnd() {
+    if (touchRef.current?.timer) clearTimeout(touchRef.current.timer);
+    touchRef.current = null;
   }
 
   async function importFromCustomers() {
@@ -586,74 +685,92 @@ export default function ContactsPage() {
           )}
         </div>
       ) : (
+        <>
         <div className="space-y-1">
           {filtered.map((c) => (
-            <div
-              key={c.id}
-              className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 hover:bg-slate-700 transition-colors"
-            >
-              {/* Avatar */}
-              <PocketAvatar name={c.name} size={40} />
-
-              {/* Name + badge + language */}
-              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailContact(c)}>
-                <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-medium text-white truncate">{c.name}</p>
-                  <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.category ?? c.contact_type] || BADGE_COLORS.friend}`}>
-                    {c.category ?? c.contact_type}
-                  </span>
-                </div>
-                {(c.company || c.phone || c.email) && (
-                  <p className="text-[12px] text-[var(--text-3)] truncate mt-0.5">
-                    {c.company || c.phone || c.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Action icons — 44px tap targets */}
-              <div className="flex items-center gap-1 shrink-0">
+            <div key={c.id} className="relative overflow-hidden rounded-xl">
+              {/* Swipe-to-delete red background */}
+              {swipedId === c.id && (
                 <button
-                  onClick={() => router.push(`/chat?contact=${c.id}`)}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-indigo-400 hover:bg-[#4F46E5]/10 transition-colors"
-                  title="Chat">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  onClick={() => handleDelete(c.id)}
+                  className="absolute right-0 top-0 bottom-0 w-[60px] bg-[#DC2626] flex items-center justify-center z-10"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
                 </button>
-                <button
-                  onClick={() => openEdit(c)}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors"
-                  title="Edit">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                </button>
-                {deleteConfirmId === c.id ? (
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => handleDelete(c.id)}
-                      className="rounded-full bg-[#DC2626] px-3 py-1.5 text-[11px] font-medium text-white">
-                      Delete?
-                    </button>
-                    <button onClick={() => setDeleteConfirmId(null)}
-                      className="text-[11px] text-slate-400 px-1">
-                      No
-                    </button>
+              )}
+
+              <div
+                className={`flex items-center gap-3 border border-slate-700 bg-slate-800 px-4 py-3 hover:bg-slate-700 transition-all relative z-20 ${swipedId === c.id ? '-translate-x-[60px]' : ''}`}
+                onTouchStart={(e) => handleTouchStart(e, c.id)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onClick={() => { if (swipedId === c.id) { setSwipedId(null); } }}
+              >
+                {/* Avatar */}
+                <PocketAvatar name={c.name} size={40} />
+
+                {/* Name + badge + language */}
+                <div className="flex-1 min-w-0 cursor-pointer" onClick={(e) => { if (swipedId !== c.id) { e.stopPropagation(); setDetailContact(c); } }}>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[14px] font-medium text-white truncate">{c.name}</p>
+                    <span className={`inline-block text-[11px] font-medium rounded-full px-2 py-0.5 capitalize ${BADGE_COLORS[c.category ?? c.contact_type] || BADGE_COLORS.friend}`}>
+                      {c.category ?? c.contact_type}
+                    </span>
                   </div>
-                ) : (
-                  <button onClick={() => setDeleteConfirmId(c.id)}
-                    className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-[#DC2626]/40 hover:text-[#DC2626] hover:bg-[#DC2626]/5 transition-colors"
-                    title="Delete">
+                  {(c.company || c.phone || c.email) && (
+                    <p className="text-[12px] text-[var(--text-3)] truncate mt-0.5">
+                      {c.company || c.phone || c.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Action icons — 44px tap targets */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); router.push(`/chat?contact=${c.id}`); }}
+                    className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-indigo-400 hover:bg-[#4F46E5]/10 transition-colors"
+                    title="Chat">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                   </button>
-                )}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openEdit(c); }}
+                    className="min-w-[44px] min-h-[44px] p-2 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-700 transition-colors"
+                    title="Edit">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Long-press delete confirmation modal */}
+        {longPressId !== null && (
+          <LongPressDeleteModal
+            contactName={(contacts.find(ct => ct.id === longPressId))?.name || ''}
+            onCancel={() => setLongPressId(null)}
+            onDelete={() => { handleDelete(longPressId); setLongPressId(null); }}
+          />
+        )}
+
+        {/* Undo toast tap handler */}
+        {undoId && (
+          <button
+            onClick={handleUndo}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-700 border border-slate-600 rounded-full px-4 py-2 text-sm text-white shadow-lg"
+          >
+            Tap to undo
+          </button>
+        )}
+        </>
       )}
 
       {/* QR Code Modal */}
