@@ -71,16 +71,13 @@ export default function UpgradePage() {
   const isOnTrial = trialEndsAt && trialEndsAt > new Date() && currentPlan === 'free';
   const trialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
-  async function handleCheckout(priceId: string, planKey: string) {
-    setLoading(planKey);
+  async function handleCheckout(tier: 'pro' | 'business') {
+    setLoading(tier);
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId,
-          organizationId: organization.id,
-        }),
+        body: JSON.stringify({ tier }),
       });
       const data = await res.json();
       if (data.url) {
@@ -96,10 +93,9 @@ export default function UpgradePage() {
   useEffect(() => {
     if (autoCheckout === '1' && targetPlan && !autoTriggered) {
       const plan = PLANS.find((p) => p.key === targetPlan);
-      if (plan && plan.priceId) {
+      if (plan && (plan.key === 'pro' || plan.key === 'business')) {
         setAutoTriggered(true);
-        const pid = (isEvrywherMode && plan.evrywherPriceId) ? plan.evrywherPriceId : plan.priceId;
-        if (pid) handleCheckout(pid, plan.key);
+        handleCheckout(plan.key);
       }
     }
   }, [autoCheckout, targetPlan, autoTriggered]);
@@ -110,7 +106,6 @@ export default function UpgradePage() {
       const res = await fetch('/api/stripe/portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ organizationId: organization.id }),
       });
       const data = await res.json();
       if (data.url) {
@@ -227,7 +222,7 @@ export default function UpgradePage() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleCheckout((isEvrywherMode && plan.evrywherPriceId) ? plan.evrywherPriceId : plan.priceId!, plan.key)}
+                    onClick={() => handleCheckout(plan.key as 'pro' | 'business')}
                     disabled={loading === plan.key || profile.role !== 'owner'}
                     className="w-full rounded-btn bg-[#4F46E5] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4338CA] disabled:opacity-50"
                   >

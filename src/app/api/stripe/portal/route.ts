@@ -32,23 +32,49 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { organizationId } = await request.json()
+  // Get org from user's profile — enforce owner role server-side
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id, role')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!profile) {
+    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+  }
+
+  if (profile.role !== 'owner') {
+    return NextResponse.json({ error: 'Only the account owner can manage subscriptions' }, { status: 403 })
+  }
 
   const { data: org } = await supabase
     .from('organizations')
     .select('stripe_customer_id')
-    .eq('id', organizationId)
+    .eq('id', profile.organization_id)
     .single()
 
   if (!org?.stripe_customer_id) {
     return NextResponse.json({ error: 'No active subscription' }, { status: 400 })
   }
 
-  const origin = request.headers.get('origin') || 'https://www.bizpocket.io'
+  // Allowlisted return URLs — reject unknown origins
+  const ALLOWED_RETURNS: Record<string, string> = {
+    'www.bizpocket.io': 'https://www.bizpocket.io',
+    'bizpocket.io': 'https://bizpocket.io',
+    'evrywher.io': 'https://evrywher.io',
+    'www.evrywher.io': 'https://www.evrywher.io',
+    'pocketchat.co': 'https://pocketchat.co',
+    'www.pocketchat.co': 'https://pocketchat.co',
+    'localhost': 'http://localhost:3000',
+  }
+  const rawOrigin = request.headers.get('origin') || ''
+  let originHost = ''
+  try { originHost = new URL(rawOrigin).hostname } catch {}
+  const safeOrigin = ALLOWED_RETURNS[originHost] || 'https://www.bizpocket.io'
 
   const session = await stripe.billingPortal.sessions.create({
     customer: org.stripe_customer_id,
-    return_url: `${origin}/settings/upgrade`,
+    return_url: `${safeOrigin}/settings/subscription`,
   })
 
   return NextResponse.json({ url: session.url })

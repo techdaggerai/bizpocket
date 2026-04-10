@@ -7,6 +7,29 @@ function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!)
 }
 
+// Server-side price ID map — NEVER accept price IDs from the client
+const PRICE_MAP: Record<string, Record<string, string>> = {
+  bizpocket: {
+    pro: 'price_1TIVgEKiugpuK1mjPOxx3pen',
+    business: 'price_1TIVgrKiugpuK1mjOgdLfnfB',
+  },
+  evrywher: {
+    pro: 'price_1TIVhTKiugpuK1mjR0zT4iOj',
+    business: 'price_1TIVi6KiugpuK1mjfa6126uy',
+  },
+}
+
+// Allowlisted origins — reject anything else
+const ALLOWED_ORIGINS: Record<string, { brand: 'bizpocket' | 'evrywher'; url: string }> = {
+  'www.bizpocket.io':   { brand: 'bizpocket', url: 'https://www.bizpocket.io' },
+  'bizpocket.io':       { brand: 'bizpocket', url: 'https://bizpocket.io' },
+  'evrywher.io':        { brand: 'evrywher',  url: 'https://evrywher.io' },
+  'www.evrywher.io':    { brand: 'evrywher',  url: 'https://www.evrywher.io' },
+  'pocketchat.co':      { brand: 'evrywher',  url: 'https://pocketchat.co' },
+  'www.pocketchat.co':  { brand: 'evrywher',  url: 'https://pocketchat.co' },
+  'localhost':          { brand: 'bizpocket', url: 'http://localhost:3000' },
+}
+
 export async function POST(request: Request) {
   const stripe = getStripe()
   const cookieStore = await cookies()
@@ -32,20 +55,52 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { priceId, organizationId } = await request.json()
-  if (!priceId || !organizationId) {
-    return NextResponse.json({ error: 'Missing priceId or organizationId' }, { status: 400 })
+  const body = await request.json()
+  const tier = body.tier as string
+
+  // Validate tier — only 'pro' or 'business' allowed
+  if (tier !== 'pro' && tier !== 'business') {
+    return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
+  }
+
+  // Get user's profile — enforce owner role server-side
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id, role')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!profile) {
+    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+  }
+
+  if (profile.role !== 'owner') {
+    return NextResponse.json({ error: 'Only the account owner can manage subscriptions' }, { status: 403 })
   }
 
   const { data: org } = await supabase
     .from('organizations')
-    .select('id, stripe_customer_id, name')
-    .eq('id', organizationId)
+    .select('id, stripe_customer_id, name, signup_source')
+    .eq('id', profile.organization_id)
     .single()
 
   if (!org) {
     return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
   }
+
+  // Determine brand from allowlisted origin — reject unknown origins
+  const rawOrigin = request.headers.get('origin') || ''
+  let originHost: string
+  try {
+    originHost = new URL(rawOrigin).hostname
+  } catch {
+    originHost = ''
+  }
+  // Also check signup_source as fallback for brand detection
+  const allowedOrigin = ALLOWED_ORIGINS[originHost]
+  const brand = allowedOrigin?.brand || (org.signup_source === 'pocketchat' ? 'evrywher' : 'bizpocket')
+  const safeOrigin = allowedOrigin?.url || 'https://www.bizpocket.io'
+  const priceId = PRICE_MAP[brand][tier]
 
   let customerId = org.stripe_customer_id
 
@@ -54,7 +109,7 @@ export async function POST(request: Request) {
       email: user.email,
       name: org.name,
       metadata: {
-        organization_id: organizationId,
+        organization_id: org.id,
         user_id: user.id,
       },
     })
@@ -63,23 +118,24 @@ export async function POST(request: Request) {
     await supabase
       .from('organizations')
       .update({ stripe_customer_id: customerId })
-      .eq('id', organizationId)
+      .eq('id', org.id)
   }
-
-  const origin = request.headers.get('origin') || 'https://www.bizpocket.io'
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
     mode: 'subscription',
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${origin}/settings/upgrade?success=true`,
-    cancel_url: `${origin}/settings/upgrade?cancelled=true`,
+    success_url: `${safeOrigin}/settings/subscription?success=true`,
+    cancel_url: `${safeOrigin}/settings/subscription?canceled=true`,
     metadata: {
-      organization_id: organizationId,
+      organization_id: org.id,
+      user_id: user.id,
+      tier,
     },
     subscription_data: {
       metadata: {
-        organization_id: organizationId,
+        organization_id: org.id,
+        tier,
       },
     },
   })

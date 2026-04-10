@@ -1147,10 +1147,10 @@ export default function SettingsPage() {
             </span>
           </SettingsRow>
           <SettingsRow>
-            <Link href="/settings/upgrade" className="flex items-center justify-between w-full">
+            <Link href="/settings/subscription" className="flex items-center justify-between w-full">
               <div>
-                <p className="text-[14px] text-[var(--text-1)] font-medium">Unlock BizPocket</p>
-                <p className="text-[12px] text-[var(--text-3)]">Invoices, business tools, team management</p>
+                <p className="text-[14px] text-[var(--text-1)] font-medium">Subscription</p>
+                <p className="text-[12px] text-[var(--text-3)]">Manage your plan & billing</p>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
             </Link>
@@ -1428,7 +1428,7 @@ export default function SettingsPage() {
 
       {/* Upgrade Plan */}
       {profile.role === 'owner' && (
-        <Link href="/settings/upgrade"
+        <Link href="/settings/subscription"
           className="flex items-center justify-between rounded-card border-2 border-[#4F46E5]/20 bg-gradient-to-r from-[rgba(79,70,229,0.04)] to-[rgba(79,70,229,0.08)] p-4 transition-shadow hover:shadow-md">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F46E5]">
@@ -1437,7 +1437,7 @@ export default function SettingsPage() {
               </svg>
             </div>
             <div>
-              <span className="text-sm font-semibold text-[var(--text-1)]">Upgrade Plan</span>
+              <span className="text-sm font-semibold text-[var(--text-1)]">Subscription</span>
               <p className="text-xs text-[var(--text-3)]">Current: <span className="capitalize font-medium text-indigo-400">{organization.plan}</span></p>
             </div>
           </div>
