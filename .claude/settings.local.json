@@ -66,7 +66,14 @@
       "Bash(npx --yes sharp-cli -i public/favicon.svg -o public/icons/bizpocket-icon-192.png resize 192 192)",
       "Bash(git show:*)",
       "Bash(npx ts-node:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Read(//c/Users/drmal/PDJ/**)",
+      "Read(//c/TechDagger/pdj//**)",
+      "Read(//c/Users/drmal/**)",
+      "Bash(find . -name \"PDJ\" -type d)",
+      "Bash(timeout 90 bash -c \"tail -f C:/Users/drmal/AppData/Local/Temp/claude/C--TechDagger-BIZPOCKET/ca6d1908-9c04-4586-8fb1-1abaf1cfd6d4/tasks/ba5pt451r.output\")",
+      "Bash(grep -c \"NSCameraUsage\\\\|NSMicrophone\\\\|ITSAppUsesNon\" ios/App/App/Info.plist)",
+      "Bash(grep -c \"CAMERA\\\\|RECORD_AUDIO\" android/app/src/main/AndroidManifest.xml)"
     ]
   }
 }
