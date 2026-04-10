@@ -1,17 +1,30 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.bizpocket.app',
-  appName: 'BizPocket',
+  appId: 'io.evrywher.app',
+  appName: 'Evrywher',
   webDir: 'out',
   server: {
-    url: 'https://www.bizpocket.io',
-    cleartext: true,
+    url: 'https://www.evrywher.io',
+    cleartext: false,
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
-      backgroundColor: '#ffffff',
+      launchAutoHide: true,
+      backgroundColor: '#0f172a',
+      showSpinner: false,
+    },
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#0f172a',
+    },
+    Keyboard: {
+      resize: 'body',
+      resizeOnFullScreen: true,
+    },
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
 };

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>BizPocket</string>
+        <string>Evrywher</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -47,5 +47,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Evrywher needs camera access for scanning and translating documents</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Evrywher needs microphone access for voice translation</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Evrywher needs photo access to share and scan images</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Evrywher can save scanned business cards to your contacts</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
