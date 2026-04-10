@@ -39,6 +39,7 @@ import PocketAvatar from '@/components/PocketAvatar';
 import TierBadge from '@/components/profile/TierBadge';
 import CorridorBadge from '@/components/profile/CorridorBadge';
 import BottomSheet from '@/components/ui/BottomSheet';
+import CulturalCoachSheet from '@/components/CulturalCoachSheet';
 import type { Tier } from '@/lib/tier-system';
 import { getSavedWallpaperId, getWallpaperById } from '@/lib/wallpapers';
 import { playSound } from '@/lib/sounds';
@@ -238,6 +239,7 @@ export default function PocketChatPage() {
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showSendLangPicker, setShowSendLangPicker] = useState(false);
   const [showAIMenu, setShowAIMenu] = useState(false);
+  const [showCulturalCoach, setShowCulturalCoach] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const [matchPillDismissed, setMatchPillDismissed] = useState(false);
   const [bizCardTipDismissed, setBizCardTipDismissed] = useState(() => { try { return localStorage.getItem('tipDismissed_bizcard') === '1'; } catch { return false; } });
@@ -2532,6 +2534,18 @@ export default function PocketChatPage() {
           />
         )}
 
+        {/* Cultural Coach Sheet */}
+        <CulturalCoachSheet
+          isOpen={showCulturalCoach}
+          onClose={() => setShowCulturalCoach(false)}
+          message={newMessage.trim()}
+          onSendPolite={(text) => {
+            if (inputRef.current) inputRef.current.textContent = text;
+            setNewMessage(text);
+          }}
+          onSendOriginal={() => {}}
+        />
+
         {/* Voice Translator */}
         {showVoiceTranslator && (
           <VoiceTranslator
@@ -3085,6 +3099,19 @@ export default function PocketChatPage() {
                   }}
                   className="flex-1 min-w-0 bg-slate-700 rounded-[20px] px-3.5 py-2.5 text-[15px] text-white max-h-24 overflow-y-auto whitespace-pre-wrap break-words focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/30 focus:bg-slate-800"
                 />
+
+                {/* Cultural Coach — only visible when there's text */}
+                {newMessage.trim() && (
+                  <button
+                    onClick={() => setShowCulturalCoach(true)}
+                    className="h-[36px] w-[36px] shrink-0 flex items-center justify-center rounded-full text-purple-400 hover:bg-purple-400/10 transition-colors"
+                    title="Cultural Coach"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </button>
+                )}
 
                 {/* Right: Mic OR Send — mutually exclusive */}
                 {newMessage.trim() ? (

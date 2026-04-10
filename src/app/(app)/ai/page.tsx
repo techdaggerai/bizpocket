@@ -16,6 +16,7 @@ import {
   GraduationCap,
   Globe2,
   Video,
+  ShieldAlert,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -49,10 +50,10 @@ const FEATURES = [
   },
   {
     title: 'Cultural Coach',
-    desc: 'Navigate life in Japan with AI',
+    desc: 'Check messages before sending',
     icon: Globe,
     bg: 'bg-purple-600',
-    route: '/ai/culture',
+    route: '/ai/cultural-coach',
   },
   {
     title: 'Business Card Scanner',
@@ -95,6 +96,13 @@ const FEATURES = [
     icon: GraduationCap,
     bg: 'bg-teal-600',
     route: '/ai/learn',
+  },
+  {
+    title: 'Emergency Card',
+    desc: 'Offline safety phrases & SOS',
+    icon: ShieldAlert,
+    bg: 'bg-red-600',
+    route: '/emergency',
   },
   {
     title: 'Website Builder',
