@@ -17,6 +17,7 @@ import {
   Globe2,
   Video,
   ShieldAlert,
+  FileBarChart,
 } from 'lucide-react';
 
 const FEATURES = [
@@ -96,6 +97,13 @@ const FEATURES = [
     icon: GraduationCap,
     bg: 'bg-teal-600',
     route: '/ai/learn',
+  },
+  {
+    title: 'Chat Summary',
+    desc: 'AI-powered conversation summaries',
+    icon: FileBarChart,
+    bg: 'bg-violet-600',
+    route: '/ai/summarize',
   },
   {
     title: 'Emergency Card',

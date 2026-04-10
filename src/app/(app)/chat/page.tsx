@@ -40,6 +40,7 @@ import TierBadge from '@/components/profile/TierBadge';
 import CorridorBadge from '@/components/profile/CorridorBadge';
 import BottomSheet from '@/components/ui/BottomSheet';
 import CulturalCoachSheet from '@/components/CulturalCoachSheet';
+import SummarySheet from '@/components/SummarySheet';
 import type { Tier } from '@/lib/tier-system';
 import { getSavedWallpaperId, getWallpaperById } from '@/lib/wallpapers';
 import { playSound } from '@/lib/sounds';
@@ -792,13 +793,12 @@ export default function PocketChatPage() {
     setSummaryText('');
     setShowChatMenu(false);
     try {
-      const res = await fetch('/api/ai/summarize', {
+      const res = await fetch('/api/evryai/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: messages.slice(-50),
           contactName: activeConvo?.contact?.name || activeConvo?.title || 'Contact',
-          userLanguage: profile?.language || 'en',
         }),
       });
       if (!res.ok) { setSummaryText('Could not summarize this conversation.'); return; }
@@ -1908,6 +1908,17 @@ export default function PocketChatPage() {
               </button>
             ) : (
               <>
+                {/* Summarize button */}
+                <button
+                  onClick={handleSummarize}
+                  className="min-w-[40px] min-h-[40px] p-2 rounded-full flex items-center justify-center shrink-0 text-violet-400 hover:bg-violet-400/10 transition-colors"
+                  title="Summarize"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /><path d="M10 9H8" />
+                  </svg>
+                </button>
+                {/* Phone call button */}
                 <button
                   onClick={() => {
                     const phone = activeConvo?.contact?.phone;
@@ -2533,6 +2544,15 @@ export default function PocketChatPage() {
             onSubmit={handleCreatePoll}
           />
         )}
+
+        {/* Summary Sheet */}
+        <SummarySheet
+          isOpen={showSummary}
+          onClose={() => setShowSummary(false)}
+          contactName={activeConvo?.contact?.name || activeConvo?.title || 'Contact'}
+          summary={summaryText}
+          loading={summaryLoading}
+        />
 
         {/* Cultural Coach Sheet */}
         <CulturalCoachSheet
