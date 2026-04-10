@@ -3,17 +3,23 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, RotateCcw, MessageCircle } from 'lucide-react';
+import { FORM_TEMPLATES, type FormTemplate, type FormTemplateField } from '@/lib/form-templates';
 
 /* ---------- Types ---------- */
 
 interface FormField {
   number: number;
-  japaneseLabel: string;
-  englishLabel: string;
-  guidance: string;
+  japaneseLabel?: string;
+  englishLabel?: string;
+  label_jp?: string;
+  label_en?: string;
+  guidance?: string;
+  explanation?: string;
   example: string;
-  required: boolean;
-  type: string;
+  required?: boolean;
+  type?: string;
+  format?: string | null;
+  cultural_note?: string | null;
 }
 
 interface GuideResult {
@@ -22,9 +28,9 @@ interface GuideResult {
   fields: FormField[];
 }
 
-type Screen = 'select' | 'camera' | 'processing' | 'results';
+type Screen = 'select' | 'camera' | 'processing' | 'results' | 'template';
 
-/* ---------- Form types ---------- */
+/* ---------- Form types for camera scan ---------- */
 
 const FORM_TYPES = [
   { id: 'juminhyo', emoji: '\uD83C\uDFE2', title: 'Residence Certificate', subtitle: '\u4F4F\u6C11\u7968 \u30FB Juuminhyo' },
@@ -49,6 +55,8 @@ export default function FormFillGuidePage() {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [askLoading, setAskLoading] = useState(false);
+  const [activeTemplate, setActiveTemplate] = useState<FormTemplate | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -87,6 +95,9 @@ export default function FormFillGuidePage() {
     canvas.getContext('2d')!.drawImage(video, 0, 0);
     stopCamera();
 
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    setCapturedImage(dataUrl);
+
     canvas.toBlob(async (blob) => {
       if (!blob) { setError('Failed to capture photo'); return; }
       await analyzeForm(blob);
@@ -96,6 +107,12 @@ export default function FormFillGuidePage() {
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = () => setCapturedImage(reader.result as string);
+    reader.readAsDataURL(file);
+
     await analyzeForm(file);
   }, []);
 
@@ -107,12 +124,17 @@ export default function FormFillGuidePage() {
     setResult(null);
 
     try {
-      const fd = new FormData();
-      fd.append('action', 'guide');
-      fd.append('formType', formType);
-      fd.append('file', imageData instanceof File ? imageData : new File([imageData], 'form.jpg', { type: 'image/jpeg' }));
+      // Convert to base64 for the authenticated route
+      const arrayBuffer = await (imageData instanceof File ? imageData.arrayBuffer() : imageData.arrayBuffer());
+      const base64 = btoa(
+        new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
 
-      const res = await fetch('/api/ai/form-fill', { method: 'POST', body: fd });
+      const res = await fetch('/api/evryai/form-fill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64, formType }),
+      });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -151,6 +173,88 @@ export default function FormFillGuidePage() {
     setAskLoading(false);
   };
 
+  /* ── Template view ── */
+
+  const openTemplate = (template: FormTemplate) => {
+    setActiveTemplate(template);
+    setScreen('template');
+  };
+
+  /* ── Helper: normalize field for display ── */
+
+  function fieldLabel(f: FormField): { jp: string; en: string } {
+    return {
+      jp: f.label_jp || f.japaneseLabel || '',
+      en: f.label_en || f.englishLabel || '',
+    };
+  }
+
+  function fieldExplanation(f: FormField): string {
+    return f.explanation || f.guidance || '';
+  }
+
+  /* ── Render field card (shared between results and template) ── */
+
+  function renderFieldCard(field: FormField | FormTemplateField, idx: number, tappable: boolean) {
+    const jp = 'label_jp' in field ? field.label_jp : (field as FormField).japaneseLabel || '';
+    const en = 'label_en' in field ? field.label_en : (field as FormField).englishLabel || '';
+    const expl = 'explanation' in field ? field.explanation : (field as FormField).guidance || '';
+    const fmt = field.format;
+    const note = field.cultural_note;
+
+    return (
+      <div
+        key={idx}
+        className={`bg-slate-800 rounded-xl p-4 mb-3 border border-slate-700 ${tappable ? 'active:bg-slate-800/80' : ''}`}
+        onClick={tappable ? () => { setAskingField(field as FormField); setQuestion(''); setAnswer(''); } : undefined}
+      >
+        {/* Number badge + labels */}
+        <div className="flex items-start gap-3">
+          <span className="bg-indigo-600 text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+            {field.number}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[15px] font-semibold text-slate-200">{jp}</p>
+            <p className="text-[13px] text-slate-400">{en}</p>
+          </div>
+        </div>
+
+        {/* Explanation */}
+        <p className="text-[13px] text-slate-300 mt-2 leading-relaxed">{expl}</p>
+
+        {/* Example box */}
+        {field.example && (
+          <div className="mt-2 bg-slate-900 rounded-lg px-3 py-2">
+            <span className="text-[11px] text-slate-500 uppercase font-medium">Example: </span>
+            <span className="text-[13px] text-slate-200 font-mono">{field.example}</span>
+          </div>
+        )}
+
+        {/* Format badge */}
+        {fmt && (
+          <div className="mt-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[11px] font-medium">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              Format: {fmt}
+            </span>
+          </div>
+        )}
+
+        {/* Cultural note */}
+        {note && (
+          <div className="mt-2 rounded-lg border-l-[3px] border-indigo-500 px-3 py-2" style={{ backgroundColor: 'rgba(99,102,241,0.08)' }}>
+            <div className="flex items-start gap-1.5">
+              <svg className="w-3.5 h-3.5 text-indigo-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
+              <p className="text-[12px] text-indigo-300 leading-relaxed">{note}</p>
+            </div>
+          </div>
+        )}
+
+        {tappable && <p className="text-indigo-400/50 text-[10px] mt-2">Tap to ask a question</p>}
+      </div>
+    );
+  }
+
   /* ── Select form type screen ── */
 
   if (screen === 'select') {
@@ -162,7 +266,7 @@ export default function FormFillGuidePage() {
               <ArrowLeft size={22} />
             </button>
           </div>
-          <h1 className="text-white text-sm font-semibold flex-1 pt-3 pb-3">Form Helper</h1>
+          <h1 className="text-white text-sm font-semibold flex-1 pt-3 pb-3">Form Fill Guide</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pt-6 pb-24">
@@ -175,7 +279,7 @@ export default function FormFillGuidePage() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-white">Fill Japanese Forms</h2>
-            <p className="text-slate-400 text-sm mt-1">Take a photo and get field-by-field guidance</p>
+            <p className="text-slate-400 text-sm mt-1">Scan a form or browse common templates</p>
           </div>
 
           {error && (
@@ -184,7 +288,24 @@ export default function FormFillGuidePage() {
             </div>
           )}
 
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">What type of form?</p>
+          {/* Offline templates section */}
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Common Form Guides (Offline)</p>
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {FORM_TEMPLATES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => openTemplate(t)}
+                className="flex-shrink-0 w-[140px] snap-center bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 text-left active:scale-95 transition-transform"
+              >
+                <span className="text-2xl">{t.icon}</span>
+                <p className="text-white font-medium text-xs mt-2 line-clamp-1">{t.title_en}</p>
+                <p className="text-slate-400 text-[10px] mt-0.5">{t.title_jp}</p>
+              </button>
+            ))}
+          </div>
+
+          {/* Scan form section */}
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 mt-6">Scan Your Form</p>
           <div className="grid grid-cols-2 gap-3">
             {FORM_TYPES.map(ft => (
               <button
@@ -210,6 +331,50 @@ export default function FormFillGuidePage() {
           >
             Or upload a photo from gallery
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Template view (offline) ── */
+
+  if (screen === 'template' && activeTemplate) {
+    return (
+      <div className="fixed inset-0 z-[60] bg-slate-900 flex flex-col">
+        <div className="px-4 pt-[env(safe-area-inset-top)] border-b border-slate-800 shrink-0">
+          <div className="flex items-center gap-3 pt-3 pb-2">
+            <button onClick={() => { setActiveTemplate(null); setScreen('select'); }} className="p-1 -ml-1 text-white active:opacity-60">
+              <ArrowLeft size={22} />
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-semibold truncate">{activeTemplate.title_en}</p>
+              <p className="text-slate-400 text-xs truncate">{activeTemplate.title_jp}</p>
+            </div>
+            <span className="text-[10px] text-green-400 bg-green-400/10 rounded-full px-2 py-0.5 font-medium shrink-0">Offline</span>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 pt-4" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+          {activeTemplate.fields.map((field, i) => renderFieldCard(field, i, false))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-4 pb-[env(safe-area-inset-bottom)]">
+          <div className="flex gap-3 py-3">
+            <button
+              onClick={() => { setActiveTemplate(null); setScreen('select'); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-sm font-medium active:bg-slate-700"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </button>
+            <button
+              onClick={() => { setActiveTemplate(null); startCamera(); }}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-medium active:bg-indigo-700"
+            >
+              Scan This Form
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -287,7 +452,7 @@ export default function FormFillGuidePage() {
       {/* Sticky header */}
       <div className="px-4 pt-[env(safe-area-inset-top)] border-b border-slate-800 shrink-0">
         <div className="flex items-center gap-3 pt-3 pb-2">
-          <button onClick={() => { setResult(null); setScreen('select'); }} className="p-1 -ml-1 text-white active:opacity-60">
+          <button onClick={() => { setResult(null); setCapturedImage(null); setScreen('select'); }} className="p-1 -ml-1 text-white active:opacity-60">
             <ArrowLeft size={22} />
           </button>
           <div className="flex-1 min-w-0">
@@ -298,39 +463,27 @@ export default function FormFillGuidePage() {
         </div>
       </div>
 
+      {/* Captured image preview */}
+      {capturedImage && (
+        <div className="shrink-0 bg-black" style={{ maxHeight: '35vh' }}>
+          <img src={capturedImage} alt="Captured form" className="w-full h-full object-contain" style={{ maxHeight: '35vh' }} />
+        </div>
+      )}
+
       {/* Field cards */}
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28">
-        {result?.fields.map(field => (
-          <div
-            key={field.number}
-            className="bg-slate-800 rounded-xl p-4 mb-3 border border-slate-700 active:bg-slate-800/80"
-            onClick={() => { setAskingField(field); setQuestion(''); setAnswer(''); }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-                Field {field.number}
-              </span>
-              <span className={`text-xs ${field.required ? 'text-amber-400' : 'text-slate-500'}`}>
-                {field.required ? 'Required' : 'Optional'}
-              </span>
-            </div>
-            <p className="text-slate-400 text-sm">{field.japaneseLabel}</p>
-            <p className="text-white font-medium">{field.englishLabel}</p>
-            <p className="text-slate-300 text-sm mt-1">{field.guidance}{field.example ? ` Example: ${field.example}` : ''}</p>
-            <p className="text-indigo-400/60 text-[10px] mt-2">Tap to ask a question</p>
-          </div>
-        ))}
+        {result?.fields.map((field, i) => renderFieldCard(field, i, true))}
       </div>
 
       {/* Bottom bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-4 pb-[env(safe-area-inset-bottom)]">
         <div className="flex gap-3 py-3">
           <button
-            onClick={() => { setResult(null); startCamera(); }}
+            onClick={() => { setResult(null); setCapturedImage(null); startCamera(); }}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-sm font-medium active:bg-slate-700"
           >
             <RotateCcw size={16} />
-            Retake
+            Scan Another
           </button>
           <button
             onClick={() => { setAskingField(null); setQuestion(''); setAnswer(''); }}
@@ -352,7 +505,7 @@ export default function FormFillGuidePage() {
             </div>
             <h3 className="text-white font-semibold mb-1">Ask about this field</h3>
             <p className="text-slate-400 text-sm mb-4">
-              {askingField.englishLabel} ({askingField.japaneseLabel})
+              {fieldLabel(askingField).en} ({fieldLabel(askingField).jp})
             </p>
 
             <div className="flex flex-wrap gap-2 mb-3">
