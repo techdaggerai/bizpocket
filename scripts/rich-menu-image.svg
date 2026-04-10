@@ -8,36 +8,45 @@
   <!-- Background -->
   <rect width="2500" height="1686" fill="#0F172A"/>
 
-  <!-- Row 1: Translate (left) -->
-  <rect x="8" y="8" width="1234" height="827" rx="20" fill="#4F46E5"/>
-  <text x="625" y="340" text-anchor="middle" fill="white" font-size="120">🌐</text>
-  <text x="625" y="480" text-anchor="middle" fill="white" font-size="56" font-weight="700">Translate Now</text>
-  <text x="625" y="550" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="36">Send any message</text>
+  <!-- Grid lines -->
+  <line x1="833" y1="0" x2="833" y2="1686" stroke="#1E293B" stroke-width="1"/>
+  <line x1="1666" y1="0" x2="1666" y2="1686" stroke="#1E293B" stroke-width="1"/>
+  <line x1="0" y1="843" x2="2500" y2="843" stroke="#1E293B" stroke-width="1"/>
 
-  <!-- Row 1: Camera Translate (right) -->
-  <rect x="1258" y="8" width="1234" height="827" rx="20" fill="#D97706"/>
-  <text x="1875" y="340" text-anchor="middle" fill="white" font-size="120">📷</text>
-  <text x="1875" y="480" text-anchor="middle" fill="white" font-size="56" font-weight="700">Camera Translate</text>
-  <text x="1875" y="550" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="36">Scan any document</text>
+  <!-- Row 1 -->
+  
+  <rect x="8" y="8" width="817" height="827" rx="20" fill="#4F46E5"/>
+  <text x="416.5" y="361.5" text-anchor="middle" fill="white" font-size="100">📷</text>
+  <text x="416.5" y="461.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">Scan &amp; Translate</text>
+  <text x="416.5" y="521.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">Point at any text</text>
+  
+  <rect x="841" y="8" width="817" height="827" rx="20" fill="#D97706"/>
+  <text x="1249.5" y="361.5" text-anchor="middle" fill="white" font-size="100">🎤</text>
+  <text x="1249.5" y="461.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">Voice Translate</text>
+  <text x="1249.5" y="521.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">Speak &amp; hear</text>
+  
+  <rect x="1674" y="8" width="818" height="827" rx="20" fill="#059669"/>
+  <text x="2083" y="361.5" text-anchor="middle" fill="white" font-size="100">💬</text>
+  <text x="2083" y="461.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">Open Chat</text>
+  <text x="2083" y="521.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">Message anyone</text>
 
-  <!-- Row 2: Invoice (left) -->
-  <rect x="8" y="851" width="817" height="827" rx="20" fill="#1E293B"/>
-  <text x="416" y="1185" text-anchor="middle" fill="white" font-size="100">🧾</text>
-  <text x="416" y="1320" text-anchor="middle" fill="white" font-size="44" font-weight="700">Invoice</text>
-  <text x="416" y="1380" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="30">Create &amp; send</text>
+  <!-- Row 2 -->
+  
+  <rect x="8" y="851" width="817" height="827" rx="20" fill="#DC2626"/>
+  <text x="416.5" y="1204.5" text-anchor="middle" fill="white" font-size="100">🆘</text>
+  <text x="416.5" y="1304.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">Emergency Card</text>
+  <text x="416.5" y="1364.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">Offline SOS phrases</text>
+  
+  <rect x="841" y="851" width="817" height="827" rx="20" fill="#0891B2"/>
+  <text x="1249.5" y="1204.5" text-anchor="middle" fill="white" font-size="100">📖</text>
+  <text x="1249.5" y="1304.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">Learn Japanese</text>
+  <text x="1249.5" y="1364.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">Words &amp; flashcards</text>
+  
+  <rect x="1674" y="851" width="818" height="827" rx="20" fill="#7C3AED"/>
+  <text x="2083" y="1204.5" text-anchor="middle" fill="white" font-size="100">⚡</text>
+  <text x="2083" y="1304.5" text-anchor="middle" fill="white" font-size="48" font-weight="700">All Features</text>
+  <text x="2083" y="1364.5" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="32">EvryAI toolkit</text>
 
-  <!-- Row 2: Business Card (middle) -->
-  <rect x="841" y="851" width="818" height="827" rx="20" fill="#1E293B"/>
-  <text x="1250" y="1185" text-anchor="middle" fill="white" font-size="100">💳</text>
-  <text x="1250" y="1320" text-anchor="middle" fill="white" font-size="44" font-weight="700">Biz Card</text>
-  <text x="1250" y="1380" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="30">Scan &amp; save</text>
-
-  <!-- Row 2: Open App (right) -->
-  <rect x="1675" y="851" width="817" height="827" rx="20" fill="#059669"/>
-  <text x="2083" y="1185" text-anchor="middle" fill="white" font-size="100">🚀</text>
-  <text x="2083" y="1320" text-anchor="middle" fill="white" font-size="44" font-weight="700">Open App</text>
-  <text x="2083" y="1380" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="30">evrywher.io</text>
-
-  <!-- Bottom branding -->
-  <text x="1250" y="1670" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="24" font-weight="500">Evrywher — AI Translation for Life in Japan</text>
+  <!-- Branding watermark -->
+  <text x="1250" y="1670" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="22" font-weight="500">Evrywher — AI Translation for Life in Japan</text>
 </svg>
