@@ -1007,6 +1007,18 @@ export default function PocketChatPage() {
 
   const sendVoiceNote = useCallback(async (blob: Blob, mimeType: string) => {
     if (!activeConvoId || !organization?.id) return;
+
+    // Validate MIME type and size before upload
+    const ALLOWED_AUDIO = ['audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/ogg'];
+    if (!ALLOWED_AUDIO.includes(mimeType)) {
+      toast('Unsupported audio format', 'error');
+      return;
+    }
+    if (blob.size > 10 * 1024 * 1024) {
+      toast('Voice note too large (max 10MB)', 'error');
+      return;
+    }
+
     setUploading(true);
 
     const ext = mimeType.includes('webm') ? 'webm' : 'mp4';
@@ -3152,11 +3164,13 @@ export default function PocketChatPage() {
                   </button>
                 ) : (
                   <button
-                    onMouseDown={startRecording}
-                    onTouchStart={(e) => { e.preventDefault(); startRecording(); }}
+                    onMouseDown={() => { if (!recording) startRecording(); }}
+                    onMouseUp={() => { if (recording) { recordingDuration >= 1 ? stopRecording() : cancelRecording(); } }}
+                    onTouchStart={(e) => { e.preventDefault(); if (!recording) startRecording(); }}
+                    onTouchEnd={() => { if (recording) { recordingDuration >= 1 ? stopRecording() : cancelRecording(); } }}
                     disabled={uploading}
                     className="h-[42px] w-[42px] shrink-0 flex items-center justify-center text-slate-400 hover:text-indigo-400 transition-colors disabled:opacity-40"
-                    title="Hold to record"
+                    title="Hold to record, or tap to toggle"
                   >
                     <svg className="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
