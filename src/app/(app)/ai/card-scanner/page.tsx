@@ -32,18 +32,23 @@ const EMPTY_CARD: CardData = {
   detected_language: '', has_card: true,
 };
 
+// Escape vCard special chars to prevent property injection
+function vcardEscape(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n').replace(/\r/g, '');
+}
+
 function generateVCard(c: CardData): string {
-  const fn = c.name_translated || c.name;
+  const fn = vcardEscape(c.name_translated || c.name);
   return [
     'BEGIN:VCARD',
     'VERSION:3.0',
     `FN:${fn}`,
-    c.company_translated || c.company ? `ORG:${c.company_translated || c.company}` : '',
-    c.title_translated || c.title ? `TITLE:${c.title_translated || c.title}` : '',
-    c.phone ? `TEL:${c.phone}` : '',
-    c.email ? `EMAIL:${c.email}` : '',
-    c.address_translated || c.address ? `ADR:;;${c.address_translated || c.address};;;;` : '',
-    c.website ? `URL:${c.website}` : '',
+    c.company_translated || c.company ? `ORG:${vcardEscape(c.company_translated || c.company)}` : '',
+    c.title_translated || c.title ? `TITLE:${vcardEscape(c.title_translated || c.title)}` : '',
+    c.phone ? `TEL:${vcardEscape(c.phone)}` : '',
+    c.email ? `EMAIL:${vcardEscape(c.email)}` : '',
+    c.address_translated || c.address ? `ADR:;;${vcardEscape(c.address_translated || c.address)};;;;` : '',
+    c.website ? `URL:${vcardEscape(c.website)}` : '',
     'NOTE:Scanned by Evrywher',
     'END:VCARD',
   ].filter(Boolean).join('\n');
@@ -65,6 +70,7 @@ export default function CardScannerPage() {
   const [cameraError, setCameraError] = useState('');
   const [saving, setSaving] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
+  const [recentScans, setRecentScans] = useState<{ id: string; name: string; company: string | null; created_at: string }[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,13 +110,26 @@ export default function CardScannerPage() {
 
   useEffect(() => () => stopCamera(), [stopCamera]);
 
+  // Load recent scans
+  useEffect(() => {
+    if (!organization?.id) return;
+    supabase
+      .from('contacts')
+      .select('id, name, company, created_at')
+      .eq('organization_id', organization.id)
+      .like('notes', '%Scanned by Evrywher%')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => { if (data) setRecentScans(data); });
+  }, [organization?.id, step]);
+
   // ─── Scan ───
   const scanCard = useCallback(async (imageData: string) => {
     setStep('scanning');
     setError('');
 
     try {
-      const res = await fetch('/api/ai/scan-card', {
+      const res = await fetch('/api/evryai/scan-card', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: imageData }),
@@ -181,6 +200,7 @@ export default function CardScannerPage() {
       if (!contactName.trim()) throw new Error('Name is required');
 
       const notes = [
+        'Scanned by Evrywher',
         cardData.detected_language ? `Language: ${cardData.detected_language}` : '',
         cardData.name && cardData.name !== contactName ? `Original name: ${cardData.name}` : '',
         cardData.company ? `Company: ${cardData.company}` : '',
@@ -336,6 +356,22 @@ export default function CardScannerPage() {
 
                 <div className="w-[56px]" /> {/* spacer */}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Scans */}
+        {!capturedImage && recentScans.length > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 z-20 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-4 pt-3 pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 100px)' }}>
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Recent Scans</p>
+            <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+              {recentScans.map(scan => (
+                <div key={scan.id} className="flex-shrink-0 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 min-w-[140px]">
+                  <p className="text-white text-xs font-medium truncate">{scan.name}</p>
+                  {scan.company && <p className="text-slate-400 text-[10px] truncate">{scan.company}</p>}
+                  <p className="text-slate-500 text-[9px] mt-1">{new Date(scan.created_at).toLocaleDateString()}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
