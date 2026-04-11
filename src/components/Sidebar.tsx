@@ -21,6 +21,7 @@ const FULL_NAV = [
       { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
       { href: '/invoices', label: 'Invoices', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M8 13h8M8 17h5' },
       { href: '/cash-flow', label: 'Cash Flow', icon: 'M4 14h3.5v6H4zM10 8h3.5v12H10zM16 4h3.5v16H16z' },
+      { href: '/dashboard/strategy', label: 'Strategy', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' },
       { href: '/detect', label: 'AI Detect', icon: 'M3 3h18v18H3zM11 11a4 4 0 100-8M15 15l4 4' },
     ],
   },
@@ -104,7 +105,9 @@ export default function Sidebar() {
             )}
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+                const isActive = item.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname === item.href || pathname?.startsWith(item.href + '/');
                 const isAI = ['/website-builder', '/social-media', '/ops-radar', '/items', '/accountant'].some(p => item.href.includes(p));
                 return (
                   <Link
