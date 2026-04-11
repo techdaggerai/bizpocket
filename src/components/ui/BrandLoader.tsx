@@ -27,14 +27,14 @@ function EvrywherLoader() {
     <div className="min-h-[100dvh] bg-slate-900 flex flex-col items-center justify-center select-none">
       <div className="relative">
         <PocketIcon>
-          {/* Chat bubble: "Hi" */}
-          <div className="brand-loader-bubble-1 absolute -top-3 -left-2">
+          {/* Chat bubble: "Hi" — lower-left, inside pocket area */}
+          <div className="brand-loader-bubble-1 absolute bottom-1 -left-3">
             <div className="bg-white rounded-xl rounded-bl-sm px-2.5 py-1 shadow-lg">
               <span className="text-[13px] font-bold text-[#4F46E5]">Hi</span>
             </div>
           </div>
-          {/* Chat bubble: "やあ" */}
-          <div className="brand-loader-bubble-2 absolute -top-1 -right-4">
+          {/* Chat bubble: "やあ" — lower-right, overlapping */}
+          <div className="brand-loader-bubble-2 absolute bottom-3 -right-4">
             <div className="bg-[#F59E0B] rounded-xl rounded-br-sm px-2.5 py-1 shadow-lg">
               <span className="text-[13px] font-bold text-white">やあ</span>
             </div>
