@@ -2,7 +2,7 @@
 // This SW is intentionally minimal: its only job is to let the browser
 // detect when a new version has been deployed so the client can prompt a refresh.
 
-const CACHE_NAME = 'evrywher-v1';
+const CACHE_NAME = 'evrywher-v2';
 
 // Install: activate immediately (don't wait for old tabs to close)
 self.addEventListener('install', () => {
