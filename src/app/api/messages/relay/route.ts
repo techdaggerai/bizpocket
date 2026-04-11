@@ -3,6 +3,12 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
+/** Strip everything except digits from a phone number */
+function normalizePhone(p: string | null | undefined): string {
+  if (!p) return ''
+  return p.replace(/\D/g, '')
+}
+
 /**
  * Message Relay — delivers a sent message to the peer's conversation.
  *
@@ -78,31 +84,100 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ skipped: true })
     }
 
-    // ─── Step 3: Find the peer user's profile by email or phone ───
+    // ─── Step 3: Find the peer user's profile — multiple fallback strategies ───
     let peerProfile: { user_id: string; organization_id: string } | null = null
 
+    // 3a. Exact email match in profiles
     if (contact.email) {
       const { data } = await admin
         .from('profiles')
         .select('user_id, organization_id')
         .eq('email', contact.email)
         .neq('organization_id', organizationId)
-        .single()
+        .maybeSingle()
       if (data) peerProfile = data
     }
 
+    // 3b. Exact phone match in profiles
     if (!peerProfile && contact.phone) {
       const { data } = await admin
         .from('profiles')
         .select('user_id, organization_id')
         .eq('phone', contact.phone)
         .neq('organization_id', organizationId)
-        .single()
+        .maybeSingle()
       if (data) peerProfile = data
     }
 
+    // 3c. Normalized phone match — try common format variants
+    if (!peerProfile && contact.phone) {
+      const contactDigits = normalizePhone(contact.phone)
+      if (contactDigits.length >= 7) {
+        // Build variants: +digits, digits, fake email format
+        const variants = [
+          `+${contactDigits}`,
+          contactDigits,
+          // Domestic format: 81XXXXXXXXX → 0XXXXXXXXX
+          ...(contactDigits.startsWith('81') ? [`0${contactDigits.slice(2)}`] : []),
+          // International: 0XXXXXXXXX → 81XXXXXXXXX or +81XXXXXXXXX
+          ...(contactDigits.startsWith('0') ? [contactDigits.slice(1), `+81${contactDigits.slice(1)}`, `81${contactDigits.slice(1)}`] : []),
+        ]
+
+        for (const variant of variants) {
+          if (peerProfile) break
+          const { data } = await admin
+            .from('profiles')
+            .select('user_id, organization_id')
+            .eq('phone', variant)
+            .neq('organization_id', organizationId)
+            .maybeSingle()
+          if (data) peerProfile = data
+        }
+      }
+    }
+
+    // 3d. Check if contact phone matches a phone-based fake email in profiles
+    if (!peerProfile && contact.phone) {
+      const contactDigits = normalizePhone(contact.phone)
+      if (contactDigits.length >= 7) {
+        const fakeEmail = `${contactDigits}@evrywher.io`
+        const { data } = await admin
+          .from('profiles')
+          .select('user_id, organization_id')
+          .eq('email', fakeEmail)
+          .neq('organization_id', organizationId)
+          .maybeSingle()
+        if (data) peerProfile = data
+      }
+    }
+
+    // 3e. Last resort: check auth.users user_metadata.phone via admin API
+    if (!peerProfile && contact.phone) {
+      const contactDigits = normalizePhone(contact.phone)
+      if (contactDigits.length >= 7) {
+        const { data: userList } = await admin.auth.admin.listUsers({ perPage: 50 })
+        if (userList?.users) {
+          const found = userList.users.find((u) => {
+            const metaPhone = u.user_metadata?.phone
+            if (!metaPhone) return false
+            return normalizePhone(metaPhone) === contactDigits
+          })
+          if (found) {
+            const { data } = await admin
+              .from('profiles')
+              .select('user_id, organization_id')
+              .eq('user_id', found.id)
+              .neq('organization_id', organizationId)
+              .maybeSingle()
+            if (data) peerProfile = data
+          }
+        }
+      }
+    }
+
     if (!peerProfile) {
-      return NextResponse.json({ skipped: true })
+      console.warn('[message-relay] peer not found — contact:', { email: contact.email, phone: contact.phone })
+      return NextResponse.json({ skipped: true, reason: 'peer_not_found' })
     }
 
     // ─── Step 4: Find (or create) the contact in peer's org for the sender ───
@@ -114,18 +189,40 @@ export async function POST(req: NextRequest) {
         .select('id')
         .eq('organization_id', peerProfile.organization_id)
         .eq('email', callerProfile.email)
-        .single()
+        .maybeSingle()
       if (data) peerContactId = data.id
     }
 
     if (!peerContactId && callerProfile.phone) {
+      // Try exact match first
       const { data } = await admin
         .from('contacts')
         .select('id')
         .eq('organization_id', peerProfile.organization_id)
         .eq('phone', callerProfile.phone)
-        .single()
+        .maybeSingle()
       if (data) peerContactId = data.id
+
+      // Try normalized phone variants
+      if (!peerContactId) {
+        const callerDigits = normalizePhone(callerProfile.phone)
+        const variants = [
+          `+${callerDigits}`,
+          callerDigits,
+          ...(callerDigits.startsWith('81') ? [`0${callerDigits.slice(2)}`] : []),
+          ...(callerDigits.startsWith('0') ? [`+81${callerDigits.slice(1)}`] : []),
+        ].filter(v => v !== callerProfile.phone) // skip the one we already tried
+        for (const variant of variants) {
+          if (peerContactId) break
+          const { data: d } = await admin
+            .from('contacts')
+            .select('id')
+            .eq('organization_id', peerProfile.organization_id)
+            .eq('phone', variant)
+            .maybeSingle()
+          if (d) peerContactId = d.id
+        }
+      }
     }
 
     // If no contact exists in peer's org, create one
