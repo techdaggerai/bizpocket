@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { PocketMark, LogoWordmark } from '@/components/Logo';
-import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
 
 export default function SplashScreen({ children, brand = 'evrywher' }: { children: React.ReactNode; brand?: string }) {
   const [show, setShow] = useState(true);
@@ -29,9 +28,15 @@ export default function SplashScreen({ children, brand = 'evrywher' }: { childre
       >
         {isEvrywher ? (
           <div className="flex flex-col items-center">
-            {/* Breathing logo */}
+            {/* Breathing app icon — same PNG used for PWA / App Store */}
             <div style={{ animation: 'splash-breathe 3s ease-in-out infinite' }}>
-              <AnimatedPocketChatLogo size={88} />
+              <img
+                src="/icons/evrywher-icon-512.png"
+                alt="Evrywher"
+                width={88}
+                height={88}
+                style={{ borderRadius: 22 }}
+              />
             </div>
             {/* Wordmark */}
             <span style={{ fontFamily: "'Outfit', sans-serif", fontWeight: 600, fontSize: 28, marginTop: 16, animation: 'splash-text-breathe 3s ease-in-out infinite 0.5s' }}>
