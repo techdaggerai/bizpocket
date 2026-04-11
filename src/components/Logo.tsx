@@ -37,12 +37,12 @@ export function PocketChatMark({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 88 88" fill="none">
       <rect width="88" height="88" rx="20" fill="#4F46E5"/>
-      <rect x="14" y="12" width="60" height="36" rx="10" fill="white" opacity="0.15"/>
-      <path d="M14 12 Q44 0 74 12" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
-      <path d="M10 50c0-7 6-13 13-13h16c7 0 13 6 13 13v6c0 7-6 13-13 13H29l-9 8v-8c-6-2-10-7-10-13v-6z" fill="white" opacity="0.95"/>
-      <path d="M36 56c0-7 6-13 13-13h16c7 0 13 6 13 13v6c0 7-6 13-13 13H58l-9 8v-8c-6-2-10-7-10-13v-6z" fill="#F59E0B"/>
-      <text x="29" y="64" fontSize="15" fontWeight="800" fill="#4338ca" textAnchor="middle" fontFamily="system-ui, -apple-system, sans-serif">Hi</text>
-      <text x="58" y="68" fontSize="13" fontWeight="700" fill="white" textAnchor="middle" fontFamily="sans-serif">やあ</text>
+      <rect x="14" y="10" width="60" height="32" rx="10" fill="white" opacity="0.15"/>
+      <path d="M14 10 Q44 -2 74 10" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
+      <path d="M2 48c0-11 9-20 20-20h18c11 0 20 9 20 20v4c0 11-9 20-20 20H28l-12 10v-10C7 69 2 61 2 52v-4z" fill="white" opacity="0.95"/>
+      <path d="M34 54c0-11 9-20 20-20h12c11 0 20 9 20 20v4c0 11-9 20-20 20H62l-10 10v-10c-9-3-18-12-18-20v-4z" fill="#F59E0B"/>
+      <text x="28" y="62" fontSize="20" fontWeight="800" fill="#4338ca" textAnchor="middle" fontFamily="system-ui, -apple-system, sans-serif">Hi</text>
+      <text x="62" y="66" fontSize="16" fontWeight="700" fill="white" textAnchor="middle" fontFamily="sans-serif">やあ</text>
     </svg>
   );
 }
