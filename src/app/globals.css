@@ -51,6 +51,18 @@ body {
   font-family: 'DM Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans Arabic', 'Noto Sans Bengali', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
 }
 
+/* Global dark input styling — prevents white/invisible text on any unstyled input */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+textarea,
+select {
+  background-color: var(--bg-2);
+  color: var(--text-2);
+  border-color: var(--bg-3);
+}
+input::placeholder, textarea::placeholder {
+  color: #64748b;
+}
+
 /* Safe area for bottom nav on iPhone */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);

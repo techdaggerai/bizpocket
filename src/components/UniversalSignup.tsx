@@ -238,7 +238,14 @@ export default function UniversalSignup({
       });
 
       if (otpErr) {
-        setError(otpErr.message || 'Could not send magic link.');
+        // Supabase rate limit: show friendly message instead of scary error
+        const msg = otpErr.message || '';
+        if (msg.toLowerCase().includes('security') || msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('seconds')) {
+          setMagicLinkSent(true);
+          setResendCountdown(60);
+        } else {
+          setError(msg || 'Could not send magic link.');
+        }
         setLoading(false);
         return;
       }

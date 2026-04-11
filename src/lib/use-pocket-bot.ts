@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { getBrandModeClient } from '@/lib/brand';
@@ -50,6 +50,19 @@ export function usePocketBot() {
     setBotConfigLoaded(true);
     return data;
   }, [organization?.id]);
+
+  // Reset when org changes so a fresh fetch is triggered
+  useEffect(() => {
+    setBotConfig(null);
+    setBotConfigLoaded(false);
+  }, [organization?.id]);
+
+  // Auto-fetch bot config on mount / org change so it survives page refresh
+  useEffect(() => {
+    if (organization?.id && !botConfigLoaded) {
+      fetchBotConfig();
+    }
+  }, [organization?.id, botConfigLoaded, fetchBotConfig]);
 
   const updateBotLocally = useCallback((name: string, icon: string) => {
     setBotConfig(prev => prev ? { ...prev, bot_name: name, bot_icon: icon } : { bot_name: name, bot_icon: icon, bot_personality: 'professional', is_setup_complete: true });
