@@ -2,44 +2,21 @@
 
 import { getBrandMode } from '@/lib/brand';
 
-// ─── Shared pocket SVG (indigo body, white flap) ───
-function PocketIcon({ children }: { children?: React.ReactNode }) {
-  return (
-    <div className="brand-loader-pocket relative">
-      {/* Pulse ring */}
-      <div className="brand-loader-pulse absolute inset-[-12px] rounded-[24px] border-2 border-[#818CF8]" />
-      <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Body */}
-        <rect x="8" y="18" width="56" height="46" rx="12" fill="#4F46E5" />
-        {/* Flap */}
-        <path d="M8 30C8 23.373 13.373 18 20 18H52C58.627 18 64 23.373 64 30V32C64 34.209 62.209 36 60 36H12C9.791 36 8 34.209 8 32V30Z" fill="#6366F1" />
-        {/* Flap curve highlight */}
-        <path d="M16 28Q36 22 56 28" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-      </svg>
-      {children}
-    </div>
-  );
-}
-
-// ─── Evrywher variant ───
+// ─── Evrywher variant — uses LOCKED master SVG (same as SplashScreen) ───
 function EvrywherLoader() {
   return (
     <div className="min-h-[100dvh] bg-slate-900 flex flex-col items-center justify-center select-none">
-      <div className="relative">
-        <PocketIcon>
-          {/* Chat bubble: "Hi" — lower-left, inside pocket area */}
-          <div className="brand-loader-bubble-1 absolute bottom-1 -left-3">
-            <div className="bg-white rounded-xl rounded-bl-sm px-2.5 py-1 shadow-lg">
-              <span className="text-[13px] font-bold text-[#4F46E5]">Hi</span>
-            </div>
-          </div>
-          {/* Chat bubble: "やあ" — lower-right, overlapping */}
-          <div className="brand-loader-bubble-2 absolute bottom-3 -right-4">
-            <div className="bg-[#F59E0B] rounded-xl rounded-br-sm px-2.5 py-1 shadow-lg">
-              <span className="text-[13px] font-bold text-white">やあ</span>
-            </div>
-          </div>
-        </PocketIcon>
+      {/* LOCKED master logo SVG — must match SplashScreen exactly */}
+      <div style={{ animation: 'splashBreathe 3s ease-in-out infinite' }}>
+        <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 100, height: 100 }}>
+          <rect width="88" height="88" rx="20" fill="#4F46E5"/>
+          <rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15"/>
+          <path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
+          <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/>
+          <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/>
+          <text x="32" y="68" fontSize="10" fontWeight="800" fill="#4338ca" textAnchor="middle" fontFamily="system-ui, -apple-system, sans-serif">Hi</text>
+          <text x="55.5" y="72" fontSize="9.5" fontWeight="700" fill="white" textAnchor="middle" fontFamily="sans-serif">やあ</text>
+        </svg>
       </div>
 
       {/* Wordmark */}
@@ -54,6 +31,13 @@ function EvrywherLoader() {
         <div className="brand-loader-dot w-2 h-2 rounded-full bg-[#F59E0B]" style={{ animationDelay: '150ms' }} />
         <div className="brand-loader-dot w-2 h-2 rounded-full bg-[#4F46E5]" style={{ animationDelay: '300ms' }} />
       </div>
+
+      <style>{`
+        @keyframes splashBreathe {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(79,70,229,0.3)); }
+          50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(79,70,229,0.5)); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -62,14 +46,14 @@ function EvrywherLoader() {
 function BizPocketLoader() {
   return (
     <div className="min-h-[100dvh] bg-slate-900 flex flex-col items-center justify-center select-none">
-      <div className="relative">
-        <PocketIcon>
-          {/* Animated text lines inside pocket */}
-          <div className="absolute top-[42px] left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5">
-            <div className="brand-loader-line-1 h-[3px] rounded-full bg-white/70" />
-            <div className="brand-loader-line-2 h-[3px] rounded-full bg-white/50" />
-          </div>
-        </PocketIcon>
+      <div style={{ animation: 'splashBreathe 3s ease-in-out infinite' }}>
+        <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 100, height: 100 }}>
+          <rect width="88" height="88" rx="20" fill="#4F46E5"/>
+          <rect x="16" y="16" width="56" height="38" rx="10" fill="white" opacity="0.15"/>
+          <path d="M16 16 Q44 4 72 16" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.95"/>
+          <path d="M18 58c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H32l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="white" opacity="0.95"/>
+          <path d="M40 62c0-5 4-9 9-9h12c5 0 9 4 9 9v4c0 5-4 9-9 9H54l-7 6v-6c-4-1.5-7-5-7-9v-4z" fill="#F59E0B"/>
+        </svg>
       </div>
 
       {/* Wordmark */}
@@ -84,6 +68,13 @@ function BizPocketLoader() {
         <div className="brand-loader-dot w-2 h-2 rounded-full bg-[#818CF8]" style={{ animationDelay: '150ms' }} />
         <div className="brand-loader-dot w-2 h-2 rounded-full bg-[#4F46E5]" style={{ animationDelay: '300ms' }} />
       </div>
+
+      <style>{`
+        @keyframes splashBreathe {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(79,70,229,0.3)); }
+          50% { transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(79,70,229,0.5)); }
+        }
+      `}</style>
     </div>
   );
 }
