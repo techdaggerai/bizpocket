@@ -92,9 +92,9 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center">
         <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl max-h-[85vh] overflow-y-auto">
+        <div className="relative bg-slate-800 w-full max-w-md rounded-t-2xl sm:rounded-2xl overflow-y-auto" style={{ maxHeight: 'calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
           {/* Header */}
           <div className="p-4 border-b border-slate-700 flex items-center justify-between">
             <h2 className="text-base font-bold text-white">Share Your Link</h2>
@@ -194,7 +194,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
 
       {/* QR Fullscreen overlay */}
       {qrFullscreen && shareLink && (
-        <div className="fixed inset-0 z-[60] bg-white flex flex-col items-center justify-center" onClick={() => setQrFullscreen(false)}>
+        <div className="fixed inset-0 z-[10000] bg-white flex flex-col items-center justify-center" onClick={() => setQrFullscreen(false)}>
           <QRCodeCanvas value={shareLink} size={280} level="H" />
           <p className="text-sm text-slate-600 mt-4 font-medium">evrywher.io/c/{username}</p>
           <p className="text-xs text-slate-400 mt-1">Scan to chat with {displayName}</p>

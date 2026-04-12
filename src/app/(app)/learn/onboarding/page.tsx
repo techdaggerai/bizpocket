@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -57,6 +57,11 @@ export default function LearningOnboarding() {
   const [interests, setInterests] = useState<string[]>([]);
   const [dailyGoal, setDailyGoal] = useState(10);
   const [saving, setSaving] = useState(false);
+  const advanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (advanceRef.current) clearTimeout(advanceRef.current); };
+  }, []);
 
   function toggleInterest(id: string) {
     setInterests(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -119,7 +124,7 @@ export default function LearningOnboarding() {
               {LANGUAGES.map(l => (
                 <button
                   key={l.code}
-                  onClick={() => setLang(l.code)}
+                  onClick={() => { setLang(l.code); if (advanceRef.current) clearTimeout(advanceRef.current); advanceRef.current = setTimeout(() => { setStep(2); advanceRef.current = null; }, 400); }}
                   className={`w-full flex items-center gap-3 rounded-2xl p-4 text-left transition-all ${
                     lang === l.code
                       ? 'border-2 border-[#4F46E5] bg-[#4F46E5]/5'

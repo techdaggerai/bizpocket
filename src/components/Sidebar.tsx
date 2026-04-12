@@ -58,6 +58,7 @@ const POCKETCHAT_NAV = [
       { href: '/chat', label: 'Evrywher', icon: '__pocketchat__' },
       { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
       { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
+      { href: '/ai', label: 'EvryAI', icon: 'M13 2L3 14h9l-1 10 10-12h-9l1-10z' },
       { href: '/download', label: 'Get the App', icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' },
       { href: '/settings', label: 'Settings', icon: 'M12 8a4 4 0 100-8M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82' },
     ],
@@ -105,7 +106,7 @@ export default function Sidebar() {
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
-                const isAI = ['/website-builder', '/social-media', '/ops-radar', '/items', '/accountant'].some(p => item.href.includes(p));
+                const isAI = ['/website-builder', '/social-media', '/ops-radar', '/items', '/accountant', '/ai'].some(p => item.href === p || (p !== '/ai' && item.href.includes(p)));
                 return (
                   <Link
                     key={item.href}
