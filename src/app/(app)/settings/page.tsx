@@ -1518,7 +1518,7 @@ export default function SettingsPage() {
       </div>
 
       {/* About */}
-      <section className="rounded-card border border-slate-700 bg-slate-800 p-4">
+      <Link href="/settings/about" className="block rounded-card border border-slate-700 bg-slate-800 p-4 active:bg-slate-800/80 transition-colors">
         <h2 className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A3A3A3]">About</h2>
         <div className="space-y-2.5">
           <div className="flex justify-between text-sm">
@@ -1527,19 +1527,14 @@ export default function SettingsPage() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-[var(--text-3)]">Made with</span>
-            <span className="text-[var(--text-1)]">❤️ in Japan</span>
+            <span className="text-[var(--text-1)]">love in Japan</span>
           </div>
           <div className="flex justify-between text-sm">
-            <Link href="/updates" className="text-[var(--text-3)] hover:text-indigo-400">What&apos;s New ✨</Link>
+            <span className="text-[var(--text-3)]">About Evrywher</span>
             <span className="text-xs text-indigo-400">→</span>
           </div>
-          <div className="flex gap-4 pt-1">
-            <Link href="/privacy" className="text-xs text-indigo-400 hover:underline">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs text-indigo-400 hover:underline">Terms of Service</Link>
-            <a href="https://evrywher.io" target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-400 hover:underline">evrywher.io ↗</a>
-          </div>
         </div>
-      </section>
+      </Link>
 
       {/* Delete Account */}
       <button

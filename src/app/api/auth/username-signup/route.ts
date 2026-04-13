@@ -12,11 +12,17 @@ export async function POST(req: NextRequest) {
     if (password.length < 6) {
       return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
     }
+    if (password.length > 128) {
+      return NextResponse.json({ error: 'Password too long (max 128 characters)' }, { status: 400 })
+    }
 
     const RESERVED = ['admin','system','root','support','evrywher','bizpocket','help','staff','moderator','owner','bot','official']
     const sanitized = username.toLowerCase().replace(/[^a-z0-9_-]/g, '')
     if (!sanitized) {
       return NextResponse.json({ error: 'Username must contain letters or numbers' }, { status: 400 })
+    }
+    if (sanitized.length > 30) {
+      return NextResponse.json({ error: 'Username too long (max 30 characters)' }, { status: 400 })
     }
     if (RESERVED.includes(sanitized)) {
       return NextResponse.json({ error: 'This username is not available' }, { status: 400 })

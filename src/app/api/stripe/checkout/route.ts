@@ -31,6 +31,7 @@ const ALLOWED_ORIGINS: Record<string, { brand: 'bizpocket' | 'evrywher'; url: st
 }
 
 export async function POST(request: Request) {
+  try {
   const stripe = getStripe()
   const cookieStore = await cookies()
   const supabase = createServerClient(
@@ -141,4 +142,8 @@ export async function POST(request: Request) {
   })
 
   return NextResponse.json({ url: session.url })
+  } catch (err) {
+    console.error('[stripe/checkout]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

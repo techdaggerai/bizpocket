@@ -3,8 +3,9 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
+  try {
   const { query } = await request.json()
-  if (!query || query.trim().length < 3) {
+  if (!query || typeof query !== 'string' || query.trim().length < 3) {
     return NextResponse.json({ error: 'Query too short (min 3 characters)' }, { status: 400 })
   }
 
@@ -58,4 +59,8 @@ export async function POST(request: Request) {
     })),
     query_type: isEmail ? 'email' : isPhone ? 'phone' : 'unknown',
   })
+  } catch (err) {
+    console.error('[contacts/search]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

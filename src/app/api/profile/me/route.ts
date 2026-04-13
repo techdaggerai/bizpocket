@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server'
 import { getTierByName, getMatchLimit, canShareBizCard, type Tier } from '@/lib/tier-system'
 
 export async function GET() {
+  try {
   const cookieStore = await cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -97,4 +98,8 @@ export async function GET() {
       daysSinceSignup,
     },
   })
+  } catch (err) {
+    console.error('[profile/me]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }

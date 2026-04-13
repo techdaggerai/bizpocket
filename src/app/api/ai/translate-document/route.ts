@@ -86,6 +86,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing image' }, { status: 400 })
   }
 
+  // MIME allowlist + size limit
+  const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  if (mediaType && !ALLOWED_MIME.includes(mediaType)) {
+    return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, or WebP.' }, { status: 400 })
+  }
+  if (imageBase64.length > 7_000_000) {
+    return NextResponse.json({ error: 'Image too large (max 5MB)' }, { status: 400 })
+  }
+
   const lang = targetLanguage || 'en'
   const langName = LANGUAGE_NAMES[lang] || 'English'
 

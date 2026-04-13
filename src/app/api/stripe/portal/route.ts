@@ -8,6 +8,7 @@ function getStripe() {
 }
 
 export async function POST(request: Request) {
+  try {
   const stripe = getStripe()
   const cookieStore = await cookies()
   const supabase = createServerClient(
@@ -78,4 +79,8 @@ export async function POST(request: Request) {
   })
 
   return NextResponse.json({ url: session.url })
+  } catch (err) {
+    console.error('[stripe/portal]', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
 }
