@@ -1,3 +1,5 @@
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -11,6 +13,16 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    // ─── Auth ───
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const { message, senderName, userLanguage, recipientLanguage, isPro } = await req.json();
 
     if (!message || !userLanguage) {

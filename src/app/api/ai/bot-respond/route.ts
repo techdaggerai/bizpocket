@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -12,6 +14,16 @@ function getAnthropic() {
 
 export async function POST(req: NextRequest) {
   try {
+    // ─── Auth ───
+    const cookieStore = await cookies();
+    const authClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
+    );
+    const { data: { user } } = await authClient.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const { conversationId, senderName, senderMessage, senderLanguage, orgId } = await req.json();
     if (!conversationId || !senderMessage || !orgId) {
       return NextResponse.json({ replied: false, reason: 'Missing fields' }, { status: 400 });
