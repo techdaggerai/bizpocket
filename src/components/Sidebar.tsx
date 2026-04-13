@@ -55,10 +55,10 @@ const POCKETCHAT_NAV = [
   {
     label: '',
     items: [
+      { href: '/ai', label: 'EvryAI', icon: '__evryai__' },
       { href: '/chat', label: 'Evrywher', icon: '__pocketchat__' },
       { href: '/contacts', label: 'Contacts', icon: 'M12 8a4 4 0 100-8M4 20c0-4 3.6-7 8-7s8 3 8 7' },
       { href: '/chat/bot-setup', label: 'Bot Setup', icon: 'M3 11h18v10H3zM12 2a3 3 0 100 6M8 16h.01M16 16h.01' },
-      { href: '/ai', label: 'EvryAI', icon: 'M13 2L3 14h9l-1 10 10-12h-9l1-10z' },
       { href: '/download', label: 'Get the App', icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' },
       { href: '/settings', label: 'Settings', icon: 'M12 8a4 4 0 100-8M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82' },
     ],
@@ -107,17 +107,31 @@ export default function Sidebar() {
               {section.items.map((item) => {
                 const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
                 const isAI = ['/website-builder', '/social-media', '/ops-radar', '/items', '/accountant', '/ai'].some(p => item.href === p || (p !== '/ai' && item.href.includes(p)));
+                const isEvryAI = item.icon === '__evryai__';
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-3 px-3 py-[7px] rounded-lg text-[14px] font-medium transition-all ${
-                      isActive
-                        ? isAI ? 'bg-amber-500/[0.08] text-amber-400' : 'bg-indigo-500/[0.08] text-indigo-400'
-                        : 'text-slate-200 hover:bg-[var(--bg-2)] hover:text-white'
+                      isEvryAI
+                        ? isActive ? 'bg-indigo-500/[0.12] text-white' : 'text-slate-200 hover:bg-[var(--bg-2)] hover:text-white'
+                        : isActive
+                          ? isAI ? 'bg-amber-500/[0.08] text-amber-400' : 'bg-indigo-500/[0.08] text-indigo-400'
+                          : 'text-slate-200 hover:bg-[var(--bg-2)] hover:text-white'
                     }`}
                   >
-                    {item.icon === '__pocketchat__' ? (
+                    {isEvryAI ? (
+                      <span className="relative flex items-center justify-center w-7 h-7 shrink-0">
+                        <svg width="28" height="28" viewBox="0 0 36 36" className="overflow-visible">
+                          <circle cx="18" cy="18" r="16" fill="#4F46E5"/>
+                          <path d="M9 18 L13 14 L17 18 L21 14 L25 18" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 24 L13 20 L17 24 L21 20 L25 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="30" cy="6" r="4.5" fill="#F59E0B"/>
+                          <path d="M28.5 6 L30 4 L31.5 6 L30 8 Z" fill="white"/>
+                        </svg>
+                        {isActive && <span className="absolute inset-0 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.5)]" />}
+                      </span>
+                    ) : item.icon === '__pocketchat__' ? (
                       <span className={isActive ? 'evrywher-logo-glow' : ''}><PocketChatMark size={28} /></span>
                     ) : (
                       <svg
@@ -132,7 +146,9 @@ export default function Sidebar() {
                         <path d={item.icon} />
                       </svg>
                     )}
-                    {item.label}
+                    {isEvryAI ? (
+                      <span>Evry<span style={{ color: '#F59E0B' }}>AI</span></span>
+                    ) : item.label}
                   </Link>
                 );
               })}
