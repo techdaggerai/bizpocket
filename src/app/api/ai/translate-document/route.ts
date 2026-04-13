@@ -3,6 +3,18 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
+// Rate limiter: 10 requests per minute per user
+const rateLimitMap = new Map<string, number[]>()
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now()
+  const timestamps = rateLimitMap.get(userId) || []
+  const recent = timestamps.filter(t => now - t < 60_000)
+  if (recent.length >= 10) return false
+  recent.push(now)
+  rateLimitMap.set(userId, recent)
+  return true
+}
+
 const LANGUAGE_NAMES: Record<string, string> = {
   en: 'English', ja: 'Japanese', ur: 'Urdu', ar: 'Arabic',
   bn: 'Bengali', pt: 'Portuguese', tl: 'Filipino', vi: 'Vietnamese',
@@ -30,6 +42,7 @@ Rules:
 - Respond with JSON ONLY. No markdown. No backticks. No preamble.`
 
 export async function POST(request: Request) {
+  try {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'AI not configured' }, { status: 500 })
@@ -56,6 +69,9 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!checkRateLimit(user.id)) {
+    return NextResponse.json({ error: 'Too many requests. Please wait a moment.' }, { status: 429 })
   }
 
   let body: { imageBase64: string; mediaType: string; targetLanguage?: string }
@@ -124,5 +140,9 @@ export async function POST(request: Request) {
       { error: 'Translation failed. Please try again.' },
       { status: 500 }
     )
+  }
+  } catch (outerErr: any) {
+    console.error('[translate-document:outer]', outerErr?.message || outerErr)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

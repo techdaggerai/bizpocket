@@ -158,6 +158,8 @@ export default function GuestChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guestId: session.guestId,
+          guestToken: session.guestToken,
+          chatId: session.chatId,
           userId,
           name: session.guestName,
           phone: phone || undefined,

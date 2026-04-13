@@ -1,10 +1,35 @@
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+// Rate limiter: 10 requests per minute per user
+const rateLimitMap = new Map<string, number[]>()
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now()
+  const timestamps = rateLimitMap.get(userId) || []
+  const recent = timestamps.filter(t => now - t < 60_000)
+  if (recent.length >= 10) return false
+  recent.push(now)
+  rateLimitMap.set(userId, recent)
+  return true
+}
+
 export async function POST(req: NextRequest) {
   try {
+    // ─── Auth ───
+    const cookieStore = await cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { getAll() { return cookieStore.getAll() }, setAll(c) { try { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)) } catch {} } } }
+    )
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!checkRateLimit(user.id)) return NextResponse.json({ error: 'Too many requests. Please wait a moment.' }, { status: 429 })
+
     const formData = await req.formData()
     const action = formData.get('action') as string
 

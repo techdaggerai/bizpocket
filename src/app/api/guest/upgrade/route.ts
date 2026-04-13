@@ -1,9 +1,33 @@
 import { createClient } from '@supabase/supabase-js'
+import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
 
+/** Verify HMAC-signed guest token: token = HMAC(serviceKey, guestId:chatId) */
+function verifyGuestToken(guestId: string, chatId: string, guestToken: string): boolean {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  const expected = createHmac('sha256', key)
+    .update(`${guestId}:${chatId}`)
+    .digest('hex')
+  return guestToken === expected
+}
+
 export async function POST(request: Request) {
+  try {
   const body = await request.json()
-  const { guestId, name } = body
+  const { guestId, name, guestToken, chatId } = body
+
+  // Validate required fields
+  if (!guestId || typeof guestId !== 'string') {
+    return NextResponse.json({ error: 'Missing guestId' }, { status: 400 })
+  }
+  if (!guestToken || !chatId) {
+    return NextResponse.json({ error: 'Missing guestToken or chatId' }, { status: 400 })
+  }
+
+  // Verify HMAC token — proves this caller owns this guest session
+  if (!verifyGuestToken(guestId, chatId, guestToken)) {
+    return NextResponse.json({ error: 'Invalid guest token' }, { status: 403 })
+  }
 
   // Support both phone-based (userId already exists) and legacy email+password
   const isPhoneAuth = !!body.userId && !!body.phone
@@ -12,9 +36,6 @@ export async function POST(request: Request) {
   const phone = body.phone
   const existingUserId = body.userId
 
-  if (!guestId) {
-    return NextResponse.json({ error: 'Missing guestId' }, { status: 400 })
-  }
   if (!isPhoneAuth && (!email || !password)) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
@@ -195,6 +216,10 @@ export async function POST(request: Request) {
     userId: newUserId,
     chatId: guest.chat_id,
   })
+  } catch (err: any) {
+    console.error('[guest/upgrade]', err?.message || err)
+    return NextResponse.json({ error: 'Upgrade failed. Please try again.' }, { status: 500 })
+  }
 }
 
 async function generateUsername(supabase: ReturnType<typeof createClient>, fullName: string): Promise<string> {

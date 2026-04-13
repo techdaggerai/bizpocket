@@ -11,6 +11,18 @@ const DEFAULT_VOICES: Record<string, string> = {
 
 const FALLBACK_VOICE = '21m00Tcm4TlvDq8ikWAM'; // Rachel (English)
 
+// Rate limiter: 20 TTS requests per minute per user
+const rateLimitMap = new Map<string, number[]>();
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(userId) || [];
+  const recent = timestamps.filter(t => now - t < 60_000);
+  if (recent.length >= 20) return false;
+  recent.push(now);
+  rateLimitMap.set(userId, recent);
+  return true;
+}
+
 export async function POST(req: NextRequest) {
   try {
     if (!process.env.ELEVENLABS_API_KEY) return NextResponse.json({ error: 'Voice not configured' }, { status: 500 });
@@ -24,6 +36,7 @@ export async function POST(req: NextRequest) {
     );
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!checkRateLimit(user.id)) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
 
     const { text, language } = await req.json();
     if (!text) return NextResponse.json({ error: 'Missing text' }, { status: 400 });
