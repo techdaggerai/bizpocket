@@ -36,3 +36,14 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# graphify
+graphify-out/
+src/graphify-out/
+.graphify_python
+
+# local claude settings
+.claude/settings.local.json
+
+# android IDE
+android/.idea/
