@@ -97,6 +97,7 @@ export default function LiveConversationPage() {
   const [person2Translation, setPerson2Translation] = useState('');
   const [interimText, setInterimText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [error, setError] = useState('');
 
   // History
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
@@ -109,6 +110,8 @@ export default function LiveConversationPage() {
   const autoDetectRef = useRef(autoDetect);
   const autoSpeakRef = useRef(autoSpeak);
   const speechRateRef = useRef(speechRate);
+  const lastProcessedIndex = useRef(-1);
+  const restartingRef = useRef(false);
   person1LangRef.current = person1Lang;
   person2LangRef.current = person2Lang;
   activeSideRef.current = activeSide;
@@ -142,6 +145,7 @@ export default function LiveConversationPage() {
   // ─── Translation ───
   const translate = useCallback(async (text: string, side: ActiveSide) => {
     setStatus('translating');
+    setError('');
     const fromLang = side === 'person1' ? person1LangRef.current : person2LangRef.current;
     const toLang = side === 'person1' ? person2LangRef.current : person1LangRef.current;
 
@@ -176,7 +180,9 @@ export default function LiveConversationPage() {
       }, ...prev].slice(0, 10));
 
       setStatus('ready');
-    } catch {
+    } catch (err) {
+      console.error('[live-conversation]', err);
+      setError(err instanceof Error ? err.message : 'Translation failed');
       setStatus('ready');
     }
   }, [speakText]);
@@ -184,7 +190,11 @@ export default function LiveConversationPage() {
   // ─── Speech Recognition ───
   const startListening = useCallback(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    setError('');
+    if (!SpeechRecognition) {
+      setError('Speech recognition is not supported in this browser. Try Chrome or Safari.');
+      return;
+    }
 
     if (recognitionRef.current) {
       recognitionRef.current.stop();
@@ -201,10 +211,15 @@ export default function LiveConversationPage() {
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interim = '';
       let final = '';
+
+      // Only process results after lastProcessedIndex to prevent repeats
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
-          final += result[0].transcript;
+          if (i > lastProcessedIndex.current) {
+            final += result[0].transcript;
+            lastProcessedIndex.current = i;
+          }
         } else {
           interim += result[0].transcript;
         }
@@ -212,15 +227,16 @@ export default function LiveConversationPage() {
 
       const textSoFar = interim || final;
 
-      // Auto-detect which side is speaking
+      // Auto-detect which side is speaking based on script
       if (autoDetectRef.current && textSoFar.length > 2) {
         const detected = detectLangFromText(textSoFar, person1LangRef.current, person2LangRef.current);
         if (detected && detected !== activeSideRef.current) {
           activeSideRef.current = detected;
           setActiveSide(detected);
-          // Restart recognition with correct language
-          const newLang = detected === 'person1' ? person1LangRef.current : person2LangRef.current;
-          recognition.lang = SPEECH_CODES[newLang] || newLang;
+          // Must restart recognition with correct language — changing .lang mid-stream has no effect
+          restartingRef.current = true;
+          recognition.stop();
+          return;
         }
       }
 
@@ -240,7 +256,14 @@ export default function LiveConversationPage() {
       }
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      if (event.error === 'not-allowed') {
+        setError('Microphone access denied. Please allow microphone permission.');
+      } else if (event.error === 'no-speech') {
+        setError('No speech detected. Please speak clearly.');
+      } else if (event.error !== 'aborted') {
+        setError(`Speech recognition error: ${event.error}`);
+      }
       setIsListening(false);
       setStatus('ready');
     };
@@ -248,7 +271,15 @@ export default function LiveConversationPage() {
     recognition.onend = () => {
       // Restart if still supposed to be listening
       if (recognitionRef.current) {
+        // Reset index on restart since results array resets
+        lastProcessedIndex.current = -1;
         try {
+          // If restarting due to language switch, use the new language
+          if (restartingRef.current) {
+            restartingRef.current = false;
+            const newLang = activeSideRef.current === 'person1' ? person1LangRef.current : person2LangRef.current;
+            recognition.lang = SPEECH_CODES[newLang] || newLang;
+          }
           recognition.start();
         } catch {
           setIsListening(false);
@@ -257,6 +288,8 @@ export default function LiveConversationPage() {
       }
     };
 
+    lastProcessedIndex.current = -1;
+    restartingRef.current = false;
     recognitionRef.current = recognition;
     recognition.start();
     setIsListening(true);
@@ -590,6 +623,13 @@ export default function LiveConversationPage() {
           </div>
         )}
       </div>
+
+      {/* ─── ERROR ─── */}
+      {error && (
+        <div className="px-4 py-2 bg-red-950/30 border-t border-red-800/30">
+          <p className="text-xs text-red-400 text-center">{error}</p>
+        </div>
+      )}
 
       {/* ─── BOTTOM CONTROLS ─── */}
       <div className="relative z-10 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800 px-4 pt-3 pb-[env(safe-area-inset-bottom)]" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}>

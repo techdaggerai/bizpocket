@@ -47,6 +47,7 @@ export default function VoiceTranslatePage() {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const fromLangRef = useRef(fromLang);
   const toLangRef = useRef(toLang);
+  const finalTextRef = useRef('');
   fromLangRef.current = fromLang;
   toLangRef.current = toLang;
 
@@ -57,54 +58,6 @@ export default function VoiceTranslatePage() {
       if (stored) setHistory(JSON.parse(stored));
     } catch { /* empty */ }
   }, []);
-
-  // ─── Translation ───
-  const translate = useCallback(async (text: string) => {
-    setRecordingState('processing');
-    setError('');
-
-    try {
-      const res = await fetch('/api/ai/voice-translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          fromLang: fromLangRef.current,
-          toLang: toLangRef.current,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Translation failed');
-      }
-
-      const data = await res.json();
-      setTranslatedText(data.translated_text);
-      setRecordingState('idle');
-
-      // Auto-speak the translation
-      speakText(data.translated_text, toLangRef.current);
-
-      // Save to history
-      const item: HistoryItem = {
-        id: Date.now().toString(),
-        originalText: text,
-        translatedText: data.translated_text,
-        fromLang: fromLangRef.current,
-        toLang: toLangRef.current,
-        timestamp: Date.now(),
-      };
-      setHistory(prev => {
-        const updated = [item, ...prev].slice(0, 5);
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
-        return updated;
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Translation failed');
-      setRecordingState('idle');
-    }
-  }, [speakText]);
 
   // ─── TTS (ElevenLabs with browser fallback) ───
   const speakText = useCallback(async (text: string, lang: string) => {
@@ -141,12 +94,65 @@ export default function VoiceTranslatePage() {
     speechSynthesis.speak(utterance);
   }, []);
 
+  // ─── Translation ───
+  const translate = useCallback(async (text: string) => {
+    setRecordingState('processing');
+    setError('');
+
+    try {
+      const res = await fetch('/api/ai/voice-translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          fromLang: fromLangRef.current,
+          toLang: toLangRef.current,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          throw new Error(data.message || 'Daily voice translation limit reached. Upgrade to Pro for unlimited.');
+        }
+        throw new Error(data.error || 'Translation failed');
+      }
+
+      const data = await res.json();
+      setTranslatedText(data.translated_text);
+      setRecordingState('idle');
+
+      // Auto-speak the translation
+      speakText(data.translated_text, toLangRef.current);
+
+      // Save to history
+      const item: HistoryItem = {
+        id: Date.now().toString(),
+        originalText: text,
+        translatedText: data.translated_text,
+        fromLang: fromLangRef.current,
+        toLang: toLangRef.current,
+        timestamp: Date.now(),
+      };
+      setHistory(prev => {
+        const updated = [item, ...prev].slice(0, 5);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+        return updated;
+      });
+    } catch (err) {
+      console.error('[voice-translate]', err);
+      setError(err instanceof Error ? err.message : 'Translation failed');
+      setRecordingState('idle');
+    }
+  }, [speakText]);
+
   // ─── Speech Recognition ───
   const startRecording = useCallback(() => {
     setError('');
     setInterimText('');
     setFinalText('');
     setTranslatedText('');
+    finalTextRef.current = '';
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -171,6 +177,7 @@ export default function VoiceTranslatePage() {
         }
       }
       if (final) {
+        finalTextRef.current = final;
         setFinalText(final);
         setInterimText('');
       } else {
@@ -180,19 +187,14 @@ export default function VoiceTranslatePage() {
 
     recognition.onend = () => {
       setRecordingState(prev => {
-        // If still recording, it ended naturally — get final text and translate
         if (prev === 'recording') {
-          // Use a small delay to ensure finalText state is updated
-          setTimeout(() => {
-            const textEl = document.getElementById('voice-final-text');
-            const text = textEl?.dataset.value || '';
-            if (text.trim()) {
-              translate(text.trim());
-            } else {
-              setError('No speech detected. Please try again.');
-              setRecordingState('idle');
-            }
-          }, 100);
+          const text = finalTextRef.current.trim();
+          if (text) {
+            translate(text);
+          } else {
+            setError('No speech detected. Please try again.');
+            setRecordingState('idle');
+          }
           return 'processing';
         }
         return prev;
@@ -312,9 +314,6 @@ export default function VoiceTranslatePage() {
             )}
           </div>
         </div>
-
-        {/* Hidden element to pass finalText to onend callback */}
-        <div id="voice-final-text" data-value={finalText} className="hidden" />
 
         {/* Swap button */}
         <div className="flex justify-center -my-1.5 relative z-10">
