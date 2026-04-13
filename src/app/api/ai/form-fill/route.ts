@@ -158,7 +158,10 @@ Rules:
       if (fieldJson) {
         try {
           const f = JSON.parse(fieldJson)
-          fieldContext = `Field: "${f.japaneseLabel}" (${f.englishLabel}). Guidance: ${f.guidance}. Example: ${f.example}.`
+          const jpLabel = f.japaneseLabel || f.label_jp || ''
+          const enLabel = f.englishLabel || f.label_en || ''
+          const guide = f.guidance || f.explanation || ''
+          fieldContext = `Field: "${jpLabel}" (${enLabel}). Guidance: ${guide}. Example: ${f.example || ''}.`
         } catch { /* ignore */ }
       }
 

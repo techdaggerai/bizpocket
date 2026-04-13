@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, RotateCcw, MessageCircle } from 'lucide-react';
 import { FORM_TEMPLATES, type FormTemplate, type FormTemplateField } from '@/lib/form-templates';
@@ -57,10 +57,12 @@ export default function FormFillGuidePage() {
   const [askLoading, setAskLoading] = useState(false);
   const [activeTemplate, setActiveTemplate] = useState<FormTemplate | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [highlightedField, setHighlightedField] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fieldCardRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   /* ── Camera ── */
 
@@ -180,6 +182,38 @@ export default function FormFillGuidePage() {
     setScreen('template');
   };
 
+  /* ── Clear highlight after delay ── */
+
+  useEffect(() => {
+    if (highlightedField === null) return;
+    const t = setTimeout(() => setHighlightedField(null), 2000);
+    return () => clearTimeout(t);
+  }, [highlightedField]);
+
+  /* ── Scroll to field card ── */
+
+  const scrollToField = useCallback((idx: number) => {
+    setHighlightedField(idx);
+    fieldCardRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
+  /* ── Compute badge positions (grid layout, reading order) ── */
+
+  function getBadgePositions(count: number): { x: number; y: number }[] {
+    const cols = count <= 4 ? 2 : count <= 9 ? 3 : 4;
+    const rows = Math.ceil(count / cols);
+    const positions: { x: number; y: number }[] = [];
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      positions.push({
+        x: ((col + 0.5) / cols) * 100,
+        y: ((row + 0.5) / rows) * 100,
+      });
+    }
+    return positions;
+  }
+
   /* ── Helper: normalize field for display ── */
 
   function fieldLabel(f: FormField): { jp: string; en: string } {
@@ -201,12 +235,23 @@ export default function FormFillGuidePage() {
     const expl = 'explanation' in field ? field.explanation : (field as FormField).guidance || '';
     const fmt = field.format;
     const note = field.cultural_note;
+    const isHighlighted = highlightedField === idx;
 
     return (
       <div
         key={idx}
-        className={`bg-slate-800 rounded-xl p-4 mb-3 border border-slate-700 ${tappable ? 'active:bg-slate-800/80' : ''}`}
-        onClick={tappable ? () => { setAskingField(field as FormField); setQuestion(''); setAnswer(''); } : undefined}
+        ref={tappable ? (el) => { fieldCardRefs.current[idx] = el; } : undefined}
+        className={`bg-slate-800 rounded-xl p-4 mb-3 border transition-all ${
+          isHighlighted
+            ? 'border-indigo-500 ring-1 ring-indigo-500/50 bg-indigo-500/5'
+            : 'border-slate-700'
+        } ${tappable ? 'active:bg-slate-800/80' : ''}`}
+        onClick={tappable ? () => {
+          setHighlightedField(idx);
+          setAskingField(field as FormField);
+          setQuestion('');
+          setAnswer('');
+        } : undefined}
       >
         {/* Number badge + labels */}
         <div className="flex items-start gap-3">
@@ -463,10 +508,29 @@ export default function FormFillGuidePage() {
         </div>
       </div>
 
-      {/* Captured image preview */}
+      {/* Captured image preview with numbered field markers */}
       {capturedImage && (
-        <div className="shrink-0 bg-black" style={{ maxHeight: '35vh' }}>
-          <img src={capturedImage} alt="Captured form" className="w-full h-full object-contain" style={{ maxHeight: '35vh' }} />
+        <div className="shrink-0 bg-black relative" style={{ maxHeight: '40vh' }}>
+          <img src={capturedImage} alt="Captured form" className="w-full h-full object-contain" style={{ maxHeight: '40vh' }} />
+          {/* Numbered badge overlay */}
+          {result && result.fields.length > 0 && (
+            <div className="absolute inset-0">
+              {getBadgePositions(result.fields.length).map((pos, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => scrollToField(idx)}
+                  className={`absolute w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg transition-all -translate-x-1/2 -translate-y-1/2 ${
+                    highlightedField === idx
+                      ? 'bg-amber-500 scale-125 ring-2 ring-amber-300'
+                      : 'bg-indigo-600 active:scale-110'
+                  }`}
+                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -486,7 +550,12 @@ export default function FormFillGuidePage() {
             Scan Another
           </button>
           <button
-            onClick={() => { setAskingField(null); setQuestion(''); setAnswer(''); }}
+            onClick={() => {
+              // Open general question sheet with a placeholder field
+              setAskingField({ number: 0, example: '', label_jp: result?.formTitle || '', label_en: result?.formTitleTranslated || 'This form', explanation: 'General question about the form' });
+              setQuestion('');
+              setAnswer('');
+            }}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-indigo-600 text-white text-sm font-medium active:bg-indigo-700"
           >
             <MessageCircle size={16} />

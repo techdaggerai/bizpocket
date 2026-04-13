@@ -89,6 +89,7 @@ export default function DocumentScannerPage() {
   // Enhancement state
   const [activePreset, setActivePreset] = useState('clean');
   const [brightness, setBrightness] = useState(1.0);
+  const [showOriginal, setShowOriginal] = useState(false);
 
   // Corner handles for manual crop
   const [showCorners, setShowCorners] = useState(false);
@@ -184,6 +185,109 @@ export default function DocumentScannerPage() {
   const handleCornerEnd = useCallback(() => {
     setDraggingCorner(null);
   }, []);
+
+  /* ---------- Apply Crop ---------- */
+
+  const applyCrop = useCallback(() => {
+    if (!imageData || !enhanceCanvasRef.current) return;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = enhanceCanvasRef.current!;
+      const ctx = canvas.getContext('2d')!;
+
+      const minX = Math.min(...corners.map(c => c.x)) / 100 * img.width;
+      const maxX = Math.max(...corners.map(c => c.x)) / 100 * img.width;
+      const minY = Math.min(...corners.map(c => c.y)) / 100 * img.height;
+      const maxY = Math.max(...corners.map(c => c.y)) / 100 * img.height;
+
+      const cropW = Math.max(1, maxX - minX);
+      const cropH = Math.max(1, maxY - minY);
+
+      canvas.width = cropW;
+      canvas.height = cropH;
+      ctx.drawImage(img, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+      setImageData(canvas.toDataURL('image/jpeg', 0.92));
+      setEnhancedImage(null);
+      setShowCorners(false);
+      setCorners([{ x: 10, y: 10 }, { x: 90, y: 10 }, { x: 90, y: 90 }, { x: 10, y: 90 }]);
+      toast('Crop applied', 'success');
+    };
+    img.src = imageData;
+  }, [imageData, corners, toast]);
+
+  /* ---------- Auto-Detect Edges ---------- */
+
+  const autoDetectEdges = useCallback(() => {
+    if (!imageData || !enhanceCanvasRef.current) return;
+    const img = new Image();
+    img.onload = () => {
+      const canvas = enhanceCanvasRef.current!;
+      const ctx = canvas.getContext('2d')!;
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const px = data.data;
+      const w = canvas.width;
+      const h = canvas.height;
+      const threshold = 40;
+
+      let minX = w, maxX = 0, minY = h, maxY = 0;
+      let edgeCount = 0;
+
+      for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+          const i = (y * w + x) * 4;
+          const gray = px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114;
+
+          // Horizontal edge
+          if (x + 3 < w) {
+            const ni = (y * w + x + 3) * 4;
+            const nGray = px[ni] * 0.299 + px[ni + 1] * 0.587 + px[ni + 2] * 0.114;
+            if (Math.abs(gray - nGray) > threshold) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+              edgeCount++;
+            }
+          }
+          // Vertical edge
+          if (y + 3 < h) {
+            const ni = ((y + 3) * w + x) * 4;
+            const nGray = px[ni] * 0.299 + px[ni + 1] * 0.587 + px[ni + 2] * 0.114;
+            if (Math.abs(gray - nGray) > threshold) {
+              if (x < minX) minX = x;
+              if (x > maxX) maxX = x;
+              if (y < minY) minY = y;
+              if (y > maxY) maxY = y;
+              edgeCount++;
+            }
+          }
+        }
+      }
+
+      if (edgeCount < 20) {
+        // Not enough edges found — use default frame
+        toast('Could not detect edges — adjust manually', 'error');
+        setShowCorners(true);
+        return;
+      }
+
+      const pad = Math.min(w, h) * 0.02;
+      setCorners([
+        { x: Math.max(0, (minX - pad) / w * 100), y: Math.max(0, (minY - pad) / h * 100) },
+        { x: Math.min(100, (maxX + pad) / w * 100), y: Math.max(0, (minY - pad) / h * 100) },
+        { x: Math.min(100, (maxX + pad) / w * 100), y: Math.min(100, (maxY + pad) / h * 100) },
+        { x: Math.max(0, (minX - pad) / w * 100), y: Math.min(100, (maxY + pad) / h * 100) },
+      ]);
+      setShowCorners(true);
+      toast('Edges detected — adjust if needed', 'success');
+    };
+    img.src = imageData;
+  }, [imageData, toast]);
 
   /* ---------- Capture ---------- */
 
@@ -365,7 +469,18 @@ export default function DocumentScannerPage() {
       }
     } catch (err: unknown) {
       console.error('[PDF export]', err);
-      toast('Export failed', 'error');
+      // Fallback: open a printable window
+      try {
+        const scanImg = enhancedImage || imageData;
+        const printHtml = `<!DOCTYPE html><html><head><title>Evrywher Scan</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:20px}img{max-width:100%;border-radius:8px}h2{color:#333}.field{margin:8px 0;padding:8px;border-bottom:1px solid #eee}.label{font-weight:600;color:#555}.trans{color:#111}</style></head><body>` +
+          `<h2>Scanned Document</h2><img src="${scanImg}" />` +
+          (result ? `<h2>Translation</h2><p>${result.translated_text}</p>` : '') +
+          `</body></html>`;
+        const w = window.open('', '_blank');
+        if (w) { w.document.write(printHtml); w.document.close(); w.print(); }
+      } catch {
+        toast('Export failed — try screenshot instead', 'error');
+      }
     } finally {
       setExporting(false);
     }
@@ -488,15 +603,21 @@ export default function DocumentScannerPage() {
                 style={{ transform: `rotate(${rotation}deg)` }}
               />
 
+              {/* Blue dashed guide border when crop is inactive */}
+              {!showCorners && (
+                <div className="absolute inset-[8%] border-2 border-dashed border-indigo-400/50 rounded-lg pointer-events-none" />
+              )}
+
               {/* Semi-transparent overlay when corners shown */}
               {showCorners && (
                 <div className="absolute inset-0 bg-black/30 pointer-events-none">
                   <svg className="absolute inset-0 w-full h-full">
                     <polygon
                       points={corners.map(c => `${c.x}%,${c.y}%`).join(' ')}
-                      fill="none"
+                      fill="rgba(34,197,94,0.08)"
                       stroke="#22C55E"
                       strokeWidth="2"
+                      strokeDasharray="6,4"
                     />
                   </svg>
                 </div>
@@ -530,12 +651,27 @@ export default function DocumentScannerPage() {
                 Crop
               </button>
               <button
+                onClick={autoDetectEdges}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-800 text-sm text-slate-300 active:bg-slate-700"
+              >
+                Auto
+              </button>
+              <button
                 onClick={() => { setImageData(null); setEnhancedImage(null); }}
                 className="flex-1 px-3 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-300 text-center active:bg-slate-800"
               >
                 Retake
               </button>
             </div>
+
+            {showCorners && (
+              <button
+                onClick={applyCrop}
+                className="w-full mt-3 py-3 rounded-xl bg-emerald-600 text-white font-semibold text-base active:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Check size={16} /> Apply Crop
+              </button>
+            )}
 
             <button
               onClick={() => setStep(1)}
@@ -549,14 +685,20 @@ export default function DocumentScannerPage() {
         {/* ═══ STEP 1: ENHANCE ═══ */}
         {step === 1 && imageData && (
           <div className="mt-2">
-            {/* Enhanced image preview */}
-            <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 mb-4">
+            {/* Enhanced image preview with Original/Enhanced toggle */}
+            <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 mb-4 relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={enhancedImage || imageData}
-                alt="Enhanced"
+                src={showOriginal ? imageData! : (enhancedImage || imageData!)}
+                alt={showOriginal ? 'Original' : 'Enhanced'}
                 className="w-full max-h-[50vh] object-contain"
               />
+              <button
+                onClick={() => setShowOriginal(v => !v)}
+                className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm text-xs font-medium text-white active:bg-black/80 transition-colors"
+              >
+                {showOriginal ? 'Original' : 'Enhanced'}
+              </button>
             </div>
 
             {/* Preset buttons */}
