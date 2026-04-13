@@ -235,6 +235,7 @@ EN-US, JA, UR, AR, BN, PT-BR, FIL, VI, TR, ZH-CN, FR, NL, ES, PS, FA, HI, KO, TH
 JPY, USD, EUR, GBP, INR, PKR, SAR, AED, BDT, NGN, BRL, VND, TRY, CNY, PHP, IDR
 
 ## Rules
+0. Before searching or exploring files, ALWAYS read graphify-out/GRAPH_REPORT.md first. Navigate by graph structure instead of blind file searching.
 1. Mobile first — 390px always
 2. Indigo #4F46E5 for CTAs and accents
 3. Multi-tenant — every query needs organization_id
