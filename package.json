@@ -34,6 +34,7 @@
     "elevenlabs": "^1.59.0",
     "html2pdf.js": "^0.14.0",
     "html5-qrcode": "^2.3.8",
+    "libphonenumber-js": "^1.12.42",
     "lucide-react": "^1.7.0",
     "next": "14.2.35",
     "qrcode": "^1.5.4",
@@ -42,7 +43,8 @@
     "react-dom": "^18",
     "server-only": "^0.0.1",
     "sharp": "^0.34.5",
-    "stripe": "^21.0.1"
+    "stripe": "^21.0.1",
+    "twilio": "^5.13.1"
   },
   "devDependencies": {
     "@types/node": "^20",
