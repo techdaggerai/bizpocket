@@ -193,19 +193,46 @@ export default function UniversalSignup({
   }, [onSuccess, isPocketChat]);
 
   const completeSignedInSession = useCallback(async () => {
-    setCheckingSession(true);
-    setError('');
+    const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const code = params.get('code');
+    const tokenHash = params.get('token_hash') || hashParams.get('token_hash');
+    const otpType = (params.get('type') || hashParams.get('type')) as EmailOtpType | null;
+    const accessToken = hashParams.get('access_token');
+    const refreshToken = hashParams.get('refresh_token');
+    const errorDescription =
+      params.get('error_description') ||
+      hashParams.get('error_description') ||
+      params.get('error') ||
+      hashParams.get('error');
+    const pendingMagicLink = window.localStorage.getItem('evrywher_magic_link_pending');
+    const hasAuthParams = Boolean(code || tokenHash || accessToken || refreshToken || errorDescription);
+
+    if (errorDescription) {
+      setError(errorDescription.replace(/\+/g, ' '));
+      return;
+    }
+
+    if (hasAuthParams) {
+      setCheckingSession(true);
+      setError('');
+    }
 
     try {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const tokenHash = params.get('token_hash');
-      const otpType = params.get('type') as EmailOtpType | null;
-
       if (code) {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) {
           setError(exchangeError.message || 'Magic link could not be verified.');
+          setCheckingSession(false);
+          return;
+        }
+      } else if (accessToken && refreshToken) {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        if (sessionError) {
+          setError(sessionError.message || 'Magic link could not be verified.');
           setCheckingSession(false);
           return;
         }
@@ -223,6 +250,17 @@ export default function UniversalSignup({
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        if (pendingMagicLink) {
+          try {
+            const pending = JSON.parse(pendingMagicLink) as { createdAt?: number };
+            const isFresh = typeof pending.createdAt === 'number' && Date.now() - pending.createdAt < 30 * 60 * 1000;
+            if (isFresh) {
+              setError('Magic link reached signup without an auth token. Supabase redirect URLs or email template need to be fixed.');
+            }
+          } catch {
+            setError('Magic link reached signup without an auth token. Supabase redirect URLs or email template need to be fixed.');
+          }
+        }
         setCheckingSession(false);
         return;
       }
@@ -249,6 +287,7 @@ export default function UniversalSignup({
         email: user.email || undefined,
         method: user.phone ? 'phone' : 'email',
       });
+      window.localStorage.removeItem('evrywher_magic_link_pending');
     } catch {
       setError('Could not finish sign in. Please try again.');
       setCheckingSession(false);
@@ -340,6 +379,12 @@ export default function UniversalSignup({
     setError('');
 
     try {
+      window.localStorage.setItem('evrywher_magic_link_pending', JSON.stringify({
+        email: email.trim(),
+        source: isPocketChat ? 'pocketchat' : 'bizpocket',
+        createdAt: Date.now(),
+      }));
+
       const { error: otpErr } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: { emailRedirectTo: `${window.location.origin}/auth/callback?source=${isPocketChat ? 'pocketchat' : 'bizpocket'}` },
