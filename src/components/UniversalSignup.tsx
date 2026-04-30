@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase-client';
 import EvryWherMark from '@/components/EvryWherMark';
 import AnimatedPocketChatLogo from '@/components/AnimatedPocketChatLogo';
+import type { EmailOtpType } from '@supabase/supabase-js';
 
 // ─── Complete international dialing codes (sorted by region, then alphabetical) ───
 const COUNTRY_CODES = [
@@ -123,6 +124,7 @@ export default function UniversalSignup({
   const [mode, setMode] = useState<'signup' | 'signin'>(defaultMode);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [checkingSession, setCheckingSession] = useState(false);
 
   // Phone state
   const [countryCode, setCountryCode] = useState('+81');
@@ -189,6 +191,73 @@ export default function UniversalSignup({
       window.location.href = isPocketChat ? '/chat' : '/dashboard';
     }
   }, [onSuccess, isPocketChat]);
+
+  const completeSignedInSession = useCallback(async () => {
+    setCheckingSession(true);
+    setError('');
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const tokenHash = params.get('token_hash');
+      const otpType = params.get('type') as EmailOtpType | null;
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (exchangeError) {
+          setError(exchangeError.message || 'Magic link could not be verified.');
+          setCheckingSession(false);
+          return;
+        }
+      } else if (tokenHash && otpType) {
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: otpType,
+        });
+        if (verifyError) {
+          setError(verifyError.message || 'Magic link could not be verified.');
+          setCheckingSession(false);
+          return;
+        }
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setCheckingSession(false);
+        return;
+      }
+
+      const completeRes = await fetch('/api/auth/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: user.phone || undefined,
+          source: isPocketChat ? 'pocketchat' : 'bizpocket',
+        }),
+      });
+      const completeData = await completeRes.json();
+
+      if (!completeRes.ok || !completeData.success) {
+        setError(completeData.error || 'Could not finish sign in.');
+        setCheckingSession(false);
+        return;
+      }
+
+      await handleAuthComplete({
+        userId: user.id,
+        phone: user.phone || undefined,
+        email: user.email || undefined,
+        method: user.phone ? 'phone' : 'email',
+      });
+    } catch {
+      setError('Could not finish sign in. Please try again.');
+      setCheckingSession(false);
+    }
+  }, [handleAuthComplete, isPocketChat, supabase]);
+
+  useEffect(() => {
+    completeSignedInSession();
+  }, [completeSignedInSession]);
 
   // ─── Phone submit ───
   async function handlePhoneSubmit() {
@@ -321,6 +390,12 @@ export default function UniversalSignup({
   if (view === 'buttons') {
     return (
       <div className="w-full flex flex-col items-center" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}>
+        {checkingSession && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-950/30 px-4 py-3 text-sm text-indigo-200">
+            <div className="h-4 w-4 rounded-full border-2 border-indigo-300/30 border-t-indigo-300 animate-spin" />
+            Finishing sign in...
+          </div>
+        )}
 
         {/* ─── Logo + headings (full mode only) ─── */}
         {!compact && (
