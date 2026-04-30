@@ -19,6 +19,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (!user) redirect('/login');
 
+  const verifiedAt = user.phone_confirmed_at || user.email_confirmed_at || user.confirmed_at || null;
+  const fallbackEmail = user.email || (user.phone ? `${user.phone.replace(/\D/g, '')}@phone.evrywher.local` : `user-${user.id}@evrywher.local`);
+
   // Single query: fetch profile + organization together (saves a round-trip)
   const { data: profile } = await supabase
     .from('profiles')
@@ -32,7 +35,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     const host = headersList.get('host') || '';
     const isPocketChat = getBrandFromHost(host) === 'evrywher';
 
-    if (isPocketChat) {
+    if (isPocketChat && verifiedAt) {
       // Auto-create org + profile so Evrywher users never hit /onboarding
       const userLang = user.user_metadata?.preferred_language || 'en';
       const { data: newOrg } = await supabase.from('organizations').insert({
@@ -51,8 +54,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           role: 'owner',
           name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Owner',
           phone: user.user_metadata?.phone || null,
-          email: user.email!,
+          phone_e164: user.phone || user.user_metadata?.phone || null,
+          email: fallbackEmail,
           language: userLang,
+          verified_at: verifiedAt,
+          verification_method: user.phone ? 'sms_otp' : 'email_magic_link',
         });
         // Re-fetch the profile we just created
         const { data: freshProfile } = await supabase
@@ -101,6 +107,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Organization was fetched in the joined profile query above
   const organization = (profile as any).organization;
   if (!organization) redirect('/onboarding');
+  if (!(profile as any).verified_at) redirect('/login?verification=required');
 
   // Remove the joined org from profile to keep types clean
   const cleanProfile = { ...profile };

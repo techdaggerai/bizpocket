@@ -46,6 +46,8 @@ export async function GET(request: NextRequest) {
         // Read source from URL params (supports both 'source' and legacy 'mode')
         const source = searchParams.get('source') || (searchParams.get('mode') === 'pocketchat' ? 'pocketchat' : 'bizpocket');
         const isPocketChat = source === 'pocketchat';
+        const verifiedAt = user.phone_confirmed_at || user.email_confirmed_at || user.confirmed_at || new Date().toISOString();
+        const verificationMethod = user.phone ? 'sms_otp' : 'email_magic_link';
 
         const { data: profile } = await supabase
           .from('profiles')
@@ -54,6 +56,15 @@ export async function GET(request: NextRequest) {
           .maybeSingle();
 
         if (profile) {
+          await supabase
+            .from('profiles')
+            .update({
+              verified_at: verifiedAt,
+              verification_method: verificationMethod,
+              email: user.email!,
+              ...(user.phone ? { phone: user.phone, phone_e164: user.phone } : {}),
+            })
+            .eq('id', profile.id);
           // Existing user — route based on source
           return NextResponse.redirect(`${origin}${isPocketChat ? '/chat' : '/dashboard'}`);
         }
@@ -80,6 +91,10 @@ export async function GET(request: NextRequest) {
             name: userName,
             email: user.email!,
             language: userLang,
+            phone: user.phone || null,
+            phone_e164: user.phone || null,
+            verified_at: verifiedAt,
+            verification_method: verificationMethod,
           });
 
           // Handle invite referral — create mutual contacts

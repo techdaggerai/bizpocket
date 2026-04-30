@@ -79,14 +79,34 @@ export async function middleware(request: NextRequest) {
   // Single auth call — this is the only network round-trip for most requests
   const { data: { user } } = await supabase.auth.getUser();
 
+  let profile:
+    | { role: string | null; onboarding_completed: boolean | null; verified_at: string | null }
+    | null = null;
+  let profileLoaded = false;
+
+  async function loadProfile() {
+    if (!user || profileLoaded) return profile;
+    profileLoaded = true;
+    const { data } = await supabase
+      .from('profiles')
+      .select('role, onboarding_completed, verified_at')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    profile = data || null;
+    return profile;
+  }
+
   // Public routes — allow without auth
   if (PUBLIC_ROUTES.includes(pathname)) {
     // Authenticated users on public pages → redirect to app
     if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname === '/pocketchat')) {
-      const url = request.nextUrl.clone();
-      const mode = request.nextUrl.searchParams.get('mode');
-      url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
-      return NextResponse.redirect(url);
+      const publicProfile = await loadProfile();
+      if (publicProfile?.verified_at) {
+        const url = request.nextUrl.clone();
+        const mode = request.nextUrl.searchParams.get('mode');
+        url.pathname = (mode === 'pocketchat' || isPocketChat) ? '/chat' : '/dashboard';
+        return NextResponse.redirect(url);
+      }
     }
     // Evrywher domain: rewrite login/signup to add mode param
     if (isPocketChat && (pathname === '/login' || pathname === '/signup')) {
@@ -116,11 +136,17 @@ export async function middleware(request: NextRequest) {
   // ── Single profile query for BOTH onboarding + role check ──
   // Only needed for page navigations, not for /auth or /onboarding
   if (pathname !== '/onboarding' && !pathname.startsWith('/auth')) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, onboarding_completed')
-      .eq('user_id', user.id)
-      .single();
+    const profile = await loadProfile();
+
+    if (!profile?.verified_at) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('verification', 'required');
+      if (isPocketChat) {
+        url.searchParams.set('mode', 'pocketchat');
+      }
+      return NextResponse.redirect(url);
+    }
 
     // Evrywher onboarding gate
     if (isPocketChat && pathname !== '/welcome' && profile && !profile.onboarding_completed) {

@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
-
-function getSupabase() {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-}
+import { requireConversationInOrg, requireVerifiedProfile } from '@/lib/api-auth';
 
 function getAnthropic() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -14,35 +8,51 @@ function getAnthropic() {
 
 export async function POST(req: NextRequest) {
   try {
-    // ─── Auth ───
-    const cookieStore = await cookies();
-    const authClient = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
-    );
-    const { data: { user } } = await authClient.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireVerifiedProfile();
+    if (!auth.ok) return auth.response;
 
-    const { conversationId, senderName, senderMessage, senderLanguage, orgId } = await req.json();
-    if (!conversationId || !senderMessage || !orgId) {
+    const { conversationId, senderMessage, senderLanguage, orgId: requestedOrgId } = await req.json();
+    const orgId = auth.profile.organization_id;
+
+    if (requestedOrgId && requestedOrgId !== orgId) {
+      return NextResponse.json({ replied: false, reason: 'Forbidden' }, { status: 403 });
+    }
+    if (!conversationId || !senderMessage) {
       return NextResponse.json({ replied: false, reason: 'Missing fields' }, { status: 400 });
     }
 
-    const supabase = getSupabase();
+    const conversationError = await requireConversationInOrg(auth.supabase, conversationId, orgId);
+    if (conversationError) return conversationError;
+
     const anthropic = getAnthropic();
 
-    const { data: botConfig } = await supabase.from('pocket_bot_config').select('*').eq('organization_id', orgId).single();
+    const { data: botConfig } = await auth.supabase
+      .from('pocket_bot_config')
+      .select('*')
+      .eq('organization_id', orgId)
+      .maybeSingle();
+
     if (!botConfig || !botConfig.auto_reply_enabled || !botConfig.is_setup_complete) {
       return NextResponse.json({ replied: false, reason: 'Bot disabled' });
     }
 
-    // Build rules text
-    const rulesText = (botConfig.bot_rules || []).filter((r: { active: boolean }) => r.active).map((r: { trigger: string }, i: number) => `Rule ${i + 1}: ${r.trigger}`).join('\n');
+    const rulesText = (botConfig.bot_rules || [])
+      .filter((r: { active: boolean }) => r.active)
+      .map((r: { trigger: string }, i: number) => `Rule ${i + 1}: ${r.trigger}`)
+      .join('\n');
 
-    // Get recent messages for context
-    const { data: recentMessages } = await supabase.from('messages').select('message, sender_type, sender_name').eq('conversation_id', conversationId).order('created_at', { ascending: false }).limit(5);
-    const chatHistory = (recentMessages || []).reverse().map((m) => `${m.sender_name}: ${m.message}`).join('\n');
+    const { data: recentMessages } = await auth.supabase
+      .from('messages')
+      .select('message, sender_type, sender_name')
+      .eq('conversation_id', conversationId)
+      .eq('organization_id', orgId)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    const chatHistory = (recentMessages || [])
+      .reverse()
+      .map((m) => `${m.sender_name}: ${m.message}`)
+      .join('\n');
 
     const systemPrompt = `You are "${botConfig.bot_name}", an AI assistant for a business on Evrywher.
 
@@ -58,9 +68,9 @@ ${rulesText || 'No custom rules set.'}
 
 INSTRUCTIONS:
 - You are responding on behalf of the business owner who is currently unavailable
-- Be helpful but honest — you are a bot, not the owner
+- Be helpful but honest - you are a bot, not the owner
 - If someone asks something you cannot answer, say the owner will respond when available
-- Keep responses short — 1 to 3 sentences max
+- Keep responses short - 1 to 3 sentences max
 - If a custom rule matches the situation, follow it exactly
 - Never make up information about products, prices, or services unless specified in rules
 - Respond in the SAME LANGUAGE as the incoming message (${senderLanguage || 'en'})
@@ -79,7 +89,6 @@ ${chatHistory}`;
     const botLang = botConfig.language || 'en';
     const translations: Record<string, string> = { [botLang]: botReply };
 
-    // Translate if needed
     if (senderLanguage && senderLanguage !== botLang) {
       try {
         const tRes = await anthropic.messages.create({
@@ -90,13 +99,14 @@ ${chatHistory}`;
         });
         const translated = tRes.content[0].type === 'text' ? tRes.content[0].text.trim() : botReply;
         translations[senderLanguage] = translated;
-      } catch { /* fallback to original */ }
+      } catch {
+        // Fall back to the bot's original language.
+      }
     }
 
-    // Save bot reply
-    await supabase.from('messages').insert({
+    await auth.supabase.from('messages').insert({
       conversation_id: conversationId,
-      sender_id: 'bot_' + orgId,
+      sender_id: `bot_${orgId}`,
       sender_type: 'bot',
       sender_name: botConfig.bot_name,
       message: botReply,
@@ -107,8 +117,11 @@ ${chatHistory}`;
       organization_id: orgId,
     });
 
-    // Update conversation last_message
-    await supabase.from('conversations').update({ last_message: botReply, last_message_at: new Date().toISOString() }).eq('id', conversationId);
+    await auth.supabase
+      .from('conversations')
+      .update({ last_message: botReply, last_message_at: new Date().toISOString() })
+      .eq('id', conversationId)
+      .eq('organization_id', orgId);
 
     return NextResponse.json({ replied: true, botName: botConfig.bot_name, botReply });
   } catch (error) {

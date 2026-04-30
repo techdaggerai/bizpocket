@@ -37,6 +37,10 @@ export interface Profile {
   name: string;
   full_name?: string;
   email: string;
+  phone?: string | null;
+  phone_e164?: string | null;
+  verified_at?: string | null;
+  verification_method?: 'sms_otp' | 'line' | 'email_magic_link' | null;
   language: string;
   avatar_url?: string | null;
   onboarding_completed?: boolean | null;

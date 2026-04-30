@@ -99,7 +99,7 @@ const COUNTRY_CODES = [
   { code: '+64', flag: '\u{1F1F3}\u{1F1FF}', name: 'New Zealand', iso: 'NZ' },
 ];
 
-type View = 'buttons' | 'phone' | 'email' | 'password';
+type View = 'buttons' | 'phone' | 'phoneCode' | 'email' | 'password';
 
 interface UniversalSignupProps {
   /** Compact mode for modals (no logo/tagline/badge) */
@@ -127,6 +127,8 @@ export default function UniversalSignup({
   // Phone state
   const [countryCode, setCountryCode] = useState('+81');
   const [phoneRaw, setPhoneRaw] = useState('');
+  const [phoneForOtp, setPhoneForOtp] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const phoneInputRef = useRef<HTMLInputElement>(null);
@@ -200,27 +202,64 @@ export default function UniversalSignup({
     const fullPhone = `${countryCode}${normalized}`;
 
     try {
-      const authRes = await fetch('/api/auth/phone-signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: fullPhone }),
+      const { error: otpErr } = await supabase.auth.signInWithOtp({
+        phone: fullPhone,
+        options: { shouldCreateUser: true },
       });
-      const authData = await authRes.json();
 
-      if (!authRes.ok || !authData.success) {
-        setError(authData.error || 'Could not sign in. Please try again.');
+      if (otpErr) {
+        setError(otpErr.message || 'Could not send verification code.');
         setLoading(false);
         return;
       }
 
-      await supabase.auth.setSession({
-        access_token: authData.access_token,
-        refresh_token: authData.refresh_token,
+      setPhoneForOtp(fullPhone);
+      setOtpCode('');
+      setView('phoneCode');
+    } catch {
+      setError('Network error - try again');
+    }
+    setLoading(false);
+  }
+
+  async function handlePhoneCodeSubmit() {
+    const code = otpCode.replace(/\D/g, '');
+    if (!phoneForOtp || code.length < 4) return;
+    setLoading(true);
+    setError('');
+
+    try {
+      const { data, error: verifyErr } = await supabase.auth.verifyOtp({
+        phone: phoneForOtp,
+        token: code,
+        type: 'sms',
       });
 
-      await handleAuthComplete({ userId: authData.userId, phone: fullPhone, method: 'phone' });
+      if (verifyErr || !data.user) {
+        setError(verifyErr?.message || 'Invalid verification code.');
+        setLoading(false);
+        return;
+      }
+
+      const completeRes = await fetch('/api/auth/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: phoneForOtp,
+          source: isPocketChat ? 'pocketchat' : 'bizpocket',
+        }),
+      });
+      const completeData = await completeRes.json();
+
+      if (!completeRes.ok || !completeData.success) {
+        setError(completeData.error || 'Could not finish signup.');
+        setLoading(false);
+        return;
+      }
+
+      await handleAuthComplete({ userId: data.user.id, phone: phoneForOtp, method: 'phone' });
     } catch {
-      setError('Network error — try again');
+      setError('Network error - try again');
     }
     setLoading(false);
   }
@@ -234,7 +273,7 @@ export default function UniversalSignup({
     try {
       const { error: otpErr } = await supabase.auth.signInWithOtp({
         email: email.trim(),
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback?source=${isPocketChat ? 'pocketchat' : 'bizpocket'}` },
       });
 
       if (otpErr) {
@@ -261,33 +300,8 @@ export default function UniversalSignup({
   // ─── Username + password ───
   async function handlePasswordSubmit() {
     if (!username.trim() || !password || password.length < 6) return;
-    setLoading(true);
     setError('');
-
-    try {
-      const authRes = await fetch('/api/auth/username-signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
-      });
-      const authData = await authRes.json();
-
-      if (!authRes.ok || !authData.success) {
-        setError(authData.error || 'Could not create account.');
-        setLoading(false);
-        return;
-      }
-
-      await supabase.auth.setSession({
-        access_token: authData.access_token,
-        refresh_token: authData.refresh_token,
-      });
-
-      await handleAuthComplete({ userId: authData.userId, email: `${username.trim()}@evrywher.local`, method: 'password' });
-    } catch {
-      setError('Network error — try again');
-    }
-    setLoading(false);
+    setError('Username-only signup is disabled. Use phone verification or email magic link.');
   }
 
   const selected = COUNTRY_CODES.find(c => c.code === countryCode) || COUNTRY_CODES[0];
@@ -379,7 +393,7 @@ export default function UniversalSignup({
                 {isSignIn ? 'Sign in with phone number' : 'Continue with phone number'}
               </p>
               <p className="text-[12px] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                {isSignIn ? 'Enter your number' : 'Fastest — one tap, no verification'}
+                {isSignIn ? 'SMS code required' : 'Verified by SMS code'}
               </p>
             </div>
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.6)" strokeWidth={2} className="shrink-0">
@@ -417,8 +431,8 @@ export default function UniversalSignup({
 
           {/* Button 3 — Username & Password (amber) */}
           <button
-            onClick={() => { setView('password'); setError(''); }}
-            className="w-full flex items-center gap-3.5 rounded-[14px] border-none cursor-pointer"
+            onClick={() => setError('Username-only signup is disabled. Use phone verification or email magic link.')}
+            className="w-full flex items-center gap-3.5 rounded-[14px] border-none cursor-not-allowed opacity-60"
             style={{
               background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
               padding: '16px 20px',
@@ -431,10 +445,10 @@ export default function UniversalSignup({
             </div>
             <div className="flex-1 text-left min-w-0">
               <p className="text-white text-[16px] font-medium leading-tight">
-                {isSignIn ? 'Sign in with username & password' : 'Create with username & password'}
+                Username signup disabled
               </p>
               <p className="text-[12px] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                {isSignIn ? 'Enter your credentials' : 'No phone or email required'}
+                Use phone verification or email
               </p>
             </div>
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.6)" strokeWidth={2} className="shrink-0">
@@ -487,6 +501,7 @@ export default function UniversalSignup({
         </button>
         <h2 className="text-xl font-semibold text-white">
           {view === 'phone' && 'Phone number'}
+          {view === 'phoneCode' && 'Verification code'}
           {view === 'email' && 'Email'}
           {view === 'password' && 'Create account'}
         </h2>
@@ -572,6 +587,45 @@ export default function UniversalSignup({
             ) : (
               'Continue \u2192'
             )}
+          </button>
+        </div>
+      )}
+
+      {view === 'phoneCode' && (
+        <div className="space-y-3">
+          <p className="text-sm text-slate-400">
+            Enter the SMS code sent to <strong className="text-white">{phoneForOtp}</strong>.
+          </p>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={otpCode}
+            onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+            onKeyDown={e => { if (e.key === 'Enter') handlePhoneCodeSubmit(); }}
+            placeholder="Verification code"
+            autoFocus
+            className="w-full bg-slate-800 text-white text-xl border border-slate-700 rounded-xl px-4 py-4 outline-none focus:border-indigo-500/50 placeholder:text-slate-500 font-medium tracking-wide"
+          />
+
+          <button
+            onClick={handlePhoneCodeSubmit}
+            disabled={loading || otpCode.replace(/\D/g, '').length < 4}
+            className="w-full text-white text-lg font-semibold rounded-[14px] py-4 disabled:opacity-40 flex items-center justify-center gap-2"
+            style={{ background: '#4f46e5' }}
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              'Verify & continue'
+            )}
+          </button>
+
+          <button
+            onClick={handlePhoneSubmit}
+            disabled={loading}
+            className="w-full py-2 text-sm text-indigo-400 disabled:opacity-40"
+          >
+            Resend code
           </button>
         </div>
       )}

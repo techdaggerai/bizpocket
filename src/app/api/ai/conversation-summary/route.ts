@@ -1,36 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import Anthropic from '@anthropic-ai/sdk';
-import { createClient } from '@supabase/supabase-js';
+import { requireConversationInOrg, requireVerifiedProfile } from '@/lib/api-auth';
+
+type SummaryMessage = {
+  sender_name: string;
+  message: string;
+};
 
 export async function POST(req: NextRequest) {
   try {
-    // ─── Auth ───
-    const cookieStore = await cookies();
-    const authClient = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll() { return cookieStore.getAll(); }, setAll() {} } }
-    );
-    const { data: { user } } = await authClient.auth.getUser();
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await requireVerifiedProfile();
+    if (!auth.ok) return auth.response;
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const { conversationId, orgId: requestedOrgId, messages } = await req.json();
+    const orgId = auth.profile.organization_id;
 
-    const { conversationId, orgId, messages } = await req.json();
-
-    if (!conversationId || !orgId || !messages?.length) {
+    if (requestedOrgId && requestedOrgId !== orgId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    if (!conversationId || !Array.isArray(messages) || !messages.length) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const conversationError = await requireConversationInOrg(auth.supabase, conversationId, orgId);
+    if (conversationError) return conversationError;
 
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const convoText = messages
-      .map((m: { sender_name: string; message: string }) => `${m.sender_name}: ${m.message}`)
+      .map((m: SummaryMessage) => `${m.sender_name}: ${m.message}`)
       .join('\n');
 
     const response = await anthropic.messages.create({
@@ -73,8 +70,7 @@ Return ONLY valid JSON.`,
       return NextResponse.json({ error: 'Failed to parse summary' }, { status: 500 });
     }
 
-    // Upsert into conversation_summaries
-    const { error: dbError } = await supabase
+    const { error: dbError } = await auth.supabase
       .from('conversation_summaries')
       .upsert({
         conversation_id: conversationId,
@@ -92,7 +88,6 @@ Return ONLY valid JSON.`,
 
     if (dbError) {
       console.error('[conversation-summary] DB error:', dbError);
-      // Don't fail — the summary was generated even if DB save fails
     }
 
     return NextResponse.json(result);
@@ -102,23 +97,25 @@ Return ONLY valid JSON.`,
   }
 }
 
-// GET: retrieve latest summary for a conversation
 export async function GET(req: NextRequest) {
+  const auth = await requireVerifiedProfile();
+  if (!auth.ok) return auth.response;
+
   const conversationId = req.nextUrl.searchParams.get('conversationId');
   if (!conversationId) {
     return NextResponse.json({ error: 'conversationId required' }, { status: 400 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const orgId = auth.profile.organization_id;
+  const conversationError = await requireConversationInOrg(auth.supabase, conversationId, orgId);
+  if (conversationError) return conversationError;
 
-  const { data, error } = await supabase
+  const { data, error } = await auth.supabase
     .from('conversation_summaries')
     .select('*')
     .eq('conversation_id', conversationId)
-    .single();
+    .eq('org_id', orgId)
+    .maybeSingle();
 
   if (error || !data) {
     return NextResponse.json({ summary: null });
